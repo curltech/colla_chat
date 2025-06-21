@@ -37,12 +37,12 @@ extension LiquidGlassWidget<T extends Widget> on T {
   }
 }
 
-class PlatformStyleContainer extends LiquidGlass {
+class LiquidGlassContainer extends LiquidGlass {
   final double? height;
   final double? width;
   final LiquidGlassSettings settings;
 
-  const PlatformStyleContainer(
+  const LiquidGlassContainer(
       {super.key,
       this.height,
       this.width,

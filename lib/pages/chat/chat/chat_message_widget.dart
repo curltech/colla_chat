@@ -174,8 +174,11 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
             width: 10.0,
           ),
           Expanded(
-              child: CommonAutoSizeText(AppLocalizations.t(
-                  'This is E2E encrypt communication, nobody can peek your chat content'))),
+              child: CommonAutoSizeText(
+                  softWrap: true,
+                  maxLines: 4,
+                  AppLocalizations.t(
+                      'This is E2E encrypt communication, nobody can peek your chat content'))),
           IconButton(
               onPressed: () {
                 securityTip.value = false;

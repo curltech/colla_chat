@@ -49,8 +49,8 @@ extension GlassmorphicKitWidget<T extends Widget> on T {
 }
 
 /// glass的实现，使用比较方便，调用asGlass
-class PlatformStyleContainer extends glass.GlassContainer {
-  const PlatformStyleContainer(
+class GlassmorphicKitContainer extends glass.GlassContainer {
+  const GlassmorphicKitContainer(
       {super.key,
       super.width,
       super.height,
@@ -64,8 +64,8 @@ class PlatformStyleContainer extends glass.GlassContainer {
       required super.child});
 }
 
-class PlatformStyleButton extends glass.GlassButton {
-  const PlatformStyleButton({
+class GlassmorphicKitButton extends glass.GlassButton {
+  const GlassmorphicKitButton({
     super.key,
     required super.child,
     super.onPressed,
@@ -79,8 +79,8 @@ class PlatformStyleButton extends glass.GlassButton {
   });
 }
 
-class PlatformStyleCard extends glass.GlassCard {
-  const PlatformStyleCard({
+class GlassmorphicKitCard extends glass.GlassCard {
+  const GlassmorphicKitCard({
     super.key,
     required super.child,
     super.blur = glass.GlassConstants.defaultBlur,
@@ -96,8 +96,8 @@ class PlatformStyleCard extends glass.GlassCard {
   });
 }
 
-class PlatformStyleDialog extends glass.GlassDialog {
-  const PlatformStyleDialog({
+class GlassmorphicKitDialog extends glass.GlassDialog {
+  const GlassmorphicKitDialog({
     super.key,
     super.title,
     super.content,
@@ -108,8 +108,8 @@ class PlatformStyleDialog extends glass.GlassDialog {
   });
 }
 
-class PlatformStyleBottomSheet extends glass.GlassBottomSheet {
-  const PlatformStyleBottomSheet({
+class GlassmorphicKitBottomSheet extends glass.GlassBottomSheet {
+  const GlassmorphicKitBottomSheet({
     super.key,
     required super.child,
     super.blur = 10,
@@ -120,8 +120,8 @@ class PlatformStyleBottomSheet extends glass.GlassBottomSheet {
   });
 }
 
-class PlatformStyleNavigationBar extends glass.GlassNavigationBar {
-  const PlatformStyleNavigationBar({
+class GlassmorphicKitNavigationBar extends glass.GlassNavigationBar {
+  const GlassmorphicKitNavigationBar({
     super.key,
     required super.destinations,
     required super.selectedIndex,
@@ -137,8 +137,8 @@ class PlatformStyleNavigationBar extends glass.GlassNavigationBar {
   });
 }
 
-class PlatformStyleNavigationDrawer extends glass.GlassNavigationDrawer {
-  const PlatformStyleNavigationDrawer({
+class GlassmorphicKitNavigationDrawer extends glass.GlassNavigationDrawer {
+  const GlassmorphicKitNavigationDrawer({
     super.key,
     super.header,
     super.children = const <Widget>[],
@@ -155,8 +155,8 @@ class PlatformStyleNavigationDrawer extends glass.GlassNavigationDrawer {
   });
 }
 
-class PlatformStyleProgressIndicator extends glass.GlassProgressIndicator {
-  const PlatformStyleProgressIndicator({
+class GlassmorphicKitProgressIndicator extends glass.GlassProgressIndicator {
+  const GlassmorphicKitProgressIndicator({
     super.key,
     super.type = glass.GlassProgressType.linear,
     super.value,
@@ -166,8 +166,8 @@ class PlatformStyleProgressIndicator extends glass.GlassProgressIndicator {
   });
 }
 
-class PlatformStyleSlider extends glass.GlassSlider {
-  const PlatformStyleSlider({
+class GlassmorphicKitSlider extends glass.GlassSlider {
+  const GlassmorphicKitSlider({
     super.key,
     required super.value,
     required super.onChanged,
@@ -196,8 +196,8 @@ class PlatformStyleSlider extends glass.GlassSlider {
   });
 }
 
-class PlatformStyleTextField extends glass.GlassTextField {
-  const PlatformStyleTextField({
+class GlassmorphicKitTextField extends glass.GlassTextField {
+  const GlassmorphicKitTextField({
     super.key,
     super.controller,
     super.hintText,

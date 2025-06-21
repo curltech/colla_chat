@@ -48,6 +48,9 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
   Widget _buildBodyView() {
     TileDataMixin mixin =
         indexWidgetProvider.views[indexWidgetProvider.currentMainIndex];
+    if (appDataProvider.smallBreakpoint.isActive(context)) {
+      return mixin;
+    }
     return Row(children: [
       const VerticalDivider(
         width: 1.0,
@@ -72,41 +75,68 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
     );
   }
 
+  final ValueNotifier<bool> visible = ValueNotifier<bool>(false);
+
   ///SecondaryBody视图
   Widget _buildSecondaryBodyView(BuildContext context) {
     ScrollPhysics? physics = const NeverScrollableScrollPhysics();
-    // if (!indexWidgetProvider.bottomBarVisible) {
-    //   physics = null;
-    // }
     var pageView = Swiper(
-      physics: physics,
-      controller: indexWidgetProvider.controller,
-      onIndexChanged: (int index) {
-        //logger.i('PageChanged:$index');
-        //indexWidgetProvider.pop(context: context);
-      },
-      itemCount: indexWidgetProvider.views.length,
-      itemBuilder: (BuildContext context, int index) {
-        if (appDataProvider.smallBreakpoint.isActive(context)) {
-          return indexWidgetProvider.views[index];
-        }
-        Widget view;
-        if (index >= indexWidgetProvider.mainViews.length) {
-          view = indexWidgetProvider.views[index];
-        } else {
-          view = nilBox;
-        }
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        physics: physics,
+        controller: indexWidgetProvider.controller,
+        onIndexChanged: (int index) {},
+        itemCount: indexWidgetProvider.views.length,
+        itemBuilder: (BuildContext context, int index) {
+          if (appDataProvider.smallBreakpoint.isActive(context)) {
+            return indexWidgetProvider.views[index];
+          }
+          Widget view;
+          if (index >= indexWidgetProvider.mainViews.length) {
+            view = indexWidgetProvider.views[index];
+          } else {
+            view = Container();
+          }
+          view = Row(children: [
             const VerticalDivider(
               width: 1.0,
             ),
-            Expanded(child: view)
-          ],
-        );
-      },
-    );
+            Expanded(
+                child: InkWell(
+                    onTap: () {
+                      visible.value = !visible.value;
+                    },
+                    child: view)),
+          ]);
+          return ValueListenableBuilder(
+              valueListenable: visible,
+              builder: (BuildContext context, bool visible, Widget? child) {
+                if (visible) {
+                  return Stack(children: [
+                    view,
+                    Align(
+                        alignment: Alignment.center,
+                        child: IconButton(
+                            color: Colors.white,
+                            hoverColor: myself.primary,
+                            onPressed: () {
+                              if (appDataProvider.bodyWidth == 0.0) {
+                                appDataProvider.bodyWidth = -1.0;
+                              } else {
+                                appDataProvider.bodyWidth = 0.0;
+                              }
+                              this.visible.value = false;
+                            },
+                            icon: Icon(
+                              size: 48,
+                              appDataProvider.bodyWidth == 0.0
+                                  ? Icons.arrow_circle_right
+                                  : Icons.arrow_circle_left,
+                            ))),
+                  ]);
+                } else {
+                  return view;
+                }
+              });
+        });
 
     return pageView;
   }

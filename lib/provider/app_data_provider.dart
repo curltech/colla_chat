@@ -28,7 +28,9 @@ class AppDataProvider with ChangeNotifier {
   double toolbarHeight = kToolbarHeight;
   double primaryNavigationWidth = 90;
   double mediumPrimaryNavigationWidth = 90;
-  int _bodyRatio = 35;
+
+  /// 主视图宽度，并以此计算主内容视图宽度secondaryBodyWidth
+  double _bodyWidth = 0;
   double dividerWidth = 1;
   double topPadding = 0;
   double bottomPadding = 0;
@@ -46,6 +48,26 @@ class AppDataProvider with ChangeNotifier {
     } else {
       orientation = Orientation.landscape;
     }
+    _initBodyWidth();
+  }
+
+  /// 初始化主视图宽度
+  _initBodyWidth() {
+    double width = portraitSize.width;
+    if (landscape) {
+      if (_totalSize.width >= largeBreakpointLimit) {
+        width = totalSize.width - primaryNavigationWidth;
+        width = width * 0.35;
+      } else if (_totalSize.width >= smallBreakpointLimit) {
+        width = totalSize.width - mediumPrimaryNavigationWidth;
+        width = width * 0.5;
+      } else {
+        width = 0;
+      }
+    } else {
+      width = 0;
+    }
+    _bodyWidth = width;
   }
 
   ///总的屏幕尺寸
@@ -101,82 +123,110 @@ class AppDataProvider with ChangeNotifier {
     return const PlatformBreakpoint(begin: largeBreakpointLimit);
   }
 
-  ///计算实际的主视图宽度，在竖屏的情况下始终为0，
-  double get bodyWidth {
-    double width = portraitSize.width;
-    if (landscape) {
-      if (_totalSize.width >= largeBreakpointLimit) {
-        width = totalSize.width - primaryNavigationWidth;
-        width = width * bodyRatio;
-      } else if (_totalSize.width >= smallBreakpointLimit) {
-        width = totalSize.width - mediumPrimaryNavigationWidth;
-        width = width * bodyRatio;
-      } else {
-        width = 0.0;
-      }
-    } else {
-      width = 0.0;
-    }
-    return width;
-  }
-
-  double get bodyRatio {
-    return _bodyRatio / 100;
-  }
-
-  set bodyRatio(double bodyRatio) {
-    int r = (bodyRatio * 100).toInt();
-    if (_bodyRatio != r) {
-      _bodyRatio = r;
-      notifyListeners();
-    }
-  }
-
-  toggleBodyRatio({bool? zero}) {
-    if (zero != null) {
-      if (zero) {
-        _bodyRatio = 0;
-      } else {
-        if (_totalSize.width >= largeBreakpointLimit) {
-          _bodyRatio = 35;
-        } else if (_totalSize.width >= smallBreakpointLimit) {
-          _bodyRatio = 50;
-        } else {
-          _bodyRatio = 0;
-        }
-      }
-    } else {
-      if (_bodyRatio == 0) {
-        if (_totalSize.width >= largeBreakpointLimit) {
-          _bodyRatio = 35;
-        } else if (_totalSize.width >= smallBreakpointLimit) {
-          _bodyRatio = 50;
-        } else {
-          _bodyRatio = 0;
-        }
-      } else {
-        _bodyRatio = 0;
-      }
-    }
-    notifyListeners();
-  }
-
-  ///计算实际的当前视图宽度
+  /// 计算实际的主视图宽度，在竖屏的情况下始终为0，
   double get secondaryBodyWidth {
     double width = portraitSize.width;
     if (landscape) {
       if (_totalSize.width >= largeBreakpointLimit) {
-        width = totalSize.width - primaryNavigationWidth;
-        width = width * (1 - bodyRatio);
+        width = _totalSize.width - primaryNavigationWidth;
+        width = width - _bodyWidth;
       } else if (_totalSize.width >= smallBreakpointLimit) {
-        width = totalSize.width - mediumPrimaryNavigationWidth;
-        width = width * (1 - bodyRatio);
+        width = _totalSize.width - mediumPrimaryNavigationWidth;
+        width = width - _bodyWidth;
       } else {
         width = portraitSize.width;
       }
     } else {
       width = _totalSize.width;
     }
+
+    return width;
+  }
+
+  double get bodyRatio {
+    double width = portraitSize.width;
+    if (landscape) {
+      if (_totalSize.width >= largeBreakpointLimit) {
+        width = _totalSize.width - primaryNavigationWidth;
+      } else if (_totalSize.width >= smallBreakpointLimit) {
+        width = _totalSize.width - mediumPrimaryNavigationWidth;
+      } else {
+        return 0.0;
+      }
+    } else {
+      return 0.0;
+    }
+
+    return _bodyWidth / width;
+  }
+
+  set secondBodyWidth(double secondBodyWidth) {
+    if (secondBodyWidth < 0) {
+      return;
+    }
+    if (secondBodyWidth < _designSize.width) {
+      return;
+    }
+    double width = portraitSize.width;
+    if (landscape) {
+      if (_totalSize.width >= largeBreakpointLimit) {
+        width = _totalSize.width - primaryNavigationWidth;
+      } else if (_totalSize.width >= smallBreakpointLimit) {
+        width = _totalSize.width - mediumPrimaryNavigationWidth;
+      }
+    }
+    double bodyWidth = width - secondBodyWidth;
+    if (bodyWidth < 0) {
+      bodyWidth = 0.0;
+    }
+    if (_bodyWidth != bodyWidth) {
+      _bodyWidth = bodyWidth;
+      notifyListeners();
+    }
+  }
+
+  set bodyWidth(double bodyWidth) {
+    if (bodyWidth < 0) {
+      _initBodyWidth();
+      notifyListeners();
+
+      return;
+    }
+    if (bodyWidth < smallBreakpointLimit / 2) {
+      bodyWidth = 0;
+    }
+    double width = portraitSize.width;
+    if (landscape) {
+      if (_totalSize.width >= largeBreakpointLimit) {
+        width = _totalSize.width - primaryNavigationWidth;
+      } else if (_totalSize.width >= smallBreakpointLimit) {
+        width = _totalSize.width - mediumPrimaryNavigationWidth;
+      }
+    }
+    if (width < bodyWidth) {
+      return;
+    }
+    if (_bodyWidth != bodyWidth) {
+      _bodyWidth = bodyWidth;
+      notifyListeners();
+    }
+  }
+
+  /// 计算实际的当前视图宽度
+  double get bodyWidth {
+    double width = portraitSize.width;
+    if (landscape) {
+      if (_totalSize.width >= largeBreakpointLimit) {
+        width = _bodyWidth;
+      } else if (_totalSize.width >= smallBreakpointLimit) {
+        width = _bodyWidth;
+      } else {
+        width = 0;
+      }
+    } else {
+      width = 0;
+    }
+
     return width;
   }
 
@@ -228,14 +278,8 @@ class AppDataProvider with ChangeNotifier {
     if (totalSize.width != _totalSize.width ||
         totalSize.height != _totalSize.height) {
       _totalSize = totalSize;
-      if (_bodyRatio > 0) {
-        if (_totalSize.width >= largeBreakpointLimit) {
-          _bodyRatio = 40;
-        } else if (_totalSize.width >= smallBreakpointLimit) {
-          _bodyRatio = 50;
-        }
-      }
     }
+    _initBodyWidth();
   }
 }
 

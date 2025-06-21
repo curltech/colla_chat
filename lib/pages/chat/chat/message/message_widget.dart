@@ -48,6 +48,7 @@ import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
+import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
@@ -243,18 +244,21 @@ class MessageWidget {
               builder: (BuildContext context) {
                 return Dialog(
                     elevation: 0.0,
+                    backgroundColor: Colors.white.withAlpha(0),
                     insetPadding: EdgeInsets.zero,
                     child: DataActionCard(
-                        onPressed: (int index, String label, {String? value}) {
-                          Navigator.pop(context);
-                          _onMessagePopAction(context, index, label,
-                              value: value);
-                        },
-                        crossAxisCount: 4,
-                        actions: messagePopActionData,
-                        height: 200,
-                        width: appDataProvider.secondaryBodyWidth,
-                        iconSize: 30));
+                            onPressed: (int index, String label,
+                                {String? value}) {
+                              Navigator.pop(context);
+                              _onMessagePopAction(context, index, label,
+                                  value: value);
+                            },
+                            crossAxisCount: 4,
+                            actions: messagePopActionData,
+                            height: 200,
+                            width: appDataProvider.secondaryBodyWidth,
+                            iconSize: 30)
+                        .asStyle());
               },
             );
           },

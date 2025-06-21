@@ -170,7 +170,6 @@ class IndexWidgetProvider with ChangeNotifier {
       index = views.length - 1;
       if (index < mainViews.length) {
         index = _currentMainIndex;
-        appDataProvider.toggleBodyRatio(zero: false);
       }
       controller.move(index);
       notifyListeners();

@@ -11,7 +11,6 @@ extension PlatformStyleWidget<T extends Widget> on T {
     Key? key,
     double? height,
     double? width,
-    bool enabled = true,
     double blur = defaultBlur,
     Color tintColor = Colors.white,
     bool frosted = false,
@@ -20,12 +19,13 @@ extension PlatformStyleWidget<T extends Widget> on T {
     TileMode tileMode = TileMode.clamp,
     CustomClipper<RRect>? clipper,
   }) {
+    Widget child;
     switch (myself.platformStyle) {
       case PlatformStyle.material:
-        return this;
+        child = this;
       case PlatformStyle.glass:
-        return asGlassWidget(
-            enabled: enabled,
+        child = asGlassWidget(
+            enabled: true,
             height: height,
             width: width,
             blur: blur,
@@ -36,16 +36,16 @@ extension PlatformStyleWidget<T extends Widget> on T {
             clipBorderRadius: clipBorderRadius,
             clipper: clipper);
       case PlatformStyle.liquidGlass:
-        return asLiquidGlassEffect(
-            height: height, width: width, blurAmount: blur);
+        child =
+            asLiquidGlassEffect(height: height, width: width, blurAmount: blur);
       case PlatformStyle.neumorphic:
-        return asNeumorphic(
+        child = asNeumorphicStyle(
           height: height,
           width: width,
         );
       default:
-        return asGlassWidget(
-            enabled: enabled,
+        child = asGlassWidget(
+            enabled: true,
             height: height,
             width: width,
             blur: blur,
@@ -56,5 +56,7 @@ extension PlatformStyleWidget<T extends Widget> on T {
             clipBorderRadius: clipBorderRadius,
             clipper: clipper);
     }
+
+    return child;
   }
 }

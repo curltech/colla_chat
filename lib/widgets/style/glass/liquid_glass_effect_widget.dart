@@ -54,7 +54,7 @@ extension LiquidGlassEffectWidget<T extends Widget> on T {
   }
 }
 
-class PlatformStyleContainer extends StatelessWidget {
+class LiquidGlassEffectContainer extends StatelessWidget {
   final double? height;
   final double? width;
   final Widget child;
@@ -68,7 +68,7 @@ class PlatformStyleContainer extends StatelessWidget {
   final BoxFit backgroundFit;
   final Alignment backgroundAlignment;
 
-  const PlatformStyleContainer({
+  const LiquidGlassEffectContainer({
     super.key,
     required this.child,
     this.blurAmount = 15,
@@ -102,7 +102,7 @@ class PlatformStyleContainer extends StatelessWidget {
   }
 }
 
-class PlatformStyleCard extends StatelessWidget {
+class LiquidGlassEffectCard extends StatelessWidget {
   final Widget child;
   final double borderRadius;
   final Color? baseColor;
@@ -117,7 +117,7 @@ class PlatformStyleCard extends StatelessWidget {
   final double scaleFactor;
   final bool enableHoverEffect;
 
-  const PlatformStyleCard({
+  const LiquidGlassEffectCard({
     super.key,
     required this.child,
     this.borderRadius = 14.0,
@@ -153,8 +153,8 @@ class PlatformStyleCard extends StatelessWidget {
   }
 }
 
-class PlatformStyleButton extends LiquidGlassElevatedButton {
-  const PlatformStyleButton({
+class LiquidGlassEffectButton extends LiquidGlassElevatedButton {
+  const LiquidGlassEffectButton({
     super.key,
     required super.onPressed,
     required super.child,
@@ -164,8 +164,8 @@ class PlatformStyleButton extends LiquidGlassElevatedButton {
   });
 }
 
-class PlatformStyleOutlinedButton extends LiquidGlassOutlinedButton {
-  const PlatformStyleOutlinedButton({
+class LiquidGlassEffectOutlinedButton extends LiquidGlassOutlinedButton {
+  const LiquidGlassEffectOutlinedButton({
     super.key,
     required super.onPressed,
     required super.child,

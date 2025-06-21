@@ -20,7 +20,7 @@ buildThemeData() {
 }
 
 extension NeumorphicWidget<T extends Widget> on T {
-  Widget asNeumorphic({
+  Widget asNeumorphicStyle({
     Key? key,
     double? height,
     double? width,
@@ -50,11 +50,11 @@ extension NeumorphicWidget<T extends Widget> on T {
   }
 }
 
-class PlatformStyleContainer extends Neumorphic {
+class NeumorphicStyleContainer extends Neumorphic {
   final double? height;
   final double? width;
 
-  PlatformStyleContainer({
+  NeumorphicStyleContainer({
     super.key,
     this.height,
     this.width,
@@ -70,7 +70,7 @@ class PlatformStyleContainer extends Neumorphic {
 
   @override
   Widget build(BuildContext context) {
-    return child!.asNeumorphic(
+    return child!.asNeumorphicStyle(
         key: key,
         height: height,
         width: width,
@@ -84,8 +84,8 @@ class PlatformStyleContainer extends Neumorphic {
   }
 }
 
-class PlatformStyleCard extends NeumorphicBackground {
-  const PlatformStyleCard({
+class NeumorphicStyleCard extends NeumorphicBackground {
+  const NeumorphicStyleCard({
     super.child,
     super.padding,
     super.margin,
@@ -94,8 +94,8 @@ class PlatformStyleCard extends NeumorphicBackground {
   });
 }
 
-class PlatformStyleAppBar extends NeumorphicAppBar {
-  PlatformStyleAppBar({
+class NeumorphicStyleAppBar extends NeumorphicAppBar {
+  NeumorphicStyleAppBar({
     super.key,
     super.title,
     super.buttonPadding,
@@ -114,8 +114,8 @@ class PlatformStyleAppBar extends NeumorphicAppBar {
   });
 }
 
-class PlatformStyleText extends NeumorphicText {
-  PlatformStyleText(
+class NeumorphicStyleText extends NeumorphicText {
+  NeumorphicStyleText(
     super.text, {
     super.key,
     super.duration = NeumorphicTheme.defaultDuration,
@@ -126,8 +126,8 @@ class PlatformStyleText extends NeumorphicText {
   });
 }
 
-class PlatformStyleTextField extends NeumorphicTextField {
-  PlatformStyleTextField({
+class NeumorphicStyleTextField extends NeumorphicTextField {
+  NeumorphicStyleTextField({
     super.key,
     super.neumorphicStyle,
     super.margin,
@@ -199,8 +199,8 @@ class PlatformStyleTextField extends NeumorphicTextField {
   });
 }
 
-class PlatformStyleButton extends NeumorphicButton {
-  PlatformStyleButton({
+class NeumorphicStyleButton extends NeumorphicButton {
+  NeumorphicStyleButton({
     super.key,
     super.padding,
     super.margin,
@@ -217,8 +217,8 @@ class PlatformStyleButton extends NeumorphicButton {
   });
 }
 
-class PlatformStyleRadio extends NeumorphicRadio {
-  PlatformStyleRadio({
+class NeumorphicStyleRadio extends NeumorphicRadio {
+  NeumorphicStyleRadio({
     super.child,
     super.style = const NeumorphicRadioStyle(),
     super.value,
@@ -231,8 +231,8 @@ class PlatformStyleRadio extends NeumorphicRadio {
   });
 }
 
-class PlatformStyleCheckbox extends NeumorphicCheckbox {
-  PlatformStyleCheckbox({
+class NeumorphicStyleCheckbox extends NeumorphicCheckbox {
+  NeumorphicStyleCheckbox({
     super.style = const NeumorphicCheckboxStyle(),
     required super.value,
     required super.onChanged,
@@ -245,8 +245,8 @@ class PlatformStyleCheckbox extends NeumorphicCheckbox {
   });
 }
 
-class PlatformStyleIcon extends NeumorphicIcon {
-  PlatformStyleIcon(
+class NeumorphicStyleIcon extends NeumorphicIcon {
+  NeumorphicStyleIcon(
     super.icon, {
     super.key,
     super.duration = NeumorphicTheme.defaultDuration,
@@ -256,8 +256,8 @@ class PlatformStyleIcon extends NeumorphicIcon {
   });
 }
 
-class PlatformStyleSwitch extends NeumorphicSwitch {
-  const PlatformStyleSwitch({
+class NeumorphicStyleSwitch extends NeumorphicSwitch {
+  const NeumorphicStyleSwitch({
     super.key,
     super.style = const NeumorphicSwitchStyle(),
     super.curve = NeumorphicTheme.defaultCurve,
@@ -269,8 +269,8 @@ class PlatformStyleSwitch extends NeumorphicSwitch {
   });
 }
 
-class PlatformStyleToggle extends NeumorphicToggle {
-  const PlatformStyleToggle({
+class NeumorphicStyleToggle extends NeumorphicToggle {
+  const NeumorphicStyleToggle({
     super.key,
     super.style = const NeumorphicToggleStyle(),
     required super.children,
@@ -289,8 +289,8 @@ class PlatformStyleToggle extends NeumorphicToggle {
   });
 }
 
-class PlatformStyleSlider extends NeumorphicSlider {
-  PlatformStyleSlider({
+class NeumorphicStyleSlider extends NeumorphicSlider {
+  NeumorphicStyleSlider({
     super.key,
     super.style = const SliderStyle(),
     super.min = 0,
@@ -305,8 +305,8 @@ class PlatformStyleSlider extends NeumorphicSlider {
   });
 }
 
-class PlatformStyleProgress extends NeumorphicProgress {
-  const PlatformStyleProgress(
+class NeumorphicStyleProgress extends NeumorphicProgress {
+  const NeumorphicStyleProgress(
       {super.key,
       double? percent,
       super.height = 10,
@@ -315,9 +315,9 @@ class PlatformStyleProgress extends NeumorphicProgress {
       super.curve = Curves.easeOutCubic});
 }
 
-class PlatformStyleProgressIndeterminate
+class NeumorphicStyleProgressIndeterminate
     extends NeumorphicProgressIndeterminate {
-  const PlatformStyleProgressIndeterminate({
+  const NeumorphicStyleProgressIndeterminate({
     super.key,
     super.height = 10,
     super.style = const ProgressStyle(),
@@ -327,8 +327,8 @@ class PlatformStyleProgressIndeterminate
   });
 }
 
-class PlatformStyleDropdownButton extends NeumorphicDropdownButton {
-  PlatformStyleDropdownButton({
+class NeumorphicStyleDropdownButton extends NeumorphicDropdownButton {
+  NeumorphicStyleDropdownButton({
     super.neumorphicStyle,
     super.margin,
     super.padding,

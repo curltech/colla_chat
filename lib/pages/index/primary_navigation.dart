@@ -6,7 +6,6 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 
@@ -72,23 +71,14 @@ class PrimaryNavigation {
     }
 
     Widget avatarImage = myself.avatarImage ?? AppImage.mdAppImage;
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      IconButton(
-        color: Colors.white,
-        onPressed: () {
-          indexWidgetProvider.push('personal_info');
-        },
-        tooltip: myself.name,
-        icon: avatarImage,
-      ),
-      IconButton(
-          color: myself.primary,
-          tooltip: AppLocalizations.t('Change body ratio'),
-          onPressed: () {
-            appDataProvider.toggleBodyRatio();
-          },
-          icon: const Icon(Icons.width_wide_outlined)),
-    ]);
+    return IconButton(
+      color: Colors.white,
+      onPressed: () {
+        indexWidgetProvider.push('personal_info');
+      },
+      tooltip: myself.name,
+      icon: avatarImage,
+    );
   }
 
   NavigationRailDestination slideInNavigationRailDestination({
@@ -218,7 +208,7 @@ class PrimaryNavigation {
                       color: Colors.white,
                       fontSize: AppFontSize.smFontSize,
                     ),
-                  )).asStyle();
+                  ));
             }),
         appDataProvider.largeBreakpoint: SlotLayout.from(
             key: const Key('Primary Navigation Large'),
@@ -255,7 +245,7 @@ class PrimaryNavigation {
                       color: Colors.white,
                       fontSize: AppFontSize.smFontSize,
                     ),
-                  )).asStyle();
+                  ));
             }),
       },
     );

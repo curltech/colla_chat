@@ -74,8 +74,8 @@ extension GlassKitWidget<T extends Widget> on T {
 }
 
 /// glass的实现，使用比较方便，调用asGlass
-class PlatformStyleContainer extends glass.GlassContainer {
-  PlatformStyleContainer(
+class GlassKitContainer extends glass.GlassContainer {
+  GlassKitContainer(
       {super.key,
       super.height,
       super.width,

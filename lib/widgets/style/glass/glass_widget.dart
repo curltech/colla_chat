@@ -34,7 +34,7 @@ extension GlassWidget<T extends Widget> on T {
 }
 
 /// glass的实现，使用比较方便，调用asGlass
-class PlatformStyleContainer extends StatelessWidget {
+class GlassContainer extends StatelessWidget {
   final Widget child;
 
   final double? height;
@@ -57,7 +57,7 @@ class PlatformStyleContainer extends StatelessWidget {
 
   final CustomClipper<RRect>? clipper;
 
-  const PlatformStyleContainer(
+  const GlassContainer(
       {super.key,
       this.height,
       this.width,
