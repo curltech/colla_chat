@@ -30,7 +30,7 @@ class AppDataProvider with ChangeNotifier {
   double mediumPrimaryNavigationWidth = 90;
 
   /// 主视图宽度，并以此计算主内容视图宽度secondaryBodyWidth
-  double _bodyWidth = 0;
+  double _bodyWidth = -1;
   double dividerWidth = 1;
   double topPadding = 0;
   double bottomPadding = 0;
@@ -56,10 +56,10 @@ class AppDataProvider with ChangeNotifier {
     double width = portraitSize.width;
     if (landscape) {
       if (_totalSize.width >= largeBreakpointLimit) {
-        width = totalSize.width - primaryNavigationWidth;
+        width = _totalSize.width - primaryNavigationWidth;
         width = width * 0.35;
       } else if (_totalSize.width >= smallBreakpointLimit) {
-        width = totalSize.width - mediumPrimaryNavigationWidth;
+        width = _totalSize.width - mediumPrimaryNavigationWidth;
         width = width * 0.5;
       } else {
         width = 0;
@@ -186,7 +186,7 @@ class AppDataProvider with ChangeNotifier {
   }
 
   set bodyWidth(double bodyWidth) {
-    if (bodyWidth < 0) {
+    if (bodyWidth == -1) {
       _initBodyWidth();
       notifyListeners();
 
@@ -279,7 +279,6 @@ class AppDataProvider with ChangeNotifier {
         totalSize.height != _totalSize.height) {
       _totalSize = totalSize;
     }
-    _initBodyWidth();
   }
 }
 
