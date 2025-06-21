@@ -53,21 +53,30 @@ class AppDataProvider with ChangeNotifier {
 
   /// 初始化主视图宽度
   _initBodyWidth() {
-    double width = portraitSize.width;
+    double bodyWidth = portraitSize.width;
+    double secondaryBodyWidth = portraitSize.width;
     if (landscape) {
       if (_totalSize.width >= largeBreakpointLimit) {
-        width = _totalSize.width - primaryNavigationWidth;
-        width = width * 0.35;
+        bodyWidth = _totalSize.width - primaryNavigationWidth;
+        secondaryBodyWidth = bodyWidth * 0.65;
+        bodyWidth = bodyWidth - secondaryBodyWidth;
       } else if (_totalSize.width >= smallBreakpointLimit) {
-        width = _totalSize.width - mediumPrimaryNavigationWidth;
-        width = width * 0.5;
+        bodyWidth = _totalSize.width - mediumPrimaryNavigationWidth;
+        secondaryBodyWidth = bodyWidth * 0.5;
+        bodyWidth = bodyWidth - secondaryBodyWidth;
       } else {
-        width = 0;
+        secondaryBodyWidth = portraitSize.width;
+        bodyWidth = bodyWidth - secondaryBodyWidth;
+      }
+      if (secondaryBodyWidth < portraitSize.width) {
+        secondaryBodyWidth = portraitSize.width;
+        bodyWidth = bodyWidth - secondaryBodyWidth;
       }
     } else {
-      width = 0;
+      secondaryBodyWidth = _totalSize.width;
+      bodyWidth = 0;
     }
-    _bodyWidth = width;
+    _bodyWidth = bodyWidth;
   }
 
   ///总的屏幕尺寸
