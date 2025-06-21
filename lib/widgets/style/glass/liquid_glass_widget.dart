@@ -8,7 +8,6 @@ extension LiquidGlassWidget<T extends Widget> on T {
       double? width,
       LiquidShape? shape,
       bool glassContainsChild = true,
-      double blur = 15,
       Clip clipBehavior = Clip.hardEdge,
       LiquidGlassSettings settings = const LiquidGlassSettings()}) {
     return SizedBox(
@@ -19,7 +18,6 @@ extension LiquidGlassWidget<T extends Widget> on T {
           shape: shape ??
               LiquidRoundedSuperellipse(borderRadius: Radius.circular(0)),
           glassContainsChild: glassContainsChild,
-          blur: blur,
           clipBehavior: clipBehavior,
           settings: settings,
           child: this,
@@ -49,7 +47,6 @@ class LiquidGlassContainer extends LiquidGlass {
       super.shape =
           const LiquidRoundedSuperellipse(borderRadius: Radius.circular(0)),
       super.glassContainsChild = true,
-      super.blur = 15,
       super.clipBehavior = Clip.hardEdge,
       this.settings = const LiquidGlassSettings(),
       required super.child});
@@ -62,7 +59,6 @@ class LiquidGlassContainer extends LiquidGlass {
         width: width,
         shape: shape,
         glassContainsChild: glassContainsChild,
-        blur: blur,
         clipBehavior: clipBehavior,
         settings: settings);
   }

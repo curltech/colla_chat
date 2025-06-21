@@ -174,3 +174,19 @@ class LiquidGlassEffectOutlinedButton extends LiquidGlassOutlinedButton {
     super.clipBehavior = Clip.none,
   });
 }
+
+class LiquidGlassEffectBackground extends LiquidGlassBackground {
+  const LiquidGlassEffectBackground({
+    super.key,
+    required super.child,
+    super.blurAmount,
+    super.noiseOpacity,
+    super.highlightIntensity,
+    super.highlightColor,
+    super.noiseColor,
+    super.backgroundImageProvider,
+    super.backgroundGradient,
+    super.backgroundFit = BoxFit.cover,
+    super.backgroundAlignment = Alignment.center,
+  });
+}
