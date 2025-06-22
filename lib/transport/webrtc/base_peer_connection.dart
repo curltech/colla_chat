@@ -1673,9 +1673,9 @@ class BasePeerConnection {
       return false;
     }
     if (_peerConnection == null ||
-        connectionState ==
-            RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
-      logger.e('PeerConnection closed');
+        connectionState !=
+            RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+      logger.e('PeerConnection is not connected: ${connectionState?.name}');
 
       return false;
     }

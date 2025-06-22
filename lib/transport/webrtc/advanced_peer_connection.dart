@@ -300,7 +300,8 @@ class AdvancedPeerConnection {
 
   ///发送数据
   Future<bool> send(List<int> data) async {
-    if (basePeerConnection.dataChannel != null &&
+    if (connected &&
+        basePeerConnection.dataChannel != null &&
         dataChannelState == RTCDataChannelState.RTCDataChannelOpen) {
       return await basePeerConnection.send(data);
     } else {
