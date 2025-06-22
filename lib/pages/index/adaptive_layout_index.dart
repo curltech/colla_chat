@@ -50,15 +50,8 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
   Widget _buildBodyView() {
     TileDataMixin mixin =
         indexWidgetProvider.views[indexWidgetProvider.currentMainIndex];
-    if (appDataProvider.smallBreakpoint.isActive(context)) {
-      return mixin;
-    }
-    return Row(children: [
-      const VerticalDivider(
-        width: 1.0,
-      ),
-      Expanded(child: mixin),
-    ]);
+
+    return mixin;
   }
 
   /// 放置Body

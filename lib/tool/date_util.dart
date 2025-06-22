@@ -50,7 +50,7 @@ class DateUtil {
         strDay = AppLocalizations.t('Yesterday');
         break;
       case 2:
-        strDay = AppLocalizations.t('Ereyesterday');
+        strDay = AppLocalizations.t('Ere yesterday');
         break;
       case 3:
         strDay = AppLocalizations.t('3 DA.');
