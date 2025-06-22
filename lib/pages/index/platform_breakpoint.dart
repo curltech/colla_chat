@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
+import 'package:custom_adaptive_scaffold/custom_adaptive_scaffold.dart';
 
 class PlatformBreakpoint extends Breakpoint {
   const PlatformBreakpoint({this.begin, this.end});

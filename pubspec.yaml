@@ -57,7 +57,7 @@ dependencies:
   screenshot_callback: ^3.0.1
   screen_brightness: ^2.1.4
   orientation: ^1.2.0 # 控制屏幕旋转
-  geocoding: ^3.0.0
+  geocoding: ^4.0.0
   network_info_plus: ^6.0.0
   beamer: ^1.4.1+1
   battery_plus: ^6.2.1
@@ -91,7 +91,7 @@ dependencies:
   #界面
   bubble: ^1.2.1
   fluttertoast: ^8.2.1
-  flutter_local_notifications: ^19.2.1
+  flutter_local_notifications: ^19.3.0
   alarm: ^5.1.1
   stacked_notification_cards: ^0.1.0-dev.6
   toastification: ^3.0.2
@@ -163,7 +163,10 @@ dependencies:
   fluentui_system_icons: ^1.1.201 #FluentIcons.access_time_24_regular
   macos_ui: ^2.1.4
   flutter_material_color_picker: ^1.2.0
-  after_layout: ^1.1.0
+  responsive_framework: ^1.5.1
+  # flutter_adaptive_scaffold: ^0.3.3+1
+  adaptive_screen_utils: ^2.4.0
+  custom_adaptive_scaffold: ^2.0.1
   flutter_resizable_container: ^4.2.0
   snapping_sheet: ^3.1.0 #在上下可以滑出的sheet
   device_preview: ^1.2.0
@@ -197,11 +200,10 @@ dependencies:
   introduction_screen: ^3.1.14
   pinput: ^5.0.0
   align_positioned: ^5.0.1
-  super_drag_and_drop: ^0.8.24
+  super_drag_and_drop: ^0.9.1
   #  dashbook: ^0.1.15
 
   #界面效果动画
-  flutter_adaptive_scaffold: ^0.3.1
   simple_animations: ^5.0.2
   flutter_animate: ^4.2.0
   auto_animated: ^3.1.0 #对滚动视图内的元素定义动画
@@ -252,7 +254,7 @@ dependencies:
       url: https://github.com/theyakka/qr.flutter.git
   qr: ^3.0.1
   lpinyin: ^2.0.3 #拼音
-  window_manager: ^0.4.0 #桌面应用的窗口管理
+  window_manager: ^0.4.3 #桌面应用的窗口管理
   #有特殊安装要求，否则编译出错
   any_link_preview: ^3.0.1 #预览link
   drules: ^1.0.0
@@ -357,7 +359,7 @@ dependency_overrides:
   js: ^0.7.1
   web: ^1.0.0
   rxdart: ^0.28.0
-  flutter_platform_widgets: ^8.0.0
+  flutter_platform_widgets: ^9.0.0
   logger: ^2.3.0
   web_socket_channel: ^3.0.3
   #  web_socket_client: ^0.2.1
@@ -384,7 +386,7 @@ dependency_overrides:
   flutter_webrtc: 0.14.1
   #  flutter_webrtc_plus: ^0.11.2+5
   #  medea_flutter_webrtc: ^0.11.0
-  protobuf: ^3.1.0
+  protobuf: ^4.1.0
   analyzer: 7.4.5
   provider: ^6.1.4
   flex_seed_scheme: ^3.5.1

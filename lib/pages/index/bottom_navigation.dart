@@ -6,7 +6,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
+import 'package:custom_adaptive_scaffold/custom_adaptive_scaffold.dart';
 
 ///mobile底边栏，用于指示当前主页面
 class BottomNavigation {
@@ -18,7 +18,7 @@ class BottomNavigation {
     Widget? selectedIcon,
     String? tooltip,
   }) {
-    return NavigationDestination(
+    return CustomNavigationDestination(
       icon: SlideTransition(
         position: Tween<Offset>(
           begin: Offset(begin, 0),
@@ -40,7 +40,7 @@ class BottomNavigation {
     for (String mainView in indexWidgetProvider.mainViews) {
       TileDataMixin? view = indexWidgetProvider.allViews[mainView];
       if (view != null) {
-        destinations.add(NavigationDestination(
+        destinations.add(CustomNavigationDestination(
           label: AppLocalizations.t(view.title),
           icon: Icon(view.iconData),
           selectedIcon: Icon(
@@ -58,14 +58,24 @@ class BottomNavigation {
     required List<NavigationDestination> destinations,
     int? currentIndex,
     double iconSize = 24,
+    EdgeInsetsGeometry margin = EdgeInsets.zero,
+    EdgeInsetsGeometry padding = EdgeInsets.zero,
+    double tooltipVerticalOffset = 42,
     ValueChanged<int>? onDestinationSelected,
   }) {
     return Builder(
       builder: (BuildContext context) {
         final NavigationBarThemeData currentNavBarTheme =
-            NavigationBarTheme.of(context);
-        return NavigationBarTheme(
-          data: currentNavBarTheme.copyWith(
+            CustomNavigationBarTheme.of(context);
+        return CustomNavigationBarTheme(
+          data: CustomNavigationBarThemeData(
+            height: currentNavBarTheme.height,
+            backgroundColor: currentNavBarTheme.backgroundColor,
+            elevation: currentNavBarTheme.elevation,
+            shadowColor: currentNavBarTheme.shadowColor,
+            surfaceTintColor: currentNavBarTheme.surfaceTintColor,
+            indicatorColor: currentNavBarTheme.indicatorColor,
+            indicatorShape: currentNavBarTheme.indicatorShape,
             labelTextStyle:
                 WidgetStateProperty.resolveWith((Set<WidgetState> states) {
               return currentNavBarTheme.labelTextStyle
@@ -80,6 +90,11 @@ class BottomNavigation {
                     IconTheme.of(context).copyWith(size: iconSize);
               },
             ),
+            labelBehavior: currentNavBarTheme.labelBehavior,
+            overlayColor: currentNavBarTheme.overlayColor,
+            margin: margin,
+            padding: padding,
+            tooltipVerticalOffset: tooltipVerticalOffset,
           ),
           child: MediaQuery(
             data: MediaQuery.of(context).removePadding(removeTop: true),

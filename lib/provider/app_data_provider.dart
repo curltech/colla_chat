@@ -48,29 +48,32 @@ class AppDataProvider with ChangeNotifier {
     } else {
       orientation = Orientation.landscape;
     }
-    _initBodyWidth();
   }
 
-  /// 初始化主视图宽度
-  _initBodyWidth() {
-    double bodyWidth = portraitSize.width;
+  /// 根据totalSize重新计算bodyWidth
+  calBodyWidth() {
+    double totalBodyWidth = portraitSize.width;
     double secondaryBodyWidth = portraitSize.width;
+    double bodyWidth;
     if (landscape) {
       if (_totalSize.width >= largeBreakpointLimit) {
-        bodyWidth = _totalSize.width - primaryNavigationWidth;
-        secondaryBodyWidth = bodyWidth * 0.65;
-        bodyWidth = bodyWidth - secondaryBodyWidth;
+        totalBodyWidth = _totalSize.width - primaryNavigationWidth;
+        secondaryBodyWidth = totalBodyWidth * 0.65;
+        bodyWidth = totalBodyWidth - secondaryBodyWidth;
       } else if (_totalSize.width >= smallBreakpointLimit) {
-        bodyWidth = _totalSize.width - mediumPrimaryNavigationWidth;
-        secondaryBodyWidth = bodyWidth * 0.5;
-        bodyWidth = bodyWidth - secondaryBodyWidth;
+        totalBodyWidth = _totalSize.width - mediumPrimaryNavigationWidth;
+        secondaryBodyWidth = totalBodyWidth * 0.5;
+        bodyWidth = totalBodyWidth - secondaryBodyWidth;
       } else {
         secondaryBodyWidth = portraitSize.width;
-        bodyWidth = bodyWidth - secondaryBodyWidth;
+        bodyWidth = totalBodyWidth - secondaryBodyWidth;
       }
       if (secondaryBodyWidth < portraitSize.width) {
         secondaryBodyWidth = portraitSize.width;
-        bodyWidth = bodyWidth - secondaryBodyWidth;
+        bodyWidth = totalBodyWidth - secondaryBodyWidth;
+      }
+      if (bodyWidth < 0) {
+        bodyWidth = 0;
       }
     } else {
       secondaryBodyWidth = _totalSize.width;
@@ -194,9 +197,10 @@ class AppDataProvider with ChangeNotifier {
     }
   }
 
+  /// 设置bodyWidth，当设置的值为-1的时候重新计算bodyWidth
   set bodyWidth(double bodyWidth) {
     if (bodyWidth == -1) {
-      _initBodyWidth();
+      calBodyWidth();
       notifyListeners();
 
       return;
@@ -223,20 +227,7 @@ class AppDataProvider with ChangeNotifier {
 
   /// 计算实际的当前视图宽度
   double get bodyWidth {
-    double width = portraitSize.width;
-    if (landscape) {
-      if (_totalSize.width >= largeBreakpointLimit) {
-        width = _bodyWidth;
-      } else if (_totalSize.width >= smallBreakpointLimit) {
-        width = _bodyWidth;
-      } else {
-        width = 0;
-      }
-    } else {
-      width = 0;
-    }
-
-    return width;
+    return _bodyWidth;
   }
 
   /// 二级视图是否横屏
@@ -287,6 +278,9 @@ class AppDataProvider with ChangeNotifier {
     if (totalSize.width != _totalSize.width ||
         totalSize.height != _totalSize.height) {
       _totalSize = totalSize;
+      if (_bodyWidth != 0) {
+        calBodyWidth();
+      }
     }
   }
 }
