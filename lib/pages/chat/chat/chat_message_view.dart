@@ -545,9 +545,7 @@ class ChatMessageView extends StatelessWidget
               );
             } else {
               return IconButton(
-                onPressed: () {
-                  //_createDataChannel();
-                },
+                onPressed: null,
                 icon: const Icon(
                   Icons.cloud_off,
                   color: Colors.red,
