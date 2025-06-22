@@ -3,11 +3,13 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/adaptive_scaffold/adaptive_scaffold.dart';
+import 'package:colla_chat/widgets/adaptive_scaffold/breakpoints.dart';
+import 'package:colla_chat/widgets/adaptive_scaffold/slot_layout.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-import 'package:custom_adaptive_scaffold/custom_adaptive_scaffold.dart';
 
 ///横屏左边栏，用于指示当前主页面
 class PrimaryNavigation {

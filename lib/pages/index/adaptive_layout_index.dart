@@ -9,9 +9,12 @@ import 'package:colla_chat/pages/index/primary_navigation.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/adaptive_scaffold/adaptive_layout.dart';
+import 'package:colla_chat/widgets/adaptive_scaffold/adaptive_scaffold.dart';
+import 'package:colla_chat/widgets/adaptive_scaffold/breakpoints.dart';
+import 'package:colla_chat/widgets/adaptive_scaffold/slot_layout.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-import 'package:custom_adaptive_scaffold/custom_adaptive_scaffold.dart';
 import 'package:provider/provider.dart';
 
 /// 自动适配的主页面结构
