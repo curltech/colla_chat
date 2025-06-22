@@ -546,7 +546,7 @@ class ChatMessageView extends StatelessWidget
             } else {
               return IconButton(
                 onPressed: () {
-                  _createDataChannel();
+                  //_createDataChannel();
                 },
                 icon: const Icon(
                   Icons.cloud_off,
@@ -569,14 +569,14 @@ class ChatMessageView extends StatelessWidget
               if (_initiator.value != null) {
                 if (_initiator.value!) {
                   return Tooltip(
-                      message: AppLocalizations.t('Leader'),
+                      message: AppLocalizations.t('Offer'),
                       child: const Icon(
                         Icons.light_mode,
                         color: Colors.yellow,
                       ));
                 } else {
                   return Tooltip(
-                      message: AppLocalizations.t('Follower'),
+                      message: AppLocalizations.t('Answer'),
                       child: const Icon(
                         Icons.light_mode,
                         color: Colors.grey,

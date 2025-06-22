@@ -617,6 +617,8 @@
   "Closing": "关闭中",
   "Leader": "主",
   "Follower": "从",
+  "Offer": "发起",
+  "Answer": "应答",
   "Group edit": "群编辑",
   "Group name": "群名",
   "Value": "价值",
