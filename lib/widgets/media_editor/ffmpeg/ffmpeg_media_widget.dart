@@ -6,9 +6,6 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
-import 'package:colla_chat/tool/ffmpeg/ffmpeg_install_widget.dart';
-import 'package:colla_chat/tool/ffmpeg_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
@@ -21,17 +18,20 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
+import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_helper.dart';
+import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_install_widget.dart';
+import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_util.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/media_information.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/return_code.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/session_state.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-PlaylistController mediaFileController = PlaylistController();
-
+/// 选择多个视频文件，使用ffmpeg对video进行处理的界面
 class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   FFMpegMediaWidget({
     super.key,
+    required this.playlistController,
   }) {
     checkFFMpeg();
   }
@@ -45,18 +45,17 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'FFMpegMedia';
 
-  
-
   @override
   bool get withLeading => true;
 
+  final PlaylistController playlistController;
   final FileType fileType = FileType.custom;
-
-  ValueNotifier<bool> ffmpegPresent = ValueNotifier<bool>(false);
-  String? output;
-  ValueNotifier<bool> gridMode = ValueNotifier<bool>(false);
-  ValueNotifier<List<TileData>> tileData = ValueNotifier<List<TileData>>([]);
-  Map<String, FFMpegHelperSession> ffmpegSessions = {};
+  final ValueNotifier<bool> ffmpegPresent = ValueNotifier<bool>(false);
+  final ValueNotifier<String?> output = ValueNotifier<String?>(null);
+  final ValueNotifier<bool> gridMode = ValueNotifier<bool>(false);
+  final ValueNotifier<List<TileData>> tileData =
+      ValueNotifier<List<TileData>>([]);
+  final Map<String, FFMpegHelperSession> ffmpegSessions = {};
 
   Future<bool> checkFFMpeg() async {
     ffmpegPresent.value = await FFMpegHelper.initialize();
@@ -70,7 +69,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
     String? mimeType = FileUtil.mimeType(filename);
     if (mimeType != null) {
       if (mimeType.startsWith('video') || filename.endsWith('rmvb')) {
-        for (var videoExtension in mediaFileController.videoExtensions) {
+        for (var videoExtension in playlistController.videoExtensions) {
           if (videoExtension != mimeType) {
             filePopActionData.add(
               ActionData(
@@ -81,7 +80,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
           }
         }
       } else if (mimeType.startsWith('audio')) {
-        for (var audioExtension in mediaFileController.audioExtensions) {
+        for (var audioExtension in playlistController.audioExtensions) {
           if (audioExtension != mimeType) {
             filePopActionData.add(
               ActionData(
@@ -92,7 +91,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
           }
         }
       } else if (mimeType.startsWith('image')) {
-        for (var imageExtension in mediaFileController.imageExtensions) {
+        for (var imageExtension in playlistController.imageExtensions) {
           if (imageExtension != mimeType) {
             filePopActionData.add(
               ActionData(
@@ -128,7 +127,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   Future<String?> _onFilePopAction(
       BuildContext context, int index, String label,
       {String? value}) async {
-    String? filename = mediaFileController.current?.filename;
+    String? filename = playlistController.current?.filename;
     if (filename == null) {
       return null;
     }
@@ -154,7 +153,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   }
 
   Future<void> _buildTileData(BuildContext context) async {
-    List<PlatformMediaSource> mediaSources = mediaFileController.data.toList();
+    List<PlatformMediaSource> mediaSources = playlistController.data.toList();
     List<TileData> tileData = [];
     for (var mediaSource in mediaSources) {
       String filename = mediaSource.filename;
@@ -165,7 +164,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
       }
       var length = file.lengthSync();
       bool selected = false;
-      String? current = mediaFileController.current?.filename;
+      String? current = playlistController.current?.filename;
       if (current != null) {
         if (current == filename) {
           selected = true;
@@ -210,11 +209,11 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
         selected: selected,
         suffix: suffix,
         onTap: (int index, String title, {String? subtitle}) {
-          mediaFileController.setCurrentIndex = index;
+          playlistController.setCurrentIndex = index;
           _buildTileData(context);
         },
         onLongPress: (int index, String title, {String? subtitle}) {
-          mediaFileController.setCurrentIndex = index;
+          playlistController.setCurrentIndex = index;
           _buildTileData(context);
           _onSelectFile(context, index, title, subtitle: subtitle);
         },
@@ -246,12 +245,12 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
     children.add(IconButton(
       tooltip: AppLocalizations.t('information'),
       onPressed: () async {
-        String? current = mediaFileController.current?.filename;
+        String? current = playlistController.current?.filename;
         if (current != null) {
           MediaInformation? info =
               await FFMpegUtil.getMediaInformation(current);
           if (info != null) {
-            output = info.getAllProperties()!.toString();
+            output.value = info.getAllProperties()!.toString();
             show(context, 'information');
           }
         }
@@ -261,7 +260,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
     children.add(IconButton(
       tooltip: AppLocalizations.t('formats'),
       onPressed: () async {
-        output = await FFMpegUtil.formats();
+        output.value = await FFMpegUtil.formats();
         show(context, 'formats');
       },
       icon: const Icon(Icons.format_align_center_outlined),
@@ -269,7 +268,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
     children.add(IconButton(
       tooltip: AppLocalizations.t('encoders'),
       onPressed: () async {
-        output = await FFMpegUtil.encoders();
+        output.value = await FFMpegUtil.encoders();
         show(context, 'encoders');
       },
       icon: const Icon(Icons.qr_code),
@@ -277,7 +276,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
     children.add(IconButton(
       tooltip: AppLocalizations.t('decoders'),
       onPressed: () async {
-        output = await FFMpegUtil.decoders();
+        output.value = await FFMpegUtil.decoders();
         show(context, 'decoders');
       },
       icon: const Icon(Icons.qr_code_scanner),
@@ -286,7 +285,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
       IconButton(
         tooltip: AppLocalizations.t('help'),
         onPressed: () async {
-          output = await FFMpegUtil.help();
+          output.value = await FFMpegUtil.help();
           show(context, 'help');
         },
         icon: const Icon(Icons.help_outline),
@@ -309,7 +308,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
                 child: SingleChildScrollView(
                     child: Container(
                         padding: const EdgeInsets.all(15.0),
-                        child: CommonAutoSizeText(output ?? '')))),
+                        child: CommonAutoSizeText(output.value ?? '')))),
           ]));
         });
   }
@@ -320,7 +319,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   }) async {
     try {
       List<PlatformMediaSource> mediaSources =
-          await mediaFileController.sourceFilePicker(directory: directory);
+          await playlistController.sourceFilePicker(directory: directory);
     } catch (e) {
       DialogUtil.error(content: 'add media file failure:$e');
     }
@@ -381,7 +380,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
               ),
               onPressed: () async {
                 ffmpegSessions.clear();
-                await mediaFileController.clear();
+                await playlistController.clear();
                 _buildTileData(context);
               },
               tooltip: AppLocalizations.t('Remove all media file'),
@@ -393,10 +392,10 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
                 color: Colors.white, //myself.primary,
               ),
               onPressed: () async {
-                var currentIndex = mediaFileController.currentIndex;
+                var currentIndex = playlistController.currentIndex.value;
                 if (currentIndex != -1) {
-                  ffmpegSessions.remove(mediaFileController.current);
-                  mediaFileController.delete(index: currentIndex.value);
+                  ffmpegSessions.remove(playlistController.current!.filename);
+                  playlistController.delete(index: currentIndex);
                   _buildTileData(context);
                 }
               },
@@ -478,7 +477,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
                       return InkWell(
                           child: thumbnails[index],
                           onTap: () {
-                            mediaFileController.setCurrentIndex = index;
+                            playlistController.setCurrentIndex = index;
                             var title = tileData[index].title;
                             var fn = tileData[index].onTap;
                             if (fn != null) {
@@ -486,7 +485,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
                             }
                           },
                           onLongPress: () {
-                            mediaFileController.setCurrentIndex = index;
+                            playlistController.setCurrentIndex = index;
                             var title = tileData[index].title;
                             var fn = tileData[index].onLongPress;
                             if (fn != null) {
@@ -498,7 +497,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
                 return DataListView(
                   onTap: (int index, String title,
                       {TileData? group, String? subtitle}) {
-                    mediaFileController.setCurrentIndex = index;
+                    playlistController.setCurrentIndex = index;
                   },
                   itemCount: tileData.length,
                   itemBuilder: (BuildContext context, int index) {

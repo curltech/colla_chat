@@ -12,7 +12,7 @@ import 'package:ffmpeg_kit_flutter_full_gpl/media_information_session.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/statistics.dart';
 
 /// 非windows环境下执行ffmpeg和probe
-class BaseFFMpegUtil {
+class NonWindowsFFMpegUtil {
   static Future<String?> formats() async {
     final FFmpegSession session = await execute('configure -formats');
     final String? output = await session.getOutput();

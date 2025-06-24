@@ -199,7 +199,7 @@ class DialogUtil {
     }
     T? value = await showMenu<T>(
         context: context,
-        color: Colors.grey.withOpacity(0.8),
+        color: Colors.grey.withAlpha(255 * 0.8.toInt()),
         position: const RelativeRect.fromLTRB(0, 0, 0, 0),
         initialValue: initialValue,
         items: options);
@@ -592,17 +592,6 @@ class DialogUtil {
         });
   }
 
-  /// barrierDismissible: false,
-  ///       transitionDuration: Duration(milliseconds: 2000),
-  ///       transitionBuilder: (context, animation, secondaryAnimation, child) {
-  ///         return FadeTransition(
-  ///           opacity: animation,
-  ///           child: ScaleTransition(
-  ///             scale: animation,
-  ///             child: child,
-  ///           ),
-  ///         );
-  ///       },
   static Future<T?> showFullScreen<T>({
     BuildContext? context,
     bool barrierDismissible = true,

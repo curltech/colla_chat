@@ -1,9 +1,10 @@
-import 'package:colla_chat/pages/media/ffmpeg_media_widget.dart';
-import 'package:colla_chat/pages/media/image_editor_widget.dart';
+import 'package:colla_chat/widgets/media/playlist_widget.dart';
+import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_media_widget.dart';
+import 'package:colla_chat/widgets/media_editor/image_editor_widget.dart';
 import 'package:colla_chat/pages/media/platform_audio_player_widget.dart';
 import 'package:colla_chat/pages/media/platform_audio_recorder_widget.dart';
 import 'package:colla_chat/pages/media/platform_video_player_widget.dart';
-import 'package:colla_chat/pages/media/video_editor_widget.dart';
+import 'package:colla_chat/widgets/media_editor/video_editor_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -18,10 +19,17 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
       PlatformAudioPlayerWidget();
   final PlatformAudioRecorderWidget audioRecorderWidget =
       PlatformAudioRecorderWidget();
-  final FFMpegMediaWidget ffmpegMediaWidget = FFMpegMediaWidget();
-  final ImageEditorWidget imageEditorWidget = ImageEditorWidget();
-  final VideoEditorWidget videoEditorWidget = VideoEditorWidget();
+  late final FFMpegMediaWidget ffmpegMediaWidget = FFMpegMediaWidget(
+    playlistController: playlistController,
+  );
+  late final ImageEditorWidget imageEditorWidget = ImageEditorWidget(
+    playlistController: playlistController,
+  );
+  late final VideoEditorWidget videoEditorWidget = VideoEditorWidget(
+    playlistController: playlistController,
+  );
   late final List<TileData> mediaTileData;
+  final PlaylistController playlistController = PlaylistController();
 
   MediaWidget({super.key}) {
     indexWidgetProvider.define(videoPlayerWidget);
@@ -53,8 +61,6 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'Media';
-
-  
 
   @override
   Widget build(BuildContext context) {

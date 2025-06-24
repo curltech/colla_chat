@@ -1,29 +1,25 @@
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/download_file_util.dart';
-import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_helper.dart';
 import 'package:flutter/material.dart';
 
-class FFMpegInstallWidget extends StatefulWidget {
-  Function()? onDownloadComplete;
+/// ffmpeg的安装界面
+class FFMpegInstallWidget extends StatelessWidget {
+  final Function() onDownloadComplete;
 
-  FFMpegInstallWidget({super.key, this.onDownloadComplete});
+  FFMpegInstallWidget({super.key, required this.onDownloadComplete});
 
-  @override
-  State<FFMpegInstallWidget> createState() => _FFMpegInstallWidgetState();
-}
-
-class _FFMpegInstallWidgetState extends State<FFMpegInstallWidget> {
-  ValueNotifier<bool> ffmpegPresent = ValueNotifier<bool>(false);
-  ValueNotifier<DownloadProgress> downloadProgress =
+  final ValueNotifier<bool> ffmpegPresent = ValueNotifier<bool>(false);
+  final ValueNotifier<DownloadProgress> downloadProgress =
       ValueNotifier<DownloadProgress>(DownloadProgress(
     downloaded: 0,
     fileSize: 0,
     phase: DownloadProgressPhase.inactive,
   ));
-  TextEditingController controller = TextEditingController();
+  final TextEditingController controller = TextEditingController();
 
   Future<bool> checkFFMpeg() async {
     ffmpegPresent.value = await FFMpegHelper.initialize();
@@ -39,7 +35,7 @@ class _FFMpegInstallWidgetState extends State<FFMpegInstallWidget> {
         },
       );
       ffmpegPresent.value = success;
-      widget.onDownloadComplete?.call();
+      onDownloadComplete.call();
     }
   }
 

@@ -6,8 +6,8 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/download_file_util.dart';
-import 'package:colla_chat/tool/ffmpeg/base_ffmpeg_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/media_editor/ffmpeg/non_windows_ffmpeg_util.dart';
 import 'package:dio/dio.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/ffmpeg_session.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/log.dart';
@@ -20,6 +20,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:process_runner/process_runner.dart';
 
+/// ffmpeg的回话管理类，获取ffmpeg执行任务的输出
 class FFMpegHelperSession {
   final List<FFmpegSession>? ffmpegSessions;
   Completer? completer;
@@ -208,9 +209,10 @@ class FFMpegHelperSession {
   }
 }
 
+/// ffmpeg的帮助类，帮助在windows和linux平台下安装ffmpeg
 class FFMpegHelper {
   static ProcessPool processPool = ProcessPool(numWorkers: 10, encoding: utf8);
-  static const String _ffmpegUrl =
+  static const String _ffmpegWinUrl =
       "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip";
   static String? _ffmpegBinDirectory;
   static String? _ffmpegInstallationPath;
@@ -295,7 +297,7 @@ class FFMpegHelper {
         try {
           Dio dio = Dio();
           Response response = await dio.download(
-            _ffmpegUrl,
+            _ffmpegWinUrl,
             ffmpegZipPath,
             cancelToken: cancelToken,
             onReceiveProgress: (int received, int total) {
@@ -496,7 +498,7 @@ class FFMpegHelper {
     List<FFmpegSession> sessions = [];
     Completer completer = Completer();
     for (var command in commands) {
-      FFmpegSession session = await BaseFFMpegUtil.executeAsync(
+      FFmpegSession session = await NonWindowsFFMpegUtil.executeAsync(
         command,
         completeCallback: (FFmpegSession session) async {
           ReturnCode? rc = await session.getReturnCode();
@@ -615,7 +617,7 @@ class FFMpegHelper {
   }) async {
     List<FFmpegSession> sessions = [];
     for (var command in commands) {
-      FFmpegSession session = await BaseFFMpegUtil.execute(
+      FFmpegSession session = await NonWindowsFFMpegUtil.execute(
         command,
         logCallback: logCallback,
         statisticsCallback: statisticsCallback,
@@ -641,7 +643,7 @@ class FFMpegHelper {
   /// 在非windows环境同步运行probe
   static Future<MediaInformation?> _getMediaInformationAsyncOnNonWindows(
       String filename) async {
-    return await BaseFFMpegUtil.getMediaInformationAsync(filename);
+    return await NonWindowsFFMpegUtil.getMediaInformationAsync(filename);
   }
 
   /// 在windows环境同步运行probe

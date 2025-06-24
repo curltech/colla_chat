@@ -1,27 +1,29 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:colla_chat/pages/media/ffmpeg_media_widget.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/media/playlist_widget.dart';
+import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
 import 'package:pro_image_editor/core/enums/editor_mode.dart';
 import 'package:pro_image_editor/core/models/editor_callbacks/pro_image_editor_callbacks.dart';
 import 'package:pro_image_editor/features/main_editor/main_editor.dart';
 
+/// 通用的视频编辑界面，分离视频成为图像
 class VideoEditorWidget extends StatelessWidget with TileDataMixin {
   VideoEditorWidget({
     super.key,
+    required this.playlistController,
   }) {
     scrollController.addListener(_onScroll);
   }
@@ -37,6 +39,8 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
 
   @override
   bool get withLeading => true;
+
+  final PlaylistController playlistController;
 
   ///视频文件拆分成图像文件
   final DataListController<String> imageFileController =
@@ -59,6 +63,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
+  /// 将视频文件按帧分离成图像
   _splitImageFiles(BuildContext context) async {
     imageFileController.clear();
     int pos = displayPosition.value;
@@ -71,7 +76,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
       filenames.add(filename);
       Duration frameTime = Duration(seconds: startTime.inSeconds + i + 1);
       String command = FFMpegHelper.buildCommand(
-        input: mediaFileController.current!.filename,
+        input: playlistController.current!.filename,
         output: filename,
         ss: frameTime.toString(),
         vframes: '1',

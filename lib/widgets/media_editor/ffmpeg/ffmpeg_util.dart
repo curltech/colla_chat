@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_helper.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/abstract_session.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/ffprobe_kit.dart';
