@@ -49,6 +49,9 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   bool get withLeading => true;
 
   final PlaylistController playlistController;
+  late final PlaylistWidget playlistWidget = PlaylistWidget(
+    playlistController: playlistController,
+  );
   final FileType fileType = FileType.custom;
   final ValueNotifier<bool> ffmpegPresent = ValueNotifier<bool>(false);
   final ValueNotifier<String?> output = ValueNotifier<String?>(null);
@@ -240,11 +243,11 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
     this.tileData.value = tileData;
   }
 
-  List<Widget>? _buildRightWidgets(BuildContext context) {
-    List<Widget> children = [];
-    children.add(IconButton(
-      tooltip: AppLocalizations.t('information'),
-      onPressed: () async {
+  List<ActionData>? _buildActions(BuildContext context) {
+    List<ActionData> children = [];
+    children.add(ActionData(
+      label: AppLocalizations.t('information'),
+      onTap: (int index, String label, {String? value}) async {
         String? current = playlistController.current?.filename;
         if (current != null) {
           MediaInformation? info =
@@ -257,34 +260,34 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
       },
       icon: const Icon(Icons.info_outline),
     ));
-    children.add(IconButton(
-      tooltip: AppLocalizations.t('formats'),
-      onPressed: () async {
+    children.add(ActionData(
+      label: AppLocalizations.t('formats'),
+      onTap: (int index, String label, {String? value}) async {
         output.value = await FFMpegUtil.formats();
         show(context, 'formats');
       },
       icon: const Icon(Icons.format_align_center_outlined),
     ));
-    children.add(IconButton(
-      tooltip: AppLocalizations.t('encoders'),
-      onPressed: () async {
+    children.add(ActionData(
+      label: AppLocalizations.t('encoders'),
+      onTap: (int index, String label, {String? value}) async {
         output.value = await FFMpegUtil.encoders();
         show(context, 'encoders');
       },
       icon: const Icon(Icons.qr_code),
     ));
-    children.add(IconButton(
-      tooltip: AppLocalizations.t('decoders'),
-      onPressed: () async {
+    children.add(ActionData(
+      label: AppLocalizations.t('decoders'),
+      onTap: (int index, String label, {String? value}) async {
         output.value = await FFMpegUtil.decoders();
         show(context, 'decoders');
       },
       icon: const Icon(Icons.qr_code_scanner),
     ));
     children.add(
-      IconButton(
-        tooltip: AppLocalizations.t('help'),
-        onPressed: () async {
+      ActionData(
+        label: AppLocalizations.t('help'),
+        onTap: (int index, String label, {String? value}) async {
           output.value = await FFMpegUtil.help();
           show(context, 'help');
         },
@@ -311,100 +314,6 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
                         child: CommonAutoSizeText(output.value ?? '')))),
           ]));
         });
-  }
-
-  Future<void> _addMediaSource(
-    BuildContext context, {
-    bool directory = false,
-  }) async {
-    try {
-      List<PlatformMediaSource> mediaSources =
-          await playlistController.sourceFilePicker(directory: directory);
-    } catch (e) {
-      DialogUtil.error(content: 'add media file failure:$e');
-    }
-  }
-
-  ///播放列表按钮
-  Widget _buildConvertFilesButton(BuildContext context) {
-    return Column(
-      children: [
-        OverflowBar(
-          alignment: MainAxisAlignment.start,
-          children: [
-            IconButton(
-              color: myself.primary,
-              icon: ValueListenableBuilder(
-                valueListenable: gridMode,
-                builder: (BuildContext context, value, Widget? child) {
-                  return Icon(
-                    gridMode.value ? Icons.list : Icons.grid_on,
-                    color: Colors.white,
-                  );
-                },
-              ),
-              onPressed: () {
-                gridMode.value = !gridMode.value;
-              },
-              tooltip: AppLocalizations.t('Toggle grid mode'),
-            ),
-            IconButton(
-              color: myself.primary,
-              icon: const Icon(
-                Icons.featured_play_list_outlined,
-                color: Colors.white,
-              ),
-              onPressed: () async {
-                await _addMediaSource(context, directory: true);
-                _buildTileData(context);
-              },
-              tooltip: AppLocalizations.t('Add media directory'),
-            ),
-            IconButton(
-              color: myself.primary,
-              icon: const Icon(
-                Icons.playlist_add,
-                color: Colors.white,
-              ),
-              onPressed: () async {
-                await _addMediaSource(context);
-                _buildTileData(context);
-              },
-              tooltip: AppLocalizations.t('Add media file'),
-            ),
-            IconButton(
-              color: myself.primary,
-              icon: const Icon(
-                Icons.bookmark_remove,
-                color: Colors.white,
-              ),
-              onPressed: () async {
-                ffmpegSessions.clear();
-                await playlistController.clear();
-                _buildTileData(context);
-              },
-              tooltip: AppLocalizations.t('Remove all media file'),
-            ),
-            IconButton(
-              color: myself.primary,
-              icon: const Icon(
-                Icons.playlist_remove,
-                color: Colors.white, //myself.primary,
-              ),
-              onPressed: () async {
-                var currentIndex = playlistController.currentIndex.value;
-                if (currentIndex != -1) {
-                  ffmpegSessions.remove(playlistController.current!.filename);
-                  playlistController.delete(index: currentIndex);
-                  _buildTileData(context);
-                }
-              },
-              tooltip: AppLocalizations.t('Remove media file'),
-            ),
-          ],
-        ),
-      ],
-    );
   }
 
   Future<Widget> _buildThumbnailView(BuildContext context) async {
@@ -510,33 +419,32 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
         });
   }
 
-  Widget _buildConvertFilesWidget(BuildContext context) {
-    return Column(children: [
-      _buildConvertFilesButton(context),
-      Expanded(
-          child: PlatformFutureBuilder(
-              future: _buildThumbnailView(context),
-              builder: (BuildContext context, Widget fileWidget) {
-                return fileWidget;
-              })),
-    ]);
-  }
-
   @override
   Widget build(BuildContext context) {
     _buildTileData(context);
-    List<Widget>? rightWidgets = _buildRightWidgets(context);
-
     return AppBarView(
       title: title,
       helpPath: routeName,
       withLeading: true,
-      rightWidgets: rightWidgets,
+      rightWidgets: [
+        IconButton(
+          tooltip: AppLocalizations.t('File Operation'),
+          onPressed: () {
+            playlistWidget.showActionCard(context);
+          },
+          icon: const Icon(Icons.file_open_outlined),
+        )
+      ],
+      actions: _buildActions(context),
       child: ValueListenableBuilder(
         valueListenable: ffmpegPresent,
         builder: (BuildContext context, value, Widget? child) {
           if (value) {
-            return _buildConvertFilesWidget(context);
+            return PlatformFutureBuilder(
+                future: _buildThumbnailView(context),
+                builder: (BuildContext context, Widget fileWidget) {
+                  return fileWidget;
+                });
           }
           return FFMpegInstallWidget(
             onDownloadComplete: () {
