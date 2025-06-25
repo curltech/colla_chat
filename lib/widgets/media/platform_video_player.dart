@@ -1,6 +1,5 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
@@ -12,7 +11,6 @@ import 'package:colla_chat/widgets/media/video/mediakit_video_player.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:colla_chat/widgets/media/video/vlc_video_player.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 /// 平台的多个视频媒体播放器组件
 class PlatformVideoPlayer extends StatelessWidget {
@@ -25,8 +23,8 @@ class PlatformVideoPlayer extends StatelessWidget {
     playlistController: playlistController,
   );
   final List<PlatformMediaPlayer> platformMediaPlayers = [];
-  final RxInt index = 0.obs;
-  final RxInt crossAxisCount = 1.obs;
+  final ValueNotifier<int> index = ValueNotifier<int>(0);
+  final ValueNotifier<int> crossAxisCount = ValueNotifier<int>(1);
 
   PlatformVideoPlayer({
     super.key,
@@ -115,23 +113,25 @@ class PlatformVideoPlayer extends StatelessWidget {
           return playlistWidget;
         }
         if (index == 1) {
-          return Obx(() {
-            return GridView.builder(
-                itemCount: platformMediaPlayers.length,
-                //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    //横轴元素个数
-                    crossAxisCount: crossAxisCount.value,
-                    //纵轴间距
-                    mainAxisSpacing: 1.0,
-                    //横轴间距
-                    crossAxisSpacing: 1.0,
-                    //子组件宽高长度比例
-                    childAspectRatio: 1),
-                itemBuilder: (BuildContext context, int index) {
-                  return platformMediaPlayers[index];
-                });
-          });
+          return ValueListenableBuilder(
+              valueListenable: crossAxisCount,
+              builder: (BuildContext context, crossAxisCount, Widget? child) {
+                return GridView.builder(
+                    itemCount: platformMediaPlayers.length,
+                    //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        //横轴元素个数
+                        crossAxisCount: crossAxisCount,
+                        //纵轴间距
+                        mainAxisSpacing: 1.0,
+                        //横轴间距
+                        crossAxisSpacing: 1.0,
+                        //子组件宽高长度比例
+                        childAspectRatio: 1),
+                    itemBuilder: (BuildContext context, int index) {
+                      return platformMediaPlayers[index];
+                    });
+              });
         }
         return nilBox;
       },

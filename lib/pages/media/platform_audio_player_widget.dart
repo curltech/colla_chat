@@ -54,7 +54,6 @@ class PlatformAudioPlayerWidget extends StatelessWidget with TileDataMixin {
         tooltip: AppLocalizations.t('Close'),
         onPressed: () async {
           platformAudioPlayer.mediaPlayerController.close();
-          platformAudioPlayer.playlistController.clear();
         },
         icon: const Icon(Icons.close),
       ),

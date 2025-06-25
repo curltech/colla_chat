@@ -63,7 +63,6 @@ class PlatformVideoPlayerWidget extends StatelessWidget with TileDataMixin {
         tooltip: AppLocalizations.t('Close'),
         onPressed: () async {
           platformVideoPlayer.close();
-          platformVideoPlayer.playlistController.clear();
         },
         icon: const Icon(Icons.close),
       ),

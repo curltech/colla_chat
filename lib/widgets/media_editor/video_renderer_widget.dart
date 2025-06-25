@@ -116,7 +116,7 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
     isExporting.value = false;
   }
 
-  FormInputWidget _buildDataFields(BuildContext context) {
+  FormInputWidget _buildFormInputWidget(BuildContext context) {
     List<PlatformDataField> dataFields = [
       PlatformDataField(
         name: 'rotateTurns',
@@ -398,7 +398,7 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
               DialogUtil.popModalBottomSheet(
                   context: context,
                   builder: (BuildContext context) {
-                    return _buildDataFields(context);
+                    return _buildFormInputWidget(context);
                   });
             },
             icon: Icon(Icons.draw_outlined))
