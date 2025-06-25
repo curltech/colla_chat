@@ -1,4 +1,5 @@
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:glassmorphic_ui_kit/glassmorphic_ui_kit.dart' as glass;
@@ -15,10 +16,6 @@ final defaultLinearGradient = LinearGradient(
       0.3,
       0.9,
     ]);
-
-const double defaultBlur = 15;
-const double defaultOpacity = 0.12;
-const BorderRadius defaultBorderRadius = BorderRadius.zero;
 
 extension GlassmorphicKitWidget<T extends Widget> on T {
   Widget asGlassmorphicKit(

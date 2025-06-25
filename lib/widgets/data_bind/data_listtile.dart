@@ -197,7 +197,7 @@ class DataListTile extends StatelessWidget {
               : null,
           softWrap: true,
           overflow: TextOverflow.ellipsis,
-          maxLines: 2,
+          maxLines: 3,
         ),
       ]);
     }

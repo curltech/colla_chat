@@ -64,6 +64,12 @@ class BottomNavigation {
   }) {
     return Builder(
       builder: (BuildContext context) {
+        final navigationBar = NavigationBar(
+          backgroundColor: myself.primary.withAlpha(15),
+          selectedIndex: currentIndex ?? 0,
+          destinations: destinations,
+          onDestinationSelected: onDestinationSelected,
+        );
         final NavigationBarThemeData currentNavBarTheme =
             NavigationBarTheme.of(context);
         return NavigationBarTheme(
@@ -84,13 +90,9 @@ class BottomNavigation {
             ),
           ),
           child: MediaQuery(
-            data: MediaQuery.of(context).removePadding(removeTop: true),
-            child: NavigationBar(
-              backgroundColor: myself.primary.withAlpha(15),
-              selectedIndex: currentIndex ?? 0,
-              destinations: destinations,
-              onDestinationSelected: onDestinationSelected,
-            ),
+            data: MediaQuery.of(context)..removePadding(removeTop: true),
+            child: navigationBar.asStyle(
+                blur: 128, height: navigationBar.height ?? appDataProvider.bottomBarHeight),
           ),
         );
       },
@@ -113,7 +115,7 @@ class BottomNavigation {
               onDestinationSelected: (int index) {
                 indexWidgetProvider.currentMainIndex = index;
               },
-            ).asStyle(blur: 128);
+            );
           },
         )
       },

@@ -1,4 +1,5 @@
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:glass_kit/glass_kit.dart' as glass;
 
@@ -23,10 +24,6 @@ final defaultBorderGradient = LinearGradient(
   ],
 );
 
-const double defaultBlur = 15;
-const double defaultFrostedOpacity = 0.12;
-const BorderRadius defaultBorderRadius = BorderRadius.zero;
-final Color defaultShadowColor = Colors.black.withAlpha(50);
 
 extension GlassKitWidget<T extends Widget> on T {
   Widget asGlassKit(

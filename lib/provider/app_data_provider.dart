@@ -278,7 +278,7 @@ class AppDataProvider with ChangeNotifier {
     if (totalSize.width != _totalSize.width ||
         totalSize.height != _totalSize.height) {
       _totalSize = totalSize;
-      if (_bodyWidth != 0) {
+      if (_bodyWidth != 0.0) {
         calBodyWidth();
       }
     }

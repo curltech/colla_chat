@@ -25,7 +25,9 @@ class LoadingUtil {
       const SizedBox(
         height: 10,
       ),
-      CommonAutoSizeText(AppLocalizations.t("Loading, please waiting..."))
+      Expanded(
+          child: CommonAutoSizeText(
+              AppLocalizations.t("Loading, please waiting...")))
     ]));
   }
 

@@ -9,6 +9,7 @@ import 'package:colla_chat/widgets/adaptive_scaffold/slot_layout.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
 
 ///横屏左边栏，用于指示当前主页面
@@ -217,37 +218,37 @@ class PrimaryNavigation {
             //inAnimation: AdaptiveScaffold.leftOutIn,
             builder: (BuildContext context) {
               return Card(
-                  elevation: 0.0,
-                  color: Colors.black54,
-                  shape: const ContinuousRectangleBorder(),
-                  margin: EdgeInsets.zero,
-                  child: AdaptiveScaffold.standardNavigationRail(
-                    width: appDataProvider.primaryNavigationWidth,
-                    selectedIndex: indexWidgetProvider.currentMainIndex,
-                    onDestinationSelected: (int index) {
-                      indexWidgetProvider.currentMainIndex = index;
-                    },
-                    padding: const EdgeInsets.all(0.0),
-                    backgroundColor: Colors.black54,
-                    leading: _buildAppBar(context),
-                    destinations: destinations,
-                    extended: true,
-                    trailing: trailingNavRail,
-                    selectedIconTheme: IconThemeData(
-                      color: myself.primary,
-                    ),
-                    unselectedIconTheme: const IconThemeData(
-                      color: Colors.white,
-                    ),
-                    selectedLabelTextStyle: TextStyle(
-                        color: myself.primary,
-                        fontSize: AppFontSize.mdFontSize,
-                        fontWeight: FontWeight.bold),
-                    unSelectedLabelTextStyle: const TextStyle(
-                      color: Colors.white,
-                      fontSize: AppFontSize.smFontSize,
-                    ),
-                  ));
+                      elevation: 0.0,
+                      color: Colors.black54,
+                      shape: const ContinuousRectangleBorder(),
+                      margin: EdgeInsets.zero,
+                      child: AdaptiveScaffold.standardNavigationRail(
+                        width: appDataProvider.primaryNavigationWidth,
+                        selectedIndex: indexWidgetProvider.currentMainIndex,
+                        onDestinationSelected: (int index) {
+                          indexWidgetProvider.currentMainIndex = index;
+                        },
+                        padding: const EdgeInsets.all(0.0),
+                        backgroundColor: Colors.black54,
+                        leading: _buildAppBar(context),
+                        destinations: destinations,
+                        extended: true,
+                        trailing: trailingNavRail,
+                        selectedIconTheme: IconThemeData(
+                          color: myself.primary,
+                        ),
+                        unselectedIconTheme: const IconThemeData(
+                          color: Colors.white,
+                        ),
+                        selectedLabelTextStyle: TextStyle(
+                            color: myself.primary,
+                            fontSize: AppFontSize.mdFontSize,
+                            fontWeight: FontWeight.bold),
+                        unSelectedLabelTextStyle: const TextStyle(
+                          color: Colors.white,
+                          fontSize: AppFontSize.smFontSize,
+                        ),
+                      ));
             }),
       },
     );
