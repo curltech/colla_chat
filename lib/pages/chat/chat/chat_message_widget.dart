@@ -62,7 +62,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     //     duration: const Duration(milliseconds: 1000), curve: Curves.ease);
   }
 
-  void _onScroll() {
+  Future<void> _onScroll() async {
     double offset = widget.scrollController.offset;
     logger.i('scrolled to $offset');
 
@@ -70,7 +70,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     if (widget.scrollController.position.pixels ==
         widget.scrollController.position.maxScrollExtent) {
       logger.i('scrolled to max');
-      chatMessageController.previous(limit: defaultLimit);
+      await chatMessageController.previous(limit: defaultLimit);
 
       if (widget.onScrollMin != null) {
         widget.onScrollMin!();
@@ -78,7 +78,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       if (widget.scrollController.position.pixels ==
           widget.scrollController.position.minScrollExtent) {
         logger.i('scrolled to min');
-        chatMessageController.latest(limit: defaultLimit);
+        await chatMessageController.latest(limit: defaultLimit);
         if (widget.onScrollMax != null) {
           widget.onScrollMax!();
         }
