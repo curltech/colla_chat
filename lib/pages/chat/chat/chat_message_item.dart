@@ -130,6 +130,7 @@ class ChatMessageItem extends StatelessWidget {
   Widget _buildMessageContainer(BuildContext context) {
     List<Widget> children = [
       PlatformFutureBuilder(
+        loadingWidget: Container(),
         future: messageWidget.buildMessageBody(context),
         builder: (BuildContext context, Widget child) {
           return child;
@@ -190,6 +191,7 @@ class ChatMessageItem extends StatelessWidget {
       );
     }
     Widget body = PlatformFutureBuilder(
+      loadingWidget: Container(),
       future: messageWidget.buildMessageBody(context),
       builder: (BuildContext context, Widget child) {
         return child;
@@ -246,6 +248,7 @@ class ChatMessageItem extends StatelessWidget {
               Container(
                   margin: const EdgeInsets.only(right: 0.0),
                   child: PlatformFutureBuilder(
+                    loadingWidget: Container(),
                     future: _getImageWidget(context),
                     builder: (BuildContext context, Widget? child) {
                       return child!;
@@ -305,6 +308,7 @@ class ChatMessageItem extends StatelessWidget {
               Container(
                   margin: const EdgeInsets.only(left: 0.0),
                   child: PlatformFutureBuilder(
+                    loadingWidget: Container(),
                     future: _getImageWidget(context),
                     builder: (BuildContext context, Widget? child) {
                       return child!;

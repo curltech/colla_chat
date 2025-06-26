@@ -49,7 +49,7 @@ class Myself with ChangeNotifier {
 
   late ThemeData _darkThemeData;
 
-  PlatformStyle platformStyle = PlatformStyle.glassKit;
+  PlatformStyle platformStyle = PlatformStyle.glass;
 
   Myself() {
     _buildThemeData();

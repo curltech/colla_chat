@@ -473,19 +473,20 @@ class ChatMessageView extends StatelessWidget
           visibleFraction = visibilityInfo.visibleFraction;
         },
         child: KeyboardActions(
-            autoScroll: true,
-            config: _buildKeyboardActionsConfig(context),
-            child: Column(children: <Widget>[
-              Obx(() {
-                var height = chatMessageViewController.chatMessageHeight;
-                return SizedBox(height: height, child: chatMessageWidget);
-              }),
+          autoScroll: true,
+          config: _buildKeyboardActionsConfig(context),
+          child: Obx(() {
+            var height = chatMessageViewController.chatMessageHeight;
+            return Column(children: <Widget>[
+              SizedBox(height: height, child: chatMessageWidget),
               Divider(
                 color: Colors.white.withAlpha(AppOpacity.xlOpacity),
                 height: 1.0,
               ),
               chatMessageInputWidget
-            ])));
+            ]);
+          }),
+        ));
 
     return chatMessageView;
   }

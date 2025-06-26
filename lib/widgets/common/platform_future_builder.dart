@@ -10,12 +10,16 @@ class PlatformFutureBuilder<T> extends StatelessWidget {
   final String? message;
   final Widget? messageWidget;
   final Widget? loadingWidget;
+  final double? width;
+  final double? height;
 
   const PlatformFutureBuilder(
       {super.key,
       this.future,
       required this.builder,
       this.message,
+      this.width,
+      this.height,
       this.messageWidget,
       this.loadingWidget});
 
@@ -25,7 +29,8 @@ class PlatformFutureBuilder<T> extends StatelessWidget {
       future: future,
       builder: (BuildContext context, AsyncSnapshot<T> snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return loadingWidget ?? LoadingUtil.buildLoadingIndicator();
+          return loadingWidget ??
+              LoadingUtil.buildLoadingIndicator(width: width, height: height);
         }
         T? data = snapshot.data;
         if (data == null) {

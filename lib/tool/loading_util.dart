@@ -10,18 +10,19 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class LoadingUtil {
-  static Widget buildLoadingIndicator() {
+  static Widget buildLoadingIndicator({double? width, double? height}) {
+    Widget loadingWidget = LoadingIndicator(
+      indicatorType: Indicator.ballRotateChase,
+      colors: [
+        myself.primary,
+      ],
+    );
+    if (width == null) {
+      return loadingWidget;
+    }
     return Center(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-      SizedBox(
-          height: 80,
-          width: 80,
-          child: LoadingIndicator(
-            indicatorType: Indicator.ballRotateChase,
-            colors: [
-              myself.primary,
-            ],
-          )),
+      SizedBox(height: width, width: height, child: loadingWidget),
       const SizedBox(
         height: 10,
       ),

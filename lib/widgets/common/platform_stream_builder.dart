@@ -9,12 +9,16 @@ class PlatformStreamBuilder<T> extends StatelessWidget {
   final String? message;
   final Widget? messageWidget;
   final Widget? loadingWidget;
+  final double? width;
+  final double? height;
 
   const PlatformStreamBuilder(
       {super.key,
       this.stream,
       required this.builder,
       this.message,
+      this.width,
+      this.height,
       this.messageWidget,
       this.loadingWidget});
 
@@ -24,7 +28,8 @@ class PlatformStreamBuilder<T> extends StatelessWidget {
       stream: stream,
       builder: (BuildContext context, AsyncSnapshot<T> snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return loadingWidget ?? LoadingUtil.buildLoadingIndicator();
+          return loadingWidget ??
+              LoadingUtil.buildLoadingIndicator(width: width, height: height);
         }
         T? data = snapshot.data;
         if (data == null) {
