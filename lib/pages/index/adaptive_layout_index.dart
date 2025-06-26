@@ -70,8 +70,6 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
     );
   }
 
-  final ValueNotifier<bool> buttonVisible = ValueNotifier<bool>(false);
-
   ///SecondaryBody视图
   Widget _buildSecondaryBodyView(BuildContext context) {
     ScrollPhysics? physics = const NeverScrollableScrollPhysics();
@@ -90,48 +88,13 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
           } else {
             view = Container();
           }
-          view = Row(children: [
-            const VerticalDivider(
+
+          return Row(children: [
+            VerticalDivider(
               width: 1.0,
             ),
-            Expanded(child: view)
-                // child: InkWell(
-                //     onLongPress: () {
-                //       buttonVisible.value = !buttonVisible.value;
-                //     },
-                //     child: view)),
+            Expanded(child: view),
           ]);
-          return view;
-          return ValueListenableBuilder(
-              valueListenable: buttonVisible,
-              builder: (BuildContext context, bool visible, Widget? child) {
-                if (visible) {
-                  return Stack(children: [
-                    view,
-                    Align(
-                        alignment: Alignment.center,
-                        child: IconButton(
-                            color: Colors.white,
-                            hoverColor: myself.primary,
-                            onPressed: () {
-                              if (appDataProvider.bodyWidth == 0.0) {
-                                appDataProvider.bodyWidth = -1.0;
-                              } else {
-                                appDataProvider.bodyWidth = 0.0;
-                              }
-                              buttonVisible.value = false;
-                            },
-                            icon: Icon(
-                              size: 48,
-                              appDataProvider.bodyWidth == 0.0
-                                  ? Icons.arrow_circle_right
-                                  : Icons.arrow_circle_left,
-                            ))),
-                  ]);
-                } else {
-                  return view;
-                }
-              });
         });
 
     return pageView;

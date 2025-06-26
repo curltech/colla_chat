@@ -74,14 +74,29 @@ class PrimaryNavigation {
     }
 
     Widget avatarImage = myself.avatarImage ?? AppImage.mdAppImage;
-    return IconButton(
-      color: Colors.white,
-      onPressed: () {
-        indexWidgetProvider.push('personal_info');
-      },
-      tooltip: myself.name,
-      icon: avatarImage,
-    );
+    return Column(children: [
+      IconButton(
+        color: Colors.white,
+        onPressed: () {
+          indexWidgetProvider.push('personal_info');
+        },
+        tooltip: myself.name,
+        icon: avatarImage,
+      ),
+      IconButton(
+        color: Colors.white,
+        hoverColor: myself.primary,
+        onPressed: () {
+          if (appDataProvider.bodyWidth == 0.0) {
+            appDataProvider.bodyWidth = -1.0;
+          } else {
+            appDataProvider.bodyWidth = 0.0;
+          }
+        },
+        tooltip: AppLocalizations.t('toggle'),
+        icon: Icon(Icons.safety_divider_outlined),
+      ),
+    ]);
   }
 
   NavigationRailDestination slideInNavigationRailDestination({
@@ -218,37 +233,37 @@ class PrimaryNavigation {
             //inAnimation: AdaptiveScaffold.leftOutIn,
             builder: (BuildContext context) {
               return Card(
-                      elevation: 0.0,
-                      color: Colors.black54,
-                      shape: const ContinuousRectangleBorder(),
-                      margin: EdgeInsets.zero,
-                      child: AdaptiveScaffold.standardNavigationRail(
-                        width: appDataProvider.primaryNavigationWidth,
-                        selectedIndex: indexWidgetProvider.currentMainIndex,
-                        onDestinationSelected: (int index) {
-                          indexWidgetProvider.currentMainIndex = index;
-                        },
-                        padding: const EdgeInsets.all(0.0),
-                        backgroundColor: Colors.black54,
-                        leading: _buildAppBar(context),
-                        destinations: destinations,
-                        extended: true,
-                        trailing: trailingNavRail,
-                        selectedIconTheme: IconThemeData(
-                          color: myself.primary,
-                        ),
-                        unselectedIconTheme: const IconThemeData(
-                          color: Colors.white,
-                        ),
-                        selectedLabelTextStyle: TextStyle(
-                            color: myself.primary,
-                            fontSize: AppFontSize.mdFontSize,
-                            fontWeight: FontWeight.bold),
-                        unSelectedLabelTextStyle: const TextStyle(
-                          color: Colors.white,
-                          fontSize: AppFontSize.smFontSize,
-                        ),
-                      ));
+                  elevation: 0.0,
+                  color: Colors.black54,
+                  shape: const ContinuousRectangleBorder(),
+                  margin: EdgeInsets.zero,
+                  child: AdaptiveScaffold.standardNavigationRail(
+                    width: appDataProvider.primaryNavigationWidth,
+                    selectedIndex: indexWidgetProvider.currentMainIndex,
+                    onDestinationSelected: (int index) {
+                      indexWidgetProvider.currentMainIndex = index;
+                    },
+                    padding: const EdgeInsets.all(0.0),
+                    backgroundColor: Colors.black54,
+                    leading: _buildAppBar(context),
+                    destinations: destinations,
+                    extended: true,
+                    trailing: trailingNavRail,
+                    selectedIconTheme: IconThemeData(
+                      color: myself.primary,
+                    ),
+                    unselectedIconTheme: const IconThemeData(
+                      color: Colors.white,
+                    ),
+                    selectedLabelTextStyle: TextStyle(
+                        color: myself.primary,
+                        fontSize: AppFontSize.mdFontSize,
+                        fontWeight: FontWeight.bold),
+                    unSelectedLabelTextStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: AppFontSize.smFontSize,
+                    ),
+                  ));
             }),
       },
     );
