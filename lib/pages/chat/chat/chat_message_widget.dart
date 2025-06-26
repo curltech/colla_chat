@@ -115,7 +115,10 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   }
 
   ///创建每一条消息
-  Widget _buildChatMessageItem(BuildContext context, int index) {
+  Widget? _buildChatMessageItem(BuildContext context, int index) {
+    if (index < 0 || index >= chatMessageController.data.length) {
+      return null;
+    }
     ChatMessage chatMessage = chatMessageController.data[index];
     Widget chatMessageItem = ChatMessageItem(
         key: UniqueKey(), chatMessage: chatMessage, index: index);
@@ -143,17 +146,19 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     return RefreshIndicator(
       onRefresh: _onRefresh,
       //notificationPredicate: _notificationPredicate,
-      child: Obx(() {
-        return ListView.builder(
+      child: Scrollbar(
           controller: widget.scrollController,
-          padding: const EdgeInsets.all(8.0),
-          reverse: true,
-          //消息组件渲染
-          itemBuilder: _buildChatMessageItem,
-          //消息条目数
-          itemCount: chatMessageController.length,
-        );
-      }),
+          child: Obx(() {
+            return ListView.builder(
+              controller: widget.scrollController,
+              padding: const EdgeInsets.all(8.0),
+              reverse: true,
+              //消息组件渲染
+              itemBuilder: _buildChatMessageItem,
+              //消息条目数
+              itemCount: chatMessageController.length,
+            );
+          })),
     );
   }
 

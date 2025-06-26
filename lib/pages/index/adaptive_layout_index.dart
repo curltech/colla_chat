@@ -70,7 +70,7 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
     );
   }
 
-  final ValueNotifier<bool> visible = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> buttonVisible = ValueNotifier<bool>(false);
 
   ///SecondaryBody视图
   Widget _buildSecondaryBodyView(BuildContext context) {
@@ -94,15 +94,16 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
             const VerticalDivider(
               width: 1.0,
             ),
-            Expanded(
-                child: InkWell(
-                    onTap: () {
-                      visible.value = !visible.value;
-                    },
-                    child: view)),
+            Expanded(child: view)
+                // child: InkWell(
+                //     onLongPress: () {
+                //       buttonVisible.value = !buttonVisible.value;
+                //     },
+                //     child: view)),
           ]);
+          return view;
           return ValueListenableBuilder(
-              valueListenable: visible,
+              valueListenable: buttonVisible,
               builder: (BuildContext context, bool visible, Widget? child) {
                 if (visible) {
                   return Stack(children: [
@@ -118,7 +119,7 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
                               } else {
                                 appDataProvider.bodyWidth = 0.0;
                               }
-                              this.visible.value = false;
+                              buttonVisible.value = false;
                             },
                             icon: Icon(
                               size: 48,
