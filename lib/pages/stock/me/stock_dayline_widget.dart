@@ -203,7 +203,7 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
     Widget formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
         child: FormInputWidget(
-          height: appDataProvider.portraitSize.height * 0.4,
+          height: appDataProvider.portraitSize.height * 0.5,
           spacing: 5.0,
           controller: searchController,
           formButtons: formButtonDefs,

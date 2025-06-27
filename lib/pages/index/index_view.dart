@@ -212,8 +212,6 @@ class _IndexViewState extends State<IndexView>
 
   @override
   onWindowResized() {
-    logger.i(
-        "window resized  ：${WidgetsBinding.instance.platformDispatcher.textScaleFactor}");
     appDataProvider.changeWindowSize();
   }
 

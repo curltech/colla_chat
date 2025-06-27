@@ -69,6 +69,13 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
   _init() {
     final List<PlatformDataField> searchDataField = [
       PlatformDataField(
+          name: 'eventCode',
+          label: 'EventCode',
+          prefixIcon: Icon(
+            Icons.event_available_outlined,
+            color: myself.primary,
+          )),
+      PlatformDataField(
           name: 'tsCode',
           label: 'TsCode',
           prefixIcon: Icon(
@@ -182,6 +189,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
 
   /// 构建搜索条件
   _buildSearchView(BuildContext context) {
+    searchController.setValues({'eventCode': inoutEventController.eventCode});
     int tradeDate = DateUtil.formatDateInt(DateUtil.currentDateTime());
     searchController.setValues({'tradeDate': tradeDate});
     List<FormButton> formButtonDefs = [
@@ -194,7 +202,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
     Widget formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
         child: FormInputWidget(
-          height: appDataProvider.portraitSize.height * 0.4,
+          height: appDataProvider.portraitSize.height * 0.5,
           spacing: 5.0,
           controller: searchController,
           formButtons: formButtonDefs,
@@ -210,11 +218,13 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
   }
 
   _onOk(BuildContext context, Map<String, dynamic> values) async {
+    String? eventCode = values['eventCode'];
     String? tsCode = values['tsCode'];
     int? tradeDate = values['tradeDate'];
     int? startDate = values['startDate'];
     int? endDate = values['endDate'];
     refresh(
+        eventCode: eventCode,
         tsCode: tsCode,
         tradeDate: tradeDate,
         startDate: startDate,
@@ -235,8 +245,12 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
   }
 
   refresh(
-      {String? tsCode, int? tradeDate, int? startDate, int? endDate}) async {
-    String? eventCode = inoutEventController.eventCode;
+      {String? eventCode,
+      String? tsCode,
+      int? tradeDate,
+      int? startDate,
+      int? endDate}) async {
+    eventCode ??= inoutEventController.eventCode;
     if (eventCode == null) {
       return;
     }
