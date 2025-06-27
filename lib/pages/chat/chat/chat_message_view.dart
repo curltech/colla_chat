@@ -19,6 +19,7 @@ import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.
 import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
@@ -475,17 +476,22 @@ class ChatMessageView extends StatelessWidget
         child: KeyboardActions(
           autoScroll: true,
           config: _buildKeyboardActionsConfig(context),
-          child: Obx(() {
-            var height = chatMessageViewController.chatMessageHeight;
-            return Column(children: <Widget>[
-              SizedBox(height: height, child: chatMessageWidget),
-              Divider(
-                color: Colors.white.withAlpha(AppOpacity.xlOpacity),
-                height: 1.0,
-              ),
-              chatMessageInputWidget
-            ]);
-          }),
+          child: ListenableBuilder(
+            listenable: appDataProvider,
+            builder: (BuildContext context, Widget? child) {
+              return Obx(() {
+                var height = chatMessageViewController.chatMessageHeight;
+                return Column(children: <Widget>[
+                  SizedBox(height: height, child: chatMessageWidget),
+                  Divider(
+                    color: Colors.white.withAlpha(AppOpacity.xlOpacity),
+                    height: 1.0,
+                  ),
+                  chatMessageInputWidget
+                ]);
+              });
+            },
+          ),
         ));
 
     return chatMessageView;

@@ -5,6 +5,8 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 
+import '../plugin/talker_logger.dart';
+
 /// 不同语言版本的下拉选择框的选项
 final localeOptions = [
   Option('English', LocaleUtil.getLocale('en_US'), hint: ''),
@@ -55,6 +57,7 @@ class AppDataProvider with ChangeNotifier {
     double totalBodyWidth = portraitSize.width;
     double secondaryBodyWidth = portraitSize.width;
     double bodyWidth;
+    _totalSize = MediaQuery.sizeOf(context!);
     if (landscape) {
       if (_totalSize.width >= largeBreakpointLimit) {
         totalBodyWidth = _totalSize.width - primaryNavigationWidth;
@@ -257,22 +260,43 @@ class AppDataProvider with ChangeNotifier {
   }
 
   ///当外部改变屏幕大小的时候引起index页面的重建，从而调用这个方法改变size
-  changeSize(BuildContext context) {
+  changeWindowSize() {
+    if (this.context == null) {
+      logger.e('context has not set!');
+      return;
+    }
+    BuildContext context = this.context!;
+    bool updated = false;
     var bottom = MediaQuery.viewInsetsOf(context).bottom;
     if (_keyboardHeight == 270.0 && bottom != 0) {
-      _keyboardHeight = bottom;
-      // logger.i('KeyboardHeight: $_keyboardHeight');
+      if (_keyboardHeight != bottom) {
+        // logger.i('KeyboardHeight: $_keyboardHeight');
+        _keyboardHeight = bottom;
+        updated = true;
+      }
     }
     // logger.i('bottomBarHeight: $bottomBarHeight');
     // logger.i('toolbarHeight: $toolbarHeight');
     // 上下边距 （主要用于 刘海  和  内置导航键）
-    topPadding = MediaQuery.paddingOf(context).top;
-    // logger.i('topPadding: $topPadding');
-    bottomPadding = MediaQuery.paddingOf(context).bottom;
-    // logger.i('bottomPadding: $bottomPadding');
+    double topPadding = MediaQuery.paddingOf(context).top;
+    if (this.topPadding != topPadding) {
+      // logger.i('topPadding: $topPadding');
+      this.topPadding = topPadding;
+      updated = true;
+    }
+    double bottomPadding = MediaQuery.paddingOf(context).bottom;
+    if (this.bottomPadding != bottomPadding) {
+      // logger.i('bottomPadding: $bottomPadding');
+      this.bottomPadding = bottomPadding;
+      updated = true;
+    }
 
-    textScaler = MediaQuery.textScalerOf(context);
-    // logger.i('textScaleFactor: $textScaleFactor');
+    TextScaler textScaler = MediaQuery.textScalerOf(context);
+    if (this.textScaler != textScaler) {
+      // logger.i('textScaleFactor: $textScaleFactor');
+      this.textScaler = textScaler;
+      updated = true;
+    }
 
     var totalSize = MediaQuery.sizeOf(context);
     if (totalSize.width != _totalSize.width ||
@@ -281,6 +305,10 @@ class AppDataProvider with ChangeNotifier {
       if (_bodyWidth != 0.0) {
         calBodyWidth();
       }
+      updated = true;
+    }
+    if (updated) {
+      notifyListeners();
     }
   }
 }

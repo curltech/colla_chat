@@ -19,7 +19,7 @@ import 'package:pro_image_editor/core/enums/editor_mode.dart';
 import 'package:pro_image_editor/core/models/editor_callbacks/pro_image_editor_callbacks.dart';
 import 'package:pro_image_editor/features/main_editor/main_editor.dart';
 
-/// 通用的视频编辑界面，分离视频成为图像
+/// 通用的视频编辑界面，使用ffmpeg分离视频成为图像
 class VideoEditorWidget extends StatelessWidget with TileDataMixin {
   VideoEditorWidget({
     super.key,

@@ -55,7 +55,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     Future.delayed(const Duration(seconds: 30), () {
       securityTip.value = false;
     });
-    chatMessageController.latest();
+    chatMessageController.latest(limit: 20);
 
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,

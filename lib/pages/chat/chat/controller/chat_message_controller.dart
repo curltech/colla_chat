@@ -39,7 +39,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     if (_chatSummary.value != chatSummary) {
       _chatSummary(chatSummary);
       clear();
-      previous(limit: defaultLimit);
+      previous(limit: 20);
     }
   }
 

@@ -9,6 +9,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:colla_chat/widgets/media_editor/video_renderer_widget.dart';
 import 'package:flutter/material.dart';
 
 //媒体页面
@@ -28,6 +29,9 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
   late final VideoEditorWidget videoEditorWidget = VideoEditorWidget(
     playlistController: playlistController,
   );
+  late final VideoRendererWidget videoRendererWidget = VideoRendererWidget(
+    playlistController: playlistController,
+  );
   late final List<TileData> mediaTileData;
   final PlaylistController playlistController = PlaylistController();
 
@@ -35,14 +39,18 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(videoPlayerWidget);
     indexWidgetProvider.define(audioPlayerWidget);
     indexWidgetProvider.define(audioRecorderWidget);
-    indexWidgetProvider.define(ffmpegMediaWidget);
     indexWidgetProvider.define(imageEditorWidget);
+    indexWidgetProvider.define(ffmpegMediaWidget);
     indexWidgetProvider.define(videoEditorWidget);
+    indexWidgetProvider.define(videoRendererWidget);
     List<TileDataMixin> mixins = [
       videoPlayerWidget,
       audioPlayerWidget,
       audioRecorderWidget,
+      imageEditorWidget,
       ffmpegMediaWidget,
+      videoEditorWidget,
+      videoRendererWidget
     ];
     mediaTileData = TileData.from(mixins);
     for (var tile in mediaTileData) {

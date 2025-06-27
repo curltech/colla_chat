@@ -202,6 +202,7 @@ class _IndexViewState extends State<IndexView>
     super.didChangeTextScaleFactor();
     logger.i(
         "didChangeTextScaleFactor  ：${WidgetsBinding.instance.platformDispatcher.textScaleFactor}");
+    appDataProvider.changeWindowSize();
   }
 
   @override
@@ -211,7 +212,9 @@ class _IndexViewState extends State<IndexView>
 
   @override
   onWindowResized() {
-    // appDataProvider.changeSize(context);
+    logger.i(
+        "window resized  ：${WidgetsBinding.instance.platformDispatcher.textScaleFactor}");
+    appDataProvider.changeWindowSize();
   }
 
   Future<bool?> _onWebrtcSignal(WebrtcEvent webrtcEvent) async {
@@ -713,7 +716,6 @@ class _IndexViewState extends State<IndexView>
   @override
   Widget build(BuildContext context) {
     appDataProvider.context = context;
-    appDataProvider.changeSize(context);
     var provider = Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(
         builder:
             (context, appDataProvider, indexWidgetProvider, myself, child) {
