@@ -105,8 +105,8 @@ class DataListController<T> {
 
   addAll(List<T> ds) {
     if (ds.isNotEmpty) {
-      this.currentIndex.value = data.length;
       data.addAll(ds);
+      this.currentIndex.value = data.length - 1;
     }
   }
 
@@ -171,8 +171,10 @@ class DataListController<T> {
   }
 
   clear() {
-    data.clear();
-    this.currentIndex.value = null;
+    if (data.isNotEmpty) {
+      data.clear();
+      this.currentIndex.value = null;
+    }
   }
 
   ///替换了当前的对象
@@ -185,7 +187,7 @@ class DataListController<T> {
   replaceAll(List<T> ds) {
     data.assignAll(ds);
     if (ds.isNotEmpty) {
-      this.currentIndex.value = 0;
+      this.currentIndex.value = data.length - 1;
     }
   }
 

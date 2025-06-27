@@ -20,7 +20,6 @@ import 'package:pro_image_editor/features/main_editor/main_editor.dart';
 class ImageEditorWidget extends StatelessWidget with TileDataMixin {
   ImageEditorWidget({
     super.key,
-    required this.playlistController,
   });
 
   @override
@@ -35,7 +34,7 @@ class ImageEditorWidget extends StatelessWidget with TileDataMixin {
   @override
   bool get withLeading => true;
 
-  final PlaylistController playlistController;
+  final PlaylistController playlistController = PlaylistController();
   late final PlaylistWidget playlistWidget = PlaylistWidget(
     playlistController: playlistController,
   );

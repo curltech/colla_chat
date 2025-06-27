@@ -17,6 +17,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -121,10 +122,6 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
       }
     }
     addAll(mediaSources);
-    if (data.isNotEmpty) {
-      setCurrentIndex = data.length - 1;
-    }
-
     return mediaSources;
   }
 
@@ -162,7 +159,7 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
     for (var allowedExtension in this.allowedExtensions) {
       allowedExtensions.add(allowedExtension.toUpperCase());
     }
-    List<PlatformMediaSource> mediaSources = [];
+    List<String> filenames = [];
     if (directory) {
       String? path = await FileUtil.directoryPathPicker(
           dialogTitle: dialogTitle, initialDirectory: initialDirectory);
@@ -177,14 +174,9 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
             }
             bool? contain = allowedExtensions.contains(extension);
             if (contain) {
-              PlatformMediaSource? mediaSource =
-                  await addMediaFile(filename: entry.path);
-              if (mediaSource != null) {
-                mediaSources.add(mediaSource);
-              }
+              filenames.add(entry.path);
             }
           }
-          setCurrentIndex = data.length - 1;
         }
       }
     } else {
@@ -194,14 +186,20 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
           allowedExtensions: allowedExtensions.toList());
       if (xfiles != null && xfiles.isNotEmpty) {
         for (var xfile in xfiles) {
-          PlatformMediaSource? mediaSource =
-              await addMediaFile(filename: xfile.path);
-          if (mediaSource != null) {
-            mediaSources.add(mediaSource);
+          String? extension = FileUtil.extension(xfile.path);
+          if (extension == null) {
+            continue;
+          }
+          bool? contain = allowedExtensions.contains(extension);
+          if (contain) {
+            filenames.add(xfile.path);
           }
         }
-        setCurrentIndex = data.length - 1;
       }
+    }
+    List<PlatformMediaSource> mediaSources = [];
+    if (filenames.isNotEmpty) {
+      mediaSources = await addMediaFiles(filenames: filenames);
     }
 
     return mediaSources;
@@ -214,13 +212,8 @@ class PlaylistWidget extends StatelessWidget {
   final PlaylistController playlistController;
 
   PlaylistWidget(
-      {super.key, this.onSelected, required this.playlistController}) {
-    playlistController.currentIndex.addListener(() {
-      _buildTileData();
-    });
-  }
+      {super.key, this.onSelected, required this.playlistController});
 
-  final RxList<TileData> tileData = <TileData>[].obs;
   final RxBool gridMode = false.obs;
 
   ///从收藏的文件中加入播放列表
@@ -252,7 +245,7 @@ class PlaylistWidget extends StatelessWidget {
     playlistController.addMediaFiles(filenames: filenames);
   }
 
-  Future<void> _buildTileData() async {
+  Future<List<TileData>> _buildTileData() async {
     List<PlatformMediaSource> mediaSources = playlistController.data;
     List<TileData> tileData = [];
     for (var mediaSource in mediaSources) {
@@ -278,100 +271,106 @@ class PlaylistWidget extends StatelessWidget {
         selected: selected,
         onTap: (int index, String title, {String? subtitle}) {
           playlistController.setCurrentIndex = index;
-          _buildTileData();
         },
       );
       tileData.add(tile);
     }
 
-    this.tileData(tileData);
+    return tileData;
   }
 
   Widget _buildThumbnailView(BuildContext context) {
     return Obx(() {
-      if (tileData.isEmpty) {
-        return Container(
-            alignment: Alignment.center,
-            child: CommonAutoSizeText(AppLocalizations.t('Playlist is empty')));
-      }
-      int crossAxisCount = (appDataProvider.secondaryBodyWidth / 250).ceil();
-      List<Widget> thumbnails = [];
-      for (var tile in tileData) {
-        List<Widget> children = [];
-        children.add(const Spacer());
-        children.add(CommonAutoSizeText(
-          tile.title,
-          style: const TextStyle(fontSize: AppFontSize.minFontSize),
-        ));
-        if (tile.subtitle != null) {
-          children.add(const SizedBox(
-            height: 2.0,
-          ));
-          children.add(CommonAutoSizeText(
-            tile.subtitle!,
-            style: const TextStyle(fontSize: AppFontSize.minFontSize),
-          ));
-        }
-        var thumbnail = Container(
-            decoration: tile.selected ?? false
-                ? BoxDecoration(
-                    border: Border.all(width: 2, color: myself.primary))
-                : null,
-            padding: EdgeInsets.zero,
-            child: Card(
-                elevation: 0.0,
-                margin: EdgeInsets.zero,
-                shape: const ContinuousRectangleBorder(),
-                child: Stack(
-                  children: [
-                    tile.prefix ?? nilBox,
-                    Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: children)
-                  ],
-                )));
-        thumbnails.add(thumbnail);
-      }
-
-      if (gridMode.isTrue) {
-        return GridView.builder(
-            itemCount: tileData.length,
-            //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                //横轴元素个数
-                crossAxisCount: crossAxisCount,
-                //纵轴间距
-                mainAxisSpacing: 4.0,
-                //横轴间距
-                crossAxisSpacing: 4.0,
-                //子组件宽高长度比例
-                childAspectRatio: 1),
-            itemBuilder: (BuildContext context, int index) {
-              return InkWell(
-                  child: thumbnails[index],
-                  onTap: () {
-                    playlistController.setCurrentIndex = index;
-                    if (onSelected != null) {
-                      onSelected!(index, tileData[index].title);
-                    }
-                  });
-            });
-      } else {
-        return DataListView(
-          onTap: (int index, String title,
-              {TileData? group, String? subtitle}) {
-            playlistController.setCurrentIndex = index;
-            if (onSelected != null) {
-              onSelected!(index, title);
+      return PlatformFutureBuilder<List<TileData>>(
+        future: _buildTileData(),
+        builder: (BuildContext context, List<TileData> tileData) {
+          if (tileData.isEmpty) {
+            return Container(
+                alignment: Alignment.center,
+                child: CommonAutoSizeText(
+                    AppLocalizations.t('Playlist is empty')));
+          }
+          int crossAxisCount =
+              (appDataProvider.secondaryBodyWidth / 250).ceil();
+          List<Widget> thumbnails = [];
+          for (var tile in tileData) {
+            List<Widget> children = [];
+            children.add(const Spacer());
+            children.add(CommonAutoSizeText(
+              tile.title,
+              style: const TextStyle(fontSize: AppFontSize.minFontSize),
+            ));
+            if (tile.subtitle != null) {
+              children.add(const SizedBox(
+                height: 2.0,
+              ));
+              children.add(CommonAutoSizeText(
+                tile.subtitle!,
+                style: const TextStyle(fontSize: AppFontSize.minFontSize),
+              ));
             }
-          },
-          itemCount: tileData.length,
-          itemBuilder: (BuildContext context, int index) {
-            return tileData[index];
-          },
-        );
-      }
+            var thumbnail = Container(
+                decoration: tile.selected ?? false
+                    ? BoxDecoration(
+                        border: Border.all(width: 2, color: myself.primary))
+                    : null,
+                padding: EdgeInsets.zero,
+                child: Card(
+                    elevation: 0.0,
+                    margin: EdgeInsets.zero,
+                    shape: const ContinuousRectangleBorder(),
+                    child: Stack(
+                      children: [
+                        tile.prefix ?? nilBox,
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: children)
+                      ],
+                    )));
+            thumbnails.add(thumbnail);
+          }
+
+          if (gridMode.isTrue) {
+            return GridView.builder(
+                itemCount: tileData.length,
+                //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    //横轴元素个数
+                    crossAxisCount: crossAxisCount,
+                    //纵轴间距
+                    mainAxisSpacing: 4.0,
+                    //横轴间距
+                    crossAxisSpacing: 4.0,
+                    //子组件宽高长度比例
+                    childAspectRatio: 1),
+                itemBuilder: (BuildContext context, int index) {
+                  return InkWell(
+                      child: thumbnails[index],
+                      onTap: () {
+                        playlistController.setCurrentIndex = index;
+                        if (onSelected != null) {
+                          onSelected!(index, tileData[index].title);
+                        }
+                      });
+                });
+          } else {
+            return DataListView(
+              onTap: (int index, String title,
+                  {TileData? group, String? subtitle}) {
+                playlistController.setCurrentIndex = index;
+                if (onSelected != null) {
+                  onSelected!(index, title);
+                }
+              },
+              itemCount: tileData.length,
+              itemBuilder: (BuildContext context, int index) {
+                return tileData[index];
+              },
+            );
+          }
+        },
+      );
     });
   }
 

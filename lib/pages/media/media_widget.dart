@@ -20,20 +20,11 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
       PlatformAudioPlayerWidget();
   final PlatformAudioRecorderWidget audioRecorderWidget =
       PlatformAudioRecorderWidget();
-  late final FFMpegMediaWidget ffmpegMediaWidget = FFMpegMediaWidget(
-    playlistController: playlistController,
-  );
-  late final ImageEditorWidget imageEditorWidget = ImageEditorWidget(
-    playlistController: playlistController,
-  );
-  late final VideoEditorWidget videoEditorWidget = VideoEditorWidget(
-    playlistController: playlistController,
-  );
-  late final VideoRendererWidget videoRendererWidget = VideoRendererWidget(
-    playlistController: playlistController,
-  );
+  final FFMpegMediaWidget ffmpegMediaWidget = FFMpegMediaWidget();
+  final ImageEditorWidget imageEditorWidget = ImageEditorWidget();
+  final VideoEditorWidget videoEditorWidget = VideoEditorWidget();
+  final VideoRendererWidget videoRendererWidget = VideoRendererWidget();
   late final List<TileData> mediaTileData;
-  final PlaylistController playlistController = PlaylistController();
 
   MediaWidget({super.key}) {
     indexWidgetProvider.define(videoPlayerWidget);

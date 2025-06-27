@@ -29,7 +29,6 @@ import 'package:flutter/material.dart';
 class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   FFMpegMediaWidget({
     super.key,
-    required this.playlistController,
   }) {
     checkFFMpeg();
   }
@@ -46,7 +45,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   @override
   bool get withLeading => true;
 
-  final PlaylistController playlistController;
+  final PlaylistController playlistController = PlaylistController();
   late final PlaylistWidget playlistWidget = PlaylistWidget(
     playlistController: playlistController,
   );

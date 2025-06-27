@@ -19,7 +19,7 @@ import 'package:pro_video_editor/core/models/video/video_metadata_model.dart';
 
 /// 视频渲染处理界面，包括旋转，裁剪
 class VideoRendererWidget extends StatelessWidget with TileDataMixin {
-  VideoRendererWidget({super.key, required this.playlistController});
+  VideoRendererWidget({super.key});
 
   @override
   bool get withLeading => true;
@@ -33,7 +33,7 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'VideoRenderer';
 
-  final PlaylistController playlistController;
+  final PlaylistController playlistController = PlaylistController();
   late final PlaylistWidget playlistWidget = PlaylistWidget(
     playlistController: playlistController,
   );

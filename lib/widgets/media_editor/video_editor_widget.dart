@@ -25,7 +25,6 @@ import 'package:pro_image_editor/features/main_editor/main_editor.dart';
 class VideoEditorWidget extends StatelessWidget with TileDataMixin {
   VideoEditorWidget({
     super.key,
-    required this.playlistController,
   }) {
     scrollController.addListener(_onScroll);
   }
@@ -42,7 +41,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
   @override
   bool get withLeading => true;
 
-  final PlaylistController playlistController;
+  final PlaylistController playlistController = PlaylistController();
   late final PlaylistWidget playlistWidget = PlaylistWidget(
     playlistController: playlistController,
   );
@@ -72,6 +71,10 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
 
   /// 将视频文件按帧分离成图像
   _splitImageFiles(BuildContext context) async {
+    String? videoFilename = playlistController.current?.filename;
+    if (videoFilename == null) {
+      return;
+    }
     imageFileController.clear();
     int pos = displayPosition.value;
     Duration startTime = Duration(minutes: pos);
@@ -83,7 +86,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
       filenames.add(filename);
       Duration frameTime = Duration(seconds: startTime.inSeconds + i + 1);
       String command = FFMpegHelper.buildCommand(
-        input: playlistController.current!.filename,
+        input: videoFilename,
         output: filename,
         ss: frameTime.toString(),
         vframes: '1',
