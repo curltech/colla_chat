@@ -23,7 +23,6 @@ import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_util.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/media_information.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/return_code.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/session_state.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 /// 选择多个视频文件，使用ffmpeg对video进行处理的界面
@@ -51,12 +50,8 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   late final PlaylistWidget playlistWidget = PlaylistWidget(
     playlistController: playlistController,
   );
-  final FileType fileType = FileType.custom;
   final ValueNotifier<bool> ffmpegPresent = ValueNotifier<bool>(false);
   final ValueNotifier<String?> output = ValueNotifier<String?>(null);
-  final ValueNotifier<bool> gridMode = ValueNotifier<bool>(false);
-  final ValueNotifier<List<TileData>> tileData =
-      ValueNotifier<List<TileData>>([]);
   final Map<String, FFMpegHelperSession> ffmpegSessions = {};
   final ValueNotifier<int> index = ValueNotifier<int>(0);
   final SwiperController swiperController = SwiperController();

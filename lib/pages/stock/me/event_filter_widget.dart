@@ -44,7 +44,7 @@ class EventFilterController extends DataListController<EventFilter> {
 /// 自选股的控制器
 final EventFilterController eventFilterController = EventFilterController();
 
-///自选股和分组的查询界面
+/// 管理自定义的事件过滤器，事件过滤器的条件为股票的查询条件
 class EventFilterWidget extends StatelessWidget with TileDataMixin {
   EventFilterWidget({super.key});
 
@@ -59,8 +59,6 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'EventFilter';
-
-  
 
   final List<PlatformDataField> eventFilterDataField = [
     PlatformDataField(
@@ -110,8 +108,8 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
   ];
   late final FormInputController formInputController =
       FormInputController(eventFilterDataField);
-  SwiperController swiperController = SwiperController();
-  RxInt index = 0.obs;
+  final SwiperController swiperController = SwiperController();
+  final RxInt index = 0.obs;
 
   Widget _buildActionWidget(
       BuildContext context, int index, dynamic eventFilter) {
@@ -160,12 +158,12 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
       PlatformDataColumn(
         label: '事件代码',
         name: 'eventCode',
-        width: 80,
+        width: 150,
       ),
       PlatformDataColumn(
         label: '事件名',
         name: 'eventName',
-        width: 100,
+        width: 150,
       ),
       PlatformDataColumn(
         label: '条件内容',
@@ -228,22 +226,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
           formButtons: formButtonDefs,
         ));
 
-    return Column(
-      children: [
-        OverflowBar(
-          alignment: MainAxisAlignment.start,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.chevron_left),
-              onPressed: () {
-                _onCancel();
-              },
-            ),
-          ],
-        ),
-        formInputWidget,
-      ],
-    );
+    return formInputWidget;
   }
 
   _onOk(BuildContext context, Map<String, dynamic> values) async {
@@ -265,42 +248,59 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
     eventFilterController.setCurrentIndex = -1;
   }
 
-  _onCancel() async {
-    swiperController.move(0);
+  Widget _buildRightWidget(BuildContext context) {
+    return Obx(() {
+      List<Widget> rightWidgets = [];
+      if (index.value == 0) {
+        rightWidgets.addAll([
+          IconButton(
+            tooltip: AppLocalizations.t('Add'),
+            onPressed: () {
+              eventFilterController.setCurrentIndex = -1;
+              swiperController.move(1);
+            },
+            icon: const Icon(Icons.add_circle_outline),
+          ),
+          IconButton(
+            tooltip: AppLocalizations.t('Refresh'),
+            onPressed: () async {
+              if (eventFilterController.eventCode != null) {
+                List<EventFilter> value = await eventFilterService.find(
+                    where: 'eventCode=?',
+                    whereArgs: [eventFilterController.eventCode!]);
+                eventFilterController.replaceAll(value);
+              } else {
+                List<EventFilter> value = await eventFilterService.findAll();
+                eventFilterController.replaceAll(value);
+              }
+            },
+            icon: const Icon(Icons.refresh_outlined),
+          ),
+        ]);
+      }
+      if (index.value == 1) {
+        rightWidgets.addAll([
+          IconButton(
+            tooltip: AppLocalizations.t('List'),
+            onPressed: () {
+              eventFilterController.setCurrentIndex = -1;
+              swiperController.move(0);
+            },
+            icon: const Icon(Icons.list_alt_outlined),
+          ),
+        ]);
+      }
+      return Row(children: rightWidgets);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> rightWidgets = [
-      IconButton(
-        tooltip: AppLocalizations.t('Add'),
-        onPressed: () {
-          eventFilterController.setCurrentIndex = -1;
-          swiperController.move(1);
-        },
-        icon: const Icon(Icons.add_circle_outline),
-      ),
-      IconButton(
-        tooltip: AppLocalizations.t('Refresh'),
-        onPressed: () async {
-          if (eventFilterController.eventCode != null) {
-            List<EventFilter> value = await eventFilterService.find(
-                where: 'eventCode=?',
-                whereArgs: [eventFilterController.eventCode!]);
-            eventFilterController.replaceAll(value);
-          } else {
-            List<EventFilter> value = await eventFilterService.findAll();
-            eventFilterController.replaceAll(value);
-          }
-        },
-        icon: const Icon(Icons.refresh_outlined),
-      ),
-    ];
     return AppBarView(
       title: title,
       helpPath: routeName,
       withLeading: true,
-      rightWidgets: rightWidgets,
+      rightWidgets: [_buildRightWidget(context)],
       child: Obx(() {
         return Swiper(
           controller: swiperController,

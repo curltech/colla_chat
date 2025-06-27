@@ -20,6 +20,7 @@ import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+/// 日线数据列表控制器
 class InoutEventController extends DataListController<DayLine> {
   final Rx<String?> _eventCode = Rx<String?>(null);
   final Rx<String?> _eventName = Rx<String?>(null);
@@ -43,7 +44,7 @@ class InoutEventController extends DataListController<DayLine> {
 
 final InoutEventController inoutEventController = InoutEventController();
 
-/// 加自选股和分组的查询界面
+/// 自定义事件在历史上发生的日线
 class InoutEventWidget extends StatelessWidget with TileDataMixin {
   InoutEventWidget({super.key}) {
     _init();
@@ -61,11 +62,9 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'InoutEvent';
 
-  
-
   late final List<PlatformDataColumn> inoutEventColumns;
   late final FormInputController searchController;
-  ExpansibleController expansibleController = ExpansibleController();
+  final ExpansibleController expansibleController = ExpansibleController();
 
   _init() {
     final List<PlatformDataField> searchDataField = [
@@ -128,9 +127,29 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
         width: 100,
       ),
       PlatformDataColumn(
+        label: '涨幅',
+        name: 'pct_chg_close',
+        dataType: DataType.percentage,
+        positiveColor: Colors.red,
+        negativeColor: Colors.green,
+        align: Alignment.centerRight,
+        width: 70,
+      ),
+      PlatformDataColumn(
+        label: '量变化',
+        name: 'pct_chg_vol',
+        dataType: DataType.percentage,
+        positiveColor: Colors.red,
+        negativeColor: Colors.green,
+        align: Alignment.centerRight,
+        width: 90,
+      ),
+      PlatformDataColumn(
         label: '换手率',
         name: 'turnover',
-        width: 100,
+        dataType: DataType.double,
+        align: Alignment.centerRight,
+        width: 70,
       ),
       PlatformDataColumn(
           label: '',

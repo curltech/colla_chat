@@ -1,7 +1,10 @@
+import 'package:card_swiper/card_swiper.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
@@ -31,6 +34,11 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
   String get title => 'VideoRenderer';
 
   final PlaylistController playlistController;
+  late final PlaylistWidget playlistWidget = PlaylistWidget(
+    playlistController: playlistController,
+  );
+  final ValueNotifier<int> index = ValueNotifier<int>(0);
+  final SwiperController swiperController = SwiperController();
   late final _player = Player();
   late final _videoController = VideoController(_player);
   late final _previewPlayer = Player();
@@ -280,13 +288,13 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
       // height: appDataProvider.portraitSize.height * 0.3,
       spacing: 10.0,
       onOk: (Map<String, dynamic> values) async {
-        _ok(values);
+        _onOk(values);
       },
       controller: formInputController,
     );
   }
 
-  _ok(Map<String, dynamic> values) {
+  _onOk(Map<String, dynamic> values) {
     int? startTimeMs = values['startTimeMs'];
     int? endTimeMs = values['endTimeMs'];
     double? blur = values['blur'];
@@ -324,24 +332,44 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildVideoPlayer(BuildContext context) {
-    return Wrap(
-      spacing: 16,
-      runSpacing: 16,
-      alignment: WrapAlignment.center,
-      children: [
-        ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: appDataProvider.secondaryBodyWidth,
-          ),
-          child: _buildSourceVideoPlayer(),
-        ),
-        ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: appDataProvider.secondaryBodyWidth,
-          ),
-          child: _buildTargetVideoPlayer(),
-        ),
-      ],
+    Widget mediaView = Swiper(
+      itemCount: 2,
+      index: index.value,
+      controller: swiperController,
+      onIndexChanged: (int index) {
+        this.index.value = index;
+      },
+      itemBuilder: (BuildContext context, int index) {
+        if (index == 0) {
+          return playlistWidget;
+        }
+        if (index == 1) {
+          return Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            alignment: WrapAlignment.center,
+            children: [
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: appDataProvider.secondaryBodyWidth,
+                ),
+                child: _buildSourceVideoPlayer(),
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: appDataProvider.secondaryBodyWidth,
+                ),
+                child: _buildTargetVideoPlayer(),
+              ),
+            ],
+          );
+        }
+        return nilBox;
+      },
+    );
+
+    return Center(
+      child: mediaView,
     );
   }
 
@@ -386,23 +414,61 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
         });
   }
 
+  List<Widget>? _buildRightWidgets(BuildContext context) {
+    List<Widget> children = [];
+    Widget btn = ValueListenableBuilder(
+        valueListenable: index,
+        builder: (BuildContext context, int index, Widget? child) {
+          if (index == 0) {
+            return Row(children: [
+              IconButton(
+                tooltip: AppLocalizations.t('Video render'),
+                onPressed: () async {
+                  await swiperController.move(1);
+                },
+                icon: const Icon(Icons.task_alt_outlined),
+              ),
+              IconButton(
+                tooltip: AppLocalizations.t('More'),
+                onPressed: () {
+                  playlistWidget.showActionCard(context);
+                },
+                icon: const Icon(Icons.more_horiz_outlined),
+              ),
+            ]);
+          } else {
+            return Row(children: [
+              IconButton(
+                tooltip: AppLocalizations.t('Playlist'),
+                onPressed: () async {
+                  await swiperController.move(0);
+                },
+                icon: const Icon(Icons.featured_play_list_outlined),
+              ),
+            ]);
+          }
+        });
+    children.add(btn);
+    children.add(IconButton(
+        onPressed: () {
+          DialogUtil.popModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return _buildFormInputWidget(context);
+              });
+        },
+        icon: Icon(Icons.draw_outlined)));
+
+    return children;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppBarView(
       title: title,
       helpPath: routeName,
       withLeading: true,
-      rightWidgets: [
-        IconButton(
-            onPressed: () {
-              DialogUtil.popModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return _buildFormInputWidget(context);
-                  });
-            },
-            icon: Icon(Icons.draw_outlined))
-      ],
+      rightWidgets: _buildRightWidgets(context),
       child: _buildVideoPlayer(context),
     );
   }

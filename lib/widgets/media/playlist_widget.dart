@@ -26,7 +26,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class PlaylistController extends DataListController<PlatformMediaSource> {
-  FileType fileType = FileType.custom;
+  late FileType _fileType;
   final Set<String> videoExtensions = {
     'mp4',
     '3gp',
@@ -54,10 +54,24 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
   };
   final Set<String> allowedExtensions = {};
 
-  PlaylistController() {
-    allowedExtensions.addAll(videoExtensions);
-    allowedExtensions.addAll(audioExtensions);
-    allowedExtensions.addAll(imageExtensions);
+  PlaylistController({FileType fileType = FileType.custom}) {
+    this.fileType = fileType;
+  }
+
+  FileType get fileType {
+    return _fileType;
+  }
+
+  set fileType(FileType fileType) {
+    if (fileType == FileType.custom || fileType == FileType.video) {
+      allowedExtensions.addAll(videoExtensions);
+    }
+    if (fileType == FileType.custom || fileType == FileType.audio) {
+      allowedExtensions.addAll(audioExtensions);
+    }
+    if (fileType == FileType.custom || fileType == FileType.image) {
+      allowedExtensions.addAll(imageExtensions);
+    }
   }
 
   previous() async {
@@ -176,7 +190,7 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
     } else {
       final xfiles = await FileUtil.pickFiles(
           allowMultiple: allowMultiple,
-          type: fileType,
+          type: _fileType,
           allowedExtensions: allowedExtensions.toList());
       if (xfiles != null && xfiles.isNotEmpty) {
         for (var xfile in xfiles) {

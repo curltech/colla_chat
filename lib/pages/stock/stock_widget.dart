@@ -1,6 +1,7 @@
 import 'package:colla_chat/pages/stock/me/add_share_widget.dart';
 import 'package:colla_chat/pages/stock/me/event_filter_widget.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
+import 'package:colla_chat/pages/stock/me/stock_dayline_widget.dart';
 import 'package:colla_chat/pages/stock/setting/refresh_stock_widget.dart';
 import 'package:colla_chat/pages/stock/setting/update_stock_widget.dart';
 import 'package:colla_chat/pages/stock/trade/in_out_event_widget.dart';
@@ -22,6 +23,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
   final UpdateStockWidget updateStockWidget = UpdateStockWidget();
   final InoutEventWidget inoutEventWidget = InoutEventWidget();
   final EventFilterWidget eventFilterWidget = EventFilterWidget();
+  final DayLineWidget dayLineWidget = DayLineWidget();
   final PerformanceWidget performanceWidget = PerformanceWidget();
   final QPerformanceWidget qperformanceWidget = QPerformanceWidget();
   final QStatWidget qstatWidget = QStatWidget();
@@ -34,6 +36,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(updateStockWidget);
     indexWidgetProvider.define(inoutEventWidget);
     indexWidgetProvider.define(eventFilterWidget);
+    indexWidgetProvider.define(dayLineWidget);
     indexWidgetProvider.define(performanceWidget);
     indexWidgetProvider.define(qperformanceWidget);
     indexWidgetProvider.define(qstatWidget);
@@ -52,15 +55,15 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Stock';
 
-  
-
   @override
   Widget build(BuildContext context) {
     Map<TileData, List<TileData>> tileData = {};
     final List<TileData> meTileData = TileData.from([
       shareSelectionWidget,
       addShareWidget,
+      dayLineWidget,
       eventFilterWidget,
+      inoutEventWidget
     ]);
     for (var tile in meTileData) {
       tile.dense = false;

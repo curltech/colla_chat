@@ -28,15 +28,13 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'AddShare';
 
-  
-
   final TextEditingController searchTextController = TextEditingController();
 
   /// 增加自选股的查询结果
   final RxList<Share> shares = <Share>[].obs;
   final RxList<TileData> tileData = <TileData>[].obs;
 
-  //将linkman和group数据转换从列表显示数据
+  /// 将linkman和group数据转换从列表显示数据
   Future<List<TileData>> _buildShareTileData() async {
     List<TileData> tiles = [];
     if (shares.isNotEmpty) {
@@ -128,6 +126,9 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: title, helpPath: routeName,withLeading: true, child: _buildSearchShareView(context));
+        title: title,
+        helpPath: routeName,
+        withLeading: true,
+        child: _buildSearchShareView(context));
   }
 }

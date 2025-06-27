@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:card_swiper/card_swiper.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -41,6 +43,11 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
   bool get withLeading => true;
 
   final PlaylistController playlistController;
+  late final PlaylistWidget playlistWidget = PlaylistWidget(
+    playlistController: playlistController,
+  );
+  final ValueNotifier<int> index = ValueNotifier<int>(0);
+  final SwiperController swiperController = SwiperController();
 
   ///视频文件拆分成图像文件
   final DataListController<String> imageFileController =
@@ -182,31 +189,93 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildVideoEditor(BuildContext context) {
-    return Obx(() {
-      String? filename = imageFileController.current;
-      if (filename == null) {
+    Widget mediaView = Swiper(
+      itemCount: 2,
+      index: index.value,
+      controller: swiperController,
+      onIndexChanged: (int index) {
+        this.index.value = index;
+      },
+      itemBuilder: (BuildContext context, int index) {
+        if (index == 0) {
+          return playlistWidget;
+        }
+        if (index == 1) {
+          return Obx(() {
+            String? filename = imageFileController.current;
+            if (filename == null) {
+              return nilBox;
+            }
+            return Column(children: [
+              Expanded(
+                  child: ProImageEditor.file(
+                      key: UniqueKey(),
+                      File(filename),
+                      callbacks: ProImageEditorCallbacks(
+                          onImageEditingComplete: (Uint8List bytes) async {
+                        String? name = await DialogUtil.showTextFormField(
+                            title: 'Save as',
+                            content: 'Filename',
+                            tip: filename);
+                        if (name != null) {
+                          await FileUtil.writeFileAsBytes(bytes, name);
+                          DialogUtil.info(
+                              content: 'Save file:$name successfully');
+                        }
+                      }, onCloseEditor: (EditorMode mode) {
+                        indexWidgetProvider.pop();
+                      }))),
+              _buildSeekBar(context),
+              _buildImageSlide(context),
+            ]);
+          });
+        }
         return nilBox;
-      }
-      return Column(children: [
-        Expanded(
-            child: ProImageEditor.file(
-                key: UniqueKey(),
-                File(filename),
-                callbacks: ProImageEditorCallbacks(
-                    onImageEditingComplete: (Uint8List bytes) async {
-                  String? name = await DialogUtil.showTextFormField(
-                      title: 'Save as', content: 'Filename', tip: filename);
-                  if (name != null) {
-                    await FileUtil.writeFileAsBytes(bytes, name);
-                    DialogUtil.info(content: 'Save file:$name successfully');
-                  }
-                }, onCloseEditor: (EditorMode mode) {
-                  indexWidgetProvider.pop();
-                }))),
-        _buildSeekBar(context),
-        _buildImageSlide(context),
-      ]);
-    });
+      },
+    );
+
+    return Center(
+      child: mediaView,
+    );
+  }
+
+  List<Widget>? _buildRightWidgets(BuildContext context) {
+    List<Widget> children = [];
+    Widget btn = ValueListenableBuilder(
+        valueListenable: index,
+        builder: (BuildContext context, int index, Widget? child) {
+          if (index == 0) {
+            return Row(children: [
+              IconButton(
+                tooltip: AppLocalizations.t('Video editor'),
+                onPressed: () async {
+                  await swiperController.move(1);
+                },
+                icon: const Icon(Icons.task_alt_outlined),
+              ),
+              IconButton(
+                tooltip: AppLocalizations.t('More'),
+                onPressed: () {
+                  playlistWidget.showActionCard(context);
+                },
+                icon: const Icon(Icons.more_horiz_outlined),
+              ),
+            ]);
+          } else {
+            return Row(children: [
+              IconButton(
+                tooltip: AppLocalizations.t('Playlist'),
+                onPressed: () async {
+                  await swiperController.move(0);
+                },
+                icon: const Icon(Icons.featured_play_list_outlined),
+              ),
+            ]);
+          }
+        });
+    children.add(btn);
+
+    return children;
   }
 
   @override
@@ -216,6 +285,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
       title: title,
       helpPath: routeName,
       withLeading: true,
+      rightWidgets: _buildRightWidgets(context),
       child: _buildVideoEditor(context),
     );
   }

@@ -65,7 +65,7 @@ class ScreenSelectDialog extends StatelessWidget {
   StateSetter? _stateSetter;
   Timer? _timer;
 
-  void _ok(context) async {
+  void _onOk(context) async {
     _timer?.cancel();
     for (var element in _subscriptions) {
       element.cancel();
@@ -149,7 +149,7 @@ class ScreenSelectDialog extends StatelessWidget {
               AppLocalizations.t('Share'),
             ),
             onPressed: () {
-              _ok(context);
+              _onOk(context);
             },
           ),
         ],
