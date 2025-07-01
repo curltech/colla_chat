@@ -17,7 +17,6 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -64,6 +63,7 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
   }
 
   set fileType(FileType fileType) {
+    _fileType = fileType;
     if (fileType == FileType.custom || fileType == FileType.video) {
       allowedExtensions.addAll(videoExtensions);
     }
@@ -212,9 +212,14 @@ class PlaylistWidget extends StatelessWidget {
   final PlaylistController playlistController;
 
   PlaylistWidget(
-      {super.key, this.onSelected, required this.playlistController});
+      {super.key, this.onSelected, required this.playlistController}) {
+    playlistController.currentIndex.addListener(() async {
+      await _buildTileData();
+    });
+  }
 
   final RxBool gridMode = false.obs;
+  final RxList<TileData> tileData = RxList<TileData>([]);
 
   ///从收藏的文件中加入播放列表
   _collect() async {
@@ -245,7 +250,7 @@ class PlaylistWidget extends StatelessWidget {
     playlistController.addMediaFiles(filenames: filenames);
   }
 
-  Future<List<TileData>> _buildTileData() async {
+  _buildTileData() {
     List<PlatformMediaSource> mediaSources = playlistController.data;
     List<TileData> tileData = [];
     for (var mediaSource in mediaSources) {
@@ -276,101 +281,93 @@ class PlaylistWidget extends StatelessWidget {
       tileData.add(tile);
     }
 
-    return tileData;
+    this.tileData.assignAll(tileData);
+  }
+
+  Widget _buildThumbnailWidget(BuildContext context, TileData tile) {
+    List<Widget> children = [];
+    children.add(const Spacer());
+    children.add(CommonAutoSizeText(
+      tile.title,
+      style: const TextStyle(fontSize: AppFontSize.minFontSize),
+    ));
+    if (tile.subtitle != null) {
+      children.add(const SizedBox(
+        height: 2.0,
+      ));
+      children.add(CommonAutoSizeText(
+        tile.subtitle!,
+        style: const TextStyle(fontSize: AppFontSize.minFontSize),
+      ));
+    }
+    Widget thumbnail = Container(
+        decoration: tile.selected ?? false
+            ? BoxDecoration(border: Border.all(width: 2, color: myself.primary))
+            : null,
+        padding: EdgeInsets.zero,
+        child: Card(
+            elevation: 0.0,
+            margin: EdgeInsets.zero,
+            shape: const ContinuousRectangleBorder(),
+            child: Stack(
+              children: [
+                tile.prefix ?? nilBox,
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: children)
+              ],
+            )));
+
+    return thumbnail;
   }
 
   Widget _buildThumbnailView(BuildContext context) {
     return Obx(() {
-      return PlatformFutureBuilder<List<TileData>>(
-        future: _buildTileData(),
-        builder: (BuildContext context, List<TileData> tileData) {
-          if (tileData.isEmpty) {
-            return Container(
-                alignment: Alignment.center,
-                child: CommonAutoSizeText(
-                    AppLocalizations.t('Playlist is empty')));
-          }
-          int crossAxisCount =
-              (appDataProvider.secondaryBodyWidth / 250).ceil();
-          List<Widget> thumbnails = [];
-          for (var tile in tileData) {
-            List<Widget> children = [];
-            children.add(const Spacer());
-            children.add(CommonAutoSizeText(
-              tile.title,
-              style: const TextStyle(fontSize: AppFontSize.minFontSize),
-            ));
-            if (tile.subtitle != null) {
-              children.add(const SizedBox(
-                height: 2.0,
-              ));
-              children.add(CommonAutoSizeText(
-                tile.subtitle!,
-                style: const TextStyle(fontSize: AppFontSize.minFontSize),
-              ));
+      if (tileData.isEmpty) {
+        return Container(
+            alignment: Alignment.center,
+            child: CommonAutoSizeText(AppLocalizations.t('Playlist is empty')));
+      }
+      int crossAxisCount = (appDataProvider.secondaryBodyWidth / 250).ceil();
+      if (gridMode.isTrue) {
+        return GridView.builder(
+            itemCount: tileData.length,
+            //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                //横轴元素个数
+                crossAxisCount: crossAxisCount,
+                //纵轴间距
+                mainAxisSpacing: 4.0,
+                //横轴间距
+                crossAxisSpacing: 4.0,
+                //子组件宽高长度比例
+                childAspectRatio: 1),
+            itemBuilder: (BuildContext context, int index) {
+              return InkWell(
+                  child: _buildThumbnailWidget(context, tileData[index]),
+                  onTap: () {
+                    playlistController.setCurrentIndex = index;
+                    if (onSelected != null) {
+                      onSelected!(index, tileData[index].title);
+                    }
+                  });
+            });
+      } else {
+        return DataListView(
+          onTap: (int index, String title,
+              {TileData? group, String? subtitle}) {
+            playlistController.setCurrentIndex = index;
+            if (onSelected != null) {
+              onSelected!(index, title);
             }
-            var thumbnail = Container(
-                decoration: tile.selected ?? false
-                    ? BoxDecoration(
-                        border: Border.all(width: 2, color: myself.primary))
-                    : null,
-                padding: EdgeInsets.zero,
-                child: Card(
-                    elevation: 0.0,
-                    margin: EdgeInsets.zero,
-                    shape: const ContinuousRectangleBorder(),
-                    child: Stack(
-                      children: [
-                        tile.prefix ?? nilBox,
-                        Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: children)
-                      ],
-                    )));
-            thumbnails.add(thumbnail);
-          }
-
-          if (gridMode.isTrue) {
-            return GridView.builder(
-                itemCount: tileData.length,
-                //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    //横轴元素个数
-                    crossAxisCount: crossAxisCount,
-                    //纵轴间距
-                    mainAxisSpacing: 4.0,
-                    //横轴间距
-                    crossAxisSpacing: 4.0,
-                    //子组件宽高长度比例
-                    childAspectRatio: 1),
-                itemBuilder: (BuildContext context, int index) {
-                  return InkWell(
-                      child: thumbnails[index],
-                      onTap: () {
-                        playlistController.setCurrentIndex = index;
-                        if (onSelected != null) {
-                          onSelected!(index, tileData[index].title);
-                        }
-                      });
-                });
-          } else {
-            return DataListView(
-              onTap: (int index, String title,
-                  {TileData? group, String? subtitle}) {
-                playlistController.setCurrentIndex = index;
-                if (onSelected != null) {
-                  onSelected!(index, title);
-                }
-              },
-              itemCount: tileData.length,
-              itemBuilder: (BuildContext context, int index) {
-                return tileData[index];
-              },
-            );
-          }
-        },
-      );
+          },
+          itemCount: tileData.length,
+          itemBuilder: (BuildContext context, int index) {
+            return tileData[index];
+          },
+        );
+      }
     });
   }
 
