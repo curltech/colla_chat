@@ -213,7 +213,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
     );
   }
 
-  List<ActionData>? _buildActions(BuildContext context) {
+  List<ActionData> _buildActions(BuildContext context) {
     List<ActionData> children = [
       ActionData(
           label: AppLocalizations.t('edit'),
@@ -374,11 +374,22 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
                 icon: const Icon(Icons.task_alt_outlined),
               ),
               IconButton(
-                tooltip: AppLocalizations.t('Actions'),
+                tooltip: AppLocalizations.t('Ffmpeg actions'),
+                onPressed: () {
+                  List<ActionData> actions = _buildActions(context);
+                  MenuUtil.popModalBottomSheet(
+                    context,
+                    actions: actions,
+                  );
+                },
+                icon: const Icon(Icons.perm_media_outlined),
+              ),
+              IconButton(
+                tooltip: AppLocalizations.t('Playlist action'),
                 onPressed: () {
                   playlistWidget.showActionCard(context);
                 },
-                icon: const Icon(Icons.call_to_action_outlined),
+                icon: const Icon(Icons.more_horiz_outlined),
               ),
             ]);
           } else {
@@ -405,7 +416,6 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
       helpPath: routeName,
       withLeading: true,
       rightWidgets: _buildRightWidgets(context),
-      actions: _buildActions(context),
       child: _buildFfmpegMedia(context),
     );
   }
