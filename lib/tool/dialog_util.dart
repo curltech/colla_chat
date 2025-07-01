@@ -245,7 +245,7 @@ class DialogUtil {
     if (title != null) {
       child = Column(children: [
         title,
-        Expanded(child: child.asStyle()),
+        Expanded(child: child),
       ]);
     }
     T? value = await showDialog<T>(
