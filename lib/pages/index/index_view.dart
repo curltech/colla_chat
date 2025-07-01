@@ -102,6 +102,7 @@ class _IndexViewState extends State<IndexView>
 
     _initSystemTray();
     _initObserver();
+    appDataProvider.calBodyWidth();
   }
 
   _initObserver() {
@@ -714,7 +715,6 @@ class _IndexViewState extends State<IndexView>
   @override
   Widget build(BuildContext context) {
     appDataProvider.context = context;
-    appDataProvider.calBodyWidth();
     var provider = Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(
         builder:
             (context, appDataProvider, indexWidgetProvider, myself, child) {
