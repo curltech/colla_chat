@@ -86,8 +86,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
   late final PlatformReactiveFormController platformReactiveFormController =
       PlatformReactiveFormController(searchDataField);
 
-  final ExpansionTileController expansionTileController =
-      ExpansionTileController();
+  final ExpansibleController expansibleController = ExpansibleController();
 
   Widget _buildPlatformReactiveForm(BuildContext context) {
     var formInputWidget = Container(
@@ -104,7 +103,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
           },
         ));
     Widget expansionTile = ExpansionTile(
-      controller: expansionTileController,
+      controller: expansibleController,
       childrenPadding: const EdgeInsets.all(0),
       maintainState: true,
       title: Text(
@@ -133,7 +132,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
       return;
     }
     try {
-      expansionTileController.collapse();
+      expansibleController.collapse();
     } catch (e) {
       logger.e('collapse failure:$e');
     }

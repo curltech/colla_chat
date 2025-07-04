@@ -202,8 +202,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   ];
   late final List<PlatformDataField> searchDataField;
   late final PlatformReactiveFormController searchController;
-  final ExpansionTileController expansionTileController =
-      ExpansionTileController();
+  final ExpansibleController expansibleController = ExpansibleController();
 
   _init() {
     performanceDataPageController.findCondition.addListener(_updatePerformance);
@@ -286,7 +285,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
     formInputWidget = ExpansionTile(
       title: Text(AppLocalizations.t('Search')),
       initiallyExpanded: true,
-      controller: expansionTileController,
+      controller: expansibleController,
       children: [formInputWidget],
     );
 
@@ -296,7 +295,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   _onOk(Map<String, dynamic> values) async {
     performanceDataPageController.findCondition.value.whereColumns = values;
     await performanceDataPageController.findData();
-    expansionTileController.collapse();
+    expansibleController.collapse();
     DialogUtil.info(
         content: AppLocalizations.t('Performance search completely'));
   }

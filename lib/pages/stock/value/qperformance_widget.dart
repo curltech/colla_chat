@@ -67,8 +67,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
 
   late final List<PlatformDataField> searchDataField;
   late final PlatformReactiveFormController searchController;
-  final ExpansionTileController expansionTileController =
-      ExpansionTileController();
+  final ExpansibleController expansibleController = ExpansibleController();
 
   _init() {
     qperformanceDataPageController.findCondition
@@ -152,7 +151,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
     formInputWidget = ExpansionTile(
       title: Text(AppLocalizations.t('Search')),
       initiallyExpanded: true,
-      controller: expansionTileController,
+      controller: expansibleController,
       children: [formInputWidget],
     );
 
@@ -162,7 +161,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
   _onOk(BuildContext context, Map<String, dynamic> values) async {
     qperformanceDataPageController.findCondition.value.whereColumns = values;
     await qperformanceDataPageController.findData();
-    expansionTileController.collapse();
+    expansibleController.collapse();
     DialogUtil.info(
         content: AppLocalizations.t('QPerformance search completely'));
   }

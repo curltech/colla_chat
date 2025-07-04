@@ -75,6 +75,13 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
     qstatDataPageController.findCondition.addListener(_updateQStat);
     searchDataField = [
       PlatformDataField(
+          name: 'startDate',
+          label: 'StartDate',
+          prefixIcon: Icon(
+            Icons.date_range_outlined,
+            color: myself.primary,
+          )),
+      PlatformDataField(
         name: 'tsCode',
         label: 'TsCode',
         cancel: true,
@@ -173,7 +180,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
             _onOk(context, values);
           }),
     ];
-    Widget formInputWidget = Container(
+    Widget platformReactiveForm = Container(
         padding: const EdgeInsets.all(10.0),
         child: PlatformReactiveForm(
           height: appDataProvider.portraitSize.height * 0.35,
@@ -182,14 +189,14 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
           formButtons: formButtonDefs,
         ));
 
-    formInputWidget = ExpansionTile(
+    platformReactiveForm = ExpansionTile(
       title: Text(AppLocalizations.t('Search')),
       initiallyExpanded: true,
       controller: expansibleController,
-      children: [formInputWidget],
+      children: [platformReactiveForm],
     );
 
-    return formInputWidget;
+    return platformReactiveForm;
   }
 
   _onOk(BuildContext context, Map<String, dynamic> values) async {
