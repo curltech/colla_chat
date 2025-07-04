@@ -22,10 +22,10 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
-import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
-import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -39,14 +39,15 @@ class P2pLoginWidget extends StatelessWidget {
 
   P2pLoginWidget({super.key, this.credential, this.onAuthenticate}) {
     _init();
+    _initValue();
   }
 
-  late final FormInputController formInputController;
+  late final PlatformReactiveFormController platformReactiveFormController;
 
-  _init() async {
-    bool isAuth = (this.credential != null);
-    final List<PlatformDataField> p2pLoginDataFields = [];
-    p2pLoginDataFields.add(PlatformDataField(
+  _init() {
+    bool isAuth = (credential != null);
+    final List<PlatformDataField> platformDataFields = [];
+    platformDataFields.add(PlatformDataField(
       name: 'credential',
       label: 'Credential(Mobile/Email/Name)',
       readOnly: isAuth,
@@ -60,7 +61,8 @@ class P2pLoginWidget extends StatelessWidget {
                 if (myselfPeer != null) {
                   String? credential = myselfPeer.loginName;
                   if (StringUtil.isNotEmpty(credential)) {
-                    formInputController.setValue('credential', credential);
+                    platformReactiveFormController.setValue(
+                        'credential', credential);
                   }
                 }
               },
@@ -71,7 +73,7 @@ class P2pLoginWidget extends StatelessWidget {
             )
           : null,
     ));
-    p2pLoginDataFields.add(PlatformDataField(
+    platformDataFields.add(PlatformDataField(
       name: 'password',
       label: 'Password',
       inputType: InputType.password,
@@ -81,8 +83,12 @@ class P2pLoginWidget extends StatelessWidget {
         color: myself.primary,
       ),
     ));
-    formInputController = FormInputController(p2pLoginDataFields);
-    String? credential = formInputController.getValue('credential');
+    platformReactiveFormController =
+        PlatformReactiveFormController(platformDataFields);
+  }
+
+  _initValue() async {
+    String? credential = platformReactiveFormController.getValue('credential');
     if (credential == null) {
       credential = this.credential;
       String? lastCredentialName = await myselfPeerService.lastCredentialName();
@@ -92,7 +98,7 @@ class P2pLoginWidget extends StatelessWidget {
         if (myselfPeer != null) {
           credential ??= lastCredentialName;
           if (StringUtil.isNotEmpty(credential)) {
-            formInputController.setValue('credential', credential);
+            platformReactiveFormController.setValue('credential', credential);
           }
           return;
         }
@@ -271,20 +277,20 @@ class P2pLoginWidget extends StatelessWidget {
     return Container(
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(horizontal: 15.0),
-        child: FormInputWidget(
+        child: PlatformReactiveForm(
           heads: heads,
           mainAxisAlignment: MainAxisAlignment.start,
           // height: appDataProvider.portraitSize.height * 0.3,
           spacing: 10.0,
-          onOk: (Map<String, dynamic> values) async {
+          onSubmit: (Map<String, dynamic> values) async {
             if (credential == null) {
               await _login(context, values);
             } else {
               await _auth(values);
             }
           },
-          okLabel: credential == null ? 'Login' : 'Auth',
-          controller: formInputController,
+          submitLabel: credential == null ? 'Login' : 'Auth',
+          platformReactiveFormController: platformReactiveFormController,
         ));
   }
 }

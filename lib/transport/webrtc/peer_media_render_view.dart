@@ -105,7 +105,7 @@ class _PeerMediaRenderViewState extends State<PeerMediaRenderView> {
               if (videoTrack != null) {
                 return livekit_client.VideoTrackRenderer(
                   videoTrack,
-                  fit: widget.objectFit,
+                  fit: livekit_client.VideoViewFit.cover,
                   mirrorMode: widget.mirror
                       ? livekit_client.VideoViewMirrorMode.mirror
                       : livekit_client.VideoViewMirrorMode.off,

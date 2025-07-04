@@ -5,8 +5,8 @@ import 'package:colla_chat/service/dht/peerendpoint.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
-import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
+import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

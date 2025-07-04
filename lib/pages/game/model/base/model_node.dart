@@ -5,7 +5,7 @@ import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/component/attribute_text_component.dart';
 import 'package:colla_chat/pages/game/model/component/method_text_component.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 
 enum Scope { private, protected, public }
 

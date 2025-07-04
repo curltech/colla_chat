@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_peer_controller.dart';
@@ -19,8 +20,8 @@ import 'package:colla_chat/tool/mobile_util.dart';
 import 'package:colla_chat/tool/phone_number_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
-import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
@@ -30,7 +31,6 @@ import 'package:phone_numbers_parser/phone_numbers_parser.dart'
     as phone_numbers_parser;
 import 'package:regexpattern/regexpattern.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
-import 'package:colla_chat/datastore/sqlite3.dart';
 
 /// 用户注册组件，一个card下的录入框和按钮组合
 class P2pRegisterWidget extends StatelessWidget {
@@ -89,8 +89,8 @@ class P2pRegisterWidget extends StatelessWidget {
           color: myself.primary,
         ))
   ];
-  late final FormInputController formInputController =
-      FormInputController(p2pRegisterDataFields);
+  late final PlatformReactiveFormController platformReactiveFormController =
+      PlatformReactiveFormController(p2pRegisterDataFields);
 
   Future<void> _pickAvatar(
     BuildContext context,
@@ -107,7 +107,7 @@ class P2pRegisterWidget extends StatelessWidget {
     String? backupFile;
     if (platformParams.desktop) {
       List<XFile>? xfiles = await FileUtil.pickFiles();
-      if (xfiles!=null && xfiles.isNotEmpty) {
+      if (xfiles != null && xfiles.isNotEmpty) {
         backupFile = xfiles[0].path;
       }
     } else if (platformParams.mobile) {
@@ -137,6 +137,7 @@ class P2pRegisterWidget extends StatelessWidget {
         onTap: _restore));
     return ListView(
       children: <Widget>[
+        SizedBox(height: 15.0,),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: ValueListenableBuilder(
@@ -185,6 +186,7 @@ class P2pRegisterWidget extends StatelessWidget {
             },
           ),
         ),
+        SizedBox(height: 15.0,),
         ValueListenableBuilder(
             valueListenable: peerId,
             builder: (BuildContext context, String? peerId, Widget? child) {
@@ -213,11 +215,11 @@ class P2pRegisterWidget extends StatelessWidget {
             }),
         Container(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: FormInputWidget(
+            child: PlatformReactiveForm(
               height: appDataProvider.portraitSize.height * 0.6,
               spacing: 5.0,
               formButtons: formButtons,
-              controller: formInputController,
+              platformReactiveFormController: platformReactiveFormController,
             )),
       ],
     );

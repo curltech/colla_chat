@@ -47,7 +47,7 @@ class P2pLogin extends StatelessWidget with WindowListener {
 
   @override
   onWindowResized() {
-    // appDataProvider.changeSize(appDataProvider.context!);
+    appDataProvider.changeWindowSize();
   }
 
   _animateToPage(int index) {

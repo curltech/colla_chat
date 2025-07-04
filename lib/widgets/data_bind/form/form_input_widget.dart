@@ -6,7 +6,8 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/data_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:provider/provider.dart';
@@ -122,25 +123,6 @@ class FormInputController with ChangeNotifier {
         setValue(name, null);
       }
     }
-  }
-}
-
-class FormButton {
-  final String label;
-  ButtonStyle? buttonStyle;
-  Widget? icon;
-  String? tooltip;
-  Function(Map<String, dynamic> values)? onTap;
-
-  FormButton(
-      {required this.label,
-      this.buttonStyle,
-      this.icon,
-      this.tooltip,
-      this.onTap}) {
-    buttonStyle = buttonStyle ??
-        StyleUtil.buildButtonStyle(
-            backgroundColor: myself.primary, elevation: 10.0);
   }
 }
 

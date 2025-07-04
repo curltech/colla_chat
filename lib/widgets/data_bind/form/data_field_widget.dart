@@ -9,158 +9,11 @@ import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:pinput/pinput.dart';
 import 'package:toggle_switch/toggle_switch.dart';
-
-///指定路由样式，不指定则系统判断，系统判断的方法是如果是移动则走全局路由，否则走工作区路由
-enum InputType {
-  label,
-  text,
-  password,
-  radio,
-  checkbox,
-  togglebuttons,
-  toggleswitch,
-  select,
-  switcher,
-  toggle,
-  textarea,
-  date,
-  time,
-  datetime,
-  datetimerange,
-  calendar,
-  custom,
-  pinput,
-  color
-}
-
-enum DataType {
-  int,
-  double,
-  num,
-  string,
-  bool,
-  date,
-  time,
-  datetime,
-  percentage,
-  set,
-  list,
-  map
-}
-
-/// 表的列定义
-class PlatformDataColumn {
-  final String name;
-  final String label;
-  final InputType inputType;
-  final DataType dataType;
-  final Alignment align;
-  final double? width;
-  final Color? positiveColor;
-  final Color? negativeColor;
-  final String? hintText;
-  final Widget Function(int, dynamic)? buildSuffix;
-  final Function(int, bool)? onSort;
-
-  PlatformDataColumn(
-      {required this.name,
-      required this.label,
-      this.hintText,
-      this.dataType = DataType.string,
-      this.positiveColor,
-      this.negativeColor,
-      this.inputType = InputType.label,
-      this.width,
-      this.align = Alignment.centerLeft,
-      this.buildSuffix,
-      this.onSort});
-}
-
-/// 表单的字段定义
-class PlatformDataField {
-  final String name;
-  final String label;
-  final InputType inputType;
-  final DataType dataType;
-  dynamic initValue;
-
-  //图标
-  final Widget? prefixIcon;
-
-  //头像
-  final String? avatar;
-
-  final String? hintText;
-
-  final TextInputType? textInputType;
-
-  final Widget? suffixIcon;
-
-  final bool cancel;
-
-  final double? width;
-
-  final int? minLines;
-
-  final int? maxLines;
-
-  bool readOnly;
-
-  final List<Option>? options;
-
-  String? groupName; //分页功能
-
-  final bool enableColumnFilter = false;
-
-  final List<TextInputFormatter>? inputFormatters;
-
-  final String? Function(String?)? validator;
-
-  final void Function(String)? onChanged;
-
-  final void Function()? onEditingComplete;
-
-  final dynamic Function(String)? onFieldSubmitted;
-
-  final bool autoValidate;
-
-  Function(int, bool)? onSort;
-
-  final Widget? customWidget;
-
-  PlatformDataField({
-    required this.name,
-    required this.label,
-    this.inputType = InputType.text,
-    this.dataType = DataType.string,
-    this.initValue,
-    this.prefixIcon,
-    this.avatar,
-    this.hintText,
-    this.textInputType = TextInputType.text,
-    this.suffixIcon,
-    this.cancel = false,
-    this.minLines = 1,
-    this.maxLines = 4,
-    this.width,
-    this.readOnly = false,
-    this.options,
-    this.groupName,
-    this.inputFormatters,
-    this.validator,
-    this.onChanged,
-    this.onEditingComplete,
-    this.onFieldSubmitted,
-    this.autoValidate = false,
-    this.onSort,
-    this.customWidget,
-  });
-}
 
 ///存储字段的真实值和文本显示值
 class DataFieldController with ChangeNotifier {
@@ -1260,7 +1113,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
       case InputType.pinput:
         dataFieldWidget = _buildPinputField(context);
         break;
-      case InputType.togglebuttons:
+      case InputType.toggleButtons:
         dataFieldWidget = _buildToggleButtonsField(context);
         break;
       case InputType.checkbox:
