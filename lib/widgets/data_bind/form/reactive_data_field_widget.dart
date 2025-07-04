@@ -1,7 +1,9 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
@@ -368,4 +370,225 @@ class ReactiveToggleButtons<T> extends ReactiveFormField<T, T> {
             );
           },
         );
+}
+
+class ReactiveCommonTextFormField<T> extends ReactiveFormField<T, String> {
+  final TextEditingController? _textController;
+
+  static Widget _defaultContextMenuBuilder(
+    BuildContext context,
+    EditableTextState editableTextState,
+  ) {
+    return AdaptiveTextSelectionToolbar.editableText(
+      editableTextState: editableTextState,
+    );
+  }
+
+  ReactiveCommonTextFormField({
+    super.key,
+    super.formControlName,
+    super.formControl,
+    super.validationMessages,
+    super.valueAccessor,
+    super.showErrors,
+    super.focusNode,
+    TextEditingController? controller,
+    TextInputType? keyboardType,
+    int? minLines,
+    TextAlign textAlign = TextAlign.start,
+    TextCapitalization textCapitalization = TextCapitalization.none,
+    bool autocorrect = true,
+    String obscuringCharacter = '*',
+    TextInputAction? textInputAction,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextDirection? textDirection,
+    TextAlignVertical? textAlignVertical,
+    bool? showCursor,
+    SmartDashesType? smartDashesType,
+    SmartQuotesType? smartQuotesType,
+    bool enableSuggestions = true,
+    MaxLengthEnforcement? maxLengthEnforcement,
+    bool expands = false,
+    int? maxLength,
+    List<TextInputFormatter>? inputFormatters,
+    bool? enabled,
+    double cursorWidth = 2.0,
+    double? cursorHeight,
+    Radius? cursorRadius,
+    Color? cursorColor,
+    Brightness? keyboardAppearance,
+    EdgeInsets scrollPadding = const EdgeInsets.all(20.0),
+    TextSelectionControls? selectionControls,
+    Widget? Function(BuildContext,
+            {required int currentLength,
+            required bool isFocused,
+            required int? maxLength})?
+        buildCounter,
+    ScrollPhysics? scrollPhysics,
+    Iterable<String>? autofillHints,
+    AutovalidateMode? autovalidateMode,
+    ScrollController? scrollController,
+    String? restorationId,
+    bool enableIMEPersonalizedLearning = true,
+    MouseCursor? mouseCursor,
+    InputDecoration? decoration,
+    Color? fillColor,
+    Color? focusColor,
+    bool autofocus = false,
+    bool enableInteractiveSelection = true,
+    Color? hoverColor,
+    String? labelText,
+    Widget? prefixIcon,
+    Widget? suffixIcon,
+    Widget? suffix,
+    String? hintText,
+    bool readOnly = false,
+    int? maxLines,
+    void Function(FormControl<T>)? onChanged,
+    void Function(FormControl<T>)? onEditingComplete,
+    dynamic Function(FormControl<T>)? onFieldSubmitted,
+    void Function(FormControl<T>?)? onSaved,
+    void Function(FormControl<T>)? onTap,
+    String? Function(FormControl<T>?)? validator,
+    bool obscureText = false,
+    String? initialValue,
+  })  : _textController = controller,
+        super(
+          builder: (ReactiveFormFieldState<T, String> field) {
+            final state = field as _ReactiveCommonTextFormFieldState<T>;
+            final effectiveDecoration = decoration?.applyDefaults(
+              Theme.of(state.context).inputDecorationTheme,
+            );
+
+            return CommonTextFormField(
+                controller: state._textController,
+                focusNode: state.focusNode,
+                decoration: effectiveDecoration?.copyWith(
+                  errorText: state.errorText,
+                ),
+                keyboardType: keyboardType,
+                textInputAction: textInputAction,
+                style: style,
+                strutStyle: strutStyle,
+                textAlign: textAlign,
+                textAlignVertical: textAlignVertical,
+                textDirection: textDirection,
+                textCapitalization: textCapitalization,
+                autofocus: autofocus,
+                readOnly: readOnly,
+                showCursor: showCursor,
+                obscureText: obscureText,
+                autocorrect: autocorrect,
+                smartDashesType: smartDashesType ??
+                    (obscureText
+                        ? SmartDashesType.disabled
+                        : SmartDashesType.enabled),
+                smartQuotesType: smartQuotesType ??
+                    (obscureText
+                        ? SmartQuotesType.disabled
+                        : SmartQuotesType.enabled),
+                enableSuggestions: enableSuggestions,
+                maxLengthEnforcement: maxLengthEnforcement,
+                maxLines: maxLines,
+                minLines: minLines,
+                expands: expands,
+                maxLength: maxLength,
+                inputFormatters: inputFormatters,
+                enabled: field.control.enabled,
+                cursorWidth: cursorWidth,
+                cursorHeight: cursorHeight,
+                cursorRadius: cursorRadius,
+                cursorColor: cursorColor,
+                scrollPadding: scrollPadding,
+                scrollPhysics: scrollPhysics,
+                keyboardAppearance: keyboardAppearance,
+                enableInteractiveSelection: enableInteractiveSelection,
+                buildCounter: buildCounter,
+                autofillHints: autofillHints,
+                mouseCursor: mouseCursor,
+                obscuringCharacter: obscuringCharacter,
+                restorationId: restorationId,
+                scrollController: scrollController,
+                selectionControls: selectionControls,
+                enableIMEPersonalizedLearning: enableIMEPersonalizedLearning,
+                onTap: onTap != null ? () => onTap(field.control) : null,
+                onFieldSubmitted: onFieldSubmitted != null
+                    ? (_) => onFieldSubmitted(field.control)
+                    : null,
+                onEditingComplete: onEditingComplete != null
+                    ? () => onEditingComplete.call(field.control)
+                    : null,
+                onSaved: onSaved != null
+                    ? (value) => onSaved.call(field.control)
+                    : null,
+                onChanged: (value) {
+                  field.didChange(value);
+                  onChanged?.call(field.control);
+                },
+                initialValue: initialValue,
+                autovalidateMode: autovalidateMode,
+                contextMenuBuilder: _defaultContextMenuBuilder);
+          },
+        );
+
+  @override
+  ReactiveFormFieldState<T, String> createState() =>
+      _ReactiveCommonTextFormFieldState<T>();
+}
+
+class _ReactiveCommonTextFormFieldState<T>
+    extends ReactiveFocusableFormFieldState<T, String> {
+  late TextEditingController _textController;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeTextController();
+  }
+
+  @override
+  void onControlValueChanged(dynamic value) {
+    final effectiveValue = (value == null) ? '' : value.toString();
+    _textController.value = _textController.value.copyWith(
+      text: effectiveValue,
+      selection: TextSelection.collapsed(offset: effectiveValue.length),
+      composing: TextRange.empty,
+    );
+
+    super.onControlValueChanged(value);
+  }
+
+  @override
+  ControlValueAccessor<T, String> selectValueAccessor() {
+    if (control is FormControl<int>) {
+      return IntValueAccessor() as ControlValueAccessor<T, String>;
+    } else if (control is FormControl<double>) {
+      return DoubleValueAccessor() as ControlValueAccessor<T, String>;
+    } else if (control is FormControl<DateTime>) {
+      return DateTimeValueAccessor() as ControlValueAccessor<T, String>;
+    } else if (control is FormControl<TimeOfDay>) {
+      return TimeOfDayValueAccessor() as ControlValueAccessor<T, String>;
+    }
+
+    return super.selectValueAccessor();
+  }
+
+  void _initializeTextController() {
+    final initialValue = value;
+    final currentWidget = widget as ReactiveCommonTextFormField<T>;
+    _textController = (currentWidget._textController != null)
+        ? currentWidget._textController!
+        : TextEditingController();
+    _textController.text = initialValue == null ? '' : initialValue.toString();
+  }
+
+  @override
+  void dispose() {
+    final currentWidget = widget as ReactiveCommonTextFormField<T>;
+    if (currentWidget._textController == null) {
+      _textController.dispose();
+    }
+    super.dispose();
+  }
 }

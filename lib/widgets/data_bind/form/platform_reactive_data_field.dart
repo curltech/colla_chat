@@ -29,18 +29,15 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     var label = platformDataField.label;
     var prefixIcon = platformDataField.prefixIcon;
     var suffixIcon = platformDataField.suffixIcon;
+    var prefix = platformDataField.prefix;
+    var suffix = platformDataField.suffix;
     var hintText = platformDataField.hintText;
-    Map<String, String Function(Object)>? validationMessages =
-        platformDataField.validationMessages;
-    InputDecoration inputDecoration = InputDecoration(
+    InputDecoration inputDecoration = buildInputDecoration(
         labelText: label,
-        border: OutlineInputBorder(),
-        fillColor: Colors.grey.withAlpha(AppOpacity.xlOpacity),
-        focusColor: Colors.grey.withAlpha(AppOpacity.xlOpacity),
-        hoverColor: Colors.grey.withAlpha(AppOpacity.xlOpacity),
-        filled: true,
         prefixIcon: prefixIcon,
+        prefix: prefix,
         suffixIcon: suffixIcon,
+        suffix: suffix,
         hintText: hintText);
 
     return inputDecoration;

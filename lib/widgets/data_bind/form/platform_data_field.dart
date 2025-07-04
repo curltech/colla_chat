@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
@@ -187,4 +188,47 @@ class FormButton {
         StyleUtil.buildButtonStyle(
             backgroundColor: myself.primary, elevation: 10.0);
   }
+}
+
+const InputBorder textFormFieldBorder = UnderlineInputBorder(
+    borderSide: BorderSide.none,
+    borderRadius: BorderRadius.all(Radius.circular(4.0)));
+
+const InputBorder outlineTextFormFieldBorder = OutlineInputBorder(
+    borderSide: BorderSide(
+      color: Colors.white,
+      width: 1.0,
+    ),
+    borderRadius: BorderRadius.all(Radius.circular(4.0)));
+
+InputDecoration buildInputDecoration({
+  Color? fillColor,
+  Color? focusColor,
+  Color? hoverColor,
+  Widget? prefixIcon,
+  Widget? prefix,
+  Widget? suffixIcon,
+  Widget? suffix,
+  String? hintText,
+  String? labelText,
+}) {
+  InputDecoration inputDecoration = InputDecoration(
+      fillColor: fillColor ?? Colors.grey.withAlpha(AppOpacity.xlOpacity),
+      focusColor: focusColor ?? Colors.grey.withAlpha(AppOpacity.xlOpacity),
+      hoverColor: hoverColor ?? Colors.grey.withAlpha(AppOpacity.xlOpacity),
+      filled: true,
+      border: textFormFieldBorder,
+      focusedBorder: outlineTextFormFieldBorder,
+      enabledBorder: textFormFieldBorder,
+      errorBorder: textFormFieldBorder,
+      disabledBorder: textFormFieldBorder,
+      focusedErrorBorder: textFormFieldBorder,
+      labelText: labelText,
+      prefixIcon: prefixIcon,
+      prefix: prefix,
+      suffixIcon: suffixIcon,
+      suffix: suffix,
+      hintText: hintText);
+
+  return inputDecoration;
 }

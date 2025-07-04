@@ -1,18 +1,8 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-const InputBorder textFormFieldBorder = UnderlineInputBorder(
-    borderSide: BorderSide.none,
-    borderRadius: BorderRadius.all(Radius.circular(4.0)));
-
-const InputBorder outlineTextFormFieldBorder = OutlineInputBorder(
-    borderSide: BorderSide(
-      color: Colors.white,
-      width: 1.0,
-    ),
-    borderRadius: BorderRadius.all(Radius.circular(4.0)));
 
 ///平台定制的通用AutoSizeTextFormField，规定了一些参数的缺省值外，还规定了边框的样式
 ///本类的目的是统一平台输入框的样式，包括自动调整字体大小适应
@@ -79,6 +69,7 @@ class CommonTextFormField extends StatefulWidget {
   final FocusNode? focusNode;
   final bool obscureText;
   final String? initialValue;
+  final Widget Function(BuildContext, EditableTextState)? contextMenuBuilder;
 
   const CommonTextFormField({
     super.key,
@@ -141,6 +132,7 @@ class CommonTextFormField extends StatefulWidget {
     this.focusNode,
     this.obscureText = false,
     this.initialValue,
+    this.contextMenuBuilder,
   });
 
   @override
@@ -199,20 +191,10 @@ class _CommonTextFormFieldState extends State<CommonTextFormField> {
       enableIMEPersonalizedLearning: widget.enableIMEPersonalizedLearning,
       mouseCursor: widget.mouseCursor,
       decoration: widget.decoration ??
-          InputDecoration(
-              fillColor: widget.fillColor ??
-                  Colors.grey.withAlpha(AppOpacity.xlOpacity),
-              focusColor: widget.focusColor ??
-                  Colors.grey.withAlpha(AppOpacity.xlOpacity),
-              hoverColor: widget.hoverColor ??
-                  Colors.grey.withAlpha(AppOpacity.xlOpacity),
-              filled: true,
-              border: textFormFieldBorder,
-              focusedBorder: outlineTextFormFieldBorder,
-              enabledBorder: textFormFieldBorder,
-              errorBorder: textFormFieldBorder,
-              disabledBorder: textFormFieldBorder,
-              focusedErrorBorder: textFormFieldBorder,
+          buildInputDecoration(
+              fillColor: widget.fillColor,
+              focusColor: widget.focusColor,
+              hoverColor: widget.hoverColor,
               labelText: widget.labelText,
               prefixIcon: widget.prefixIcon,
               suffixIcon: widget.suffixIcon,
@@ -223,6 +205,7 @@ class _CommonTextFormFieldState extends State<CommonTextFormField> {
       onFieldSubmitted: widget.onFieldSubmitted,
       onSaved: widget.onSaved,
       onTap: widget.onTap,
+      contextMenuBuilder: widget.contextMenuBuilder,
     );
 
     return textFormField;
@@ -294,6 +277,7 @@ class CommonAutoSizeTextFormField extends StatefulWidget {
   final FocusNode? focusNode;
   final bool obscureText;
   final String? initialValue;
+  final Widget Function(BuildContext, EditableTextState)? contextMenuBuilder;
 
   const CommonAutoSizeTextFormField({
     super.key,
@@ -356,6 +340,7 @@ class CommonAutoSizeTextFormField extends StatefulWidget {
     this.focusNode,
     this.obscureText = false,
     this.initialValue,
+    this.contextMenuBuilder,
   });
 
   @override
@@ -415,20 +400,10 @@ class _CommonAutoSizeTextFormFieldState
       enableIMEPersonalizedLearning: widget.enableIMEPersonalizedLearning,
       mouseCursor: widget.mouseCursor,
       decoration: widget.decoration ??
-          InputDecoration(
-              fillColor: widget.fillColor ??
-                  Colors.grey.withAlpha(AppOpacity.xlOpacity),
-              focusColor: widget.focusColor ??
-                  Colors.grey.withAlpha(AppOpacity.xlOpacity),
-              hoverColor: widget.hoverColor ??
-                  Colors.grey.withAlpha(AppOpacity.xlOpacity),
-              filled: true,
-              border: textFormFieldBorder,
-              focusedBorder: outlineTextFormFieldBorder,
-              enabledBorder: textFormFieldBorder,
-              errorBorder: textFormFieldBorder,
-              disabledBorder: textFormFieldBorder,
-              focusedErrorBorder: textFormFieldBorder,
+          buildInputDecoration(
+              fillColor: widget.fillColor,
+              focusColor: widget.focusColor,
+              hoverColor: widget.hoverColor,
               labelText: widget.labelText,
               prefixIcon: widget.prefixIcon,
               suffixIcon: widget.suffixIcon,
@@ -439,6 +414,7 @@ class _CommonAutoSizeTextFormFieldState
       onFieldSubmitted: widget.onFieldSubmitted,
       onSaved: widget.onSaved,
       onTap: widget.onTap,
+      contextMenuBuilder: widget.contextMenuBuilder,
     );
 
     return textFormField;
