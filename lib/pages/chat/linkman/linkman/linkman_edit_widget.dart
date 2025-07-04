@@ -48,6 +48,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
         name: 'id',
         label: 'Id',
         inputType: InputType.label,
+        dataType: DataType.int,
         readOnly: true,
         prefixIcon: Icon(
           Icons.numbers_outlined,
@@ -252,8 +253,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
         title: title,
         helpPath: widget.routeName,
         withLeading: widget.withLeading,
-        child:
-            SingleChildScrollView(child: _buildPlatformReactiveForm(context)));
+        child: _buildPlatformReactiveForm(context));
 
     return appBarView;
   }

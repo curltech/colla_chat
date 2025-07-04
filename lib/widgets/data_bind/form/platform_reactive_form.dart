@@ -24,19 +24,64 @@ class PlatformReactiveFormController {
       PlatformDataField platformDataField = dataFields[i];
       var name = platformDataField.name;
       var initValue = platformDataField.initValue;
-      var dataType = platformDataField.dataType;
       var validators = platformDataField.validators ?? const [];
       FormControl formControl;
-      if (dataType == DataType.double) {
-        formControl = FormControl<double>(
-          value: initValue,
-          validators: validators,
-        );
-      } else {
-        formControl = FormControl<String>(
-          value: initValue,
-          validators: validators,
-        );
+      var dataType = platformDataField.dataType;
+      switch (dataType) {
+        case DataType.int:
+          formControl = FormControl<int>(
+            value: initValue,
+            validators: validators,
+          );
+          break;
+        case DataType.num:
+          formControl = FormControl<num>(
+            value: initValue,
+            validators: validators,
+          );
+          break;
+        case DataType.bool:
+          formControl = FormControl<bool>(
+            value: initValue,
+            validators: validators,
+          );
+          break;
+        case DataType.double:
+          formControl = FormControl<double>(
+            value: initValue,
+            validators: validators,
+          );
+          break;
+        case DataType.date:
+          formControl = FormControl<DateTime>(
+            value: initValue,
+            validators: validators,
+          );
+          break;
+        case DataType.list:
+          formControl = FormControl<List>(
+            value: initValue,
+            validators: validators,
+          );
+          break;
+        case DataType.map:
+          formControl = FormControl<Map>(
+            value: initValue,
+            validators: validators,
+          );
+          break;
+        case DataType.set:
+          formControl = FormControl<Set>(
+            value: initValue,
+            validators: validators,
+          );
+          break;
+        default:
+          formControl = FormControl<String>(
+            value: initValue,
+            validators: validators,
+          );
+          break;
       }
 
       var inputType = platformDataField.inputType;

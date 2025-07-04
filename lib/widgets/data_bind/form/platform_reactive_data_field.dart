@@ -58,6 +58,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
   Widget _buildLabel(BuildContext context) {
     String label = platformDataField.label;
     label = '${AppLocalizations.t(label)}:';
+    var name = platformDataField.name;
+    final dynamic value = formGroup.control(name).value;
     return Container(
         padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 14.0),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -70,8 +72,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
             width: 10.0,
           ),
           Expanded(
-              child: CommonAutoSizeText(
-                  (platformDataField.initValue ?? '').toString(),
+              child: CommonAutoSizeText((value ?? '').toString(),
                   textAlign: TextAlign.start))
         ]));
   }
