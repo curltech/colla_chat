@@ -1,8 +1,9 @@
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/download_file_util.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
+import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_helper.dart';
 import 'package:flutter/material.dart';
 
@@ -93,18 +94,19 @@ class FFMpegInstallWidget extends StatelessWidget {
         List<Widget> children = [];
         controller.text = FFMpegHelper.ffmpegInstallationPath ?? '';
         children.add(
-          CommonAutoSizeTextFormField(
-              labelText: 'FFMpeg installation path',
+          AutoSizeTextFormField(
               controller: controller,
-              hintText: 'FFMpeg installation path',
-              suffix: IconButton(
-                  onPressed: () {
-                    FFMpegHelper.ffmpegInstallationPath = controller.text;
-                  },
-                  icon: Icon(
-                    Icons.save,
-                    color: myself.primary,
-                  ))),
+              decoration: buildInputDecoration(
+                  hintText: 'FFMpeg installation path',
+                  labelText: 'FFMpeg installation path',
+                  suffix: IconButton(
+                      onPressed: () {
+                        FFMpegHelper.ffmpegInstallationPath = controller.text;
+                      },
+                      icon: Icon(
+                        Icons.save,
+                        color: myself.primary,
+                      )))),
         );
 
         if (!ffmpegPresent) {

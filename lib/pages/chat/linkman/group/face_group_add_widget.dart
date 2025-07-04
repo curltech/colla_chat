@@ -12,10 +12,10 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -50,8 +50,6 @@ class FaceGroupAddWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Face add group';
 
-  
-
   @override
   bool get withLeading => true;
 
@@ -59,16 +57,17 @@ class FaceGroupAddWidget extends StatelessWidget with TileDataMixin {
   StreamSubscription<ChainMessage>? chainMessageListen;
 
   _buildSearchTextField(BuildContext context) {
-    var searchTextField = CommonTextFormField(
+    var searchTextField = TextFormField(
         controller: textEditingController,
         keyboardType: TextInputType.text,
-        labelText: AppLocalizations.t('PeerId/Mobile/Email/Name'),
-        suffixIcon: IconButton(
-          onPressed: () {
-            _search(textEditingController.text);
-          },
-          icon: const Icon(Icons.search),
-        ));
+        decoration: buildInputDecoration(
+            labelText: AppLocalizations.t('PeerId/Mobile/Email/Name'),
+            suffixIcon: IconButton(
+              onPressed: () {
+                _search(textEditingController.text);
+              },
+              icon: const Icon(Icons.search),
+            )));
 
     return searchTextField;
   }

@@ -2,10 +2,11 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/service/stock/stock_line.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
+import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -25,12 +26,10 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'UpdateStock';
 
-
-
   final TextEditingController _startDateTextController =
       TextEditingController();
   final TextEditingController _tsCodeTextController = TextEditingController();
-  RxList<TileData> tileData = <TileData>[].obs;
+  final RxList<TileData> tileData = <TileData>[].obs;
 
   _initTileData(BuildContext context) {
     tileData.clear();
@@ -244,16 +243,18 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
     return Column(children: [
       Container(
           padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-          child: CommonAutoSizeTextFormField(
+          child: AutoSizeTextFormField(
               controller: _tsCodeTextController,
               keyboardType: TextInputType.text,
-              labelText: AppLocalizations.t('tsCode'))),
+              decoration: buildInputDecoration(
+                  labelText: AppLocalizations.t('tsCode')))),
       Container(
           padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-          child: CommonAutoSizeTextFormField(
+          child: AutoSizeTextFormField(
               controller: _startDateTextController,
               keyboardType: TextInputType.number,
-              labelText: AppLocalizations.t('startDate'))),
+              decoration: buildInputDecoration(
+                  labelText: AppLocalizations.t('startDate')))),
       Expanded(
         child: Obx(() {
           return DataListView(

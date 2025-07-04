@@ -1,7 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 
 enum ActionType {
@@ -39,12 +39,12 @@ class ActionData {
 
 class DataActionCard extends StatelessWidget {
   final List<ActionData> actions;
-  late double? height;
-  late double? width;
+  late final double? height;
+  late final double? width;
   final int crossAxisCount;
   final double mainAxisSpacing;
   final double crossAxisSpacing;
-  late double? mainAxisExtent;
+  late final double? mainAxisExtent;
   final double childAspectRatio;
   final double iconSize;
   final bool showLabel;
@@ -106,23 +106,24 @@ class DataActionCard extends StatelessWidget {
     var controller = TextEditingController();
     var addFriendTextField = Container(
         padding: const EdgeInsets.all(10.0),
-        child: CommonTextFormField(
-          controller: controller,
-          keyboardType: TextInputType.text,
-          labelText: label,
-          suffixIcon: IconButton(
-            onPressed: () {
-              if (onPressed != null) {
-                onPressed!(index, actionData.label, value: controller.text);
-              }
-              if (actionData.onTap != null) {
-                actionData.onTap!(index, actionData.label,
-                    value: controller.text);
-              }
-            },
-            icon: const Icon(Icons.person_add),
-          ),
-        ));
+        child: TextFormField(
+            controller: controller,
+            keyboardType: TextInputType.text,
+            decoration: buildInputDecoration(
+              labelText: label,
+              suffixIcon: IconButton(
+                onPressed: () {
+                  if (onPressed != null) {
+                    onPressed!(index, actionData.label, value: controller.text);
+                  }
+                  if (actionData.onTap != null) {
+                    actionData.onTap!(index, actionData.label,
+                        value: controller.text);
+                  }
+                },
+                icon: const Icon(Icons.person_add),
+              ),
+            )));
 
     return addFriendTextField;
   }

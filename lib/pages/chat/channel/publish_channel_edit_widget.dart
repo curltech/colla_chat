@@ -8,9 +8,9 @@ import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
 import 'package:colla_chat/widgets/webview/html_preview_widget.dart';
 import 'package:flutter/material.dart';
@@ -33,8 +33,6 @@ class PublishChannelEditWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Publish Channel Edit';
-
-  
 }
 
 class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
@@ -122,10 +120,11 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
   }
 
   Widget _buildTitleTextField(BuildContext context) {
-    var textFormField = CommonTextFormField(
-      controller: textEditingController,
-      labelText: AppLocalizations.t('Title'),
-    );
+    var textFormField = TextFormField(
+        controller: textEditingController,
+        decoration: buildInputDecoration(
+          labelText: AppLocalizations.t('Title'),
+        ));
 
     return textFormField;
   }

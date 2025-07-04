@@ -8,9 +8,9 @@ import 'package:colla_chat/tool/clipboard_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 
 ///粘贴linkman的json字符串增加
@@ -25,8 +25,6 @@ class JsonLinkmanAddWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Json add linkman';
-
-
 
   @override
   bool get withLeading => true;
@@ -48,14 +46,15 @@ class _JsonLinkmanAddWidgetState extends State<JsonLinkmanAddWidget> {
   }
 
   _buildJsonTextField(BuildContext context) {
-    var jsonTextField = CommonTextFormField(
-      controller: jsonController,
-      keyboardType: TextInputType.text,
-      autofocus: true,
-      minLines: 100,
-      labelText: AppLocalizations.t('Please paste linkman json here'),
-      //hintText: AppLocalizations.t('Please paste linkman json here'),
-    );
+    var jsonTextField = TextFormField(
+        controller: jsonController,
+        keyboardType: TextInputType.text,
+        autofocus: true,
+        minLines: 100,
+        decoration: buildInputDecoration(
+          labelText: AppLocalizations.t('Please paste linkman json here'),
+          //hintText: AppLocalizations.t('Please paste linkman json here'),
+        ));
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),

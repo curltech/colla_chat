@@ -2,10 +2,11 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/service/stock/stock_line.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
+import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -24,8 +25,6 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'RefreshStock';
-
-  
 
   final TextEditingController _startDateTextController =
       TextEditingController();
@@ -185,11 +184,13 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
   Widget _buildRefreshStockView(BuildContext context) {
     return Column(children: [
       Container(
-          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-          child: CommonAutoSizeTextFormField(
-              controller: _startDateTextController,
-              keyboardType: TextInputType.number,
-              labelText: AppLocalizations.t('startDate'))),
+        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+        child: AutoSizeTextFormField(
+            controller: _startDateTextController,
+            keyboardType: TextInputType.number,
+            decoration: buildInputDecoration(
+                labelText: AppLocalizations.t('startDate'))),
+      ),
       Expanded(
         child: Obx(() {
           return DataListView(

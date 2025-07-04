@@ -11,7 +11,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
+import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
@@ -49,20 +49,21 @@ class FileWidget extends StatelessWidget with TileDataMixin {
   final TextEditingController searchTextController = TextEditingController();
 
   Widget _buildSearchTextWidget(BuildContext context) {
-    return CommonAutoSizeTextFormField(
-      labelText: AppLocalizations.t('Search'),
-      controller: searchTextController,
-      keyboardType: TextInputType.text,
-      suffixIcon: IconButton(
-        onPressed: () {
-          _searchFile(searchTextController.text);
-        },
-        icon: Icon(
-          Icons.search,
-          color: myself.primary,
-        ),
-      ),
-    );
+    return AutoSizeTextFormField(
+        controller: searchTextController,
+        keyboardType: TextInputType.text,
+        decoration: buildInputDecoration(
+          labelText: AppLocalizations.t('Search'),
+          suffixIcon: IconButton(
+            onPressed: () {
+              _searchFile(searchTextController.text);
+            },
+            icon: Icon(
+              Icons.search,
+              color: myself.primary,
+            ),
+          ),
+        ));
   }
 
   _searchFile(String keyword) async {
@@ -223,8 +224,10 @@ class FileWidget extends StatelessWidget with TileDataMixin {
       File? file = fileController.current;
       String? path = file?.file.path;
 
-      return CommonAutoSizeTextFormField(
-        labelText: AppLocalizations.t('Path'),
+      return AutoSizeTextFormField(
+        decoration: buildInputDecoration(
+          labelText: AppLocalizations.t('Path'),
+        ),
         readOnly: true,
         controller: TextEditingController(text: path ?? ''),
       );

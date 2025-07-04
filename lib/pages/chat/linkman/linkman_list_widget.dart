@@ -28,12 +28,12 @@ import 'package:colla_chat/tool/qrcode_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -97,8 +97,6 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Linkman';
-
-  
 }
 
 class _LinkmanListWidgetState extends State<LinkmanListWidget>
@@ -135,20 +133,21 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   _buildLinkmanSearchTextField(BuildContext context) {
     var searchTextField = Container(
         padding: const EdgeInsets.all(10.0),
-        child: CommonTextFormField(
-          controller: _linkmanTextController,
-          keyboardType: TextInputType.text,
-          //labelText: AppLocalizations.t('Search'),
-          suffixIcon: IconButton(
-            onPressed: () {
-              _searchLinkman(_linkmanTextController.text);
-            },
-            icon: Icon(
-              Icons.search,
-              color: myself.primary,
-            ),
-          ),
-        ));
+        child: TextFormField(
+            controller: _linkmanTextController,
+            keyboardType: TextInputType.text,
+            decoration: buildInputDecoration(
+              //labelText: AppLocalizations.t('Search'),
+              suffixIcon: IconButton(
+                onPressed: () {
+                  _searchLinkman(_linkmanTextController.text);
+                },
+                icon: Icon(
+                  Icons.search,
+                  color: myself.primary,
+                ),
+              ),
+            )));
 
     return searchTextField;
   }
@@ -156,20 +155,21 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   _buildGroupSearchTextField(BuildContext context) {
     var searchTextField = Container(
         padding: const EdgeInsets.all(10.0),
-        child: CommonTextFormField(
-          controller: _groupTextController,
-          keyboardType: TextInputType.text,
-          //labelText: AppLocalizations.t('Search'),
-          suffixIcon: IconButton(
-            onPressed: () {
-              _searchGroup(_groupTextController.text);
-            },
-            icon: Icon(
-              Icons.search,
-              color: myself.primary,
-            ),
-          ),
-        ));
+        child: TextFormField(
+            controller: _groupTextController,
+            keyboardType: TextInputType.text,
+            decoration: buildInputDecoration(
+              //labelText: AppLocalizations.t('Search'),
+              suffixIcon: IconButton(
+                onPressed: () {
+                  _searchGroup(_groupTextController.text);
+                },
+                icon: Icon(
+                  Icons.search,
+                  color: myself.primary,
+                ),
+              ),
+            )));
 
     return searchTextField;
   }
@@ -177,20 +177,21 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   _buildConferenceSearchTextField(BuildContext context) {
     var searchTextField = Container(
         padding: const EdgeInsets.all(10.0),
-        child: CommonTextFormField(
-          controller: _conferenceTextController,
-          keyboardType: TextInputType.text,
-          //labelText: AppLocalizations.t('Search'),
-          suffixIcon: IconButton(
-            onPressed: () {
-              _searchConference(_conferenceTextController.text);
-            },
-            icon: Icon(
-              Icons.search,
-              color: myself.primary,
-            ),
-          ),
-        ));
+        child: TextFormField(
+            controller: _conferenceTextController,
+            keyboardType: TextInputType.text,
+            decoration: buildInputDecoration(
+              //labelText: AppLocalizations.t('Search'),
+              suffixIcon: IconButton(
+                onPressed: () {
+                  _searchConference(_conferenceTextController.text);
+                },
+                icon: Icon(
+                  Icons.search,
+                  color: myself.primary,
+                ),
+              ),
+            )));
 
     return searchTextField;
   }

@@ -14,10 +14,11 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
+import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,7 @@ import 'package:get/get.dart';
 
 /// 18m麻将游戏
 class Majiang18mWidget extends StatelessWidget with TileDataMixin {
-  Majiang18mWidget({super.key}){
+  Majiang18mWidget({super.key}) {
     Flame.images.prefix = 'assets/image/';
     logger.i('all tiles have ${fullPile.tiles.length}');
   }
@@ -50,10 +51,11 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   //房间成员显示界面
   Widget _buildRoomParticipantWidget(BuildContext context) {
     return Column(children: [
-      CommonAutoSizeTextFormField(
-        controller: textEditingController,
-        labelText: AppLocalizations.t('Name'),
-      ),
+      AutoSizeTextFormField(
+          controller: textEditingController,
+          decoration: buildInputDecoration(
+            labelText: AppLocalizations.t('Name'),
+          )),
       const SizedBox(
         height: 20.0,
       ),

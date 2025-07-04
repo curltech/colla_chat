@@ -5,7 +5,6 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
@@ -264,18 +263,19 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
       }
     }
     String label = AppLocalizations.t(dataFieldDef.label);
-    var textFormField = CommonTextFormField(
+    var textFormField = TextFormField(
       controller: controller,
       focusNode: widget.focusNode,
       keyboardType: dataFieldDef.textInputType,
       maxLines: dataFieldDef.maxLines,
       minLines: dataFieldDef.minLines,
       readOnly: dataFieldDef.readOnly,
-      labelText: label,
-      prefixIcon: _buildIcon(),
-      suffixIcon: suffixIcon,
-      suffix: suffix,
-      hintText: dataFieldDef.hintText,
+      decoration: buildInputDecoration(
+          suffix: suffix,
+          hintText: dataFieldDef.hintText,
+          labelText: label,
+          prefixIcon: _buildIcon(),
+          suffixIcon: suffixIcon),
       inputFormatters: dataFieldDef.inputFormatters,
       validator: dataFieldDef.validator,
       onChanged: dataFieldDef.onChanged,
@@ -315,28 +315,29 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     }
 
     bool pwdShow = widget.controller.flag ?? false;
-    var textFormField = CommonTextFormField(
+    var textFormField = TextFormField(
       controller: controller,
       focusNode: widget.focusNode,
       keyboardType: dataFieldDef.textInputType,
       obscureText: !pwdShow,
       maxLines: 1,
-      labelText: AppLocalizations.t(dataFieldDef.label),
-      prefixIcon: _buildIcon(),
-      suffixIcon: IconButton(
-        icon: Icon(
-          pwdShow ? Icons.visibility_off : Icons.visibility,
-          color: myself.primary,
-        ),
-        onPressed: () {
-          setState(() {
-            widget.controller.value = controller!.value.text;
-            widget.controller.flag = !pwdShow;
-          });
-        },
-      ),
-      suffix: suffix,
-      hintText: dataFieldDef.hintText,
+      decoration: buildInputDecoration(
+          suffix: suffix,
+          hintText: dataFieldDef.hintText,
+          labelText: AppLocalizations.t(dataFieldDef.label),
+          prefixIcon: _buildIcon(),
+          suffixIcon: IconButton(
+            icon: Icon(
+              pwdShow ? Icons.visibility_off : Icons.visibility,
+              color: myself.primary,
+            ),
+            onPressed: () {
+              setState(() {
+                widget.controller.value = controller!.value.text;
+                widget.controller.flag = !pwdShow;
+              });
+            },
+          )),
       onChanged: dataFieldDef.onChanged,
       onEditingComplete: dataFieldDef.onEditingComplete,
       onFieldSubmitted: dataFieldDef.onFieldSubmitted,
@@ -758,26 +759,28 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
               icon: const Icon(Icons.cancel, color: Colors.grey))
           : null;
     }
-    var textFormField = CommonTextFormField(
+    var textFormField = TextFormField(
       controller: controller,
       focusNode: widget.focusNode,
       keyboardType: dataFieldDef.textInputType,
       readOnly: true,
-      labelText: AppLocalizations.t(dataFieldDef.label),
-      prefixIcon: _buildIcon(),
-      suffixIcon: IconButton(
-          icon: Icon(Icons.date_range, color: myself.primary),
-          onPressed: () async {
-            DateTime? initialDate;
-            if (initialValue != null) {
-              initialDate = DateUtil.toDateTime(initialValue);
-            }
-            var value =
-                await _showDatePicker(context, initialDate: initialDate);
-            widget.controller.value = value;
-          }),
-      suffix: suffix,
-      hintText: dataFieldDef.hintText,
+      decoration: buildInputDecoration(
+        labelText: AppLocalizations.t(dataFieldDef.label),
+        prefixIcon: _buildIcon(),
+        suffixIcon: IconButton(
+            icon: Icon(Icons.date_range, color: myself.primary),
+            onPressed: () async {
+              DateTime? initialDate;
+              if (initialValue != null) {
+                initialDate = DateUtil.toDateTime(initialValue);
+              }
+              var value =
+                  await _showDatePicker(context, initialDate: initialDate);
+              widget.controller.value = value;
+            }),
+        suffix: suffix,
+        hintText: dataFieldDef.hintText,
+      ),
     );
 
     return textFormField;
@@ -855,27 +858,28 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
               icon: const Icon(Icons.cancel, color: Colors.grey))
           : null;
     }
-    var textFormField = CommonTextFormField(
-      controller: controller,
-      focusNode: widget.focusNode,
-      keyboardType: dataFieldDef.textInputType,
-      readOnly: true,
-      labelText: AppLocalizations.t(dataFieldDef.label),
-      prefixIcon: _buildIcon(),
-      suffixIcon: IconButton(
-          icon: Icon(Icons.access_time_filled, color: myself.primary),
-          onPressed: () async {
-            TimeOfDay? initialTime;
-            if (initialValue != null) {
-              initialTime = DateUtil.toTime(initialValue);
-            }
-            var value =
-                await _showTimePicker(context, initialTime: initialTime);
-            widget.controller.value = value;
-          }),
-      suffix: suffix,
-      hintText: dataFieldDef.hintText,
-    );
+    var textFormField = TextFormField(
+        controller: controller,
+        focusNode: widget.focusNode,
+        keyboardType: dataFieldDef.textInputType,
+        readOnly: true,
+        decoration: buildInputDecoration(
+          labelText: AppLocalizations.t(dataFieldDef.label),
+          prefixIcon: _buildIcon(),
+          suffixIcon: IconButton(
+              icon: Icon(Icons.access_time_filled, color: myself.primary),
+              onPressed: () async {
+                TimeOfDay? initialTime;
+                if (initialValue != null) {
+                  initialTime = DateUtil.toTime(initialValue);
+                }
+                var value =
+                    await _showTimePicker(context, initialTime: initialTime);
+                widget.controller.value = value;
+              }),
+          suffix: suffix,
+          hintText: dataFieldDef.hintText,
+        ));
 
     return textFormField;
   }
@@ -926,27 +930,28 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
               icon: const Icon(Icons.cancel, color: Colors.grey))
           : null;
     }
-    var textFormField = CommonTextFormField(
-      controller: controller,
-      focusNode: widget.focusNode,
-      keyboardType: dataFieldDef.textInputType,
-      readOnly: true,
-      labelText: AppLocalizations.t(dataFieldDef.label),
-      prefixIcon: _buildIcon(),
-      suffixIcon: IconButton(
-          icon: Icon(Icons.date_range, color: myself.primary),
-          onPressed: () async {
-            DateTime? initialDate;
-            if (initialValue != null) {
-              initialDate = DateUtil.toDateTime(initialValue);
-            }
-            var value =
-                await _showDateTimePicker(context, initialDate: initialDate);
-            widget.controller.value = value;
-          }),
-      suffix: suffix,
-      hintText: dataFieldDef.hintText,
-    );
+    var textFormField = TextFormField(
+        controller: controller,
+        focusNode: widget.focusNode,
+        keyboardType: dataFieldDef.textInputType,
+        readOnly: true,
+        decoration: buildInputDecoration(
+          labelText: AppLocalizations.t(dataFieldDef.label),
+          prefixIcon: _buildIcon(),
+          suffixIcon: IconButton(
+              icon: Icon(Icons.date_range, color: myself.primary),
+              onPressed: () async {
+                DateTime? initialDate;
+                if (initialValue != null) {
+                  initialDate = DateUtil.toDateTime(initialValue);
+                }
+                var value = await _showDateTimePicker(context,
+                    initialDate: initialDate);
+                widget.controller.value = value;
+              }),
+          suffix: suffix,
+          hintText: dataFieldDef.hintText,
+        ));
 
     return textFormField;
   }

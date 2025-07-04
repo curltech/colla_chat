@@ -4,10 +4,10 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 
 class OptionController with ChangeNotifier {
@@ -180,10 +180,11 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
   }
 
   Widget _buildSearchTextField(BuildContext context) {
-    var searchTextField = CommonTextFormField(
+    var searchTextField = TextFormField(
       controller: textController,
       keyboardType: TextInputType.text,
-      suffixIcon: IconButton(
+      decoration: buildInputDecoration(
+          suffixIcon: IconButton(
         onPressed: () async {
           await _search();
         },
@@ -191,7 +192,7 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
           Icons.search,
           color: myself.primary,
         ),
-      ),
+      )),
       onChanged: (String? value) async {
         await _search();
       },
@@ -349,42 +350,43 @@ class _CustomSingleSelectFieldState extends State<CustomSingleSelectField> {
           Icons.arrow_drop_down,
           color: Colors.white,
         );
-    return CommonTextFormField(
-      controller: textEditingController,
-      readOnly: true,
-      keyboardType: TextInputType.text,
-      minLines: 1,
-      labelText: AppLocalizations.t(widget.title ?? ''),
-      prefixIcon: widget.prefix,
-      suffixIcon: InkWell(
-        child: suffix,
-        onTap: () async {
-          String? selected = await DialogUtil.show(
-              context: context,
-              builder: (BuildContext context) {
-                return DataListSingleSelect(
-                  title: widget.title,
-                  optionController: widget.optionController,
-                  onSearch: widget.onSearch,
-                  onChanged: (String? selected) {
-                    Navigator.pop(
-                      context,
-                      selected,
+    return TextFormField(
+        controller: textEditingController,
+        readOnly: true,
+        keyboardType: TextInputType.text,
+        minLines: 1,
+        decoration: buildInputDecoration(
+          labelText: AppLocalizations.t(widget.title ?? ''),
+          prefixIcon: widget.prefix,
+          suffixIcon: InkWell(
+            child: suffix,
+            onTap: () async {
+              String? selected = await DialogUtil.show(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return DataListSingleSelect(
+                      title: widget.title,
+                      optionController: widget.optionController,
+                      onSearch: widget.onSearch,
+                      onChanged: (String? selected) {
+                        Navigator.pop(
+                          context,
+                          selected,
+                        );
+                      },
                     );
-                  },
-                );
-              });
-          widget.onChanged(selected);
-          for (var option in widget.optionController.options) {
-            selected = selected ?? '';
-            if (option.value == selected) {
-              textEditingController.text = option.label;
-              break;
-            }
-          }
-        },
-      ),
-    );
+                  });
+              widget.onChanged(selected);
+              for (var option in widget.optionController.options) {
+                selected = selected ?? '';
+                if (option.value == selected) {
+                  textEditingController.text = option.label;
+                  break;
+                }
+              }
+            },
+          ),
+        ));
   }
 
   @override
@@ -457,16 +459,18 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
   }
 
   Widget _buildSearchTextField(BuildContext context) {
-    var searchTextField = CommonTextFormField(
+    var searchTextField = TextFormField(
       controller: textController,
       keyboardType: TextInputType.text,
-      suffixIcon: IconButton(
-        onPressed: () async {
-          await _search();
-        },
-        icon: Icon(
-          Icons.search,
-          color: myself.primary,
+      decoration: buildInputDecoration(
+        suffixIcon: IconButton(
+          onPressed: () async {
+            await _search();
+          },
+          icon: Icon(
+            Icons.search,
+            color: myself.primary,
+          ),
         ),
       ),
       onChanged: (String? value) async {

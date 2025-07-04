@@ -1,8 +1,8 @@
 import 'package:colla_chat/entity/stock/user.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/routers/routes.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
@@ -47,14 +47,14 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
         children: <Widget>[
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 50.0),
-              child: CommonTextFormField(
+              child: TextFormField(
                 keyboardType: TextInputType.text,
                 //controller: _credentialController,
-
-                labelText:
-                    AppLocalizations.t('Credential(Mobile/Email/LoginName)'),
-                prefixIcon: const Icon(Icons.person),
-
+                decoration: buildInputDecoration(
+                  labelText:
+                      AppLocalizations.t('Credential(Mobile/Email/LoginName)'),
+                  prefixIcon: const Icon(Icons.person),
+                ),
                 initialValue: _credential,
                 onChanged: (String val) {
                   setState(() {
@@ -66,23 +66,23 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
           const SizedBox(height: 30.0),
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 50.0),
-              child: CommonTextFormField(
+              child: TextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,
-
-                labelText: AppLocalizations.t('Password'),
-                prefixIcon: const Icon(Icons.lock),
-                suffixIcon: IconButton(
-                  icon:
-                      Icon(_pwdShow ? Icons.visibility : Icons.visibility_off),
-                  onPressed: () {
-                    setState(() {
-                      _pwdShow = !_pwdShow;
-                    });
-                  },
+                decoration: buildInputDecoration(
+                  labelText: AppLocalizations.t('Password'),
+                  prefixIcon: const Icon(Icons.lock),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                        _pwdShow ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        _pwdShow = !_pwdShow;
+                      });
+                    },
+                  ),
                 ),
-
                 initialValue: _password,
                 onChanged: (String val) {
                   setState(() {

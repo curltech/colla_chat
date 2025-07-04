@@ -8,7 +8,6 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -38,15 +37,13 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MailAddressAutoDiscover';
 
-  
-
   late final FormInputController formInputController;
 
-  Rx<EmailServiceProvider?> emailServiceProvider =
+  final Rx<EmailServiceProvider?> emailServiceProvider =
       Rx<EmailServiceProvider?>(null);
-  TextEditingController emailServiceProviderController =
+  final TextEditingController emailServiceProviderController =
       TextEditingController();
-  RxList<Option<String>> emailServiceProviderOptions =
+  final RxList<Option<String>> emailServiceProviderOptions =
       RxList<Option<String>>([]);
 
   _updateEmailServiceProviderOptions() {
@@ -77,29 +74,31 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
               break;
             }
           }
-          return CommonTextFormField(
-            labelText: 'Select email service provider',
-            prefixIcon: prefix,
-            controller: emailServiceProviderController,
-            readOnly: true,
-            suffixIcon: IconButton(
-              onPressed: () async {
-                String? domainName = await DialogUtil.showSelectDialog<String>(
-                    context: context,
-                    title: const CommonAutoSizeText(
-                        'Select email service provider'),
-                    items: options);
-                if (domainName != null) {
-                  emailServiceProviderController.text = domainName;
-                  _updateEmailServiceProviderOptions();
-                }
-              },
-              icon: Icon(
-                Icons.search,
-                color: myself.primary,
-              ),
-            ),
-          );
+          return TextFormField(
+              controller: emailServiceProviderController,
+              readOnly: true,
+              decoration: buildInputDecoration(
+                labelText: 'Select email service provider',
+                prefixIcon: prefix,
+                suffixIcon: IconButton(
+                  onPressed: () async {
+                    String? domainName =
+                        await DialogUtil.showSelectDialog<String>(
+                            context: context,
+                            title: const CommonAutoSizeText(
+                                'Select email service provider'),
+                            items: options);
+                    if (domainName != null) {
+                      emailServiceProviderController.text = domainName;
+                      _updateEmailServiceProviderOptions();
+                    }
+                  },
+                  icon: Icon(
+                    Icons.search,
+                    color: myself.primary,
+                  ),
+                ),
+              ));
         });
 
     return Container(

@@ -18,11 +18,11 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
 import 'package:enough_mail/highlevel.dart' as enough_mail;
 import 'package:flutter/material.dart';
@@ -66,8 +66,6 @@ class NewMailWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'New mail';
-
-  
 
   //已经选择的收件人
   final RxList<String> receipts = RxList([]);
@@ -142,9 +140,10 @@ class NewMailWidget extends StatelessWidget with TileDataMixin {
           const SizedBox(
             height: 5.0,
           ),
-          CommonTextFormField(
+          TextFormField(
               controller: subjectController,
-              labelText: AppLocalizations.t('Subject'))
+              decoration: buildInputDecoration(
+                  labelText: AppLocalizations.t('Subject')))
         ]));
   }
 

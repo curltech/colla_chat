@@ -5,11 +5,12 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/download_file_util.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_config_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
+import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 
 class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
@@ -30,8 +31,6 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'SherpaInstall';
-
-  
 
   final ValueNotifier<bool> sherpaPresent = ValueNotifier<bool>(false);
   final ValueNotifier<DownloadProgress> downloadProgress =
@@ -142,22 +141,23 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
         const SizedBox(
           height: 15.0,
         ),
-        CommonAutoSizeTextFormField(
+        AutoSizeTextFormField(
             controller: modelNameController,
-            labelText: AppLocalizations.t('Sherpa model'),
-            suffix: IconButton(
-                onPressed: () {
-                  DialogUtil.show(
-                      title: Text(AppLocalizations.t('Select')),
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Dialog(child: child);
-                      });
-                },
-                icon: Icon(
-                  Icons.select_all_outlined,
-                  color: myself.primary,
-                ))),
+            decoration: buildInputDecoration(
+                labelText: AppLocalizations.t('Sherpa model'),
+                suffix: IconButton(
+                    onPressed: () {
+                      DialogUtil.show(
+                          title: Text(AppLocalizations.t('Select')),
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Dialog(child: child);
+                          });
+                    },
+                    icon: Icon(
+                      Icons.select_all_outlined,
+                      color: myself.primary,
+                    )))),
       ],
     );
   }
@@ -176,20 +176,22 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
             controller.text =
                 SherpaConfigUtil.sherpaModelInstallationPath ?? '';
             children.add(
-              CommonAutoSizeTextFormField(
-                labelText: AppLocalizations.t('Sherpa installation path'),
+              AutoSizeTextFormField(
                 controller: controller,
-                hintText: AppLocalizations.t('Sherpa installation path'),
-                suffix: IconButton(
-                  onPressed: () {
-                    SherpaConfigUtil.sherpaModelInstallationPath =
-                        controller.text;
-                  },
-                  icon: Icon(
-                    Icons.save,
-                    color: myself.primary,
+                decoration: buildInputDecoration(
+                  labelText: AppLocalizations.t('Sherpa installation path'),
+                  hintText: AppLocalizations.t('Sherpa installation path'),
+                  suffix: IconButton(
+                    onPressed: () {
+                      SherpaConfigUtil.sherpaModelInstallationPath =
+                          controller.text;
+                    },
+                    icon: Icon(
+                      Icons.save,
+                      color: myself.primary,
+                    ),
+                    tooltip: AppLocalizations.t('Save'),
                   ),
-                  tooltip: AppLocalizations.t('Save'),
                 ),
               ),
             );

@@ -5,10 +5,11 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
+import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -90,27 +91,28 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
     return Column(children: [
       Container(
           padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-          child: CommonAutoSizeTextFormField(
+          child: AutoSizeTextFormField(
             controller: searchTextController,
             keyboardType: TextInputType.text,
-            prefixIcon: IconButton(
-              onPressed: () {
-                searchTextController.text = '';
-              },
-              icon: Icon(
-                Icons.clear,
-                color: myself.primary,
-              ),
-            ),
-            suffixIcon: IconButton(
-              onPressed: () {
-                _searchShare(searchTextController.text);
-              },
-              icon: Icon(
-                Icons.search,
-                color: myself.primary,
-              ),
-            ),
+            decoration: buildInputDecoration(
+                prefixIcon: IconButton(
+                  onPressed: () {
+                    searchTextController.text = '';
+                  },
+                  icon: Icon(
+                    Icons.clear,
+                    color: myself.primary,
+                  ),
+                ),
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    _searchShare(searchTextController.text);
+                  },
+                  icon: Icon(
+                    Icons.search,
+                    color: myself.primary,
+                  ),
+                )),
           )),
       Expanded(child: Obx(() {
         return DataListView(

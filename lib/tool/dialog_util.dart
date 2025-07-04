@@ -4,10 +4,10 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_indicator/loading_indicator.dart';
@@ -419,9 +419,11 @@ class DialogUtil {
                 style: const TextStyle(color: Colors.white),
               )),
           titlePadding: EdgeInsets.zero,
-          content: CommonTextFormField(
+          content: TextFormField(
             keyboardType: TextInputType.text,
-            labelText: AppLocalizations.t(content),
+            decoration: buildInputDecoration(
+              labelText: AppLocalizations.t(content),
+            ),
             controller: controller,
           ),
           actions: <Widget>[

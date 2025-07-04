@@ -1,5 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
+import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
@@ -372,7 +372,7 @@ class ReactiveToggleButtons<T> extends ReactiveFormField<T, T> {
         );
 }
 
-class ReactiveCommonTextFormField<T> extends ReactiveFormField<T, String> {
+class ReactiveAutoSizeTextFormField<T> extends ReactiveFormField<T, String> {
   final TextEditingController? _textController;
 
   static Widget _defaultContextMenuBuilder(
@@ -384,7 +384,7 @@ class ReactiveCommonTextFormField<T> extends ReactiveFormField<T, String> {
     );
   }
 
-  ReactiveCommonTextFormField({
+  ReactiveAutoSizeTextFormField({
     super.key,
     super.formControlName,
     super.formControl,
@@ -432,7 +432,7 @@ class ReactiveCommonTextFormField<T> extends ReactiveFormField<T, String> {
     String? restorationId,
     bool enableIMEPersonalizedLearning = true,
     MouseCursor? mouseCursor,
-    InputDecoration? decoration,
+    InputDecoration decoration = const InputDecoration(),
     Color? fillColor,
     Color? focusColor,
     bool autofocus = false,
@@ -456,17 +456,12 @@ class ReactiveCommonTextFormField<T> extends ReactiveFormField<T, String> {
   })  : _textController = controller,
         super(
           builder: (ReactiveFormFieldState<T, String> field) {
-            final state = field as _ReactiveCommonTextFormFieldState<T>;
-            final effectiveDecoration = decoration?.applyDefaults(
-              Theme.of(state.context).inputDecorationTheme,
-            );
+            final state = field as _ReactiveAutoSizeTextFormFieldState<T>;
 
-            return CommonTextFormField(
+            return AutoSizeTextFormField(
                 controller: state._textController,
                 focusNode: state.focusNode,
-                decoration: effectiveDecoration?.copyWith(
-                  errorText: state.errorText,
-                ),
+                decoration: decoration,
                 keyboardType: keyboardType,
                 textInputAction: textInputAction,
                 style: style,
@@ -534,10 +529,10 @@ class ReactiveCommonTextFormField<T> extends ReactiveFormField<T, String> {
 
   @override
   ReactiveFormFieldState<T, String> createState() =>
-      _ReactiveCommonTextFormFieldState<T>();
+      _ReactiveAutoSizeTextFormFieldState<T>();
 }
 
-class _ReactiveCommonTextFormFieldState<T>
+class _ReactiveAutoSizeTextFormFieldState<T>
     extends ReactiveFocusableFormFieldState<T, String> {
   late TextEditingController _textController;
 
@@ -576,7 +571,7 @@ class _ReactiveCommonTextFormFieldState<T>
 
   void _initializeTextController() {
     final initialValue = value;
-    final currentWidget = widget as ReactiveCommonTextFormField<T>;
+    final currentWidget = widget as ReactiveAutoSizeTextFormField<T>;
     _textController = (currentWidget._textController != null)
         ? currentWidget._textController!
         : TextEditingController();
@@ -585,7 +580,7 @@ class _ReactiveCommonTextFormFieldState<T>
 
   @override
   void dispose() {
-    final currentWidget = widget as ReactiveCommonTextFormField<T>;
+    final currentWidget = widget as ReactiveAutoSizeTextFormField<T>;
     if (currentWidget._textController == null) {
       _textController.dispose();
     }

@@ -14,10 +14,10 @@ import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/validator_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -35,8 +35,6 @@ class P2pLinkmanAddWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'P2p add linkman';
-
-  
 
   @override
   bool get withLeading => true;
@@ -63,22 +61,23 @@ class P2pLinkmanAddWidget extends StatelessWidget with TileDataMixin {
   }
 
   _buildSearchTextField(BuildContext context) {
-    var searchTextField = CommonTextFormField(
+    var searchTextField = TextFormField(
         controller: controller,
         keyboardType: TextInputType.text,
         validator: (value) {
           return ValidatorUtil.emptyValidator(value);
         },
-        labelText: AppLocalizations.t('PeerId/Mobile/Email/Name'),
-        suffixIcon: IconButton(
-          onPressed: () {
-            _search(controller.text);
-          },
-          icon: Icon(
-            Icons.search,
-            color: myself.primary,
-          ),
-        ));
+        decoration: buildInputDecoration(
+            labelText: AppLocalizations.t('PeerId/Mobile/Email/Name'),
+            suffixIcon: IconButton(
+              onPressed: () {
+                _search(controller.text);
+              },
+              icon: Icon(
+                Icons.search,
+                color: myself.primary,
+              ),
+            )));
 
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15.0),

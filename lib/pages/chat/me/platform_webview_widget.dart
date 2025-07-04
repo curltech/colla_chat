@@ -1,6 +1,5 @@
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/webview/platform_webview.dart';
 import 'package:flutter/material.dart';
@@ -20,11 +19,9 @@ class PlatformWebViewWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'WebView';
 
-  
-
   late final urlTextController = TextEditingController(text: initialUrl);
 
-  PlatformWebViewController platformWebViewController =
+  final PlatformWebViewController platformWebViewController =
       PlatformWebViewController();
 
   bool fullScreen = false;
@@ -64,7 +61,7 @@ class PlatformWebViewWidget extends StatelessWidget with TileDataMixin {
         width: 10,
       ),
       Expanded(
-          child: CommonTextFormField(
+          child: TextFormField(
         //prefixIcon: const Icon(Icons.http),
         controller: urlTextController,
         keyboardType: TextInputType.url,
@@ -117,6 +114,9 @@ class PlatformWebViewWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: title, helpPath: routeName,withLeading: true, child: buildWebView(context));
+        title: title,
+        helpPath: routeName,
+        withLeading: true,
+        child: buildWebView(context));
   }
 }
