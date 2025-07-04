@@ -357,6 +357,7 @@ class DialogUtil {
       context: context,
       builder: (context) {
         return AlertDialog(
+          icon: icon ?? Icon(Icons.confirmation_num_outlined),
           title: AppBarWidget(
               isAppBar: false,
               title: Text(
@@ -364,12 +365,16 @@ class DialogUtil {
                 style: const TextStyle(color: Colors.white),
               )),
           titlePadding: EdgeInsets.zero,
-          content: CommonAutoSizeText(
-              style: TextStyle(color: Colors.white),
-              softWrap: true,
-              maxLines: 4,
-              overflow: TextOverflow.ellipsis,
-              AppLocalizations.t(content)),
+          content: SizedBox(
+              width: appDataProvider.totalSize.width * 0.8,
+              height: appDataProvider.totalSize.height * 0.5,
+              child: Center(
+                  child: CommonAutoSizeText(
+                      style: TextStyle(color: Colors.white),
+                      softWrap: true,
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                      AppLocalizations.t(content)))),
           actions: <Widget>[
             TextButton(
               style: style,
@@ -388,7 +393,7 @@ class DialogUtil {
               child: Text(AppLocalizations.t(okLabel)),
             ),
           ],
-        ).asStyle();
+        );
       },
     );
 
