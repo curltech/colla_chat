@@ -19,7 +19,7 @@ import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -47,8 +47,6 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'NodeEdit';
 
-  
-
   ModelNode? get modelNode {
     return modelProjectController.selectedSrcModelNode.value;
   }
@@ -75,7 +73,7 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
         prefixIcon: Icon(Icons.height_outlined, color: myself.primary)),
   ];
 
-  FormInputController? formInputController;
+  PlatformReactiveFormController? platformReactiveFormController;
 
   final Rx<String?> content = Rx<String?>(null);
 
@@ -96,7 +94,7 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
   }
 
   //ModelNode信息编辑界面
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     if (modelNode == null) {
       return nilBox;
     }
@@ -121,14 +119,15 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
         );
       }));
     }
-    formInputController = FormInputController(_buildModelNodeDataFields());
-    formInputController!.setValues(JsonUtil.toJson(modelNode));
-    Widget formInputWidget = FormInputWidget(
+    platformReactiveFormController =
+        PlatformReactiveFormController(_buildModelNodeDataFields());
+    platformReactiveFormController!.values = JsonUtil.toJson(modelNode);
+    Widget formInputWidget = PlatformReactiveForm(
         spacing: 15.0,
-        onOk: (Map<String, dynamic> values) {
+        onSubmit: (Map<String, dynamic> values) {
           _onOk(values);
         },
-        controller: formInputController!,
+        platformReactiveFormController: platformReactiveFormController!,
         tails: tails);
 
     return Container(
@@ -239,6 +238,6 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
               },
               icon: Icon(methodEditWidget.iconData))
         ],
-        child: _buildFormInputWidget(context));
+        child: _buildPlatformReactiveForm(context));
   }
 }

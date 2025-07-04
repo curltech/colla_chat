@@ -10,7 +10,7 @@ import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -26,8 +26,6 @@ class DruleEditWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'DruleEdit';
-
-  
 
   DruleEditWidget({super.key});
 
@@ -67,11 +65,11 @@ class DruleEditWidget extends StatelessWidget with TileDataMixin {
         prefixIcon: Icon(Icons.sms_failed_outlined, color: myself.primary)),
   ];
 
-  late final FormInputController formInputController =
-      FormInputController(druleDataFields);
+  late final PlatformReactiveFormController platformReactiveFormController =
+      PlatformReactiveFormController(druleDataFields);
 
   //ModelNode信息编辑界面
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     List<Option<dynamic>> options = [];
     for (var value in DataType.values) {
       options.add(Option(value.name, value.name));
@@ -81,13 +79,13 @@ class DruleEditWidget extends StatelessWidget with TileDataMixin {
       if (drule == null) {
         return nilBox;
       }
-      formInputController.setValues(JsonUtil.toJson(drule));
-      var formInputWidget = FormInputWidget(
+      platformReactiveFormController.values = JsonUtil.toJson(drule);
+      var formInputWidget = PlatformReactiveForm(
         spacing: 15.0,
-        onOk: (Map<String, dynamic> values) {
+        onSubmit: (Map<String, dynamic> values) {
           _onOk(values);
         },
-        controller: formInputController,
+        platformReactiveFormController: platformReactiveFormController,
       );
 
       return Container(
@@ -164,6 +162,6 @@ class DruleEditWidget extends StatelessWidget with TileDataMixin {
         helpPath: routeName,
         withLeading: true,
         rightWidgets: _buildRightButton(context),
-        child: _buildFormInputWidget(context));
+        child: _buildPlatformReactiveForm(context));
   }
 }

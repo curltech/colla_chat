@@ -16,7 +16,7 @@ import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_paginated_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 
 class QPerformanceDataPageController extends DataPageController<QPerformance> {
@@ -65,10 +65,8 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'QPerformance';
 
-
-
   late final List<PlatformDataField> searchDataField;
-  late final FormInputController searchController;
+  late final PlatformReactiveFormController searchController;
   final ExpansionTileController expansionTileController =
       ExpansionTileController();
 
@@ -99,13 +97,13 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
             color: myself.primary,
           )),
     ];
-    searchController = FormInputController(searchDataField);
+    searchController = PlatformReactiveFormController(searchDataField);
     searchController.setValue(
         'startDate', DateUtil.formatDateQuarter(DateTime.now()));
   }
 
   _updateQPerformance() {
-    Map<String, dynamic> values = searchController.getValues();
+    Map<String, dynamic> values = searchController.values;
     qperformanceDataPageController.findCondition.value.whereColumns = values;
     qperformanceDataPageController.findData();
   }
@@ -144,10 +142,10 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
     ];
     Widget formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
-        child: FormInputWidget(
+        child: PlatformReactiveForm(
           height: appDataProvider.portraitSize.height * 0.2,
           spacing: 5.0,
-          controller: searchController,
+          platformReactiveFormController: searchController,
           formButtons: formButtonDefs,
         ));
 
@@ -162,7 +160,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
   }
 
   _onOk(BuildContext context, Map<String, dynamic> values) async {
-    qperformanceDataPageController.findCondition.value.whereColumns=values;
+    qperformanceDataPageController.findCondition.value.whereColumns = values;
     await qperformanceDataPageController.findData();
     expansionTileController.collapse();
     DialogUtil.info(

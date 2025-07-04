@@ -13,7 +13,7 @@ import 'package:colla_chat/tool/qrcode_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 
 ///根据token创建匿名的SFU会议
@@ -31,8 +31,6 @@ class AnonymousConferenceEditWidget extends StatelessWidget with TileDataMixin {
 
   @override
   bool get withLeading => true;
-
-
 
   final List<PlatformDataField> conferenceDataField = [
     PlatformDataField(
@@ -95,21 +93,21 @@ class AnonymousConferenceEditWidget extends StatelessWidget with TileDataMixin {
       prefixIcon: Icon(Icons.pin_end, color: myself.primary),
     ),
   ];
-  late final FormInputController formInputController =
-      FormInputController(conferenceDataField);
+  late final PlatformReactiveFormController platformReactiveFormController =
+      PlatformReactiveFormController(conferenceDataField);
 
   //会议信息编辑界面
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     var formInputWidget = ValueListenableBuilder(
         valueListenable: conferenceNotifier,
         builder: (BuildContext context, Conference? conference, Widget? child) {
           if (conference != null) {
-            formInputController.setValues(JsonUtil.toJson(conference));
+            platformReactiveFormController.values = JsonUtil.toJson(conference);
           }
-          return FormInputWidget(
+          return PlatformReactiveForm(
             spacing: 5.0,
             height: appDataProvider.portraitSize.height * 0.7,
-            controller: formInputController,
+            platformReactiveFormController: platformReactiveFormController,
             formButtons: [
               FormButton(
                   label: 'Qrcode',
@@ -172,7 +170,7 @@ class AnonymousConferenceEditWidget extends StatelessWidget with TileDataMixin {
         title: title,
         helpPath: routeName,
         withLeading: withLeading,
-        child: _buildFormInputWidget(context));
+        child: _buildPlatformReactiveForm(context));
     return appBarView;
   }
 }

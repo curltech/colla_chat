@@ -16,7 +16,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 
 class StatScoreDataPageController extends DataPageController<StatScore> {
@@ -64,12 +64,9 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'StatScore';
 
-  
-
   late final List<PlatformDataField> searchDataField;
-  late final FormInputController searchController;
-  final ExpansibleController expansibleController =
-      ExpansibleController();
+  late final PlatformReactiveFormController searchController;
+  final ExpansibleController expansibleController = ExpansibleController();
 
   _init() {
     statScoreDataPageController.findCondition.addListener(_updateStatScore);
@@ -117,11 +114,11 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
             color: myself.primary,
           )),
     ];
-    searchController = FormInputController(searchDataField);
+    searchController = PlatformReactiveFormController(searchDataField);
   }
 
   _updateStatScore() {
-    Map<String, dynamic> values = searchController.getValues();
+    Map<String, dynamic> values = searchController.values;
     statScoreDataPageController.findCondition.value.whereColumns = values;
     statScoreDataPageController.findData();
   }
@@ -160,10 +157,10 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
     ];
     Widget formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
-        child: FormInputWidget(
+        child: PlatformReactiveForm(
           height: appDataProvider.portraitSize.height * 0.3,
           spacing: 5.0,
-          controller: searchController,
+          platformReactiveFormController: searchController,
           formButtons: formButtonDefs,
         ));
 
@@ -217,7 +214,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
         label: '增长',
         name: 'increase_score',
         dataType: DataType.double,
-        align:Alignment.centerRight,
+        align: Alignment.centerRight,
         width: 80,
         onSort: (int index, bool ascending) => statScoreDataPageController.sort(
             (t) => t.increaseScore, index, 'increaseScore', ascending),
@@ -226,7 +223,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
         label: '累计业绩',
         name: 'acc_score',
         dataType: DataType.double,
-        align:Alignment.centerRight,
+        align: Alignment.centerRight,
         width: 80,
         onSort: (int index, bool ascending) => statScoreDataPageController.sort(
             (t) => t.accScore, index, 'accScore', ascending),

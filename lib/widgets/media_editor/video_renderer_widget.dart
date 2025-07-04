@@ -6,8 +6,8 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:colla_chat/widgets/media/video/mediakit_video_player.dart';
 import 'package:colla_chat/widgets/media_editor/pro_video_editor.dart';
@@ -124,7 +124,7 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
     isExporting.value = false;
   }
 
-  FormInputWidget _buildFormInputWidget(BuildContext context) {
+  PlatformReactiveForm _buildPlatformReactiveForm(BuildContext context) {
     List<PlatformDataField> dataFields = [
       PlatformDataField(
         name: 'rotateTurns',
@@ -281,16 +281,17 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
       ),
     ];
 
-    FormInputController formInputController = FormInputController(dataFields);
+    PlatformReactiveFormController platformReactiveFormController =
+        PlatformReactiveFormController(dataFields);
 
-    return FormInputWidget(
+    return PlatformReactiveForm(
       mainAxisAlignment: MainAxisAlignment.start,
       // height: appDataProvider.portraitSize.height * 0.3,
       spacing: 10.0,
-      onOk: (Map<String, dynamic> values) async {
+      onSubmit: (Map<String, dynamic> values) async {
         _onOk(values);
       },
-      controller: formInputController,
+      platformReactiveFormController: platformReactiveFormController,
     );
   }
 
@@ -454,7 +455,7 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
           DialogUtil.popModalBottomSheet(
               context: context,
               builder: (BuildContext context) {
-                return _buildFormInputWidget(context);
+                return _buildPlatformReactiveForm(context);
               });
         },
         icon: Icon(Icons.draw_outlined)));

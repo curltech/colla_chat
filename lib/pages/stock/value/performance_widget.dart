@@ -16,7 +16,7 @@ import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_paginated_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 
 class PerformanceDataPageController extends DataPageController<Performance> {
@@ -66,8 +66,6 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'Performance';
-
-
 
   late final List<PlatformDataColumn> performanceDataColumns = [
     PlatformDataColumn(
@@ -203,7 +201,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
         buildSuffix: _buildActionWidget),
   ];
   late final List<PlatformDataField> searchDataField;
-  late final FormInputController searchController;
+  late final PlatformReactiveFormController searchController;
   final ExpansionTileController expansionTileController =
       ExpansionTileController();
 
@@ -233,13 +231,13 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
             color: myself.primary,
           )),
     ];
-    searchController = FormInputController(searchDataField);
+    searchController = PlatformReactiveFormController(searchDataField);
     searchController.setValue(
         'startDate', DateUtil.formatDateQuarter(DateTime.now()));
   }
 
   _updatePerformance() {
-    Map<String, dynamic> values = searchController.getValues();
+    Map<String, dynamic> values = searchController.values;
     performanceDataPageController.findCondition.value.whereColumns = values;
     performanceDataPageController.findData();
   }
@@ -278,10 +276,10 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
     ];
     Widget formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
-        child: FormInputWidget(
+        child: PlatformReactiveForm(
           height: appDataProvider.portraitSize.height * 0.22,
           spacing: 10.0,
-          controller: searchController,
+          platformReactiveFormController: searchController,
           formButtons: formButtonDefs,
         ));
 

@@ -14,10 +14,10 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart' as p;
@@ -83,21 +83,22 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
           color: myself.primary,
         )),
   ];
-  late final FormInputController formInputController =
-      FormInputController(searchDataField);
+  late final PlatformReactiveFormController platformReactiveFormController =
+      PlatformReactiveFormController(searchDataField);
 
-  final ExpansionTileController expansionTileController = ExpansionTileController();
+  final ExpansionTileController expansionTileController =
+      ExpansionTileController();
 
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     var formInputWidget = Container(
         height: 280,
         padding: const EdgeInsets.all(10.0),
-        child: FormInputWidget(
+        child: PlatformReactiveForm(
           height: 280,
           spacing: 5.0,
-          okLabel: 'Search',
-          controller: formInputController,
-          onOk: (Map<String, dynamic> values) {
+          submitLabel: 'Search',
+          platformReactiveFormController: platformReactiveFormController,
+          onSubmit: (Map<String, dynamic> values) {
             poemController.clear();
             _onOk(context, values);
           },
@@ -189,7 +190,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
 
   Future<void> _onRefresh(BuildContext context) async {
     int length = poemController.data.length;
-    Map<String, dynamic> values = formInputController.getValues();
+    Map<String, dynamic> values = platformReactiveFormController.values;
     _onOk(context, values, from: length);
   }
 
@@ -198,7 +199,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
       const SizedBox(
         height: 5,
       ),
-      _buildFormInputWidget(context),
+      _buildPlatformReactiveForm(context),
       Expanded(child: Obx(
         () {
           List<TileData> tiles = [];

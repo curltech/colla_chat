@@ -11,7 +11,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -28,11 +28,12 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'DataColumnEdit';
 
-  late final FormInputController formInputController;
+  late final PlatformReactiveFormController platformReactiveFormController;
 
   DataColumnEditWidget({super.key}) {
     List<PlatformDataField> dataColumnDataFields = buildDataColumnDataFields();
-    formInputController = FormInputController(dataColumnDataFields);
+    platformReactiveFormController =
+        PlatformReactiveFormController(dataColumnDataFields);
   }
 
   List<PlatformDataField> buildDataColumnDataFields() {
@@ -79,19 +80,20 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
   }
 
   //DataSourceNode信息编辑界面
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     return Obx(() {
       data_source.DataColumnNode? dataColumnNode =
           dataSourceController.getDataColumnNode();
       if (dataColumnNode != null) {
-        formInputController.setValues(JsonUtil.toJson(dataColumnNode.value));
+        platformReactiveFormController.values =
+            JsonUtil.toJson(dataColumnNode.value);
       }
-      var formInputWidget = FormInputWidget(
+      var formInputWidget = PlatformReactiveForm(
         spacing: 15.0,
-        onOk: (Map<String, dynamic> values) {
+        onSubmit: (Map<String, dynamic> values) {
           _onOk(values);
         },
-        controller: formInputController,
+        platformReactiveFormController: platformReactiveFormController,
       );
 
       return Container(
@@ -141,6 +143,8 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: title, withLeading: true, child: _buildFormInputWidget(context));
+        title: title,
+        withLeading: true,
+        child: _buildPlatformReactiveForm(context));
   }
 }

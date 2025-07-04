@@ -13,7 +13,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -38,8 +38,6 @@ class LlmChatAddWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Add llm linkman';
 
-  
-
   final List<PlatformDataField> llmChatDataFields = [
     PlatformDataField(
         name: 'id',
@@ -62,25 +60,25 @@ class LlmChatAddWidget extends StatelessWidget with TileDataMixin {
         )),
   ];
 
-  late final FormInputController controller =
-      FormInputController(llmChatDataFields);
+  late final PlatformReactiveFormController platformReactiveFormController =
+      PlatformReactiveFormController(llmChatDataFields);
   Linkman? linkman;
 
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     return Obx(() {
       Linkman? linkman = linkmanController.current;
       if (linkman != null) {
-        controller.setValues(JsonUtil.toJson(linkman));
+        platformReactiveFormController.values = JsonUtil.toJson(linkman);
       }
 
       var formInputWidget = Container(
           padding: const EdgeInsets.all(15.0),
-          child: FormInputWidget(
+          child: PlatformReactiveForm(
             height: 420,
-            onOk: (Map<String, dynamic> values) {
+            onSubmit: (Map<String, dynamic> values) {
               _onOk(context, values);
             },
-            controller: controller,
+            platformReactiveFormController: platformReactiveFormController,
           ));
 
       return ListView(children: [formInputWidget]);
@@ -126,7 +124,7 @@ class LlmChatAddWidget extends StatelessWidget with TileDataMixin {
         title: title,
         helpPath: routeName,
         withLeading: withLeading,
-        child: _buildFormInputWidget(context));
+        child: _buildPlatformReactiveForm(context));
 
     return appBarView;
   }

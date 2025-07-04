@@ -8,10 +8,8 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../../plugin/talker_logger.dart';
 
 final List<PlatformDataField> peerProfileDataFields = [
   PlatformDataField(
@@ -152,20 +150,20 @@ class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Privacy Setting';
 
-  final FormInputController controller =
-      FormInputController(peerProfileDataFields);
+  final PlatformReactiveFormController platformReactiveFormController =
+      PlatformReactiveFormController(peerProfileDataFields);
 
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     PeerProfile? peerProfile = myself.myselfPeer.peerProfile;
     if (peerProfile != null) {
-      controller.setValues(JsonUtil.toJson(peerProfile));
+      platformReactiveFormController.values = JsonUtil.toJson(peerProfile);
     }
-    var formInputWidget = FormInputWidget(
+    var formInputWidget = PlatformReactiveForm(
       height: 500,
-      onOk: (Map<String, dynamic> values) async {
+      onSubmit: (Map<String, dynamic> values) async {
         await _onOk(context, values);
       },
-      controller: controller,
+      platformReactiveFormController: platformReactiveFormController,
     );
 
     return formInputWidget;
@@ -222,7 +220,7 @@ class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
         title: title,
         helpPath: routeName,
         withLeading: withLeading,
-        child: _buildFormInputWidget(context));
+        child: _buildPlatformReactiveForm(context));
     return appBarView;
   }
 }

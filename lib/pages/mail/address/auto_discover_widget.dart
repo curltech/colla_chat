@@ -13,7 +13,8 @@ import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:enough_mail/discover.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,7 +22,7 @@ import 'package:get/get.dart';
 /// 自动邮件发现视图，一个card下的录入框和按钮组合
 class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
   AutoDiscoverWidget({super.key}) {
-    formInputController = FormInputController(_getAutoDiscoveryColumnField());
+    platformReactiveFormController = PlatformReactiveFormController(_getAutoDiscoveryColumnField());
     _updateEmailServiceProviderOptions();
   }
 
@@ -37,7 +38,7 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MailAddressAutoDiscover';
 
-  late final FormInputController formInputController;
+  late final PlatformReactiveFormController platformReactiveFormController;
 
   final Rx<EmailServiceProvider?> emailServiceProvider =
       Rx<EmailServiceProvider?>(null);
@@ -137,10 +138,10 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
     return autoDiscoveryColumnField;
   }
 
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     var formInputWidget = Container(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: FormInputWidget(
+        child: PlatformReactiveForm(
           height: appDataProvider.portraitSize.height * 0.4,
           spacing: 5.0,
           formButtons: [
@@ -155,7 +156,7 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
                   _connect(values);
                 }),
           ],
-          controller: formInputController,
+          platformReactiveFormController: platformReactiveFormController,
         ));
 
     return formInputWidget;
@@ -273,7 +274,7 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
             height: 10.0,
           ),
           //_buildEmailServiceProviderSelector(context),
-          _buildFormInputWidget(context),
+          _buildPlatformReactiveForm(context),
           Expanded(child: Obx(() {
             if (emailServiceProvider.value != null) {
               return Card(

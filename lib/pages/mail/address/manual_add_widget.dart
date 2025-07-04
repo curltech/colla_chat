@@ -10,7 +10,8 @@ import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
 
@@ -32,8 +33,8 @@ class ManualAddWidget extends StatelessWidget with TileDataMixin {
 
   
 
-  late final FormInputController formInputController =
-      FormInputController(_getManualDiscoveryColumnField());
+  late final PlatformReactiveFormController platformReactiveFormController =
+      PlatformReactiveFormController(_getManualDiscoveryColumnField());
 
   static const String imapServerPort = '993';
   static const String popServerPort = '995';
@@ -132,14 +133,14 @@ class ManualAddWidget extends StatelessWidget with TileDataMixin {
     return manualDiscoveryColumnField;
   }
 
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     double height = appDataProvider.portraitSize.height * 0.7;
     var formInputWidget = SingleChildScrollView(
         child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: Column(children: [
               const SizedBox(height: 10.0),
-              FormInputWidget(
+              PlatformReactiveForm(
                 height: height,
                 spacing: 5.0,
                 formButtons: [
@@ -149,7 +150,7 @@ class ManualAddWidget extends StatelessWidget with TileDataMixin {
                         _connect(values);
                       }),
                 ],
-                controller: formInputController,
+                platformReactiveFormController: platformReactiveFormController,
               )
             ])));
 
@@ -274,7 +275,7 @@ class ManualAddWidget extends StatelessWidget with TileDataMixin {
         title: title,
         helpPath: routeName,
         withLeading: withLeading,
-        child: _buildFormInputWidget(context));
+        child: _buildPlatformReactiveForm(context));
 
     return appBarView;
   }

@@ -23,9 +23,9 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
-import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -43,8 +43,6 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'Group edit';
-
-  
 
   @override
   bool get withLeading => true;
@@ -73,8 +71,8 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
         label: 'MyAlias',
         prefixIcon: Icon(Icons.person_pin, color: myself.primary)),
   ];
-  late final FormInputController formInputController =
-      FormInputController(groupDataFields);
+  late final PlatformReactiveFormController platformReactiveFormController =
+      PlatformReactiveFormController(groupDataFields);
 
   final OptionController groupOwnerController = OptionController();
 
@@ -252,7 +250,7 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
   }
 
   //群信息编辑界面
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     List<Widget> children = [
       const SizedBox(
         height: 10.0,
@@ -274,18 +272,18 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
             return nilBox;
           }
 
-          formInputController.setValues(JsonUtil.toJson(group));
-          return FormInputWidget(
+          platformReactiveFormController.values = JsonUtil.toJson(group);
+          return PlatformReactiveForm(
             height: appDataProvider.portraitSize.height * 0.5,
             spacing: 5.0,
-            onOk: (Map<String, dynamic> values) {
+            onSubmit: (Map<String, dynamic> values) {
               _onOk(values).then((group) {
                 if (group != null) {
                   DialogUtil.info(content: 'Group ${group.name} is built');
                 }
               });
             },
-            controller: formInputController,
+            platformReactiveFormController: platformReactiveFormController,
           );
         });
     children.add(formInputWidget);
@@ -436,7 +434,7 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
         helpPath: routeName,
         withLeading: withLeading,
         rightWidgets: rightWidgets,
-        child: _buildFormInputWidget(context));
+        child: _buildPlatformReactiveForm(context));
 
     return appBarView;
   }

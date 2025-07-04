@@ -12,10 +12,10 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
-import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -32,8 +32,6 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'MethodEdit';
-
-  
 
   final Rx<List<Method>?> methods = Rx<List<Method>?>(null);
 
@@ -56,7 +54,7 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
         prefixIcon: Icon(Icons.shopping_bag_outlined, color: myself.primary)),
   ];
 
-  FormInputController? formInputController;
+  PlatformReactiveFormController? platformReactiveFormController;
 
   Widget _buildMethodsWidget(BuildContext context) {
     return Obx(() {
@@ -85,7 +83,7 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
   }
 
   //ModelNode信息编辑界面
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     List<Option<dynamic>> options = [];
     for (var value in DataType.values) {
       options.add(Option(value.name, value.name));
@@ -97,19 +95,20 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
         prefixIcon: Icon(Icons.data_object_outlined, color: myself.primary),
         inputType: InputType.select,
         options: options));
-    formInputController = FormInputController(methodDataFields);
+    platformReactiveFormController =
+        PlatformReactiveFormController(methodDataFields);
     return Obx(() {
       if (method.value == null) {
         return nilBox;
       }
-      formInputController!.setValues(JsonUtil.toJson(method.value));
-      var formInputWidget = FormInputWidget(
+      platformReactiveFormController!.values = JsonUtil.toJson(method.value);
+      var formInputWidget = PlatformReactiveForm(
         height: appDataProvider.portraitSize.height * 0.5,
         spacing: 15.0,
-        onOk: (Map<String, dynamic> values) {
+        onSubmit: (Map<String, dynamic> values) {
           _onOk(values);
         },
-        controller: formInputController!,
+        platformReactiveFormController: platformReactiveFormController!,
       );
 
       return Container(
@@ -226,7 +225,7 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
                   width: appDataProvider.secondaryBodyWidth * 0.4,
                   child: _buildMethodsWidget(context)),
               const VerticalDivider(),
-              Expanded(child: _buildFormInputWidget(context))
+              Expanded(child: _buildPlatformReactiveForm(context))
             ]);
           } else {
             child = Column(children: [
@@ -234,7 +233,7 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
                   height: appDataProvider.portraitSize.height * 0.4,
                   child: _buildMethodsWidget(context)),
               const Divider(),
-              Expanded(child: _buildFormInputWidget(context))
+              Expanded(child: _buildPlatformReactiveForm(context))
             ]);
           }
           return child;

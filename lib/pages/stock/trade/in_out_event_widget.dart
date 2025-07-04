@@ -16,7 +16,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -63,7 +63,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
   String get title => 'InoutEvent';
 
   late final List<PlatformDataColumn> inoutEventColumns;
-  late final FormInputController searchController;
+  late final PlatformReactiveFormController searchController;
   final ExpansibleController expansibleController = ExpansibleController();
 
   _init() {
@@ -164,7 +164,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
           inputType: InputType.custom,
           buildSuffix: _buildActionWidget),
     ];
-    searchController = FormInputController(searchDataField);
+    searchController = PlatformReactiveFormController(searchDataField);
   }
 
   Widget _buildActionWidget(int index, dynamic dayLine) {
@@ -189,9 +189,9 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
 
   /// 构建搜索条件
   _buildSearchView(BuildContext context) {
-    searchController.setValues({'eventCode': inoutEventController.eventCode});
+    searchController.values = {'eventCode': inoutEventController.eventCode};
     int tradeDate = DateUtil.formatDateInt(DateUtil.currentDateTime());
-    searchController.setValues({'tradeDate': tradeDate});
+    searchController.values = {'tradeDate': tradeDate};
     List<FormButton> formButtonDefs = [
       FormButton(
           label: 'Ok',
@@ -201,10 +201,10 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
     ];
     Widget formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
-        child: FormInputWidget(
+        child: PlatformReactiveForm(
           height: appDataProvider.portraitSize.height * 0.5,
           spacing: 5.0,
-          controller: searchController,
+          platformReactiveFormController: searchController,
           formButtons: formButtonDefs,
         ));
 

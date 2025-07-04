@@ -81,6 +81,10 @@ class PlatformReactiveFormController {
     formGroup.control(name).value = value;
   }
 
+  reset({Map<String, Object?>? values}) {
+    return formGroup.reset(value: values);
+  }
+
   focus(String name) {
     return formGroup.control(name).focus();
   }
@@ -90,11 +94,11 @@ class PlatformReactiveFormController {
   }
 
   markAsDisabled(String name) {
-    return formGroup..control(name).markAsDisabled();
+    return formGroup.control(name).markAsDisabled();
   }
 
   markAsTouched(String name) {
-    return formGroup..control(name).markAsTouched();
+    return formGroup.control(name).markAsTouched();
   }
 }
 

@@ -18,10 +18,10 @@ import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
-import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 
 ///显示会议的基本信息，会议成员和会议发起人
@@ -86,8 +86,8 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
       prefixIcon: Icon(Icons.token, color: myself.primary),
     ),
   ];
-  late final FormInputController controller =
-      FormInputController(readOnlyConferenceDataField);
+  late final PlatformReactiveFormController platformReactiveFormController =
+      PlatformReactiveFormController(readOnlyConferenceDataField);
   final bool hasTitle;
 
   ConferenceShowWidget({super.key, this.hasTitle = true});
@@ -100,8 +100,6 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'Conference show';
-
-  
 
   @override
   bool get withLeading => true;
@@ -192,12 +190,12 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
   }
 
   //会议信息编辑界面
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
     final Conference? conference = conferenceNotifier.value;
     if (conference != null) {
-      controller.setValues(JsonUtil.toJson(conference));
+      platformReactiveFormController.values = JsonUtil.toJson(conference);
       List<FormButton> formButtons = [];
       if (conference.conferenceOwnerPeerId == myself.peerId) {
         formButtons.add(FormButton(
@@ -211,11 +209,11 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
       var formInputWidget = SingleChildScrollView(
           child: Container(
               padding: const EdgeInsets.all(10.0),
-              child: FormInputWidget(
+              child: PlatformReactiveForm(
                 height: 400,
                 showResetButton: false,
                 formButtons: formButtons,
-                controller: controller,
+                platformReactiveFormController: platformReactiveFormController,
               )));
 
       return formInputWidget;
@@ -264,7 +262,7 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
         ExpansionTile(
             title: Text(AppLocalizations.t('Conference')),
             initiallyExpanded: true,
-            children: [_buildFormInputWidget(context)]),
+            children: [_buildPlatformReactiveForm(context)]),
         Expanded(
             child: FutureBuilder<List<TileData>>(
           future: _buildChatReceipts(),
@@ -295,8 +293,11 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
     if (!hasTitle) {
       return child;
     }
-    var appBarView =
-        AppBarView(title: title,helpPath: routeName, withLeading: withLeading, child: child);
+    var appBarView = AppBarView(
+        title: title,
+        helpPath: routeName,
+        withLeading: withLeading,
+        child: child);
 
     return appBarView;
   }

@@ -13,10 +13,10 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
-import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_highlight/themes/idea.dart';
@@ -74,10 +74,10 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     return dataSourceDataFields;
   }
 
-  FormInputController? formInputController;
+  PlatformReactiveFormController? platformReactiveFormController;
 
   /// DataTableNode信息编辑界面
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     return Obx(() {
       data_source.DataTableNode? dataTableNode =
           dataSourceController.getDataTableNode();
@@ -86,16 +86,18 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       }
       List<PlatformDataField> dataSourceDataFields =
           buildDataTableDataFields(SourceType.sqlite.name);
-      formInputController = FormInputController(dataSourceDataFields);
+      platformReactiveFormController =
+          PlatformReactiveFormController(dataSourceDataFields);
 
-      formInputController?.setValues(JsonUtil.toJson(dataTableNode.value));
-      var formInputWidget = FormInputWidget(
+      platformReactiveFormController?.values =
+          JsonUtil.toJson(dataTableNode.value);
+      var formInputWidget = PlatformReactiveForm(
         spacing: 10.0,
         height: 160,
-        onOk: (Map<String, dynamic> values) {
+        onSubmit: (Map<String, dynamic> values) {
           _onOk(values);
         },
-        controller: formInputController!,
+        platformReactiveFormController: platformReactiveFormController!,
         formButtons: [
           FormButton(
               label: 'Generate',
@@ -343,7 +345,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   Widget _buildDataTableTab(BuildContext context) {
     return Column(
       children: [
-        _buildFormInputWidget(context),
+        _buildPlatformReactiveForm(context),
         Expanded(
           child: SingleChildScrollView(
             child: CodeTheme(
@@ -467,7 +469,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   @override
   void dispose() {
     _tabController.dispose();
-    formInputController?.dispose();
+    platformReactiveFormController?.reset();
     super.dispose();
   }
 }

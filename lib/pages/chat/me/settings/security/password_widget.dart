@@ -8,7 +8,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:regexpattern/regexpattern.dart';
 
@@ -46,23 +46,20 @@ class PasswordWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Password';
 
-  
-
-  final FormInputController controller =
-      FormInputController(passwordInputFieldDef);
+  final PlatformReactiveFormController platformReactiveFormController =
+      PlatformReactiveFormController(passwordInputFieldDef);
 
   Widget _buildPasswordWidget(BuildContext context) {
     return ListView(
       children: <Widget>[
         Container(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: FormInputWidget(
+            child: PlatformReactiveForm(
               height: 250,
-              onOk: (Map<String, dynamic> values) {
+              onSubmit: (Map<String, dynamic> values) {
                 _onOk(context, values);
               },
-              okLabel: 'Ok',
-              controller: controller,
+              platformReactiveFormController: platformReactiveFormController,
             )),
       ],
     );
@@ -122,6 +119,9 @@ class PasswordWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        withLeading: true, title: title,helpPath: routeName, child: _buildPasswordWidget(context));
+        withLeading: true,
+        title: title,
+        helpPath: routeName,
+        child: _buildPasswordWidget(context));
   }
 }

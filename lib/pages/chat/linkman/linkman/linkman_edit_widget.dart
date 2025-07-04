@@ -17,7 +17,7 @@ import 'package:colla_chat/tool/share_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 
 final ValueNotifier<Linkman?> linkmanNotifier = ValueNotifier<Linkman?>(null);
@@ -114,8 +114,8 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
           color: myself.primary,
         )),
   ];
-  late final FormInputController controller =
-      FormInputController(linkmanDataField);
+  late final PlatformReactiveFormController platformReactiveFormController =
+      PlatformReactiveFormController(linkmanDataField);
 
   @override
   initState() {
@@ -127,10 +127,10 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     setState(() {});
   }
 
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     Linkman? linkman = linkmanNotifier.value;
     if (linkman != null) {
-      controller.setValues(JsonUtil.toJson(linkman));
+      platformReactiveFormController.values = JsonUtil.toJson(linkman);
     }
     List<FormButton> formButtons = [
       FormButton(
@@ -166,11 +166,11 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     }
     var formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
-        child: FormInputWidget(
+        child: PlatformReactiveForm(
           height: appDataProvider.portraitSize.height * 0.7,
           spacing: 5.0,
           formButtons: formButtons,
-          controller: controller,
+          platformReactiveFormController: platformReactiveFormController,
           heads: heads,
         ));
 
@@ -252,7 +252,8 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
         title: title,
         helpPath: widget.routeName,
         withLeading: widget.withLeading,
-        child: SingleChildScrollView(child: _buildFormInputWidget(context)));
+        child:
+            SingleChildScrollView(child: _buildPlatformReactiveForm(context)));
 
     return appBarView;
   }

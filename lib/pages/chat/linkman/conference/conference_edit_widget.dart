@@ -24,9 +24,9 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
-import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:colla_chat/widgets/qrcode_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -45,8 +45,6 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'Conference edit';
-
-  
 
   @override
   bool get withLeading => true;
@@ -130,8 +128,8 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
       readOnly: true,
     ),
   ];
-  late final FormInputController formInputController =
-      FormInputController(conferenceDataField);
+  late final PlatformReactiveFormController platformReactiveFormController =
+      PlatformReactiveFormController(conferenceDataField);
 
   final OptionController conferenceOwnerController = OptionController();
 
@@ -338,7 +336,7 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
   }
 
   //会议信息编辑界面
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     var children = [
       _buildConferenceMembersWidget(context),
       const SizedBox(
@@ -353,7 +351,7 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
       if (conference == null) {
         return nilBox;
       }
-      formInputController.setValues(JsonUtil.toJson(conference));
+      platformReactiveFormController.values = JsonUtil.toJson(conference);
       List<FormButton> formButtons = [
         FormButton(
             label: 'Ok',
@@ -379,10 +377,10 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
           label: AppLocalizations.t('Resend'),
         ));
       }
-      return FormInputWidget(
+      return PlatformReactiveForm(
         spacing: 5.0,
         height: appDataProvider.portraitSize.height * 0.6,
-        controller: formInputController,
+        platformReactiveFormController: platformReactiveFormController,
         formButtons: formButtons,
       );
     });
@@ -575,7 +573,7 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
         helpPath: routeName,
         withLeading: withLeading,
         rightWidgets: rightWidgets,
-        child: _buildFormInputWidget(context));
+        child: _buildPlatformReactiveForm(context));
     return appBarView;
   }
 }

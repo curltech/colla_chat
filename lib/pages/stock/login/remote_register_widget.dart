@@ -1,8 +1,7 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
-
-import '../../../l10n/localization.dart';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
 class RemoteRegisterWidget extends StatefulWidget {

@@ -9,7 +9,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 
 class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
@@ -24,8 +24,6 @@ class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'RelationshipEdit';
-
-  
 
   NodeRelationshipEditWidget({super.key});
 
@@ -56,10 +54,10 @@ class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
         prefixIcon: Icon(Icons.star, color: myself.primary)),
   ];
 
-  FormInputController? formInputController;
+  PlatformReactiveFormController? platformReactiveFormController;
 
   //ModelNode信息编辑界面
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     List<Option<dynamic>> options = [];
     for (var value in RelationshipType.values) {
       options.add(Option(value.name, value.name));
@@ -81,14 +79,15 @@ class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.list,
         inputType: InputType.checkbox,
         options: options));
-    formInputController = FormInputController(relationshipDataFields);
-    formInputController!.setValues(JsonUtil.toJson(nodeRelationship));
-    var formInputWidget = FormInputWidget(
+    platformReactiveFormController =
+        PlatformReactiveFormController(relationshipDataFields);
+    platformReactiveFormController!.values = JsonUtil.toJson(nodeRelationship);
+    var formInputWidget = PlatformReactiveForm(
       spacing: 15.0,
-      onOk: (Map<String, dynamic> values) {
+      onSubmit: (Map<String, dynamic> values) {
         _onOk(values);
       },
-      controller: formInputController!,
+      platformReactiveFormController: platformReactiveFormController!,
     );
 
     return Container(
@@ -129,6 +128,9 @@ class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: title,helpPath: routeName, withLeading: true, child: _buildFormInputWidget(context));
+        title: title,
+        helpPath: routeName,
+        withLeading: true,
+        child: _buildPlatformReactiveForm(context));
   }
 }

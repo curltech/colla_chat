@@ -6,7 +6,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -27,8 +27,6 @@ class PeerEndpointEditWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'PeerEndpointEdit';
-
-  
 
   final List<PlatformDataField> peerEndpointColumnField = [
     PlatformDataField(
@@ -103,21 +101,21 @@ class PeerEndpointEditWidget extends StatelessWidget with TileDataMixin {
           color: myself.primary,
         )),
   ];
-  late final FormInputController formInputController =
-      FormInputController(peerEndpointColumnField);
+  late final PlatformReactiveFormController platformReactiveFormController =
+      PlatformReactiveFormController(peerEndpointColumnField);
 
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     return Obx(() {
       PeerEndpoint? peerEndpoint = peerEndpointController.current;
       if (peerEndpoint != null) {
-        formInputController.setValues(JsonUtil.toJson(peerEndpoint));
+        platformReactiveFormController.values = JsonUtil.toJson(peerEndpoint);
       }
-      var formInputWidget = FormInputWidget(
+      var formInputWidget = PlatformReactiveForm(
         height: 500,
-        onOk: (Map<String, dynamic> values) {
+        onSubmit: (Map<String, dynamic> values) {
           _onOk(values);
         },
-        controller: formInputController,
+        platformReactiveFormController: platformReactiveFormController,
       );
 
       return Container(
@@ -139,7 +137,7 @@ class PeerEndpointEditWidget extends StatelessWidget with TileDataMixin {
         title: title,
         helpPath: routeName,
         withLeading: withLeading,
-        child: _buildFormInputWidget(context));
+        child: _buildPlatformReactiveForm(context));
     return appBarView;
   }
 }

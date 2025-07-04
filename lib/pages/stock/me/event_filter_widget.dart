@@ -12,7 +12,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -106,8 +106,8 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
           color: myself.primary,
         )),
   ];
-  late final FormInputController formInputController =
-      FormInputController(eventFilterDataField);
+  late final PlatformReactiveFormController platformReactiveFormController =
+      PlatformReactiveFormController(eventFilterDataField);
   final SwiperController swiperController = SwiperController();
   final RxInt index = 0.obs;
 
@@ -194,7 +194,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
   _buildEventFilterEditView(BuildContext context) {
     EventFilter? eventFilter = eventFilterController.current;
     if (eventFilter != null) {
-      formInputController.setValues(eventFilter.toJson());
+      platformReactiveFormController.values = eventFilter.toJson();
     } else {
       String? eventCode = eventFilterController.eventCode;
       String? eventName = eventFilterController.eventName;
@@ -203,7 +203,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
         json['eventCode'] = eventCode;
         json['eventName'] = eventName;
       }
-      formInputController.setValues(json);
+      platformReactiveFormController.values = json;
     }
     List<FormButton> formButtonDefs = [
       FormButton(
@@ -219,10 +219,10 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
     ];
     var formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
-        child: FormInputWidget(
+        child: PlatformReactiveForm(
           height: appDataProvider.portraitSize.height * 0.7,
           spacing: 5.0,
-          controller: formInputController,
+          platformReactiveFormController: platformReactiveFormController,
           formButtons: formButtonDefs,
         ));
 
@@ -244,7 +244,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
   }
 
   _onCopy(Map<String, dynamic> values) async {
-    formInputController.setValue('id', null);
+    platformReactiveFormController.setValue('id', null);
     eventFilterController.setCurrentIndex = -1;
   }
 

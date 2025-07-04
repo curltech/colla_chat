@@ -9,7 +9,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -26,10 +26,11 @@ class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'DataIndexEdit';
 
-  late final FormInputController formInputController;
+  late final PlatformReactiveFormController platformReactiveFormController;
 
   DataIndexEditWidget({super.key}) {
-    formInputController = FormInputController(buildDataIndexDataFields());
+    platformReactiveFormController =
+        PlatformReactiveFormController(buildDataIndexDataFields());
   }
 
   List<PlatformDataField> buildDataIndexDataFields() {
@@ -58,19 +59,20 @@ class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
   }
 
   //DataIndex信息编辑界面
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     return Obx(() {
       data_source.DataIndexNode? dataIndexNode =
           dataSourceController.getDataIndexNode();
-      if (dataIndexNode!=null) {
-        formInputController.setValues(JsonUtil.toJson(dataIndexNode.value));
+      if (dataIndexNode != null) {
+        platformReactiveFormController.values =
+            JsonUtil.toJson(dataIndexNode.value);
       }
-      var formInputWidget = FormInputWidget(
+      var formInputWidget = PlatformReactiveForm(
         spacing: 15.0,
-        onOk: (Map<String, dynamic> values) {
+        onSubmit: (Map<String, dynamic> values) {
           _onOk(values);
         },
-        controller: formInputController,
+        platformReactiveFormController: platformReactiveFormController,
       );
 
       return Container(
@@ -108,6 +110,8 @@ class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: title, withLeading: true, child: _buildFormInputWidget(context));
+        title: title,
+        withLeading: true,
+        child: _buildPlatformReactiveForm(context));
   }
 }

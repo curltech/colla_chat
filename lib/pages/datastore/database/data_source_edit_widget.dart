@@ -10,7 +10,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -57,7 +57,8 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
                   onPressed: () async {
                     XFile? xfile = await FileUtil.selectFile();
                     if (xfile != null) {
-                      formInputController?.setValue('filename', xfile.path);
+                      platformReactiveFormController?.setValue(
+                          'filename', xfile.path);
                     }
                   },
                   icon: Icon(Icons.arrow_circle_down_outlined,
@@ -108,28 +109,31 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
     return dataSourceDataFields;
   }
 
-  FormInputController? formInputController;
+  PlatformReactiveFormController? platformReactiveFormController;
 
   //DataSourceNode信息编辑界面
-  Widget _buildFormInputWidget(BuildContext context) {
+  Widget _buildPlatformReactiveForm(BuildContext context) {
     return Obx(() {
       DataSource? dataSource =
           dataSourceController.current?.value as DataSource?;
       List<PlatformDataField> dataSourceDataFields =
           buildDataSourceDataFields();
-      formInputController?.dispose();
-      formInputController = FormInputController(dataSourceDataFields);
+      platformReactiveFormController?.reset();
+      platformReactiveFormController =
+          PlatformReactiveFormController(dataSourceDataFields);
       if (dataSource != null) {
-        formInputController?.setValues(JsonUtil.toJson(dataSource));
+        platformReactiveFormController?.values = JsonUtil.toJson(dataSource);
       } else {
-        formInputController?.setValues({'sourceType': sourceType.value});
+        platformReactiveFormController?.values = {
+          'sourceType': sourceType.value
+        };
       }
-      var formInputWidget = FormInputWidget(
+      var formInputWidget = PlatformReactiveForm(
         spacing: 15.0,
-        onOk: (Map<String, dynamic> values) {
+        onSubmit: (Map<String, dynamic> values) {
           _onOk(values);
         },
-        controller: formInputController!,
+        platformReactiveFormController: platformReactiveFormController!,
       );
 
       return Container(
@@ -192,6 +196,8 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
     DataSource? dataSource = dataSourceController.current?.value as DataSource?;
     sourceType.value = dataSource?.sourceType;
     return AppBarView(
-        title: title, withLeading: true, child: _buildFormInputWidget(context));
+        title: title,
+        withLeading: true,
+        child: _buildPlatformReactiveForm(context));
   }
 }
