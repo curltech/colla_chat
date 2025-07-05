@@ -26,12 +26,24 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
   });
 
   InputDecoration _buildInputDecoration(PlatformDataField platformDataField) {
+    var name = platformDataField.name;
     var label = platformDataField.label;
     var prefixIcon = platformDataField.prefixIcon;
     var suffixIcon = platformDataField.suffixIcon;
     var prefix = platformDataField.prefix;
     var suffix = platformDataField.suffix;
     var hintText = platformDataField.hintText;
+    if (platformDataField.cancel) {
+      suffixIcon ??= IconButton(
+          //如果文本长度不为空则显示清除按钮
+          onPressed: () {
+            formGroup.control(name).value = '';
+          },
+          icon: Icon(
+            Icons.cancel,
+            color: myself.primary,
+          ));
+    }
     InputDecoration inputDecoration = buildInputDecoration(
         labelText: label,
         prefixIcon: prefixIcon,
@@ -79,7 +91,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
 
   Widget _buildTextFormField(BuildContext context) {
     var name = platformDataField.name;
-    var suffixIcon = platformDataField.suffixIcon;
     var readOnly = platformDataField.readOnly;
     var autofocus = platformDataField.autofocus;
     InputType inputType = platformDataField.inputType;
@@ -87,23 +98,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         platformDataField.textInputType ?? TextInputType.text;
     Map<String, String Function(Object)>? validationMessages =
         platformDataField.validationMessages;
-    Widget? suffix;
-    if (platformDataField.cancel) {
-      suffix = IconButton(
-          //如果文本长度不为空则显示清除按钮
-          onPressed: () {
-            formGroup.control(name).value = '';
-          },
-          icon: Icon(
-            Icons.cancel,
-            color: myself.primary,
-          ));
 
-      if (suffixIcon == null) {
-        suffixIcon = suffix;
-        suffix = null;
-      }
-    }
     InputDecoration decoration = _buildInputDecoration(platformDataField);
 
     return ReactiveTextField<String>(
@@ -174,7 +169,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         platformDataField.onChanged?.call(formControl.value);
       },
       options: options,
-      initValue: platformDataField.initValue,
     );
     children.add(radioGroup);
 
@@ -201,7 +195,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         platformDataField.onChanged?.call(formControl.value);
       },
       options: options,
-      initValue: platformDataField.initValue,
     );
     List<Widget> children = [];
     var prefixIcon = _buildPrefixWidget();
@@ -251,7 +244,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         platformDataField.onChanged?.call(formControl.value);
       },
       options: options,
-      initValue: platformDataField.initValue,
     );
     children.add(checkboxGroup);
     return Row(
@@ -276,7 +268,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         platformDataField.onChanged?.call(formControl.value);
       },
       options: options,
-      initValue: platformDataField.initValue,
     );
 
     List<Widget> children = [];
@@ -386,11 +377,38 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
 
   Widget _buildDateTimePicker(BuildContext context) {
     var name = platformDataField.name;
+    List<Widget> children = [];
+    var prefixIcon = platformDataField.prefixIcon;
+    if (prefixIcon != null) {
+      children.add(prefixIcon);
+      children.add(const SizedBox(
+        width: 15.0,
+      ));
+    }
+    var label = platformDataField.label;
+    if (prefixIcon != null) {
+      children.add(Text(AppLocalizations.t(label)));
+      children.add(const SizedBox(
+        width: 20.0,
+      ));
+    }
+    DataType dataType = platformDataField.dataType;
+    ReactiveDatePickerFieldType type = ReactiveDatePickerFieldType.date;
+    if (dataType == DataType.date) {
+      type = ReactiveDatePickerFieldType.date;
+    } else if (dataType == DataType.time) {
+      type = ReactiveDatePickerFieldType.time;
+    } else if (dataType == DataType.datetime) {
+      type = ReactiveDatePickerFieldType.dateTime;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget datePicker = ReactiveDateTimePicker(
       formControlName: name,
-      type: ReactiveDatePickerFieldType.date,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(Duration(days: 356)),
+      type: type,
+      decoration: decoration,
+      locale: myself.locale,
+      // firstDate: DateTime.now(),
+      // lastDate: DateTime.now().add(Duration(days: 356)),
     );
 
     return datePicker;
@@ -398,13 +416,14 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
 
   Widget _buildColorPicker(BuildContext context) {
     var name = platformDataField.name;
-    var label = platformDataField.label;
     Color? value = formGroup.value[name] as Color?;
-    value ??= platformDataField.initValue;
-    value ??= myself.primary;
-    formGroup.value[name] = value;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget colorPicker = ReactiveColorPicker<Color>(
       formControlName: name,
+      decoration: decoration,
     );
 
     return colorPicker;

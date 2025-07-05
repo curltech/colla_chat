@@ -39,12 +39,12 @@ class ActionData {
 
 class DataActionCard extends StatelessWidget {
   final List<ActionData> actions;
-  late final double? height;
-  late final double? width;
+  double? height;
+  double? width;
   final int crossAxisCount;
   final double mainAxisSpacing;
   final double crossAxisSpacing;
-  late final double? mainAxisExtent;
+  double? mainAxisExtent;
   final double childAspectRatio;
   final double iconSize;
   final bool showLabel;

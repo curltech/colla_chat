@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -83,6 +85,9 @@ class StringUtil {
         break;
       case DataType.map:
         value = JsonUtil.toJson(str);
+        break;
+      case DataType.color:
+        value = Color(int.parse(str));
         break;
     }
     return value;

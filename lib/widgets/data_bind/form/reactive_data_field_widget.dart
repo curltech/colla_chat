@@ -30,13 +30,11 @@ class ReactiveRadioGroup<T> extends ReactiveFormField<T, T> {
     VisualDensity? visualDensity,
     FocusNode? focusNode,
     bool autofocus = false,
-    T? initValue,
   }) : super(
           builder: (field) {
             List<Widget> radioChildren = [];
             if (options.isNotEmpty) {
               T? groupValue = field.value;
-              groupValue ??= initValue;
               for (var i = 0; i < options.length; ++i) {
                 var option = options[i];
                 var radio = Radio<T>(
@@ -110,21 +108,19 @@ class ReactiveCheckboxGroup<T> extends ReactiveFormField<T, Set<T>> {
     String? semanticLabel,
     Widget? prefixIcon,
     String? label,
-    Set<T>? initValue,
   }) : super(builder: (field) {
           Set<T>? value = field.value;
           List<Widget> checkChildren = [];
-          value ??= initValue;
           if (options.isNotEmpty) {
-            Set<T>? value = initValue ?? {};
+            value ??= {};
             for (var i = 0; i < options.length; ++i) {
               var option = options[i];
               var checkbox = Checkbox(
                 onChanged: (bool? selected) {
                   if (selected == null || !selected) {
-                    value.remove(option.value);
+                    value!.remove(option.value);
                   } else if (selected) {
-                    value.add(option.value);
+                    value!.add(option.value);
                   }
 
                   field.didChange(value);
@@ -211,11 +207,9 @@ class ReactiveToggleSwitch<T> extends ReactiveFormField<T, T> {
     Future<bool> Function(T?)? cancelToggle,
     List<bool>? states,
     List<Widget>? customWidgets,
-    T? initValue,
   }) : super(
           builder: (field) {
             T? value = field.value;
-            value ??= initValue;
             List<String> labels = [];
             List<IconData> icons = [];
             int? initialLabelIndex;
@@ -318,11 +312,9 @@ class ReactiveToggleButtons<T> extends ReactiveFormField<T, T> {
     ReactiveFormFieldCallback<T>? onToggle,
     Axis direction = Axis.horizontal,
     VerticalDirection verticalDirection = VerticalDirection.down,
-    T? initValue,
   }) : super(
           builder: (field) {
             T? value = field.value;
-            value ??= initValue;
             List<bool> isSelected = [];
             List<Widget> children = [];
             for (var i = 0; i < options.length; ++i) {
@@ -452,7 +444,6 @@ class ReactiveAutoSizeTextFormField<T> extends ReactiveFormField<T, String> {
     void Function(FormControl<T>)? onTap,
     String? Function(FormControl<T>?)? validator,
     bool obscureText = false,
-    String? initialValue,
   })  : _textController = controller,
         super(
           builder: (ReactiveFormFieldState<T, String> field) {
@@ -521,7 +512,6 @@ class ReactiveAutoSizeTextFormField<T> extends ReactiveFormField<T, String> {
                   field.didChange(value);
                   onChanged?.call(field.control);
                 },
-                initialValue: initialValue,
                 autovalidateMode: autovalidateMode,
                 contextMenuBuilder: _defaultContextMenuBuilder);
           },

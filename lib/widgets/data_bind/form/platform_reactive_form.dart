@@ -1,14 +1,17 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_data_field.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:reactive_forms/reactive_forms.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 
 class PlatformReactiveFormController {
   final List<PlatformDataField> dataFields;
+  final Map<String, PlatformDataField> dataFieldMap = {};
   late final FormGroup formGroup;
   final Map<String, FocusNode> focusNodes = {};
   late final KeyboardActionsConfig keyboardActionsConfig;
@@ -23,6 +26,7 @@ class PlatformReactiveFormController {
     for (var i = 0; i < dataFields.length; i++) {
       PlatformDataField platformDataField = dataFields[i];
       var name = platformDataField.name;
+      dataFieldMap[name] = platformDataField;
       var initValue = platformDataField.initValue;
       var validators = platformDataField.validators ?? const [];
       FormControl formControl;
@@ -52,8 +56,20 @@ class PlatformReactiveFormController {
             validators: validators,
           );
           break;
+        case DataType.datetime:
+          formControl = FormControl<DateTime>(
+            value: initValue,
+            validators: validators,
+          );
+          break;
         case DataType.date:
           formControl = FormControl<DateTime>(
+            value: initValue,
+            validators: validators,
+          );
+          break;
+        case DataType.time:
+          formControl = FormControl<TimeOfDay>(
             value: initValue,
             validators: validators,
           );
@@ -110,20 +126,136 @@ class PlatformReactiveFormController {
     );
   }
 
-  Map<String, Object?> get values {
+  Map<String, Object?> get rawValues {
     return formGroup.value;
   }
 
-  set values(Map<String, Object?>? values) {
+  set rawValues(Map<String, Object?>? values) {
     formGroup.value = values;
   }
 
-  dynamic getValue(String name) {
+  dynamic getRawValue(String name) {
     return formGroup.control(name).value;
   }
 
-  setValue(String name, dynamic value) {
+  setRawValue(String name, dynamic value) {
     formGroup.control(name).value = value;
+  }
+
+  ///获取真实值，如果控制器为空，返回_value，否则取控制器的值，并覆盖_value
+  dynamic parse(String name, dynamic value, {bool get = true}) {
+    if (value == null) {
+      return null;
+    }
+    PlatformDataField? platformDataField = dataFieldMap[name];
+    if (platformDataField == null) {
+      return value;
+    }
+    DataType dataType = platformDataField.dataType;
+    DataType? outputDataType = platformDataField.outputDataType;
+    if (outputDataType == null || outputDataType == dataType) {
+      return value;
+    }
+    if (get) {
+      dataType = outputDataType;
+    }
+    switch (dataType) {
+      case DataType.string:
+        if (value is! String) {
+          if (value is DateTime) {
+            return value.toLocal().toIso8601String();
+          } else {
+            return value.toString();
+          }
+        }
+        break;
+      case DataType.double:
+        if (value is! double) {
+          return num.parse(value.toString());
+        }
+        break;
+      case DataType.int:
+        if (value is! int) {
+          if (value is Color) {
+            return value.toARGB32();
+          }
+          return int.parse(value.toString());
+        }
+        break;
+      case DataType.num:
+        if (value is! num) {
+          return num.parse(value.toString());
+        }
+        break;
+      case DataType.bool:
+        if (value is! bool) {
+          return bool.parse(value.toString());
+        }
+        break;
+      case DataType.datetime:
+        if (value is! DateTime) {
+          return DateUtil.toDateTime(value.toString());
+        }
+        break;
+      case DataType.date:
+        if (value is! DateTime) {
+          return DateUtil.toDateTime(value.toString());
+        }
+        break;
+      case DataType.time:
+        if (value is! TimeOfDay) {
+          return DateUtil.toTime(value.toString());
+        }
+        break;
+      case DataType.list:
+        if (value is! List) {
+          return [value];
+        }
+        break;
+      case DataType.map:
+        if (value is! Map) {
+          return {name: value};
+        }
+        break;
+      case DataType.set:
+        if (value is! Set) {
+          return {value};
+        }
+        break;
+      case DataType.percentage:
+        if (value is num) {
+          return (value * 100).toString();
+        }
+        break;
+      case DataType.color:
+        if (value is! Color && value is int) {
+          return Color(value);
+        }
+    }
+
+    return value;
+  }
+
+  Map<String, Object?> get values {
+    return formGroup.value.map((key, value) {
+      return MapEntry(key, parse(key, value));
+    });
+  }
+
+  set values(Map<String, Object?>? values) {
+    formGroup.value = values?.map((key, value) {
+      return MapEntry(key, parse(key, value, get: false));
+    });
+  }
+
+  dynamic getValue(String name) {
+    dynamic value = formGroup.control(name).value;
+
+    return parse(name, value);
+  }
+
+  setValue(String name, dynamic value) {
+    formGroup.control(name).value = parse(name, value, get: false);
   }
 
   reset({Map<String, Object?>? values}) {
@@ -189,12 +321,9 @@ class PlatformReactiveForm extends StatelessWidget {
         style: style,
         child: CommonAutoSizeText(AppLocalizations.t('Reset')),
         onPressed: () {
-          if (onReset != null) {
-            var values = platformReactiveFormController.values;
-            onReset?.call(values);
-          } else {
-            platformReactiveFormController.values = {};
-          }
+          platformReactiveFormController.reset();
+          var values = platformReactiveFormController.values;
+          onReset?.call(values);
         },
       ));
     }

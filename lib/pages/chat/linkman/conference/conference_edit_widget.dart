@@ -94,14 +94,16 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
       name: 'startDate',
       label: 'StartDate',
       inputType: InputType.datetime,
-      dataType: DataType.string,
+      dataType: DataType.datetime,
+      outputDataType: DataType.string,
       prefixIcon: Icon(Icons.start, color: myself.primary),
     ),
     PlatformDataField(
       name: 'endDate',
       label: 'EndDate',
       inputType: InputType.datetime,
-      dataType: DataType.string,
+      dataType: DataType.datetime,
+      outputDataType: DataType.string,
       prefixIcon: Icon(Icons.pin_end, color: myself.primary),
     ),
     PlatformDataField(

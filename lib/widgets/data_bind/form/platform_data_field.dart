@@ -39,6 +39,7 @@ enum DataType {
   time,
   datetime,
   percentage,
+  color,
   set,
   list,
   map
@@ -78,6 +79,7 @@ class PlatformDataField<T> {
   final String label;
   final InputType inputType;
   final DataType dataType;
+  final DataType? outputDataType;
   dynamic initValue;
 
   //图标
@@ -141,6 +143,7 @@ class PlatformDataField<T> {
     required this.label,
     this.inputType = InputType.text,
     this.dataType = DataType.string,
+    this.outputDataType,
     this.initValue,
     this.prefixIcon,
     this.prefix,
