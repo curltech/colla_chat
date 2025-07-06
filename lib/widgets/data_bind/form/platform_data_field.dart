@@ -56,7 +56,7 @@ enum InputType {
   checkboxListTile,
   contact,
   animatedToggleSwitch,
-  awesomeSelect,
+  choice,
   cartStepper,
   dropdownButton,
   dropdownMenu,

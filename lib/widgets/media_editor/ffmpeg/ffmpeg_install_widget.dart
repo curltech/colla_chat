@@ -1,7 +1,7 @@
+import 'package:auto_size_text_field/auto_size_text_field.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/download_file_util.dart';
-import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_helper.dart';
@@ -94,7 +94,7 @@ class FFMpegInstallWidget extends StatelessWidget {
         List<Widget> children = [];
         controller.text = FFMpegHelper.ffmpegInstallationPath ?? '';
         children.add(
-          AutoSizeTextFormField(
+          AutoSizeTextField(
               controller: controller,
               decoration: buildInputDecoration(
                   hintText: 'FFMpeg installation path',

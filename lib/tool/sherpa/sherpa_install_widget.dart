@@ -1,3 +1,4 @@
+import 'package:auto_size_text_field/auto_size_text_field.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -5,7 +6,6 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/download_file_util.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_config_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
@@ -141,7 +141,7 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
         const SizedBox(
           height: 15.0,
         ),
-        AutoSizeTextFormField(
+        AutoSizeTextField(
             controller: modelNameController,
             decoration: buildInputDecoration(
                 labelText: AppLocalizations.t('Sherpa model'),
@@ -176,7 +176,7 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
             controller.text =
                 SherpaConfigUtil.sherpaModelInstallationPath ?? '';
             children.add(
-              AutoSizeTextFormField(
+              AutoSizeTextField(
                 controller: controller,
                 decoration: buildInputDecoration(
                   labelText: AppLocalizations.t('Sherpa installation path'),

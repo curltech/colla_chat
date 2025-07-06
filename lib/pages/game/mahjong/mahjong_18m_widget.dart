@@ -1,3 +1,4 @@
+import 'package:auto_size_text_field/auto_size_text_field.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/game/mahjong/base/full_pile.dart';
@@ -14,7 +15,6 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
@@ -51,7 +51,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   //房间成员显示界面
   Widget _buildRoomParticipantWidget(BuildContext context) {
     return Column(children: [
-      AutoSizeTextFormField(
+      AutoSizeTextField(
           controller: textEditingController,
           decoration: buildInputDecoration(
             labelText: AppLocalizations.t('Name'),

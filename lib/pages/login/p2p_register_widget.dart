@@ -18,15 +18,14 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/mobile_util.dart';
 import 'package:colla_chat/tool/phone_number_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
-import 'package:intl_phone_field/country_picker_dialog.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:intl_phone_field/phone_number.dart';
+import 'package:phone_form_field/phone_form_field.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart'
     as phone_numbers_parser;
 import 'package:regexpattern/regexpattern.dart';
@@ -45,7 +44,11 @@ class P2pRegisterWidget extends StatelessWidget {
   }
 
   final ValueNotifier<String> countryCode = ValueNotifier<String>('CN');
-  final TextEditingController mobileController = TextEditingController();
+  final PhoneController phoneController = PhoneController(
+      initialValue: PhoneNumber(
+          isoCode: StringUtil.enumFromString(
+              IsoCode.values, myself.locale.countryCode)!,
+          nsn: ''));
   final ValueNotifier<String?> peerId = ValueNotifier<String?>(null);
   final ValueNotifier<Uint8List?> avatar = ValueNotifier<Uint8List?>(null);
   final List<PlatformDataField> p2pRegisterDataFields = [
@@ -137,56 +140,54 @@ class P2pRegisterWidget extends StatelessWidget {
         onTap: _restore));
     return ListView(
       children: <Widget>[
-        SizedBox(height: 15.0,),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          child: ValueListenableBuilder(
-            valueListenable: countryCode,
-            builder: (BuildContext context, String countryCode, Widget? child) {
-              return IntlPhoneField(
-                languageCode: myself.locale.languageCode,
-                pickerDialogStyle: PickerDialogStyle(
-                    searchFieldInputDecoration: InputDecoration(
-                  labelText: AppLocalizations.t('Search country'),
-                )),
-                invalidNumberMessage:
-                    AppLocalizations.t('Invalid Mobile Number'),
-                controller: mobileController,
-                initialCountryCode: countryCode,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('Mobile'),
-                  suffixIcon: platformParams.android
-                      ? IconButton(
-                          onPressed: () async {
-                            String? mobile = await MobileUtil.getMobileNumber();
-                            if (mobile != null) {
-                              int pos = mobile.indexOf('+');
-                              if (pos > -1) {
-                                mobile = mobile.substring(pos);
-                              }
-                              phone_numbers_parser.PhoneNumber phoneNumber =
-                                  PhoneNumberUtil.fromRaw(mobile);
-                              mobileController.text = phoneNumber.nsn;
-                            }
-                          },
-                          icon: Icon(
-                            Icons.mobile_screen_share,
-                            color: myself.primary,
-                          ))
-                      : null,
-                ),
-                onChanged: (PhoneNumber phoneNumber) {
-                  // mobileController.text = phoneNumber.number;
-                },
-                onCountryChanged: (country) {
-                  this.countryCode.value = country.name;
-                },
-                disableLengthCheck: true,
-              );
-            },
-          ),
+        SizedBox(
+          height: 15.0,
         ),
-        SizedBox(height: 15.0,),
+        Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: PhoneFormField(
+              controller: phoneController,
+              isCountryButtonPersistent: true,
+              autofocus: false,
+              autofillHints: const [AutofillHints.telephoneNumber],
+              countrySelectorNavigator:
+                  CountrySelectorNavigator.modalBottomSheet(),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.t('Mobile'),
+                suffixIcon: platformParams.android
+                    ? IconButton(
+                        onPressed: () async {
+                          String? mobile = await MobileUtil.getMobileNumber();
+                          if (mobile != null) {
+                            int pos = mobile.indexOf('+');
+                            if (pos > -1) {
+                              mobile = mobile.substring(pos);
+                            }
+                            phone_numbers_parser.PhoneNumber phoneNumber =
+                                PhoneNumberUtil.fromRaw(mobile);
+                            phoneController.value = phoneNumber;
+                          }
+                        },
+                        icon: Icon(
+                          Icons.mobile_screen_share,
+                          color: myself.primary,
+                        ))
+                    : null,
+              ),
+              enabled: true,
+              countryButtonStyle: CountryButtonStyle(
+                  showFlag: true,
+                  showIsoCode: false,
+                  showDialCode: true,
+                  showDropdownIcon: true,
+                  borderRadius: BorderRadius.circular(50)),
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              cursorColor: myself.primary,
+              onChanged: (p) {},
+            )),
+        SizedBox(
+          height: 15.0,
+        ),
         ValueListenableBuilder(
             valueListenable: peerId,
             builder: (BuildContext context, String? peerId, Widget? child) {
@@ -284,7 +285,7 @@ class P2pRegisterWidget extends StatelessWidget {
     try {
       MyselfPeer myselfPeer = await myselfPeerService.register(
           name, loginName, plainPassword,
-          mobile: mobileController.text, email: email);
+          mobile: phoneController.value.nsn, email: email);
       myself.myselfPeer = myselfPeer;
       myselfPeerController.add(myselfPeer);
       peerId.value = myselfPeer.peerId;

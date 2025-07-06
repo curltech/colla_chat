@@ -1,3 +1,4 @@
+import 'package:auto_size_text_field/auto_size_text_field.dart';
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
@@ -5,7 +6,6 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -91,7 +91,7 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
     return Column(children: [
       Container(
           padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-          child: AutoSizeTextFormField(
+          child: AutoSizeTextField(
             controller: searchTextController,
             keyboardType: TextInputType.text,
             decoration: buildInputDecoration(

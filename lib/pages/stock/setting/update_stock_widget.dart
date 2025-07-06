@@ -1,8 +1,8 @@
+import 'package:auto_size_text_field/auto_size_text_field.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/service/stock/stock_line.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -243,14 +243,14 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
     return Column(children: [
       Container(
           padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-          child: AutoSizeTextFormField(
+          child: AutoSizeTextField(
               controller: _tsCodeTextController,
               keyboardType: TextInputType.text,
               decoration: buildInputDecoration(
                   labelText: AppLocalizations.t('tsCode')))),
       Container(
           padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-          child: AutoSizeTextFormField(
+          child: AutoSizeTextField(
               controller: _startDateTextController,
               keyboardType: TextInputType.number,
               decoration: buildInputDecoration(

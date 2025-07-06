@@ -108,8 +108,7 @@ dependencies:
   flutter_animated_icons: ^1.0.1
   flutter_material_design_icons: ^1.1.7447 #Icon(MdiIcons.abacus)
   hugeicons: ^0.0.10 #HugeIcons.strokeRoundedHome01
-  country_pickers: ^3.0.1
-  country_picker: ^2.0.15
+  country_code_picker: ^3.3.0
   multi_dropdown: ^3.0.1
   font_awesome_flutter: ^10.1.0
   unicode_emojis: ^0.4.0
@@ -121,8 +120,7 @@ dependencies:
   fzregex: ^2.1.1 #静态方法：Fzregex.hasMatch
   regexpattern: ^2.5.0
   phone_number: ^2.0.1 #仅支持ios和android，解析电话号码
-  phone_form_field: ^10.0.6 #支持所有平台，电话号码的录入字段
-  intl_phone_field: ^3.2.0 #支持所有平台，电话号码的录入字段
+  phone_form_field: ^10.0.8 #支持所有平台，电话号码的录入字段
   mobile_number: ^3.0.0 #仅支持android，获取电话号码，ios无此功能
   phone_numbers_parser: ^9.0.0 #支持所有的平台
   badges: ^3.1.2

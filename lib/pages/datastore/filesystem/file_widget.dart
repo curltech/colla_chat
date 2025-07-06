@@ -1,5 +1,6 @@
 import 'dart:io' as io;
 
+import 'package:auto_size_text_field/auto_size_text_field.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/datastore/filesystem/file_node.dart';
 import 'package:colla_chat/pages/datastore/filesystem/file_system_controller.dart';
@@ -11,7 +12,6 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
@@ -49,7 +49,7 @@ class FileWidget extends StatelessWidget with TileDataMixin {
   final TextEditingController searchTextController = TextEditingController();
 
   Widget _buildSearchTextWidget(BuildContext context) {
-    return AutoSizeTextFormField(
+    return AutoSizeTextField(
         controller: searchTextController,
         keyboardType: TextInputType.text,
         decoration: buildInputDecoration(
@@ -224,7 +224,7 @@ class FileWidget extends StatelessWidget with TileDataMixin {
       File? file = fileController.current;
       String? path = file?.file.path;
 
-      return AutoSizeTextFormField(
+      return AutoSizeTextField(
         decoration: buildInputDecoration(
           labelText: AppLocalizations.t('Path'),
         ),

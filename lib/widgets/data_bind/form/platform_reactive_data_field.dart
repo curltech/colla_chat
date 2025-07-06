@@ -5,7 +5,11 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/checkbox_group.dart';
+import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/chip_group.dart';
+import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/radio_group.dart';
+import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/toggle_buttons.dart';
+import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:reactive_color_picker/reactive_color_picker.dart';
 import 'package:reactive_date_time_picker/reactive_date_time_picker.dart';
@@ -470,12 +474,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget dataFieldWidget;
-    var customWidget = platformDataField.customWidget;
-    if (customWidget != null) {
-      dataFieldWidget = customWidget;
-      return dataFieldWidget;
-    }
+    Widget? dataFieldWidget;
+
     var inputType = platformDataField.inputType;
     switch (inputType) {
       case InputType.label:
@@ -526,9 +526,151 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       case InputType.color:
         dataFieldWidget = _buildColorPicker(context);
         break;
-      default:
-        dataFieldWidget = _buildTextFormField(context);
+      case InputType.dateRange:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.calendar:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.custom:
+        dataFieldWidget = platformDataField.customWidget!;
+        break;
+      case InputType.advancedSwitcher:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.dropdownSearch:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.file:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.image:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.multiImage:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.segmentedControl:
+        break;
+      case InputType.signature:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.touchSpin:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.rangeSlider:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.circularSlider:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.cupertinoTextField:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.ratingBar:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.macosUi:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.cupertinoSwitch:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.pinCode:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.cupertinoSlidingSegmentedControl:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.cupertinoSlider:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.month:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.rawAutocomplete:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.typeahead:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.pinInput:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.directSelect:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.markdownEditableTextInput:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.code:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.phone:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.extendedText:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.checkboxListTile:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.contact:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.animatedToggleSwitch:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.choice:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.cartStepper:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.dropdownButton:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.dropdownMenu:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.fileSelector:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.fancyPassword:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.fluentUi:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.language:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.inputDecorator:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.languagetool:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.multiSelect:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.signaturePad:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.assets:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.camera:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
+      case InputType.chip:
+        dataFieldWidget = _buildChipGroup(context);
+        break;
+      case InputType.country:
+        dataFieldWidget = _buildColorPicker(context);
+        break;
     }
-    return dataFieldWidget;
+
+    return dataFieldWidget ?? _buildTextFormField(context);
   }
 }
