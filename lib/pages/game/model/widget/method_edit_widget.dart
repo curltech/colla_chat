@@ -93,7 +93,7 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
         name: 'returnType',
         label: 'ReturnType',
         prefixIcon: Icon(Icons.data_object_outlined, color: myself.primary),
-        inputType: InputType.select,
+        inputType: InputType.dropdownField,
         options: options));
     platformReactiveFormController =
         PlatformReactiveFormController(methodDataFields);

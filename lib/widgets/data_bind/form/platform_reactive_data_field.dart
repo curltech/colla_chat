@@ -125,7 +125,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         });
   }
 
-  Widget _buildPinput(BuildContext context) {
+  Widget _buildPinPut(BuildContext context) {
     var name = platformDataField.name;
     var pinputField = ReactivePinPut(
       formControlName: name,
@@ -251,6 +251,45 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     );
   }
 
+  //多个字符串选择多个，对应的字段是字符串的Set
+  Widget _buildChipGroup(BuildContext context) {
+    var name = platformDataField.name;
+    var label = platformDataField.label;
+    var options = platformDataField.options ?? [];
+
+    List<Widget> children = [];
+    var prefixIcon = _buildPrefixWidget();
+    if (prefixIcon != null) {
+      children.add(const SizedBox(
+        width: 10.0,
+      ));
+      children.add(prefixIcon);
+      children.add(const SizedBox(
+        width: 15.0,
+      ));
+    }
+    children.add(Text(AppLocalizations.t(label)));
+    var chipGroup = ReactiveChipGroup<T>(
+      formControlName: name,
+      onSelected: (FormControl<T> formControl) {
+        if (platformDataField.readOnly) {
+          return;
+        }
+        platformDataField.onChanged?.call(formControl.value);
+      },
+      options: options,
+      disabledColor: Colors.white,
+      selectedColor: myself.primary,
+      backgroundColor: Colors.white,
+      showCheckmark: false,
+      checkmarkColor: myself.primary,
+    );
+    children.add(chipGroup);
+    return Row(
+      children: children,
+    );
+  }
+
   /// 多个字符串选择一个
   Widget _buildToggleButtons(BuildContext context) {
     var name = platformDataField.name;
@@ -336,7 +375,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         child: Row(children: children));
   }
 
-  Widget _buildDropdownButton(BuildContext context) {
+  Widget _buildDropdownField(BuildContext context) {
     var name = platformDataField.name;
     var options = platformDataField.options;
     List<DropdownMenuItem<T>> children = [];
@@ -451,8 +490,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       case InputType.password:
         dataFieldWidget = _buildTextFormField(context);
         break;
-      case InputType.pinput:
-        dataFieldWidget = _buildPinput(context);
+      case InputType.pinPut:
+        dataFieldWidget = _buildPinPut(context);
         break;
       case InputType.toggleButtons:
         dataFieldWidget = _buildToggleButtons(context);
@@ -463,8 +502,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       case InputType.radio:
         dataFieldWidget = _buildRadioGroup(context);
         break;
-      case InputType.select:
-        dataFieldWidget = _buildDropdownButton(context);
+      case InputType.dropdownField:
+        dataFieldWidget = _buildDropdownField(context);
         break;
       case InputType.toggle:
         dataFieldWidget = _buildToggleSwitch(context);

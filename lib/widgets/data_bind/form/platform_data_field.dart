@@ -15,18 +15,63 @@ enum InputType {
   checkbox,
   toggleButtons,
   toggleSwitch,
-  select,
+  dropdownField,
   switcher,
   toggle,
   textarea,
   date,
   time,
   datetime,
-  datetimeRange,
+  dateRange,
   calendar,
   custom,
-  pinput,
-  color
+  pinPut,
+  color,
+  advancedSwitcher,
+  dropdownSearch,
+  file,
+  image,
+  multiImage,
+  segmentedControl,
+  signature,
+  touchSpin,
+  rangeSlider,
+  circularSlider,
+  cupertinoTextField,
+  ratingBar,
+  macosUi,
+  cupertinoSwitch,
+  pinCode,
+  cupertinoSlidingSegmentedControl,
+  cupertinoSlider,
+  month,
+  rawAutocomplete,
+  typeahead,
+  pinInput,
+  directSelect,
+  markdownEditableTextInput,
+  code,
+  phone,
+  extendedText,
+  checkboxListTile,
+  contact,
+  animatedToggleSwitch,
+  awesomeSelect,
+  cartStepper,
+  dropdownButton,
+  dropdownMenu,
+  fileSelector,
+  fancyPassword,
+  fluentUi,
+  language,
+  inputDecorator,
+  languagetool,
+  multiSelect,
+  signaturePad,
+  assets,
+  camera,
+  chip,
+  country
 }
 
 enum DataType {
@@ -59,18 +104,17 @@ class PlatformDataColumn {
   final Widget Function(int, dynamic)? buildSuffix;
   final Function(int, bool)? onSort;
 
-  PlatformDataColumn(
-      {required this.name,
-      required this.label,
-      this.hintText,
-      this.dataType = DataType.string,
-      this.positiveColor,
-      this.negativeColor,
-      this.inputType = InputType.label,
-      this.width,
-      this.align = Alignment.centerLeft,
-      this.buildSuffix,
-      this.onSort});
+  PlatformDataColumn({required this.name,
+    required this.label,
+    this.hintText,
+    this.dataType = DataType.string,
+    this.positiveColor,
+    this.negativeColor,
+    this.inputType = InputType.label,
+    this.width,
+    this.align = Alignment.centerLeft,
+    this.buildSuffix,
+    this.onSort});
 }
 
 /// 表单的字段定义
@@ -181,12 +225,11 @@ class FormButton {
   String? tooltip;
   Function(Map<String, dynamic> values)? onTap;
 
-  FormButton(
-      {required this.label,
-      this.buttonStyle,
-      this.icon,
-      this.tooltip,
-      this.onTap}) {
+  FormButton({required this.label,
+    this.buttonStyle,
+    this.icon,
+    this.tooltip,
+    this.onTap}) {
     buttonStyle = buttonStyle ??
         StyleUtil.buildButtonStyle(
             backgroundColor: myself.primary, elevation: 10.0);

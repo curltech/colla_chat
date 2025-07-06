@@ -95,7 +95,7 @@ class AttributeEditWidget extends StatelessWidget with TileDataMixin {
         name: 'dataType',
         label: 'DataType',
         prefixIcon: Icon(Icons.data_object_outlined, color: myself.primary),
-        inputType: InputType.select,
+        inputType: InputType.dropdownField,
         options: options));
     platformReactiveFormController =
         PlatformReactiveFormController(attributeDataFields);
