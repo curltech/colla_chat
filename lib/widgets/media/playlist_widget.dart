@@ -15,7 +15,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -287,7 +287,7 @@ class PlaylistWidget extends StatelessWidget {
   Widget _buildThumbnailWidget(BuildContext context, TileData tile) {
     List<Widget> children = [];
     children.add(const Spacer());
-    children.add(CommonAutoSizeText(
+    children.add(AutoSizeText(
       tile.title,
       style: const TextStyle(fontSize: AppFontSize.minFontSize),
     ));
@@ -295,7 +295,7 @@ class PlaylistWidget extends StatelessWidget {
       children.add(const SizedBox(
         height: 2.0,
       ));
-      children.add(CommonAutoSizeText(
+      children.add(AutoSizeText(
         tile.subtitle!,
         style: const TextStyle(fontSize: AppFontSize.minFontSize),
       ));
@@ -327,7 +327,7 @@ class PlaylistWidget extends StatelessWidget {
       if (tileData.isEmpty) {
         return Container(
             alignment: Alignment.center,
-            child: CommonAutoSizeText(AppLocalizations.t('Playlist is empty')));
+            child: AutoSizeText(AppLocalizations.t('Playlist is empty')));
       }
       int crossAxisCount = (appDataProvider.secondaryBodyWidth / 250).ceil();
       if (gridMode.isTrue) {

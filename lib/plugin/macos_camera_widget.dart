@@ -13,7 +13,7 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/foundation.dart';
@@ -425,7 +425,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
   //           child: Column(
   //             crossAxisAlignment: CrossAxisAlignment.start,
   //             children: [
-  //               CommonAutoSizeText(
+  //               AutoSizeText(
   //                 '${AppLocalizations.t('Resolution')}: ${resolutionPreset.name}',
   //                 style: const TextStyle(
   //                   color: Colors.white,
@@ -433,7 +433,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
   //                   fontWeight: FontWeight.w400,
   //                 ),
   //               ),
-  //               CommonAutoSizeText(
+  //               AutoSizeText(
   //                 '${AppLocalizations.t('Size')}: ${previewSize.width.toStringAsFixed(0)}x${previewSize.height.toStringAsFixed(0)}',
   //                 style: const TextStyle(
   //                   color: Colors.white,

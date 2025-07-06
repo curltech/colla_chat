@@ -3,7 +3,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/abstract_audio_recorder_controller.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
@@ -130,19 +130,19 @@ class _PlatformAudioRecorderWidgetState
       children: <Widget>[
         Container(
             padding: const EdgeInsets.all(10.0),
-            child: const CommonAutoSizeText('aacLc')),
+            child: const AutoSizeText('aacLc')),
         Container(
             padding: const EdgeInsets.all(10.0),
-            child: const CommonAutoSizeText('flac')),
+            child: const AutoSizeText('flac')),
         Container(
             padding: const EdgeInsets.all(10.0),
-            child: const CommonAutoSizeText('pcm16bits')),
+            child: const AutoSizeText('pcm16bits')),
         Container(
             padding: const EdgeInsets.all(10.0),
-            child: const CommonAutoSizeText('opus')),
+            child: const AutoSizeText('opus')),
         Container(
             padding: const EdgeInsets.all(10.0),
-            child: const CommonAutoSizeText('wav')),
+            child: const AutoSizeText('wav')),
       ],
     );
     return SizedBox(

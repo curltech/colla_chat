@@ -1,7 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/emoji_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:unicode_emojis/unicode_emojis.dart';
@@ -31,7 +31,7 @@ class _UnicodeEmojiPickerState extends State<UnicodeEmojiPicker>
     for (var entry in allEmojis.entries) {
       var category = entry.key;
       tabs.add(Tab(
-        icon: CommonAutoSizeText(AppLocalizations.t(category.description)),
+        icon: AutoSizeText(AppLocalizations.t(category.description)),
       ));
       List<Emoji> emojis = entry.value;
       List<Widget> eles = [];

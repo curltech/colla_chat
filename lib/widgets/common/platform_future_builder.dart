@@ -1,6 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/tool/loading_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 
@@ -40,7 +40,7 @@ class PlatformFutureBuilder<T> extends StatelessWidget {
           String? message = this.message;
           if (message != null) {
             return Center(
-                child: CommonAutoSizeText(AppLocalizations.t(message)));
+                child: AutoSizeText(AppLocalizations.t(message)));
           }
           return nilBox;
         }

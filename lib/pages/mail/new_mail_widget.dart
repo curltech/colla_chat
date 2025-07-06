@@ -18,7 +18,7 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
@@ -185,13 +185,13 @@ class NewMailWidget extends StatelessWidget with TileDataMixin {
           size: 32,
           isOutlined: true,
         ),
-        CommonAutoSizeText(
+        AutoSizeText(
           name,
           softWrap: true,
           overflow: TextOverflow.fade,
           maxLines: 3,
         ),
-        CommonAutoSizeText('${size % 1024}KB'),
+        AutoSizeText('${size % 1024}KB'),
       ]);
       var chip = Card(
         elevation: 0.0,

@@ -13,7 +13,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -174,7 +174,7 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
           onTap: () {
             swiperController.move(1);
           },
-          child: CommonAutoSizeText(
+          child: AutoSizeText(
             getMailboxName(),
             style: const TextStyle(color: Colors.white),
             softWrap: true,

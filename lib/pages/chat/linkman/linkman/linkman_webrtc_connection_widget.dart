@@ -5,7 +5,7 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -44,7 +44,7 @@ class LinkmanWebrtcConnectionWidget extends StatelessWidget with TileDataMixin {
       backgroundColor: connectionNum == 0 ? Colors.red : Colors.green,
       padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 2.0),
       label: Center(
-          child: CommonAutoSizeText('$connectionNum',
+          child: AutoSizeText('$connectionNum',
               style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,

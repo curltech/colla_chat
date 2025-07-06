@@ -2,7 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -153,7 +153,7 @@ class DataListTile extends StatelessWidget {
       if (suffix is Widget) {
         trailing.add(suffix);
       } else if (suffix is String) {
-        trailing.add(CommonAutoSizeText(
+        trailing.add(AutoSizeText(
           suffix,
           softWrap: true,
           overflow: TextOverflow.ellipsis,
@@ -176,7 +176,7 @@ class DataListTile extends StatelessWidget {
           child: Row(
               mainAxisAlignment: MainAxisAlignment.end, children: trailing));
     }
-    Widget titleWidget = CommonAutoSizeText(
+    Widget titleWidget = AutoSizeText(
       tileData.title,
       style: tileData.dense
           ? const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)
@@ -188,7 +188,7 @@ class DataListTile extends StatelessWidget {
       titleWidget = Row(children: [
         Expanded(child: titleWidget),
         //const Spacer(),
-        CommonAutoSizeText(
+        AutoSizeText(
           tileData.titleTail ?? '',
           style: tileData.dense
               ? const TextStyle(
@@ -247,7 +247,7 @@ class DataListTile extends StatelessWidget {
       leading: leading,
       title: titleWidget,
       subtitle: tileData.subtitle != null
-          ? CommonAutoSizeText(
+          ? AutoSizeText(
               tileData.subtitle!,
               maxLines: 2,
             )

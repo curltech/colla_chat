@@ -11,7 +11,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:flutter/material.dart';
@@ -330,7 +330,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
         currentIndex < playlistController.length) {
       if (filename.value != null) {
         String name = FileUtil.filename(filename.value!);
-        children.add(CommonAutoSizeText(
+        children.add(AutoSizeText(
           name,
           style: const TextStyle(color: Colors.white),
           maxLines: 1,

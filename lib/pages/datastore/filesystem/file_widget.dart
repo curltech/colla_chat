@@ -12,7 +12,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -256,7 +256,7 @@ class FileWidget extends StatelessWidget with TileDataMixin {
                     children: [
                       file.icon,
                       Expanded(
-                          child: CommonAutoSizeText(
+                          child: AutoSizeText(
                         file.name,
                         style: TextStyle(
                             color: file == fileController.current

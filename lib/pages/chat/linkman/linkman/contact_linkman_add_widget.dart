@@ -16,7 +16,7 @@ import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -102,7 +102,7 @@ class ContactLinkmanAddWidget extends StatelessWidget with TileDataMixin {
             isFriend = true;
           }
         }
-        Widget suffix = CommonAutoSizeText(AppLocalizations.t('friend'));
+        Widget suffix = AutoSizeText(AppLocalizations.t('friend'));
         if (!isFriend) {
           suffix = IconButton(
             iconSize: 24.0,

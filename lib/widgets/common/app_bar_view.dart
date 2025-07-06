@@ -3,7 +3,7 @@ import 'package:colla_chat/pages/index/help_information_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 
@@ -48,7 +48,7 @@ class AppBarView extends StatelessWidget {
       listenable: myself,
       builder: (BuildContext context, Widget? child) {
         Widget titleWidget = this.titleWidget ??
-            CommonAutoSizeText(
+            AutoSizeText(
               AppLocalizations.t(title ?? ''),
               style: const TextStyle(color: Colors.white),
               //softWrap: true,

@@ -37,7 +37,8 @@ import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/websocket/websocket_channel.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
@@ -381,7 +382,7 @@ class _IndexViewState extends State<IndexView>
       List<Widget> children = <Widget>[];
       if (name != null) {
         children.add(
-          CommonAutoSizeText(name,
+          AutoSizeText(name,
               maxLines: 1,
               style:
                   const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
@@ -390,7 +391,7 @@ class _IndexViewState extends State<IndexView>
       String? title = chatMessage!.title;
       if (title != null) {
         children.add(
-          CommonAutoSizeText(
+          AutoSizeText(
             title,
             maxLines: 1,
             style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w400),
@@ -531,7 +532,7 @@ class _IndexViewState extends State<IndexView>
           .conferenceChatMessageController?.conference?.name;
       if (conferenceName != null) {
         // children.add(
-        //   CommonAutoSizeText(
+        //   AutoSizeText(
         //     AppLocalizations.t('You are in conference:') + conferenceName,
         //     style: const TextStyle(color: Colors.amber),
         //   ),
@@ -539,9 +540,9 @@ class _IndexViewState extends State<IndexView>
       }
     }
     children.addAll([
-      CommonAutoSizeText(conferenceChatMessage.senderName ?? '',
+      AutoSizeText(conferenceChatMessage.senderName ?? '',
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-      CommonAutoSizeText('$name\n$title',
+      AutoSizeText('$name\n$title',
           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
     ]);
     _play();
@@ -550,7 +551,7 @@ class _IndexViewState extends State<IndexView>
       key: UniqueKey(),
       icon: bannerAvatarImage,
       toastDuration: const Duration(milliseconds: 10000),
-      title: CommonAutoSizeText(conferenceChatMessage.senderName ?? '',
+      title: AutoSizeText(conferenceChatMessage.senderName ?? '',
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
       description: ExtendedText(
         '$name:${topic ?? ''}',

@@ -13,7 +13,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -184,7 +184,7 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
             title = '$title\n${videoChatMessageController.conferenceName}';
           }
 
-          Widget titleWidget = CommonAutoSizeText(title, maxLines: 2);
+          Widget titleWidget = AutoSizeText(title, maxLines: 2);
 
           return titleWidget;
         });

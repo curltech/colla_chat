@@ -6,7 +6,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_item.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -179,7 +179,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
             width: 10.0,
           ),
           Expanded(
-              child: CommonAutoSizeText(
+              child: AutoSizeText(
                   softWrap: true,
                   maxLines: 4,
                   AppLocalizations.t(

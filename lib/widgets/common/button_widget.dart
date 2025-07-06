@@ -3,33 +3,6 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:flutter/material.dart';
 
-///平台定制的通用AutoSizeText，规定了一些参数的缺省值外，还规定了文本的样式
-///本类的目的是统一平台文本显示的样式，包括自动调整字体大小适应
-class CommonAutoSizeText extends AutoSizeText {
-  const CommonAutoSizeText(
-    super.data, {
-    super.key,
-    super.textKey,
-    super.style,
-    super.strutStyle,
-    super.minFontSize = AppFontSize.minFontSize,
-    super.maxFontSize = AppFontSize.maxFontSize,
-    super.stepGranularity,
-    super.presetFontSizes,
-    super.group,
-    super.textAlign,
-    super.textDirection,
-    super.locale,
-    super.softWrap,
-    super.wrapWords,
-    super.overflow,
-    super.overflowReplacement,
-    super.textScaleFactor,
-    super.maxLines,
-    super.semanticsLabel,
-  });
-}
-
 ///创建常用的大图标按钮
 class CircleTextButton extends StatelessWidget {
   final String? label;
@@ -90,7 +63,7 @@ class CircleTextButton extends StatelessWidget {
         ),
       );
       children.add(
-        CommonAutoSizeText(
+        AutoSizeText(
           AppLocalizations.t(label!),
           style: const TextStyle(
               color: Colors.white, fontSize: AppFontSize.mdFontSize),
@@ -142,7 +115,7 @@ class IconTextButton extends StatelessWidget {
       );
       children.add(
         Expanded(
-            child: CommonAutoSizeText(
+            child: AutoSizeText(
           AppLocalizations.t(label ?? ''),
           style: TextStyle(
             color: labelColor,
@@ -203,7 +176,7 @@ class InkWellTextButton extends StatelessWidget {
         const SizedBox(height: 2.0),
       );
       children.add(
-        CommonAutoSizeText(
+        AutoSizeText(
           AppLocalizations.t(label ?? ''),
           style: TextStyle(
             color: labelColor,

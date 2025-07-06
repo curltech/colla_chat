@@ -7,7 +7,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -115,9 +115,9 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
             return tileData[index];
           },
         ));
-    children.add(CommonAutoSizeText(AppLocalizations.t('Room')));
+    children.add(AutoSizeText(AppLocalizations.t('Room')));
     children.add(conferenceView);
-    children.add(CommonAutoSizeText(AppLocalizations.t('Room info')));
+    children.add(AutoSizeText(AppLocalizations.t('Room info')));
     children.add(Expanded(child: _buildRoomWidget(context)));
 
     return Column(
@@ -134,47 +134,47 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
     List<Widget> children = [];
     LiveKitRoomClient roomClient = liveKitConferenceClient.roomClient;
     children.add(
-        CommonAutoSizeText('${AppLocalizations.t('uri')}:${roomClient.uri}'));
-    children.add(CommonAutoSizeText(
+        AutoSizeText('${AppLocalizations.t('uri')}:${roomClient.uri}'));
+    children.add(AutoSizeText(
         '${AppLocalizations.t('adaptiveStream')}:${roomClient.adaptiveStream}'));
-    children.add(CommonAutoSizeText(
+    children.add(AutoSizeText(
         '${AppLocalizations.t('dynacast')}:${roomClient.dynacast}'));
     children.add(
-        CommonAutoSizeText('${AppLocalizations.t('e2ee')}:${roomClient.e2ee}'));
-    children.add(CommonAutoSizeText(
+        AutoSizeText('${AppLocalizations.t('e2ee')}:${roomClient.e2ee}'));
+    children.add(AutoSizeText(
         '${AppLocalizations.t('fastConnect')}:${roomClient.fastConnect}'));
-    children.add(CommonAutoSizeText(
+    children.add(AutoSizeText(
         '${AppLocalizations.t('sharedKey')}:${roomClient.sharedKey}'));
-    children.add(CommonAutoSizeText(
+    children.add(AutoSizeText(
         '${AppLocalizations.t('simulcast')}:${roomClient.simulcast}'));
-    children.add(CommonAutoSizeText(
+    children.add(AutoSizeText(
         '${AppLocalizations.t('token')}:${roomClient.token}'));
-    children.add(CommonAutoSizeText(
+    children.add(AutoSizeText(
         '${AppLocalizations.t('dynacast')}:${roomClient.dynacast}'));
     livekit_client.Room room = roomClient.room;
     if (room.connectionState == livekit_client.ConnectionState.connected) {
       children.add(
-          CommonAutoSizeText('${AppLocalizations.t('name')}:${room.name}'));
-      children.add(CommonAutoSizeText(
+          AutoSizeText('${AppLocalizations.t('name')}:${room.name}'));
+      children.add(AutoSizeText(
           '${AppLocalizations.t('connectionState')}:${room.connectionState}'));
-      children.add(CommonAutoSizeText(
+      children.add(AutoSizeText(
           '${AppLocalizations.t('autoSubscribe')}:${room.connectOptions.autoSubscribe}'));
-      children.add(CommonAutoSizeText(
+      children.add(AutoSizeText(
           '${AppLocalizations.t('encryptionType')}:${room.roomOptions.e2eeOptions?.encryptionType}'));
-      children.add(CommonAutoSizeText(
+      children.add(AutoSizeText(
           '${AppLocalizations.t('canPlaybackAudio')}:${room.canPlaybackAudio}'));
 
-      children.add(CommonAutoSizeText(
+      children.add(AutoSizeText(
           '${AppLocalizations.t('speakerOn')}:${room.speakerOn}'));
-      children.add(CommonAutoSizeText(
+      children.add(AutoSizeText(
           '${AppLocalizations.t('selectedAudioInputDeviceId')}:${room.selectedAudioInputDeviceId}'));
-      children.add(CommonAutoSizeText(
+      children.add(AutoSizeText(
           '${AppLocalizations.t('selectedAudioOutputDeviceId')}:${room.selectedAudioOutputDeviceId}'));
-      children.add(CommonAutoSizeText(
+      children.add(AutoSizeText(
           '${AppLocalizations.t('selectedVideoInputDeviceId')}:${room.selectedVideoInputDeviceId}'));
-      children.add(CommonAutoSizeText(
+      children.add(AutoSizeText(
           '${AppLocalizations.t('serverRegion')}:${room.serverRegion}'));
-      children.add(CommonAutoSizeText(
+      children.add(AutoSizeText(
           '${AppLocalizations.t('serverVersion')}:${room.serverVersion}'));
     }
     return ListView(

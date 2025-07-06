@@ -4,7 +4,7 @@ import 'package:colla_chat/plugin/pip/inapp_pip_player_widget.dart';
 import 'package:colla_chat/plugin/pip/mobile_fl_pip_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -31,7 +31,7 @@ class FlutterPipWindowWidget extends StatelessWidget with TileDataMixin {
     return OverlayNotification(
         key: UniqueKey(),
         autoDismiss: false,
-        description: CommonAutoSizeText(''));
+        description: AutoSizeText(''));
   }
 
   @override

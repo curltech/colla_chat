@@ -4,7 +4,8 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
@@ -104,7 +105,7 @@ class _DataDropdownButtonState extends State<DataDropdownButton> {
     for (var item in widget.optionController.options) {
       var label = AppLocalizations.t(item.label);
       var menuItem = DropdownMenuItem<String>(
-          value: item.value, child: CommonAutoSizeText(label));
+          value: item.value, child: AutoSizeText(label));
       if (item.selected) {
         selected = item.value;
       }
@@ -215,7 +216,7 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
       children.add(
         AppBarWidget(
             isAppBar: false,
-            title: CommonAutoSizeText(
+            title: AutoSizeText(
               AppLocalizations.t(widget.title ?? ''),
               style: const TextStyle(
                   fontSize: AppFontSize.mdFontSize, color: Colors.white),
@@ -268,7 +269,7 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
 
                 Widget tileWidget = RadioListTile<bool>(
                   groupValue: true,
-                  title: CommonAutoSizeText(option.label),
+                  title: AutoSizeText(option.label),
                   secondary: option.leading,
                   controlAffinity: ListTileControlAffinity.trailing,
                   activeColor: myself.primary,
@@ -545,8 +546,8 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
                 Option<String> option = options[index];
 
                 Widget tileWidget = CheckboxListTile(
-                  title: CommonAutoSizeText(option.label),
-                  subtitle: CommonAutoSizeText(option.hint ?? ''),
+                  title: AutoSizeText(option.label),
+                  subtitle: AutoSizeText(option.hint ?? ''),
                   secondary: option.leading,
                   controlAffinity: ListTileControlAffinity.trailing,
                   value: option.selected,
@@ -571,7 +572,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
       children.add(
         AppBarWidget(
             isAppBar: false,
-            title: CommonAutoSizeText(
+            title: AutoSizeText(
               AppLocalizations.t(widget.title ?? ''),
               style: const TextStyle(fontSize: 16, color: Colors.white),
             )),
@@ -635,14 +636,14 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
                 onPressed: () {
                   widget.onConfirm(null);
                 },
-                child: CommonAutoSizeText(AppLocalizations.t('Cancel'))),
+                child: AutoSizeText(AppLocalizations.t('Cancel'))),
             TextButton(
                 style: mainStyle,
                 onPressed: () {
                   widget.optionController.options = options.value;
                   widget.onConfirm(widget.optionController.selected);
                 },
-                child: CommonAutoSizeText(AppLocalizations.t('Ok'))),
+                child: AutoSizeText(AppLocalizations.t('Ok'))),
           ],
         )));
     return _buildDialogWidget(
@@ -759,7 +760,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
                 Icons.navigate_next,
                 color: Colors.white,
               ),
-              title: CommonAutoSizeText(AppLocalizations.t(widget.title ?? '')),
+              title: AutoSizeText(AppLocalizations.t(widget.title ?? '')),
               subtitle: _buildChipPanel(context),
               onTap: () async {
                 List<String>? selected = await DialogUtil.show(

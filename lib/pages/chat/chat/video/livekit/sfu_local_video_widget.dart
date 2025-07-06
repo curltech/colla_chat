@@ -21,7 +21,8 @@ import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
@@ -282,7 +283,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
       await DialogUtil.show(
           context: context,
           // title: AppBarWidget.buildTitleBar(
-          //     title: CommonAutoSizeText(AppLocalizations.t('Select one linkman'))),
+          //     title: AutoSizeText(AppLocalizations.t('Select one linkman'))),
           builder: (BuildContext context) {
             return LinkmanGroupSearchWidget(
                 onSelected: (List<String>? peerIds) async {

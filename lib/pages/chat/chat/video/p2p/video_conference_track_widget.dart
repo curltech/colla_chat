@@ -2,7 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -129,7 +129,7 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
   Widget _buildTrackListView(BuildContext context) {
     var tileData = _buildTrackTileData(context);
     var trackView = Column(children: [
-      CommonAutoSizeText(AppLocalizations.t('TrackSender')),
+      AutoSizeText(AppLocalizations.t('TrackSender')),
       PlatformFutureBuilder(
           future: _buildTrackSenderTileData(context),
           builder: (BuildContext context, List<TileData> tiles) {
@@ -143,7 +143,7 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
       const SizedBox(
         height: 15.0,
       ),
-      CommonAutoSizeText(AppLocalizations.t('Track')),
+      AutoSizeText(AppLocalizations.t('Track')),
       DataListView(
         itemCount: tileData.length,
         itemBuilder: (BuildContext context, int index) {

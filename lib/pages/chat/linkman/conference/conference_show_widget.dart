@@ -13,7 +13,8 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -220,7 +221,7 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
     }
 
     return Center(
-        child: CommonAutoSizeText(AppLocalizations.t('No conference')));
+        child: AutoSizeText(AppLocalizations.t('No conference')));
   }
 
   Future<List<TileData>> _buildChatReceipts() async {

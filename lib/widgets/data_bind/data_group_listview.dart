@@ -1,6 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
@@ -112,11 +112,11 @@ class GroupDataListView extends StatelessWidget {
           maintainState: true,
           leading: leading,
           textColor: selected ? myself.primary : null,
-          title: CommonAutoSizeText(
+          title: AutoSizeText(
             AppLocalizations.t(tileData.title),
           ),
           subtitle: tileData.subtitle != null
-              ? CommonAutoSizeText(
+              ? AutoSizeText(
                   tileData.subtitle!,
                 )
               : null,

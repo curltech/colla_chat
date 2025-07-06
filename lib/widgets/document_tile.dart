@@ -1,4 +1,4 @@
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 class DocumentData {
@@ -34,11 +34,11 @@ class DocumentTile extends StatelessWidget {
       child: Column(
         children: <Widget>[
           _documentData.icon,
-          CommonAutoSizeText(
+          AutoSizeText(
             _documentData.title,
             style: const TextStyle(fontSize: 16.0, color: Colors.cyan),
           ),
-          CommonAutoSizeText(
+          AutoSizeText(
             _documentData.subtitle!,
             style: const TextStyle(fontSize: 12.0, color: Colors.cyan),
           ),

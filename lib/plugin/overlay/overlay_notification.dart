@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/animated_progress_bar.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
@@ -321,7 +321,7 @@ class OverlayNotification extends StatefulWidget {
 
   OverlayNotification(
       {super.key,
-      this.title = const CommonAutoSizeText(appName),
+      this.title = const AutoSizeText(appName),
       this.description,
       this.icon,
       this.background,
@@ -355,7 +355,7 @@ class OverlayNotification extends StatefulWidget {
       this.notificationType = NotificationType.custom,
       this.child}) {
     if (child == null) {
-      description ??= CommonAutoSizeText('');
+      description ??= AutoSizeText('');
     }
   }
 
@@ -639,7 +639,7 @@ class OverlayNotificationState extends State<OverlayNotification>
     /// 如果定制组件为空，而且是通知组件，创建通知组件设置为child
     if (widget.child == null) {
       if (widget.description == null) {
-        widget.description = CommonAutoSizeText('');
+        widget.description = AutoSizeText('');
       }
       widget.child = widget._buildNotificationWidget(context);
     }

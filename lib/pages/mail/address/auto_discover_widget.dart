@@ -8,7 +8,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
@@ -86,7 +86,7 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
                     String? domainName =
                         await DialogUtil.showSelectDialog<String>(
                             context: context,
-                            title: const CommonAutoSizeText(
+                            title: const AutoSizeText(
                                 'Select email service provider'),
                             items: options);
                     if (domainName != null) {
@@ -246,19 +246,19 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
     List<Widget> configWidgets = [];
     for (final ConfigEmailProvider provider in clientConfig.emailProviders!) {
       configWidgets
-          .add(CommonAutoSizeText('displayName:${provider.displayName ?? ''}'));
+          .add(AutoSizeText('displayName:${provider.displayName ?? ''}'));
       configWidgets
-          .add(CommonAutoSizeText('domains:${provider.domains.toString()}'));
-      configWidgets.add(const CommonAutoSizeText('preferredIncomingServer:'));
+          .add(AutoSizeText('domains:${provider.domains.toString()}'));
+      configWidgets.add(const AutoSizeText('preferredIncomingServer:'));
       configWidgets.add(Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child:
-              CommonAutoSizeText(provider.preferredIncomingServer.toString())));
-      configWidgets.add(const CommonAutoSizeText('preferredOutgoingServer:'));
+              AutoSizeText(provider.preferredIncomingServer.toString())));
+      configWidgets.add(const AutoSizeText('preferredOutgoingServer:'));
       configWidgets.add(Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child:
-              CommonAutoSizeText(provider.preferredOutgoingServer.toString())));
+              AutoSizeText(provider.preferredOutgoingServer.toString())));
     }
     return configWidgets;
   }

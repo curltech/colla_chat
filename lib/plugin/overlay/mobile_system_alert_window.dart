@@ -5,7 +5,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/overlay/overlay_notification.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -129,7 +129,7 @@ class MobileSystemAlertOverlay extends StatelessWidget {
   void _init() {
     SystemAlertWindow.overlayListener.listen((event) {
       enabled.value = OverlayNotification(
-          key: UniqueKey(), description: CommonAutoSizeText(event));
+          key: UniqueKey(), description: AutoSizeText(event));
     });
     sendPort = IsolateNameServer.lookupPortByName(
       mainSendPortName,

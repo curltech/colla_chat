@@ -1,7 +1,7 @@
 import 'package:colla_chat/entity/stock/user.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/routers/routes.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 
@@ -96,13 +96,13 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
             padding: const EdgeInsets.symmetric(horizontal: 50.0),
             child: Row(children: [
               TextButton(
-                child: CommonAutoSizeText(AppLocalizations.t('Login')),
+                child: AutoSizeText(AppLocalizations.t('Login')),
                 onPressed: () async {
                   _login();
                 },
               ),
               TextButton(
-                child: CommonAutoSizeText(AppLocalizations.t('Reset')),
+                child: AutoSizeText(AppLocalizations.t('Reset')),
                 onPressed: () async {},
               )
             ]),

@@ -6,7 +6,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -294,7 +294,7 @@ class AppleMapWidgetState extends State<AppleMapWidget> {
                 valueListenable: locationPosition,
                 builder: (BuildContext context,
                     LocationPosition? locationPosition, Widget? child) {
-                  return CommonAutoSizeText(
+                  return AutoSizeText(
                       '${locationPosition?.name ?? ''}\n${locationPosition?.address ?? ''}',
                       maxLines: 4);
                 }),

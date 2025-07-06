@@ -2,7 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +61,7 @@ class BrightnessPicker extends StatelessWidget {
             ],
           );
           return Row(children: [
-            CommonAutoSizeText(AppLocalizations.t('Brightness')),
+            AutoSizeText(AppLocalizations.t('Brightness')),
             const Spacer(),
             toggleWidget,
             const SizedBox(

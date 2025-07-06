@@ -1,4 +1,4 @@
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：网络连接消息
@@ -16,7 +16,7 @@ class UrlMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {},
-      child: CommonAutoSizeText(
+      child: AutoSizeText(
         url,
       ),
     );

@@ -14,7 +14,7 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -172,7 +172,7 @@ class MailContentWidget extends StatelessWidget with TileDataMixin {
               DecryptedMimeMessage? decryptedMimeMessage) {
             var appBarView = AppBarView(
                 titleWidget:
-                    CommonAutoSizeText(decryptedMimeMessage?.subject ?? ''),
+                    AutoSizeText(decryptedMimeMessage?.subject ?? ''),
                 helpPath: routeName,
                 withLeading: withLeading,
                 child: Card(
@@ -314,13 +314,13 @@ class MailAttachmentWidget extends StatelessWidget {
           size: 32,
           isOutlined: true,
         ),
-        CommonAutoSizeText(
+        AutoSizeText(
           fileName,
           softWrap: true,
           overflow: TextOverflow.fade,
           maxLines: 3,
         ),
-        CommonAutoSizeText(size == null ? '' : '${size % 1024}KB'),
+        AutoSizeText(size == null ? '' : '${size % 1024}KB'),
       ]);
 
       var chip = GestureDetector(

@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -265,7 +265,7 @@ class _TextSelectionControlsToolbarState
           padding: TextSelectionToolbarTextButton.getPadding(
               entry.key, itemDatas.length),
           onPressed: entry.value.onPressed,
-          child: CommonAutoSizeText(entry.value.label),
+          child: AutoSizeText(entry.value.label),
         );
       }).toList(),
     );

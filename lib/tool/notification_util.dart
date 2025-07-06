@@ -2,7 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/overlay/overlay_notification.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked_notification_cards/stacked_notification_cards.dart';
 import 'package:toastification/toastification.dart';
@@ -10,7 +10,7 @@ import 'package:toastification/toastification.dart';
 class NotificationUtil {
   static OverlayNotification show(BuildContext context,
       {Key? key,
-      Widget title = const CommonAutoSizeText(appName),
+      Widget title = const AutoSizeText(appName),
       required Widget description,
       Widget? icon,
       Color? background,
@@ -97,8 +97,8 @@ class NotificationUtil {
   }) {
     OverlayNotification overlayNotification = OverlayNotification(
       key: UniqueKey(),
-      title: CommonAutoSizeText(AppLocalizations.t(title)),
-      description: CommonAutoSizeText(AppLocalizations.t(description)),
+      title: AutoSizeText(AppLocalizations.t(title)),
+      description: AutoSizeText(AppLocalizations.t(description)),
       icon: icon,
       showProgressIndicator: showProgressIndicator,
       notificationType: NotificationType.info,
@@ -118,8 +118,8 @@ class NotificationUtil {
   }) {
     OverlayNotification overlayNotification = OverlayNotification(
       key: UniqueKey(),
-      title: CommonAutoSizeText(AppLocalizations.t(title)),
-      description: CommonAutoSizeText(AppLocalizations.t(description)),
+      title: AutoSizeText(AppLocalizations.t(title)),
+      description: AutoSizeText(AppLocalizations.t(description)),
       icon: icon,
       showProgressIndicator: showProgressIndicator,
       notificationType: NotificationType.success,
@@ -139,8 +139,8 @@ class NotificationUtil {
   }) {
     OverlayNotification overlayNotification = OverlayNotification(
       key: UniqueKey(),
-      title: CommonAutoSizeText(AppLocalizations.t(title)),
-      description: CommonAutoSizeText(AppLocalizations.t(description)),
+      title: AutoSizeText(AppLocalizations.t(title)),
+      description: AutoSizeText(AppLocalizations.t(description)),
       icon: icon,
       showProgressIndicator: showProgressIndicator,
       notificationType: NotificationType.error,
@@ -160,8 +160,8 @@ class NotificationUtil {
   }) {
     OverlayNotification overlayNotification = OverlayNotification(
       key: UniqueKey(),
-      title: CommonAutoSizeText(AppLocalizations.t(title)),
-      description: CommonAutoSizeText(AppLocalizations.t(description)),
+      title: AutoSizeText(AppLocalizations.t(title)),
+      description: AutoSizeText(AppLocalizations.t(description)),
       icon: icon,
       showProgressIndicator: showProgressIndicator,
       notificationType: NotificationType.warning,
@@ -181,7 +181,7 @@ class NotificationUtil {
         animationBuilder,
     ToastificationType? type,
     ToastificationStyle? style,
-    Widget title = const CommonAutoSizeText(appName),
+    Widget title = const AutoSizeText(appName),
     Duration? animationDuration,
     Widget? description,
     Widget? icon,

@@ -3,7 +3,7 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/menu_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 
@@ -36,7 +36,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       this.rightWidgets,
       this.bottom,
       this.withLeading = false,
-      this.title = const CommonAutoSizeText(''),
+      this.title = const AutoSizeText(''),
       this.centerTitle = false,
       this.isAppBar = true});
 

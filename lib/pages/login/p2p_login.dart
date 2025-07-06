@@ -9,7 +9,8 @@ import 'package:colla_chat/pages/login/p2p_setting_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -143,7 +144,7 @@ class P2pLogin extends StatelessWidget with WindowListener {
         listenable: myself,
         builder: (BuildContext context, Widget? child) {
           PreferredSizeWidget appBar = AppBarWidget(
-            title: CommonAutoSizeText(AppLocalizations.t('Login')),
+            title: AutoSizeText(AppLocalizations.t('Login')),
             toolbarHeight: 56,
             rightWidgets: [_buildRightWidget(context)],
           );

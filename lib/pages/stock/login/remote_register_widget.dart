@@ -1,5 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 
@@ -189,11 +189,11 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: Row(children: [
               TextButton(
-                child: CommonAutoSizeText(AppLocalizations.t('Register')),
+                child: AutoSizeText(AppLocalizations.t('Register')),
                 onPressed: () async {},
               ),
               TextButton(
-                child: CommonAutoSizeText(AppLocalizations.t('Reset')),
+                child: AutoSizeText(AppLocalizations.t('Reset')),
                 onPressed: () async {},
               )
             ]),

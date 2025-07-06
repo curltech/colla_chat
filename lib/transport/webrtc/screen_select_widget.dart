@@ -4,7 +4,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -116,7 +116,7 @@ class ScreenSelectDialog extends StatelessWidget {
   Widget _buildTitle(BuildContext context) {
     return AppBarWidget(
         isAppBar: false,
-        title: CommonAutoSizeText(
+        title: AutoSizeText(
           AppLocalizations.t('Choose what to share'),
           style: const TextStyle(fontSize: 16, color: Colors.white),
         ),
@@ -135,7 +135,7 @@ class ScreenSelectDialog extends StatelessWidget {
       child: OverflowBar(
         children: <Widget>[
           MaterialButton(
-            child: CommonAutoSizeText(
+            child: AutoSizeText(
               AppLocalizations.t('Cancel'),
               style: const TextStyle(color: Colors.black),
             ),
@@ -145,7 +145,7 @@ class ScreenSelectDialog extends StatelessWidget {
           ),
           MaterialButton(
             color: primary,
-            child: CommonAutoSizeText(
+            child: AutoSizeText(
               AppLocalizations.t('Share'),
             ),
             onPressed: () {
@@ -209,12 +209,12 @@ class ScreenSelectDialog extends StatelessWidget {
             }),
         tabs: [
           Tab(
-              child: CommonAutoSizeText(
+              child: AutoSizeText(
             AppLocalizations.t('Entire Screen'),
             style: const TextStyle(color: Colors.black),
           )),
           Tab(
-              child: CommonAutoSizeText(
+              child: AutoSizeText(
             AppLocalizations.t('Window'),
             style: const TextStyle(color: Colors.black),
           )),
@@ -340,7 +340,7 @@ class _ThumbnailWidgetState extends State<ThumbnailWidget> {
                 : nilBox,
           ),
         )),
-        CommonAutoSizeText(
+        AutoSizeText(
           widget.source.name,
           style: TextStyle(
               fontSize: 12,

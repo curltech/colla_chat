@@ -7,7 +7,8 @@ import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -147,7 +148,7 @@ class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
     return TextButton.icon(
       style: style,
       icon: const Icon(Icons.exit_to_app),
-      label: CommonAutoSizeText(AppLocalizations.t('Logout')),
+      label: AutoSizeText(AppLocalizations.t('Logout')),
       onPressed: () {
         myselfPeerService.logout();
         indexWidgetProvider.pop(context: context);

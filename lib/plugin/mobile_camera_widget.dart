@@ -12,7 +12,8 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -180,7 +181,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CommonAutoSizeText(
+                AutoSizeText(
                   '${AppLocalizations.t('Resolution')}: ${resolutionPreset.name}',
                   style: const TextStyle(
                     color: Colors.white,
@@ -188,7 +189,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                     fontWeight: FontWeight.w400,
                   ),
                 ),
-                CommonAutoSizeText(
+                AutoSizeText(
                   '${AppLocalizations.t('Size')}: ${previewSize.width.toStringAsFixed(0)}x${previewSize.height.toStringAsFixed(0)}',
                   style: const TextStyle(
                     color: Colors.white,
@@ -387,7 +388,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
           child: Column(
             children: <Widget>[
               Center(
-                child: CommonAutoSizeText(AppLocalizations.t('Exposure Mode')),
+                child: AutoSizeText(AppLocalizations.t('Exposure Mode')),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -404,14 +405,14 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                             AppLocalizations.t('Resetting exposure point'));
                       }
                     },
-                    child: CommonAutoSizeText(AppLocalizations.t('Auto')),
+                    child: AutoSizeText(AppLocalizations.t('Auto')),
                   ),
                   TextButton(
                     style: styleLocked,
                     onPressed: cameraController != null
                         ? () => _setExposureMode(ExposureMode.locked)
                         : null,
-                    child: CommonAutoSizeText(AppLocalizations.t('Locked')),
+                    child: AutoSizeText(AppLocalizations.t('Locked')),
                   ),
                   TextButton(
                     style: styleLocked,
@@ -419,18 +420,18 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                         ? () => cameraController!.setExposureOffset(0.0)
                         : null,
                     child:
-                        CommonAutoSizeText(AppLocalizations.t('Reset Offset')),
+                        AutoSizeText(AppLocalizations.t('Reset Offset')),
                   ),
                 ],
               ),
               Center(
                 child:
-                    CommonAutoSizeText(AppLocalizations.t('Exposure Offset')),
+                    AutoSizeText(AppLocalizations.t('Exposure Offset')),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  CommonAutoSizeText(_minAvailableExposureOffset.toString()),
+                  AutoSizeText(_minAvailableExposureOffset.toString()),
                   Slider(
                     value: _currentExposureOffset,
                     min: _minAvailableExposureOffset,
@@ -441,7 +442,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                         ? null
                         : _setExposureOffset,
                   ),
-                  CommonAutoSizeText(_maxAvailableExposureOffset.toString()),
+                  AutoSizeText(_maxAvailableExposureOffset.toString()),
                 ],
               ),
             ],
@@ -473,7 +474,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
           child: Column(
             children: <Widget>[
               Center(
-                child: CommonAutoSizeText(AppLocalizations.t('Focus Mode')),
+                child: AutoSizeText(AppLocalizations.t('Focus Mode')),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -490,14 +491,14 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                       _showInSnackBar(
                           AppLocalizations.t('Resetting focus point'));
                     },
-                    child: CommonAutoSizeText(AppLocalizations.t('Auto')),
+                    child: AutoSizeText(AppLocalizations.t('Auto')),
                   ),
                   TextButton(
                     style: styleLocked,
                     onPressed: cameraController != null
                         ? () => _setFocusMode(FocusMode.locked)
                         : null,
-                    child: CommonAutoSizeText(AppLocalizations.t('Locked')),
+                    child: AutoSizeText(AppLocalizations.t('Locked')),
                   ),
                 ],
               ),

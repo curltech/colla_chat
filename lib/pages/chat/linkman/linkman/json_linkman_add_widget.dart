@@ -8,7 +8,8 @@ import 'package:colla_chat/tool/clipboard_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +73,7 @@ class _JsonLinkmanAddWidgetState extends State<JsonLinkmanAddWidget> {
             icon: const Icon(
               Icons.clear,
             ),
-            label: CommonAutoSizeText(AppLocalizations.t('Reset')),
+            label: AutoSizeText(AppLocalizations.t('Reset')),
           ),
           TextButton.icon(
             style: StyleUtil.buildButtonStyle(
@@ -84,7 +85,7 @@ class _JsonLinkmanAddWidgetState extends State<JsonLinkmanAddWidget> {
             icon: const Icon(
               Icons.paste,
             ),
-            label: CommonAutoSizeText(AppLocalizations.t('Paste')),
+            label: AutoSizeText(AppLocalizations.t('Paste')),
           ),
         ]),
         OverflowBar(alignment: MainAxisAlignment.end, children: [
@@ -102,7 +103,7 @@ class _JsonLinkmanAddWidgetState extends State<JsonLinkmanAddWidget> {
             icon: const Icon(
               Icons.heart_broken,
             ),
-            label: CommonAutoSizeText(AppLocalizations.t('Add linkman')),
+            label: AutoSizeText(AppLocalizations.t('Add linkman')),
           ),
           TextButton.icon(
             style: StyleUtil.buildButtonStyle(
@@ -122,7 +123,7 @@ class _JsonLinkmanAddWidgetState extends State<JsonLinkmanAddWidget> {
             icon: const Icon(
               Icons.person_add,
             ),
-            label: CommonAutoSizeText(AppLocalizations.t('Add friend')),
+            label: AutoSizeText(AppLocalizations.t('Add friend')),
           ),
         ])
       ]),

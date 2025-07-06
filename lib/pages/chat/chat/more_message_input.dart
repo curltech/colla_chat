@@ -31,7 +31,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -174,7 +174,7 @@ class MoreMessageInput extends StatelessWidget {
   ///阅后删除时间
   _onActionDeleteTime() async {
     int? deleteTime = await DialogUtil.showSelectDialog<int>(
-        title: CommonAutoSizeText(AppLocalizations.t('Select delete time')),
+        title: AutoSizeText(AppLocalizations.t('Select delete time')),
         items: [
           _buildOption(0),
           _buildOption(15),
@@ -376,7 +376,7 @@ class MoreMessageInput extends StatelessWidget {
     ];
 
     Widget title = AppBarWidget(
-      title: CommonAutoSizeText(
+      title: AutoSizeText(
         AppLocalizations.t('Location map'),
         style: const TextStyle(color: Colors.white),
       ),
@@ -456,7 +456,7 @@ class MoreMessageInput extends StatelessWidget {
       return Dialog(
         child: Column(children: [
           AppBarWidget(
-            title: CommonAutoSizeText(
+            title: AutoSizeText(
                 AppLocalizations.t('Select collect message')),
           ),
           Expanded(child: CollectionListWidget())

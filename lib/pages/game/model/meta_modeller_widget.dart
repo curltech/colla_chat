@@ -22,7 +22,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:file_selector/file_selector.dart';
@@ -69,7 +69,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       }
     }
     String? subjectName = await DialogUtil.showSelectDialog<String>(
-        title: CommonAutoSizeText(AppLocalizations.t('Select subject')),
+        title: AutoSizeText(AppLocalizations.t('Select subject')),
         items: options);
     if (subjectName != null) {
       modelProjectController.currentSubjectName.value = subjectName;
@@ -606,7 +606,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       }
     }
     String? metaId = await DialogUtil.showSelectDialog<String>(
-        title: const CommonAutoSizeText('Select meta project'), items: options);
+        title: const AutoSizeText('Select meta project'), items: options);
     if (metaId != null) {
       modelProjectController.currentMetaId.value = metaId;
       modelProjectController.project.value = null;
@@ -736,7 +736,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       if (project != null) {
         title = '$title\n${project.name}';
       }
-      Widget titleWidget = CommonAutoSizeText(
+      Widget titleWidget = AutoSizeText(
         AppLocalizations.t(title ?? ''),
         style: const TextStyle(color: Colors.white, fontSize: 12),
         wrapWords: false,

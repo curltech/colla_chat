@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart';
@@ -177,12 +177,12 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
               liveKitConferenceClientPool.conferenceClient;
           if (conferenceClient == null) {
             return Center(
-                child: CommonAutoSizeText(AppLocalizations.t('No conference'),
+                child: AutoSizeText(AppLocalizations.t('No conference'),
                     style: const TextStyle(color: Colors.white)));
           }
           if (value == 0) {
             return Center(
-                child: CommonAutoSizeText(
+                child: AutoSizeText(
                     AppLocalizations.t('No video view in current conference'),
                     style: const TextStyle(color: Colors.white)));
           }

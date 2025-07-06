@@ -4,7 +4,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -89,7 +89,7 @@ class FlutterWebView extends StatelessWidget {
     } else {
       webView = Center(
           child:
-              CommonAutoSizeText(AppLocalizations.t('Not supported platform')));
+              AutoSizeText(AppLocalizations.t('Not supported platform')));
     }
   }
 

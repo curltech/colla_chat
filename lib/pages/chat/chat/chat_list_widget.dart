@@ -32,7 +32,7 @@ import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket/websocket_channel.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -263,14 +263,14 @@ class _ChatListWidgetState extends State<ChatListWidget>
     Widget? child;
     if (unreadNumber > 0) {
       child = Center(
-          child: CommonAutoSizeText('$unreadNumber',
+          child: AutoSizeText('$unreadNumber',
               style: const TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: Colors.white)));
     } else if (connectionNum > 0) {
       child = const Center(
-          child: CommonAutoSizeText('',
+          child: AutoSizeText('',
               style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
@@ -604,7 +604,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
                     Icons.wifi,
                     color: Colors.white,
                   ),
-            CommonAutoSizeText(connectivityResult.name,
+            AutoSizeText(connectivityResult.name,
                 style: const TextStyle(fontSize: 12, color: Colors.white)),
           ]));
     });

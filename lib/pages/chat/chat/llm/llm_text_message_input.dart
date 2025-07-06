@@ -13,7 +13,8 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
@@ -257,7 +258,7 @@ class LlmTextMessageInputWidget extends StatelessWidget {
               backgroundColor: myself.primary,
               foregroundColor: Colors.white,
             ),
-            child: CommonAutoSizeText(
+            child: AutoSizeText(
               AppLocalizations.t('Ok'),
             ),
             onPressed: () {

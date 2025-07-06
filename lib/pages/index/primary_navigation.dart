@@ -6,7 +6,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/adaptive_scaffold/adaptive_scaffold.dart';
 import 'package:colla_chat/widgets/adaptive_scaffold/breakpoints.dart';
 import 'package:colla_chat/widgets/adaptive_scaffold/slot_layout.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
@@ -45,7 +45,7 @@ class PrimaryNavigation {
     bool current = indexWidgetProvider.currentMainIndex == index;
     List<Widget> children = [icon];
     if (label != null) {
-      children.add(CommonAutoSizeText(
+      children.add(AutoSizeText(
         label,
         style: TextStyle(
             color: current ? myself.primary : Colors.grey,

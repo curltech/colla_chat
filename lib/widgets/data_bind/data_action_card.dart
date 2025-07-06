@@ -1,6 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 
@@ -175,7 +176,7 @@ class DataActionCard extends StatelessWidget {
               child: actionData.icon),
         )),
         const SizedBox(height: 5.0),
-        CommonAutoSizeText(
+        AutoSizeText(
           label,
           style: TextStyle(
             color: labelColor,

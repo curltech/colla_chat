@@ -14,7 +14,8 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -248,7 +249,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       title = '$title\n${conferenceChatMessageController.conferenceName}';
     }
 
-    Widget titleWidget = CommonAutoSizeText(title, maxLines: 2);
+    Widget titleWidget = AutoSizeText(title, maxLines: 2);
 
     return titleWidget;
   }

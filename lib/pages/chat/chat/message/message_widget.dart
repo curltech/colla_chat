@@ -43,7 +43,7 @@ import 'package:colla_chat/tool/pdf_util.dart';
 import 'package:colla_chat/tool/share_util.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_speech_to_text.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -76,7 +76,7 @@ class MessageWidget {
     ChatMessageSubType? subMessageType;
     subMessageType = StringUtil.enumFromString(
         ChatMessageSubType.values, chatMessage.subMessageType);
-    Widget body = CommonAutoSizeText(AppLocalizations.t('No content'));
+    Widget body = AutoSizeText(AppLocalizations.t('No content'));
     if (subMessageType == ChatMessageSubType.chat) {
       switch (contentType) {
         case ChatMessageContentType.text:
@@ -423,7 +423,7 @@ class MessageWidget {
             context: context,
             builder: (context) {
               return Dialog(
-                  child: CommonAutoSizeText(sherpaSpeechToText.text!));
+                  child: AutoSizeText(sherpaSpeechToText.text!));
             });
       }
     }
@@ -878,7 +878,7 @@ class MessageWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 child: Row(children: [
-                  Expanded(child: CommonAutoSizeText(data)),
+                  Expanded(child: AutoSizeText(data)),
                   readOnly
                       ? Container()
                       : InkWell(

@@ -19,7 +19,8 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/mobile_util.dart';
 import 'package:colla_chat/tool/phone_number_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
@@ -203,7 +204,7 @@ class P2pRegisterWidget extends StatelessWidget {
                     });
 
                 return ListTile(
-                    title: CommonAutoSizeText(AppLocalizations.t('Avatar')),
+                    title: AutoSizeText(AppLocalizations.t('Avatar')),
                     trailing: avatarImage,
                     onTap: () async {
                       await _pickAvatar(

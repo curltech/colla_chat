@@ -2,7 +2,8 @@ import 'package:auto_size_text_field/auto_size_text_field.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/download_file_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_helper.dart';
 import 'package:flutter/material.dart';
@@ -117,7 +118,7 @@ class FFMpegInstallWidget extends StatelessWidget {
             ]);
           }
           if (platformParams.linux) {
-            children.add(const CommonAutoSizeText(
+            children.add(const AutoSizeText(
                 'FFmpeg installation required by user.\nsudo apt-get install ffmpeg\nsudo snap install ffmpeg'));
           }
         }

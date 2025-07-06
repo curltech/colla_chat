@@ -4,7 +4,8 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
@@ -57,7 +58,7 @@ class DialogUtil {
                 onPressed: () {
                   ScaffoldMessenger.of(context!).hideCurrentMaterialBanner();
                 },
-                child: CommonAutoSizeText(AppLocalizations.t('Dismiss')),
+                child: AutoSizeText(AppLocalizations.t('Dismiss')),
               ),
             ],
       ),
@@ -157,7 +158,7 @@ class DialogUtil {
         width: 10.0,
       ));
     }
-    children.add(CommonAutoSizeText(
+    children.add(AutoSizeText(
       label,
       style: selected ? style : null,
     ));
@@ -218,7 +219,7 @@ class DialogUtil {
     return PopupMenuItem(
         value: value,
         child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          CommonAutoSizeText(
+          AutoSizeText(
             AppLocalizations.t(label),
             style: selected ? style : null,
           ),
@@ -291,7 +292,7 @@ class DialogUtil {
         const SizedBox(
           height: 20,
         ),
-        CommonAutoSizeText(AppLocalizations.t(tip)),
+        AutoSizeText(AppLocalizations.t(tip)),
         const SizedBox(
           height: 20,
         ),
@@ -369,7 +370,7 @@ class DialogUtil {
               width: appDataProvider.totalSize.width * 0.8,
               height: appDataProvider.totalSize.height * 0.5,
               child: Center(
-                  child: CommonAutoSizeText(
+                  child: AutoSizeText(
                       style: TextStyle(color: Colors.white),
                       softWrap: true,
                       maxLines: 4,
@@ -514,7 +515,7 @@ class DialogUtil {
         Icons.error_outline_outlined,
         color: Colors.red,
       ),
-      content: CommonAutoSizeText(
+      content: AutoSizeText(
           style: TextStyle(color: Colors.white),
           softWrap: true,
           maxLines: 4,
@@ -531,7 +532,7 @@ class DialogUtil {
         Icons.warning_amber,
         color: Colors.amber,
       ),
-      content: CommonAutoSizeText(
+      content: AutoSizeText(
           style: TextStyle(color: Colors.white),
           softWrap: true,
           maxLines: 4,
@@ -548,7 +549,7 @@ class DialogUtil {
           Icons.info_outline,
           color: Colors.green,
         ),
-        content: CommonAutoSizeText(
+        content: AutoSizeText(
             style: TextStyle(color: Colors.white),
             softWrap: true,
             maxLines: 4,

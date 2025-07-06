@@ -2,7 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/checkbox_group.dart';
@@ -83,12 +83,12 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
           const SizedBox(
             width: 10.0,
           ),
-          CommonAutoSizeText(label),
+          AutoSizeText(label),
           const SizedBox(
             width: 10.0,
           ),
           Expanded(
-              child: CommonAutoSizeText((value ?? '').toString(),
+              child: AutoSizeText((value ?? '').toString(),
                   textAlign: TextAlign.start))
         ]));
   }

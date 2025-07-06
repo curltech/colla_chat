@@ -2,7 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
@@ -130,7 +130,7 @@ class SmartDialogUtil {
           ),
           Container(
             margin: const EdgeInsets.only(top: 20),
-            child: CommonAutoSizeText(AppLocalizations.t('Loading...')),
+            child: AutoSizeText(AppLocalizations.t('Loading...')),
           ),
         ]),
       ),
@@ -238,19 +238,19 @@ class SmartDialogUtil {
         return AlertDialog(
           title: Row(children: <Widget>[
             i,
-            CommonAutoSizeText(title),
+            AutoSizeText(title),
           ]),
-          content: CommonAutoSizeText(content),
+          content: AutoSizeText(content),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: CommonAutoSizeText(AppLocalizations.t('Cancel')),
+              child: AutoSizeText(AppLocalizations.t('Cancel')),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: CommonAutoSizeText(AppLocalizations.t('Ok')),
+              child: AutoSizeText(AppLocalizations.t('Ok')),
             ),
           ],
         );

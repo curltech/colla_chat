@@ -1,7 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -121,7 +121,7 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
     var audioTileData = _buildAudioTrackTileData(context);
     var videoTileData = _buildVideoTrackTileData(context);
     var trackView = Column(children: [
-      CommonAutoSizeText(AppLocalizations.t('AudioTrack')),
+      AutoSizeText(AppLocalizations.t('AudioTrack')),
       DataListView(
         itemCount: audioTileData.length,
         itemBuilder: (BuildContext context, int index) {
@@ -131,7 +131,7 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
       const SizedBox(
         height: 15.0,
       ),
-      CommonAutoSizeText(AppLocalizations.t('VideoTrack')),
+      AutoSizeText(AppLocalizations.t('VideoTrack')),
       DataListView(
         itemCount: videoTileData.length,
         itemBuilder: (BuildContext context, int index) {
@@ -158,32 +158,32 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
             return nilBox;
           }
           List<Widget> children = [];
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('name')}:${trackPublication.name}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('encryptionType')}:${trackPublication.encryptionType}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('isScreenShare')}:${trackPublication.isScreenShare}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('mimeType')}:${trackPublication.mimeType}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('muted')}:${trackPublication.muted}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('simulcasted')}:${trackPublication.simulcasted}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('subscribed')}:${trackPublication.subscribed}'));
 
           livekit_client.Track? track = trackPublication.track;
           if (track != null) {
-            children.add(CommonAutoSizeText(
+            children.add(AutoSizeText(
                 '${AppLocalizations.t('sid')}:${track.sid}'));
-            children.add(CommonAutoSizeText(
+            children.add(AutoSizeText(
                 '${AppLocalizations.t('kind')}:${track.kind}'));
-            children.add(CommonAutoSizeText(
+            children.add(AutoSizeText(
                 '${AppLocalizations.t('muted')}:${track.muted}'));
-            children.add(CommonAutoSizeText(
+            children.add(AutoSizeText(
                 '${AppLocalizations.t('isActive')}:${track.isActive}'));
-            children.add(CommonAutoSizeText(
+            children.add(AutoSizeText(
                 '${AppLocalizations.t('mediaType')}:${track.mediaType}'));
           }
           return ListView(

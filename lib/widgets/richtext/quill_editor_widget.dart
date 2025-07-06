@@ -9,7 +9,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -87,7 +87,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            CommonAutoSizeText('${isEditing ? 'Edit' : 'Add'} note'),
+            AutoSizeText('${isEditing ? 'Edit' : 'Add'} note'),
             IconButton(
               onPressed: () => Navigator.of(context).pop(),
               icon: const Icon(Icons.close),
@@ -332,7 +332,7 @@ class NotesEmbedBuilder extends EmbedBuilder {
     return Material(
       color: Colors.transparent,
       child: ListTile(
-        title: CommonAutoSizeText(
+        title: AutoSizeText(
           notes.toPlainText().replaceAll('\n', ' '),
           maxLines: 3,
           overflow: TextOverflow.ellipsis,

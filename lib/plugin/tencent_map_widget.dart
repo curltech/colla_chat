@@ -4,7 +4,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:latlong2/latlong.dart';
@@ -244,7 +244,7 @@ class TencentMapWidgetState extends State<TencentMapWidget> {
                 valueListenable: locationPosition,
                 builder: (BuildContext context,
                     LocationPosition? locationPosition, Widget? child) {
-                  return CommonAutoSizeText(
+                  return AutoSizeText(
                       '${locationPosition?.name ?? ''}\n${locationPosition?.address ?? ''}',
                       maxLines: 4);
                 }),

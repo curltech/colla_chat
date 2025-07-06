@@ -8,7 +8,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_text_to_speech_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -91,12 +91,12 @@ class PoemContentWidget extends StatelessWidget with TileDataMixin {
           int i = 0;
           for (var title in titles) {
             if (i == 0) {
-              titleWidgets.add(CommonAutoSizeText(
+              titleWidgets.add(AutoSizeText(
                 title,
                 style: const TextStyle(fontSize: 28),
               ));
             } else {
-              titleWidgets.add(CommonAutoSizeText(
+              titleWidgets.add(AutoSizeText(
                 title,
                 style: const TextStyle(fontSize: 12),
               ));
@@ -107,7 +107,7 @@ class PoemContentWidget extends StatelessWidget with TileDataMixin {
           List<String> paragraphs = poem.paragraphs!.split(reg);
           List<Widget> paragraphWidgets = [];
           for (var paragraph in paragraphs) {
-            paragraphWidgets.add(CommonAutoSizeText(
+            paragraphWidgets.add(AutoSizeText(
               paragraph,
               style: const TextStyle(fontSize: 16),
             ));
@@ -211,7 +211,7 @@ class PoemContentWidget extends StatelessWidget with TileDataMixin {
                   const SizedBox(
                     height: 15,
                   ),
-                  CommonAutoSizeText('${poem.dynasty} ${poem.author}'),
+                  AutoSizeText('${poem.dynasty} ${poem.author}'),
                   const SizedBox(
                     height: 15,
                   ),

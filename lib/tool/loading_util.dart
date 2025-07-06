@@ -1,7 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -27,7 +27,7 @@ class LoadingUtil {
         height: 10,
       ),
       Expanded(
-          child: CommonAutoSizeText(
+          child: AutoSizeText(
               AppLocalizations.t("Loading, please waiting...")))
     ]));
   }
@@ -39,7 +39,7 @@ class LoadingUtil {
       const SizedBox(
         height: 10,
       ),
-      CommonAutoSizeText(AppLocalizations.t("Loading, please waiting..."))
+      AutoSizeText(AppLocalizations.t("Loading, please waiting..."))
     ]));
   }
 
@@ -56,7 +56,7 @@ class LoadingUtil {
   //         height: 10,
   //       ),
   //       Expanded(
-  //           child: CommonAutoSizeText(
+  //           child: AutoSizeText(
   //               AppLocalizations.t("Loading, please waiting..."))),
   //     ],
   //   ));

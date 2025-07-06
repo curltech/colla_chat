@@ -7,7 +7,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -120,7 +120,7 @@ class NameCardMessage extends StatelessWidget {
         }
         Widget child = Row(children: [
           prefix,
-          Expanded(child: CommonAutoSizeText(names.toString()))
+          Expanded(child: AutoSizeText(names.toString()))
         ]);
 
         return CommonMessage(child: child);
@@ -140,7 +140,7 @@ class NameCardMessage extends StatelessWidget {
         }
         Widget child = Row(children: [
           prefix,
-          Expanded(child: CommonAutoSizeText(names.toString()))
+          Expanded(child: AutoSizeText(names.toString()))
         ]);
 
         return CommonMessage(child: child);

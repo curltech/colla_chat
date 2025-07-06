@@ -1,6 +1,6 @@
 import 'dart:ui' as ui show PlaceholderAlignment;
 
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +45,7 @@ class EmailText extends SpecialText {
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    CommonAutoSizeText(
+                    AutoSizeText(
                       text.trim(),
                       //style: textStyle?.copyWith(color: Colors.orange),
                     ),
@@ -88,7 +88,7 @@ class EmailText extends SpecialText {
                         controller: textEditingController,
                         decoration: InputDecoration(
                             suffixIcon: TextButton(
-                          child: const CommonAutoSizeText('OK'),
+                          child: const AutoSizeText('OK'),
                           onPressed: () {
                             controller!.value = controller!.value.copyWith(
                                 text: controller!.text.replaceRange(

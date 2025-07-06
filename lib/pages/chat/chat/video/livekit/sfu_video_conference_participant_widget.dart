@@ -3,7 +3,7 @@ import 'package:colla_chat/pages/chat/chat/video/livekit/sfu_video_conference_tr
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -101,39 +101,39 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
             return nilBox;
           }
           List<Widget> children = [];
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('name')}:${participant.name}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('connectionQuality')}:${participant.connectionQuality}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('joinedAt')}:${participant.joinedAt}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('identity')}:${participant.identity}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('audioLevel')}:${participant.audioLevel}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('firstTrackEncryptionType')}:${participant.firstTrackEncryptionType}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('hasAudio')}:${participant.hasAudio}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('hashCode')}:${participant.hashCode}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('hasVideo')}:${participant.hasVideo}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('isEncrypted')}:${participant.isEncrypted}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('isMuted')}:${participant.isMuted}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('lastSpokeAt')}:${participant.lastSpokeAt}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('permissions')}:${participant.permissions}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('sid')}:${participant.sid}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('isCameraEnabled')}:${participant.isCameraEnabled()}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('isMicrophoneEnabled')}:${participant.isMicrophoneEnabled()}'));
-          children.add(CommonAutoSizeText(
+          children.add(AutoSizeText(
               '${AppLocalizations.t('isScreenShareEnabled')}:${participant.isScreenShareEnabled()}'));
           // children.add(SfuParticipantStatsWidget(
           //   participant: participant,
@@ -172,17 +172,17 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
         helpPath: routeName,
         withLeading: withLeading,
         child: Column(children: [
-          CommonAutoSizeText(AppLocalizations.t('LocalParticipant')),
+          AutoSizeText(AppLocalizations.t('LocalParticipant')),
           _buildLocalParticipantWidget(context),
           const SizedBox(
             height: 15.0,
           ),
-          CommonAutoSizeText(AppLocalizations.t('RemoteParticipant')),
+          AutoSizeText(AppLocalizations.t('RemoteParticipant')),
           _buildRemoteParticipantListView(context),
           const SizedBox(
             height: 15.0,
           ),
-          CommonAutoSizeText(AppLocalizations.t('Participant info')),
+          AutoSizeText(AppLocalizations.t('Participant info')),
           Expanded(child: _buildParticipantWidget(context)),
         ]));
   }

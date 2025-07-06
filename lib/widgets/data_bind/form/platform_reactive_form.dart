@@ -1,7 +1,8 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_data_field.dart';
 import 'package:flutter/material.dart';
@@ -319,7 +320,7 @@ class PlatformReactiveForm extends StatelessWidget {
     if (showResetButton) {
       btns.add(TextButton(
         style: style,
-        child: CommonAutoSizeText(AppLocalizations.t('Reset')),
+        child: AutoSizeText(AppLocalizations.t('Reset')),
         onPressed: () {
           platformReactiveFormController.reset();
           var values = platformReactiveFormController.values;
@@ -330,7 +331,7 @@ class PlatformReactiveForm extends StatelessWidget {
     if (formButtons == null && onSubmit != null) {
       btns.add(TextButton(
         style: mainStyle,
-        child: CommonAutoSizeText(AppLocalizations.t(submitLabel)),
+        child: AutoSizeText(AppLocalizations.t(submitLabel)),
         onPressed: () {
           if (onSubmit != null) {
             var values = platformReactiveFormController.values;
@@ -342,7 +343,7 @@ class PlatformReactiveForm extends StatelessWidget {
       for (FormButton formButton in formButtons!) {
         btns.add(TextButton(
           style: formButton.buttonStyle,
-          child: CommonAutoSizeText(AppLocalizations.t(formButton.label)),
+          child: AutoSizeText(AppLocalizations.t(formButton.label)),
           onPressed: () {
             if (formButton.onTap != null) {
               var values = platformReactiveFormController.values;

@@ -2,7 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/qrcode_widget.dart';
 import 'package:flutter/material.dart';
@@ -42,8 +42,8 @@ class MyselfQrcodeWidget extends StatelessWidget with TileDataMixin {
     var children = <Widget>[
       ListTile(
           leading: myself.avatarImage,
-          title: CommonAutoSizeText(name),
-          subtitle: CommonAutoSizeText(peerId)),
+          title: AutoSizeText(name),
+          subtitle: AutoSizeText(peerId)),
       const SizedBox(
         height: 40.0,
       ),
@@ -52,7 +52,7 @@ class MyselfQrcodeWidget extends StatelessWidget with TileDataMixin {
         width: 320,
       ),
       const Spacer(),
-      CommonAutoSizeText(
+      AutoSizeText(
         AppLocalizations.t('Scan qrcode, add linkman'),
         style: const TextStyle(color: Colors.white),
       ),

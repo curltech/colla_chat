@@ -1,6 +1,6 @@
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,8 +17,8 @@ class MeHeadWidget extends StatelessWidget {
     name = myselfPeer.name;
     var listTile = ListTile(
       leading: myself.avatarImage,
-      title: CommonAutoSizeText(name),
-      subtitle: CommonAutoSizeText(peerId),
+      title: AutoSizeText(name),
+      subtitle: AutoSizeText(peerId),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {
         var indexWidgetProvider =

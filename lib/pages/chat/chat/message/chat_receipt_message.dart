@@ -2,7 +2,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：回复消息
@@ -29,9 +29,9 @@ class ChatReceiptMessage extends StatelessWidget {
       onTap: () {},
       child: ListTile(
         leading: leading,
-        title: CommonAutoSizeText(
+        title: AutoSizeText(
             title + groupType + AppLocalizations.t('receipt')),
-        subtitle: CommonAutoSizeText(
+        subtitle: AutoSizeText(
             '$receiverName\n$groupName\n${AppLocalizations.t(content)}'),
         //dense: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 5.0),

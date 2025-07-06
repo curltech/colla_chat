@@ -4,7 +4,7 @@ import 'package:colla_chat/plugin/overlay/flutter_floating_widget.dart';
 import 'package:colla_chat/plugin/overlay/mobile_system_alert_window.dart';
 import 'package:colla_chat/plugin/overlay/overlay_notification.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_floating/floating/assist/Point.dart';
@@ -41,7 +41,7 @@ class FlutterOverlayWindowWidget extends StatelessWidget with TileDataMixin {
             onPressed: () {
               flutterOverlayWindow.setOverlay(OverlayNotification(
                 key: UniqueKey(),
-                description: CommonAutoSizeText('Text'),
+                description: AutoSizeText('Text'),
                 onCloseButtonPressed:
                     (OverlayNotification overlayNotification) {
                   flutterOverlayWindow.closeOverlay();

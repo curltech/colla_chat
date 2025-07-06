@@ -23,7 +23,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -293,7 +293,7 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
               const SizedBox(
                 width: 15.0,
               ),
-              CommonAutoSizeText(AppLocalizations.t('Auto login')),
+              AutoSizeText(AppLocalizations.t('Auto login')),
             ]),
             dense: false,
             activeColor: myself.primary,

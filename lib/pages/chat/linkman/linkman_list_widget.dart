@@ -28,7 +28,7 @@ import 'package:colla_chat/tool/qrcode_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -201,7 +201,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     Widget? child;
     if (connectionNum > 0) {
       child = const Center(
-          child: CommonAutoSizeText('',
+          child: AutoSizeText('',
               style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,

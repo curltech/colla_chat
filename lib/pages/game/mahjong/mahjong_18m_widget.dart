@@ -15,7 +15,8 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
@@ -103,7 +104,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
                 children: [
                   AppBarWidget(
                       isAppBar: false,
-                      title: CommonAutoSizeText(
+                      title: AutoSizeText(
                         AppLocalizations.t('Majiang room and participants'),
                         style:
                             const TextStyle(fontSize: 16, color: Colors.white),
@@ -126,7 +127,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
                               onPressed: () {
                                 Navigator.pop(context);
                               },
-                              child: CommonAutoSizeText(
+                              child: AutoSizeText(
                                   AppLocalizations.t('Cancel'))),
                           TextButton(
                               style: mainStyle,
@@ -138,7 +139,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
                                 }
                               },
                               child:
-                                  CommonAutoSizeText(AppLocalizations.t('Ok'))),
+                                  AutoSizeText(AppLocalizations.t('Ok'))),
                         ],
                       ))
                 ],

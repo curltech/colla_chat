@@ -8,7 +8,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_render_view.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 
@@ -98,7 +98,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
 
   Widget _buildPopupVideoView() {
     Widget mediaRenderView = Center(
-        child: CommonAutoSizeText(AppLocalizations.t('No media stream')));
+        child: AutoSizeText(AppLocalizations.t('No media stream')));
     if (peerMediaStreams.isEmpty) {
       return mediaRenderView;
     }
@@ -230,7 +230,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   Widget _buildSingleVideoView(
       BuildContext context, double? height, double? width) {
     Widget mediaRenderView = Center(
-        child: CommonAutoSizeText(AppLocalizations.t('No media stream')));
+        child: AutoSizeText(AppLocalizations.t('No media stream')));
     if (peerMediaStreams.isEmpty) {
       return mediaRenderView;
     }
@@ -286,7 +286,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
           padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            CommonAutoSizeText(
+            AutoSizeText(
               name,
               style: const TextStyle(
                   color: Colors.white, fontSize: AppFontSize.xsFontSize),
@@ -294,7 +294,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
             ValueListenableBuilder(
                 valueListenable: volume,
                 builder: (BuildContext context, double volume, Widget? child) {
-                  return CommonAutoSizeText(
+                  return AutoSizeText(
                     '$volume',
                     style: const TextStyle(
                         color: Colors.white, fontSize: AppFontSize.xsFontSize),

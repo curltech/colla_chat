@@ -17,7 +17,7 @@ import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -173,8 +173,8 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
           indexWidgetProvider.push('published_channel_message_preview');
         }
       },
-      title: CommonAutoSizeText(title),
-      subtitle: CommonAutoSizeText(sendTime),
+      title: AutoSizeText(title),
+      subtitle: AutoSizeText(sendTime),
       leading: leading,
       trailing: thumbnailWidget,
     );

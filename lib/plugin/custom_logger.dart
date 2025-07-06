@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;
@@ -177,7 +177,7 @@ class _LoggerConsoleWidgetState extends State<LoggerConsoleWidget> {
               itemBuilder: (context, index) {
                 final log = loggerController.logs.elementAt(index);
                 final int length = log.length;
-                return CommonAutoSizeText(log.substring(11, length - 4));
+                return AutoSizeText(log.substring(11, length - 4));
               },
             )));
   }

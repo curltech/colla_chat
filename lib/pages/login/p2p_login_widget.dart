@@ -21,7 +21,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
@@ -66,7 +66,7 @@ class P2pLoginWidget extends StatelessWidget {
                   }
                 }
               },
-              label: CommonAutoSizeText(
+              label: AutoSizeText(
                 AppLocalizations.t('Select'),
                 style: const TextStyle(color: Colors.yellowAccent),
               ),
@@ -160,7 +160,7 @@ class P2pLoginWidget extends StatelessWidget {
     return Dialog(
         child: Column(children: [
       AppBarWidget(
-        title: CommonAutoSizeText(AppLocalizations.t('Select login peer')),
+        title: AutoSizeText(AppLocalizations.t('Select login peer')),
       ),
       const SizedBox(
         height: 5.0,
@@ -259,7 +259,7 @@ class P2pLoginWidget extends StatelessWidget {
           height: AppImageSize.xlSize,
           width: AppImageSize.xlSize,
         ),
-        CommonAutoSizeText(
+        AutoSizeText(
           AppLocalizations.t('Secure your collaboration'),
           textAlign: TextAlign.center,
           style: const TextStyle(

@@ -8,7 +8,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_config_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:sherpa_onnx/sherpa_onnx.dart';
 
@@ -61,7 +61,7 @@ class SherpaTextToSpeechWidget extends StatelessWidget {
   /// 速度
   Widget _buildSpeedWidget() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      CommonAutoSizeText(AppLocalizations.t('Speed')),
+      AutoSizeText(AppLocalizations.t('Speed')),
       const SizedBox(
         height: 5.0,
       ),

@@ -12,7 +12,7 @@ import 'package:colla_chat/service/poem/poem.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -232,7 +232,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
             );
           }
           return Center(
-              child: CommonAutoSizeText(AppLocalizations.t('No poem')));
+              child: AutoSizeText(AppLocalizations.t('No poem')));
         },
       )),
     ]);

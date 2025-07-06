@@ -4,7 +4,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +61,7 @@ class BindingDataTable2<T> extends StatelessWidget {
       if (inputType == InputType.custom) {
         dataColumns.add(
           DataColumn2(
-            label: CommonAutoSizeText(
+            label: AutoSizeText(
                 AppLocalizations.t(platformDataColumn.label)),
             fixedWidth: platformDataColumn.width,
             numeric: true,
@@ -70,7 +70,7 @@ class BindingDataTable2<T> extends StatelessWidget {
       } else {
         dataColumns.add(
           DataColumn2(
-              label: CommonAutoSizeText(
+              label: AutoSizeText(
                   AppLocalizations.t(platformDataColumn.label)),
               fixedWidth: platformDataColumn.width,
               tooltip: platformDataColumn.hintText,
@@ -146,7 +146,7 @@ class BindingDataTable2<T> extends StatelessWidget {
           align = TextAlign.left;
         }
         var dataCell = DataCell(
-          CommonAutoSizeText(fieldValue!,
+          AutoSizeText(fieldValue!,
               style: TextStyle(
                   backgroundColor: textBackgroundColor, color: textColor),
               textAlign: align),

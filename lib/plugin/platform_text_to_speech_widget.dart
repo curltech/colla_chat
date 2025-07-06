@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
@@ -178,10 +178,10 @@ class PlatformTextToSpeechWidget extends StatelessWidget {
             if (snapshot.hasData) {
               return _enginesDropDownSection(snapshot.data as List<dynamic>);
             } else if (snapshot.hasError) {
-              return CommonAutoSizeText(
+              return AutoSizeText(
                   AppLocalizations.t('Error loading engines...'));
             } else {
-              return CommonAutoSizeText(
+              return AutoSizeText(
                   AppLocalizations.t('Loading engines...'));
             }
           });
@@ -198,10 +198,10 @@ class PlatformTextToSpeechWidget extends StatelessWidget {
             if (snapshot.hasData) {
               return _buildLanguageOption(snapshot.data as List<dynamic>);
             } else if (snapshot.hasError) {
-              return CommonAutoSizeText(
+              return AutoSizeText(
                   AppLocalizations.t('Error loading languages...'));
             } else {
-              return CommonAutoSizeText(
+              return AutoSizeText(
                   AppLocalizations.t('Loading Languages...'));
             }
           }),
@@ -223,7 +223,7 @@ class PlatformTextToSpeechWidget extends StatelessWidget {
   /// 选择语言
   Widget _buildLanguageOption(List<dynamic> languages) {
     return Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-      CommonAutoSizeText(AppLocalizations.t('Language')),
+      AutoSizeText(AppLocalizations.t('Language')),
       const SizedBox(
         width: 15.0,
       ),
@@ -240,7 +240,7 @@ class PlatformTextToSpeechWidget extends StatelessWidget {
       ),
       Visibility(
         visible: platformParams.android,
-        child: CommonAutoSizeText(
+        child: AutoSizeText(
             "${AppLocalizations.t("Is installed")}: $isCurrentLanguageInstalled"),
       ),
     ]);
@@ -251,7 +251,7 @@ class PlatformTextToSpeechWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CommonAutoSizeText(AppLocalizations.t('Volume')),
+        AutoSizeText(AppLocalizations.t('Volume')),
         const SizedBox(
           height: 5.0,
         ),
@@ -281,7 +281,7 @@ class PlatformTextToSpeechWidget extends StatelessWidget {
   /// 音高
   Widget _buildPitchWidget() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      CommonAutoSizeText(AppLocalizations.t('Pitch')),
+      AutoSizeText(AppLocalizations.t('Pitch')),
       const SizedBox(
         height: 5.0,
       ),
@@ -309,7 +309,7 @@ class PlatformTextToSpeechWidget extends StatelessWidget {
   /// 速度
   Widget _buildRateWidget() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      CommonAutoSizeText(AppLocalizations.t('Rate')),
+      AutoSizeText(AppLocalizations.t('Rate')),
       const SizedBox(
         height: 5.0,
       ),

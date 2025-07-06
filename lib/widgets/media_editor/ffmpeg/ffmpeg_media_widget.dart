@@ -9,7 +9,7 @@ import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -302,13 +302,13 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
           return Dialog(
               child: Column(children: [
             AppBarWidget(
-              title: CommonAutoSizeText(AppLocalizations.t(title)),
+              title: AutoSizeText(AppLocalizations.t(title)),
             ),
             Expanded(
                 child: SingleChildScrollView(
                     child: Container(
                         padding: const EdgeInsets.all(15.0),
-                        child: CommonAutoSizeText(output.value ?? '')))),
+                        child: AutoSizeText(output.value ?? '')))),
           ]));
         });
   }

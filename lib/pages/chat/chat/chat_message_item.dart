@@ -14,7 +14,7 @@ import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -179,14 +179,14 @@ class ChatMessageItem extends StatelessWidget {
     sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
     //${chatMessage.id}:${chatMessage.senderName}
     Widget title =
-        CommonAutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
-    // CommonAutoSizeText('${chatMessage.id}:${chatMessage.senderName}');
+        AutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
+    // AutoSizeText('${chatMessage.id}:${chatMessage.senderName}');
     if (timer != null) {
       title = Row(
         children: [
           title,
           const Icon(Icons.timer_sharp),
-          Obx(() => CommonAutoSizeText('$leftDeleteTime')),
+          Obx(() => AutoSizeText('$leftDeleteTime')),
         ],
       );
     }
@@ -221,13 +221,13 @@ class ChatMessageItem extends StatelessWidget {
       sendTime = '$id:$sendTime';
     }
     Widget title =
-        CommonAutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
+        AutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
     if (timer != null) {
       title = Row(
         children: [
           title,
           const Icon(Icons.timer_sharp),
-          Obx(() => CommonAutoSizeText('$leftDeleteTime')),
+          Obx(() => AutoSizeText('$leftDeleteTime')),
         ],
       );
     }
@@ -276,13 +276,13 @@ class ChatMessageItem extends StatelessWidget {
       sendTime = '$id:$sendTime';
     }
     Widget title =
-        CommonAutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
+        AutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
     if (timer != null) {
       title = Row(
         children: [
           title,
           const Icon(Icons.timer_sharp),
-          Obx(() => CommonAutoSizeText('$leftDeleteTime')),
+          Obx(() => AutoSizeText('$leftDeleteTime')),
         ],
       );
     }
