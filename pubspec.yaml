@@ -397,6 +397,7 @@ dependency_overrides:
   reactive_dropdown_menu: ^0.0.2
   reactive_file_selector: ^3.0.2
   reactive_input_decorator: ^1.0.0
+  reactive_animated_toggle_switch: ^0.0.4
   uuid: ^4.3.1
   meta: ^1.11.0
   xml: ^6.0.1

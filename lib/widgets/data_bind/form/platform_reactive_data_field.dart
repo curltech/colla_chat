@@ -189,6 +189,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       inputFormatters: platformDataField.inputFormatters ?? const [],
       onSubmitted: platformDataField.onFieldSubmitted,
       length: platformDataField.length!,
+      onCompleted: platformDataField.onChanged,
     );
 
     return pinputField;
@@ -216,9 +217,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       autofocus: platformDataField.autofocus,
       focusNode: focusNode,
       onChanged: (FormControl<T> formControl) {
-        if (platformDataField.readOnly) {
-          return;
-        }
         platformDataField.onChanged?.call(formControl.value);
       },
       options: options,
@@ -296,9 +294,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     var checkboxGroup = ReactiveCheckboxGroup<T>(
       formControlName: name,
       onChanged: (FormControl<T> formControl) {
-        if (platformDataField.readOnly) {
-          return;
-        }
         platformDataField.onChanged?.call(formControl.value);
       },
       options: options,
@@ -330,9 +325,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     var chipGroup = ReactiveChipGroup<T>(
       formControlName: name,
       onSelected: (FormControl<T> formControl) {
-        if (platformDataField.readOnly) {
-          return;
-        }
         platformDataField.onChanged?.call(formControl.value);
       },
       options: options,
@@ -359,9 +351,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       fillColor: myself.primary,
       selectedColor: Colors.white,
       onToggle: (FormControl<T> formControl) {
-        if (platformDataField.readOnly) {
-          return;
-        }
         platformDataField.onChanged?.call(formControl.value);
       },
       options: options,
@@ -419,9 +408,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
           inactiveThumbColor: myself.secondary,
           inactiveTrackColor: Colors.grey,
           onChanged: (FormControl<bool> formControl) {
-            if (platformDataField.readOnly) {
-              return;
-            }
             bool? value = formControl.value;
             platformDataField.onChanged?.call(value);
           },
@@ -560,8 +546,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       type: type,
       decoration: decoration,
       locale: myself.locale,
-      // firstDate: DateTime.now(),
-      // lastDate: DateTime.now().add(Duration(days: 356)),
     );
 
     return datePicker;
