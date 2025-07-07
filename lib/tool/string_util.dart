@@ -7,6 +7,7 @@ import 'package:colla_chat/tool/number_util.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import 'package:reactive_language_picker/reactive_language_picker.dart';
 
 class StringUtil {
   // 是否是空字符串
@@ -93,6 +94,9 @@ class StringUtil {
       case DataType.dateTimeRange:
         Set s = JsonUtil.toJson(str);
         value = DateTimeRange<DateTime>(start: s.first, end: s.last);
+        break;
+      case DataType.language:
+        value = Language.fromIsoCode(str);
         break;
     }
     return value;

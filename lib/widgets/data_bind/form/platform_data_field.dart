@@ -1,6 +1,5 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
@@ -85,6 +84,7 @@ enum DataType {
   time,
   datetime,
   dateTimeRange,
+  language,
   percentage,
   color,
   set,

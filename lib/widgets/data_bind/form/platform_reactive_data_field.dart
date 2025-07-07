@@ -55,6 +55,7 @@ import 'package:reactive_cupertino_text_field/reactive_cupertino_text_field.dart
 import 'package:reactive_flutter_rating_bar/reactive_flutter_rating_bar.dart';
 import 'package:reactive_touch_spin/reactive_touch_spin.dart';
 import 'package:reactive_input_decorator/reactive_input_decorator.dart';
+import 'package:reactive_animated_toggle_switch/reactive_animated_toggle_switch.dart';
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class PlatformReactiveDataField<T> extends StatelessWidget {
@@ -1170,9 +1171,9 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       formGroup.value[name] = myself.primary;
     }
     InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget filePicker = ReactiveCodeTextField<String>(
-      formControlName: 'input',
-      controller: CodeController(),
+    Widget filePicker = ReactiveAnimatedToggleSwitchRolling<int, int>(
+      formControlName: name,
+      values: [],
     );
 
     return filePicker;

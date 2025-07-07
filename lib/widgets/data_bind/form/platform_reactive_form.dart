@@ -1,13 +1,17 @@
+import 'dart:async';
+
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
-import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_data_field.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:reactive_forms/reactive_forms.dart';
+import 'package:reactive_language_picker/reactive_language_picker.dart';
 
 class PlatformReactiveFormController {
   final List<PlatformDataField> dataFields;
@@ -15,6 +19,8 @@ class PlatformReactiveFormController {
   late final FormGroup formGroup;
   final Map<String, FocusNode> focusNodes = {};
   late final KeyboardActionsConfig keyboardActionsConfig;
+  late final StreamSubscription<Map<String, Object?>?>
+      valueChangeStreamSubscription;
 
   PlatformReactiveFormController(this.dataFields) {
     _init();
@@ -124,6 +130,8 @@ class PlatformReactiveFormController {
       formControls[name] = formControl;
     }
     formGroup = FormGroup(formControls);
+    valueChangeStreamSubscription =
+        formGroup.valueChanges.listen(onData, onError: onError, onDone: onDone);
     keyboardActionsConfig = KeyboardActionsConfig(
       keyboardActionsPlatform: KeyboardActionsPlatform.ALL,
       keyboardBarColor: myself.primary,
@@ -131,6 +139,24 @@ class PlatformReactiveFormController {
       actions: actions,
     );
   }
+
+  onData(Map<String, Object?>? values) {
+    if (values == null || values.isEmpty) {
+      return;
+    }
+    for (var entry in values.entries) {
+      String name = entry.key;
+      Object? value = entry.value;
+      PlatformDataField? platformDataField = dataFieldMap[name];
+      if (platformDataField != null) {
+        platformDataField.onChanged?.call(value);
+      }
+    }
+  }
+
+  onError(Object value, StackTrace stackTrace) {}
+
+  onDone() {}
 
   Map<String, Object?> get rawValues {
     return formGroup.value;
@@ -149,7 +175,7 @@ class PlatformReactiveFormController {
   }
 
   ///获取真实值，如果控制器为空，返回_value，否则取控制器的值，并覆盖_value
-  dynamic parse(String name, dynamic value, {bool get = true}) {
+  dynamic parse(String name, dynamic value, {bool vm = true}) {
     if (value == null) {
       return null;
     }
@@ -157,19 +183,117 @@ class PlatformReactiveFormController {
     if (platformDataField == null) {
       return value;
     }
+    PlatformControlValueAccessor accessor =
+        PlatformControlValueAccessor(platformDataField);
+    if (vm) {
+      return accessor.viewToModelValue(value);
+    } else {
+      return accessor.modelToViewValue(value);
+    }
+  }
+
+  Map<String, Object?> get values {
+    return formGroup.value.map((key, value) {
+      return MapEntry(key, parse(key, value));
+    });
+  }
+
+  set values(Map<String, Object?>? values) {
+    formGroup.value = values?.map((key, value) {
+      return MapEntry(key, parse(key, value, vm: false));
+    });
+  }
+
+  dynamic getValue(String name) {
+    dynamic value = formGroup.control(name).value;
+
+    return parse(name, value);
+  }
+
+  setValue(String name, dynamic value) {
+    formGroup.control(name).value = parse(name, value, vm: false);
+  }
+
+  reset({Map<String, Object?>? values}) {
+    return formGroup.reset(value: values);
+  }
+
+  focus(String name) {
+    return formGroup.control(name).focus();
+  }
+
+  unfocus(String name) {
+    return formGroup.control(name).unfocus();
+  }
+
+  markAsEnabled(String name) {
+    return formGroup.control(name).markAsEnabled();
+  }
+
+  markAsDisabled(String name) {
+    return formGroup.control(name).markAsDisabled();
+  }
+
+  markAsTouched(String name) {
+    return formGroup.control(name).markAsTouched();
+  }
+
+  markAsUntouched(String name) {
+    return formGroup.control(name).markAsUntouched();
+  }
+
+  markAsDirty(String name) {
+    return formGroup.control(name).markAsDirty();
+  }
+
+  markAsPending(String name) {
+    return formGroup.control(name).markAsPending();
+  }
+
+  markAsPristine(String name) {
+    return formGroup.control(name).markAsPristine();
+  }
+
+  valid() {
+    return formGroup.valid;
+  }
+
+  dispose() {
+    valueChangeStreamSubscription.cancel();
+    formGroup.dispose();
+  }
+}
+
+/// 模型值一般是简单数据类型，比如String，int，double，bool
+/// 视图值一般是复杂数据类型，比如Language，Color，DataTime
+class PlatformControlValueAccessor<M, V> extends ControlValueAccessor<M, V> {
+  final PlatformDataField platformDataField;
+
+  PlatformControlValueAccessor(this.platformDataField);
+
+  /// 数据转换，vm为true，表示视图值转换成模型值
+  /// 否则，表示模型值转换成视图值
+  dynamic _parse(dynamic value, {bool vm = true}) {
+    if (value == null) {
+      return null;
+    }
+
     DataType dataType = platformDataField.dataType;
     DataType? outputDataType = platformDataField.outputDataType;
     if (outputDataType == null || outputDataType == dataType) {
       return value;
     }
-    if (get) {
+    if (vm) {
       dataType = outputDataType;
     }
     switch (dataType) {
+      /// 其他类型转换成字符串，DateTime，Language需要特别处理
       case DataType.string:
         if (value is! String) {
           if (value is DateTime) {
             return value.toLocal().toIso8601String();
+          } else if (value is Language) {
+            return value.isoCode;
           } else {
             return value.toString();
           }
@@ -177,7 +301,7 @@ class PlatformReactiveFormController {
         break;
       case DataType.double:
         if (value is! double) {
-          return num.parse(value.toString());
+          return double.parse(value.toString());
         }
         break;
       case DataType.int:
@@ -220,7 +344,7 @@ class PlatformReactiveFormController {
         break;
       case DataType.map:
         if (value is! Map) {
-          return {name: value};
+          return JsonUtil.toJson(value);
         }
         break;
       case DataType.set:
@@ -244,51 +368,25 @@ class PlatformReactiveFormController {
         if (value is! Set && value is DateTimeRange) {
           return {value.start, value.end};
         }
+        break;
+      case DataType.language:
+        if (value is! Color && value is String) {
+          return Language.fromIsoCode(value);
+        }
     }
 
     return value;
   }
 
-  Map<String, Object?> get values {
-    return formGroup.value.map((key, value) {
-      return MapEntry(key, parse(key, value));
-    });
+  @override
+  V? modelToViewValue(M? modelValue) {
+    if (modelValue == null) return null;
+    return _parse(modelValue);
   }
 
-  set values(Map<String, Object?>? values) {
-    formGroup.value = values?.map((key, value) {
-      return MapEntry(key, parse(key, value, get: false));
-    });
-  }
-
-  dynamic getValue(String name) {
-    dynamic value = formGroup.control(name).value;
-
-    return parse(name, value);
-  }
-
-  setValue(String name, dynamic value) {
-    formGroup.control(name).value = parse(name, value, get: false);
-  }
-
-  reset({Map<String, Object?>? values}) {
-    return formGroup.reset(value: values);
-  }
-
-  focus(String name) {
-    return formGroup.control(name).focus();
-  }
-
-  unfocus(String name) {
-    return formGroup.control(name).unfocus();
-  }
-
-  markAsDisabled(String name) {
-    return formGroup.control(name).markAsDisabled();
-  }
-
-  markAsTouched(String name) {
-    return formGroup.control(name).markAsTouched();
+  @override
+  M? viewToModelValue(V? viewValue) {
+    return _parse(viewValue, vm: true);
   }
 }
 
@@ -299,7 +397,7 @@ class PlatformReactiveForm extends StatelessWidget {
   final bool showResetButton;
   final String submitLabel;
   final double? height; //高度
-  final double? width; //高度
+  final double? width; //宽度
   final MainAxisAlignment mainAxisAlignment;
   final double spacing;
   final double buttonSpacing;
@@ -405,15 +503,25 @@ class PlatformReactiveForm extends StatelessWidget {
       children.addAll(tails!);
     }
 
-    children.add(SizedBox(
-      height: buttonSpacing,
-    ));
-    children.add(_buildButtonBar());
-    children.add(SizedBox(
-      height: buttonSpacing,
-    ));
+    Widget widgets = Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: _buildFormFieldWidget(),
+    );
 
-    return children;
+    final KeyboardActions keyboardActions = KeyboardActions(
+        config: platformReactiveFormController.keyboardActionsConfig,
+        child: SingleChildScrollView(child: widgets));
+
+    return [
+      Expanded(child: keyboardActions),
+      SizedBox(
+        height: buttonSpacing,
+      ),
+      _buildButtonBar(),
+      SizedBox(
+        height: buttonSpacing,
+      )
+    ];
   }
 
   @override
@@ -421,14 +529,11 @@ class PlatformReactiveForm extends StatelessWidget {
     final ReactiveForm reactiveForm = ReactiveForm(
       formGroup: platformReactiveFormController.formGroup,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: _buildFormFieldWidget(),
       ),
     );
-    final KeyboardActions formWidget = KeyboardActions(
-        config: platformReactiveFormController.keyboardActionsConfig,
-        child: SingleChildScrollView(child: reactiveForm));
 
-    return SizedBox(height: height, width: width, child: formWidget);
+    return SizedBox(height: height, width: width, child: reactiveForm);
   }
 }
