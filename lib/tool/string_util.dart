@@ -5,6 +5,7 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
+import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 class StringUtil {
@@ -88,6 +89,10 @@ class StringUtil {
         break;
       case DataType.color:
         value = Color(int.parse(str));
+        break;
+      case DataType.dateTimeRange:
+        Set s = JsonUtil.toJson(str);
+        value = DateTimeRange<DateTime>(start: s.first, end: s.last);
         break;
     }
     return value;

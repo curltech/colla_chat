@@ -2,8 +2,8 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
-class ReactiveToggleButtons extends ReactiveFormField<String, String> {
-  ReactiveToggleButtons({
+class ReactiveCountryCodePicker extends ReactiveFormField<String, String> {
+  ReactiveCountryCodePicker({
     super.key,
     super.formControlName,
     super.formControl,

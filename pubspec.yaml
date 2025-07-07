@@ -154,7 +154,7 @@ dependencies:
   # flutter_embed_unity: ^1.2.3
   #  opencv_dart: ^1.2.5
   flame: ^1.30.0
-  interactive_chart: ^0.3.5 #candlesticks
+  interactive_chart: ^0.3.6 #candlesticks
   #  candlesticks:
   #    git:
   #      url: https://github.com/r-mzy47/candlesticks.git
@@ -382,6 +382,21 @@ dependency_overrides:
   reactive_color_picker: ^2.2.2
   reactive_date_range_picker: ^2.3.0
   reactive_dropdown_search: ^6.0.0-pre4
+  reactive_wechat_assets_picker: ^3.0.1
+  reactive_wechat_camera_picker: ^4.0.1
+  reactive_contact_picker: ^3.0.1
+  reactive_multi_select_flutter: ^2.0.2
+  reactive_fancy_password_field: ^2.1.2
+  reactive_toggle_switch: ^2.1.1
+  reactive_language_picker: ^2.0.2
+  reactive_fluent_ui: ^3.0.0
+  reactive_cart_stepper: ^2.1.1
+  reactive_flutter_native_text_input: ^2.0.2
+  reactive_languagetool_textfield: ^0.0.3
+  reactive_dropdown_button2: ^0.0.2
+  reactive_dropdown_menu: ^0.0.2
+  reactive_file_selector: ^3.0.2
+  reactive_input_decorator: ^1.0.0
   uuid: ^4.3.1
   meta: ^1.11.0
   xml: ^6.0.1

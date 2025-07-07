@@ -5,7 +5,7 @@ import 'package:choice/choice.dart';
 
 enum ItemType { chip, checkbox, radio, switcher }
 
-class ReactiveChoice<T> extends ReactiveFormField<T, Set<T>> {
+class ReactiveChoice<T> extends ReactiveFormField<Set<T>, Set<T>> {
   ReactiveChoice({
     super.key,
     super.formControlName,
@@ -21,7 +21,7 @@ class ReactiveChoice<T> extends ReactiveFormField<T, Set<T>> {
     bool confirmation = false,
     bool loading = false,
     bool error = false,
-    void Function(FormControl<T>)? onChanged,
+    void Function(FormControl<Set<T>>)? onChanged,
     bool Function(ChoiceController<T>, int)? itemSkip,
     String Function(int)? itemGroup,
     Widget Function(ChoiceController<T>)? dividerBuilder,

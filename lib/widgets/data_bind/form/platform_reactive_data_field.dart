@@ -1,20 +1,60 @@
+import 'dart:typed_data';
+
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/checkbox_group.dart';
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/chip_group.dart';
+import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/choice.dart';
+import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/country_code.dart';
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/radio_group.dart';
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/toggle_buttons.dart';
-import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/toggle_switch.dart';
+import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/wechat/selected_asset_view.dart';
+import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/wechat/selected_assets_list_view.dart';
 import 'package:flutter/material.dart';
+import 'package:reactive_advanced_switch/reactive_advanced_switch.dart';
+import 'package:reactive_cart_stepper/reactive_cart_stepper.dart';
 import 'package:reactive_color_picker/reactive_color_picker.dart';
+import 'package:reactive_contact_picker/reactive_contact_picker.dart';
+import 'package:reactive_cupertino_switch/reactive_cupertino_switch.dart';
+import 'package:reactive_date_range_picker/reactive_date_range_picker.dart';
 import 'package:reactive_date_time_picker/reactive_date_time_picker.dart';
+import 'package:reactive_extended_text_field/reactive_extended_text_field.dart';
+import 'package:reactive_fancy_password_field/reactive_fancy_password_field.dart';
+import 'package:reactive_file_picker/reactive_file_picker.dart';
+import 'package:reactive_flutter_native_text_input/reactive_flutter_native_text_input.dart';
+import 'package:reactive_flutter_typeahead/reactive_flutter_typeahead.dart';
 import 'package:reactive_forms/reactive_forms.dart';
+import 'package:reactive_image_picker/reactive_image_picker.dart';
+import 'package:reactive_language_picker/reactive_language_picker.dart';
+import 'package:reactive_languagetool_textfield/reactive_languagetool_textfield.dart';
+import 'package:reactive_md_editable_textinput/reactive_md_editable_textinput.dart';
+import 'package:reactive_month_picker_dialog/reactive_month_picker_dialog.dart';
+import 'package:reactive_multi_select_flutter/reactive_multi_select_flutter.dart';
+import 'package:reactive_phone_form_field/reactive_phone_form_field.dart';
 import 'package:reactive_pinput/reactive_pinput.dart';
+import 'package:reactive_range_slider/reactive_range_slider.dart';
+import 'package:reactive_raw_autocomplete/reactive_raw_autocomplete.dart';
+import 'package:reactive_segmented_control/reactive_segmented_control.dart';
+import 'package:reactive_signature/reactive_signature.dart';
+import 'package:reactive_sleek_circular_slider/reactive_sleek_circular_slider.dart';
+import 'package:reactive_sliding_segmented/reactive_sliding_segmented.dart';
+import 'package:reactive_toggle_switch/reactive_toggle_switch.dart';
+import 'package:reactive_wechat_assets_picker/reactive_wechat_assets_picker.dart';
+import 'package:reactive_wechat_camera_picker/reactive_wechat_camera_picker.dart';
+import 'package:reactive_code_text_field/reactive_code_text_field.dart';
+import 'package:reactive_dropdown_search/reactive_dropdown_search.dart';
+import 'package:reactive_dropdown_button2/reactive_dropdown_button2.dart';
+import 'package:reactive_dropdown_menu/reactive_dropdown_menu.dart';
+import 'package:reactive_file_selector/reactive_file_selector.dart';
+import 'package:reactive_cupertino_text_field/reactive_cupertino_text_field.dart';
+import 'package:reactive_flutter_rating_bar/reactive_flutter_rating_bar.dart';
+import 'package:reactive_touch_spin/reactive_touch_spin.dart';
+import 'package:reactive_input_decorator/reactive_input_decorator.dart';
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class PlatformReactiveDataField<T> extends StatelessWidget {
@@ -59,6 +99,14 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return inputDecoration;
   }
 
+  BoxDecoration _buildBoxDecoration() {
+    return BoxDecoration(
+      border: Border.all(
+        color: myself.primary,
+      ),
+    );
+  }
+
   Widget? _buildPrefixWidget() {
     Widget? icon = platformDataField.prefixIcon;
     if (icon == null) {
@@ -93,7 +141,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         ]));
   }
 
-  Widget _buildTextFormField(BuildContext context) {
+  Widget _buildTextField(BuildContext context) {
     var name = platformDataField.name;
     var readOnly = platformDataField.readOnly;
     var autofocus = platformDataField.autofocus;
@@ -184,6 +232,16 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     var name = platformDataField.name;
     var label = platformDataField.label;
     var options = platformDataField.options ?? [];
+    List<String> labels = [];
+    List<IconData> icons = [];
+    for (var i = 0; i < options.length; ++i) {
+      var option = options[i];
+      if (option.icon != null) {
+        icons.add(option.icon!);
+      } else {
+        labels.add(option.label);
+      }
+    }
 
     var toggleSwitch = ReactiveToggleSwitch<T>(
       formControlName: name,
@@ -192,13 +250,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       inactiveBgColor: myself.secondary,
       inactiveFgColor: Colors.white,
       totalSwitches: options.length,
-      onToggle: (FormControl<T> formControl) {
-        if (platformDataField.readOnly) {
-          return;
-        }
-        platformDataField.onChanged?.call(formControl.value);
-      },
-      options: options,
+      labels: labels,
+      icons: icons,
     );
     List<Widget> children = [];
     var prefixIcon = _buildPrefixWidget();
@@ -379,6 +432,40 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         child: Row(children: children));
   }
 
+  /// 适合数据类型为bool
+  Widget _buildAdvancedSwitch(BuildContext context) {
+    var name = platformDataField.name;
+    List<Widget> children = [];
+    var prefixIcon = platformDataField.prefixIcon;
+    if (prefixIcon != null) {
+      children.add(prefixIcon);
+      children.add(const SizedBox(
+        width: 15.0,
+      ));
+    }
+    var label = platformDataField.label;
+    if (prefixIcon != null) {
+      children.add(Text(AppLocalizations.t(label)));
+      children.add(const SizedBox(
+        width: 20.0,
+      ));
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    var switcher = Transform.scale(
+        scale: 0.8,
+        child: ReactiveAdvancedSwitch<bool>(
+          formControlName: name,
+          decoration: decoration,
+          activeColor: myself.primary,
+          inactiveColor: Colors.grey,
+        ));
+    children.add(switcher);
+
+    return Container(
+        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+        child: Row(children: children));
+  }
+
   Widget _buildDropdownField(BuildContext context) {
     var name = platformDataField.name;
     var options = platformDataField.options;
@@ -410,6 +497,28 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         items: children,
         onChanged: (FormControl<T> formControl) {
           var value = formControl.value;
+          platformDataField.onChanged?.call(value);
+        },
+      )
+    ]);
+
+    return dropdownButton;
+  }
+
+  Widget _buildChoice(BuildContext context) {
+    var name = platformDataField.name;
+    var options = platformDataField.options;
+    var dropdownButton = Row(children: [
+      Text(AppLocalizations.t(platformDataField.label)),
+      const SizedBox(
+        width: 15.0,
+      ),
+      ReactiveChoice<T>(
+        formControlName: name,
+        title: AppLocalizations.t(platformDataField.label),
+        options: options!,
+        onChanged: (FormControl<Set<T>> formControl) {
+          Set<T>? value = formControl.value;
           platformDataField.onChanged?.call(value);
         },
       )
@@ -457,6 +566,35 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return datePicker;
   }
 
+  /// 返回值是DateTimeRange
+  Widget _buildDateRangePicker(BuildContext context) {
+    var name = platformDataField.name;
+    List<Widget> children = [];
+    var prefixIcon = platformDataField.prefixIcon;
+    if (prefixIcon != null) {
+      children.add(prefixIcon);
+      children.add(const SizedBox(
+        width: 15.0,
+      ));
+    }
+    var label = platformDataField.label;
+    if (prefixIcon != null) {
+      children.add(Text(AppLocalizations.t(label)));
+      children.add(const SizedBox(
+        width: 20.0,
+      ));
+    }
+
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget datePicker = ReactiveDateRangePicker(
+      formControlName: name,
+      decoration: decoration,
+      locale: myself.locale,
+    );
+
+    return datePicker;
+  }
+
   Widget _buildColorPicker(BuildContext context) {
     var name = platformDataField.name;
     Color? value = formGroup.value[name] as Color?;
@@ -472,6 +610,752 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return colorPicker;
   }
 
+  Widget _buildCountryCodePicker(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget colorPicker = ReactiveCountryCodePicker(
+      formControlName: name,
+    );
+
+    return colorPicker;
+  }
+
+  Widget _buildFilePicker(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveFilePicker<String>(
+      formControlName: name,
+      decoration: decoration,
+    );
+
+    return filePicker;
+  }
+
+  /// List<SelectedFile>
+  Widget _buildImagePicker(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveImagePicker(
+      formControlName: name,
+      decoration: decoration,
+    );
+
+    return filePicker;
+  }
+
+  ///
+  Widget _buildTypeAhead(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveTypeAhead<String, String>(
+      formControlName: name,
+      stringify: (value) => value,
+      suggestionsCallback: (pattern) {},
+      itemBuilder: (context, city) {
+        return Text(city);
+      },
+      decoration: decoration,
+    );
+
+    return filePicker;
+  }
+
+  ///
+  Widget _buildRawAutocomplete(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    var options = platformDataField.options;
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveRawAutocomplete<String, String>(
+      formControlName: name,
+      decoration: decoration,
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        List<String> values = [];
+        for (var option in options!) {
+          if (option.label.contains(textEditingValue.text.toLowerCase())) {
+            values.add(option.label);
+          }
+        }
+        return values;
+      },
+      autocompleteOnSubmit: true,
+      optionsViewBuilder: (BuildContext context,
+          void Function(String) onSelected, Iterable<String> options) {
+        final selectedIndex = AutocompleteHighlightedOption.of(context);
+        return Align(
+          alignment: Alignment.topLeft,
+          child: Material(
+            elevation: 4.0,
+            child: SizedBox(
+              height: 200.0,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(8.0),
+                itemCount: options.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final String option = options.elementAt(index);
+                  return GestureDetector(
+                    onTap: () {
+                      onSelected(option);
+                    },
+                    child: ListTile(
+                      title: Text(option),
+                      selected: selectedIndex == index,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildMonthPicker(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveMonthPickerDialog(
+      formControlName: name,
+      decoration: decoration,
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildSlidingSegmentedControl(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveSlidingSegmentedControl<String, String>(
+      formControlName: name,
+      decoration: decoration,
+      children: {},
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildCupertinoSwitch(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveCupertinoSwitch<bool>(
+      formControlName: name,
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildSleekCircularSlider(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveSleekCircularSlider<double>(
+      formControlName: name,
+      decoration: decoration,
+      min: 5,
+      max: 100,
+      heightFactor: 0.78,
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildSegmentedControl(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveSegmentedControl<String, String>(
+      formControlName: name,
+      decoration: decoration,
+      children: {},
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildRangeSlider(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveRangeSlider<RangeValues>(
+      formControlName: name,
+      decoration: decoration,
+      min: 0,
+      max: 100,
+      divisions: 5,
+      labelBuilder: (values) => RangeLabels(
+        values.start.round().toString(),
+        values.end.round().toString(),
+      ),
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildMarkdownEditableTextInput(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveMarkdownEditableTextInput<String>(
+      formControlName: name,
+      decoration: decoration,
+      maxLines: platformDataField.maxLines ?? 10,
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildExtendedTextField(BuildContext context) {
+    var name = platformDataField.name;
+    var readOnly = platformDataField.readOnly;
+    var autofocus = platformDataField.autofocus;
+    InputType inputType = platformDataField.inputType;
+    TextInputType textInputType =
+        platformDataField.textInputType ?? TextInputType.text;
+    Map<String, String Function(Object)>? validationMessages =
+        platformDataField.validationMessages;
+
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+
+    return ReactiveExtendedTextField<String>(
+      formControlName: name,
+      decoration: decoration,
+      validationMessages: validationMessages,
+      keyboardType: textInputType,
+      readOnly: readOnly,
+      obscureText: inputType == InputType.password,
+      inputFormatters: platformDataField.inputFormatters,
+      autofocus: autofocus,
+      focusNode: focusNode,
+      maxLines: platformDataField.maxLines,
+      minLines: platformDataField.minLines,
+    );
+  }
+
+  Widget _buildSignature(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveSignature<Uint8List>(
+      formControlName: name,
+      decoration: decoration,
+      height: 200,
+      backgroundColor: Colors.grey,
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildPhoneContactPicker(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactivePhoneContactPicker<PhoneContact>(
+      formControlName: name,
+      decoration: decoration,
+      contactBuilder: (PhoneContact? contact) {
+        return Column(
+          children: <Widget>[
+            const Text("Phone contact:"),
+            Text("Name: ${contact?.fullName}"),
+            Text(
+                "Phone: ${contact?.phoneNumber!.number} (${contact?.phoneNumber!.label})")
+          ],
+        );
+      },
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildMultiSelectDialogField(BuildContext context) {
+    var name = platformDataField.name;
+    var options = platformDataField.options;
+    List<MultiSelectItem<String>> items = [];
+    if (options != null && options.isNotEmpty) {
+      for (var i = 0; i < options.length; ++i) {
+        var option = options[i];
+        var item =
+            MultiSelectItem<String>(option.value.toString(), option.label);
+        items.add(item);
+      }
+    }
+    var dropdownButton = Row(children: [
+      Text(AppLocalizations.t(platformDataField.label)),
+      const SizedBox(
+        width: 15.0,
+      ),
+      // ReactiveMultiSelectChipField
+      ReactiveMultiSelectDialogField<String, String>(
+        formControlName: name,
+        items: items,
+      )
+    ]);
+
+    return dropdownButton;
+  }
+
+  Widget _buildFancyPasswordField(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveFancyPasswordField<String>(
+      formControlName: name,
+      decoration: decoration,
+      validationRules: {
+        UppercaseValidationRule(),
+        LowercaseValidationRule(),
+        DigitValidationRule(),
+        SpecialCharacterValidationRule(),
+        MinCharactersValidationRule(6),
+      },
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildLanguageToolTextField(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveLanguageToolTextField<String>(
+      formControlName: name,
+      decoration: decoration,
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildNativeTextInput(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    Widget filePicker = ReactiveFlutterNativeTextInput<String>(
+      formControlName: name,
+      decoration: _buildBoxDecoration(),
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildCartStepper(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveCartStepper<int, int>(
+      formControlName: name,
+      decoration: decoration,
+      stepper: 1,
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildTouchSpin(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveTouchSpin<int>(
+      formControlName: name,
+      decoration: decoration,
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildRatingBar(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveRatingBarBuilder<double>(
+      formControlName: name,
+      decoration: decoration,
+      itemBuilder: (BuildContext context, int index) {
+        return const Icon(
+          Icons.star,
+          color: Colors.amber,
+        );
+      },
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildCupertinoTextField(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveCupertinoTextField<String>(
+      formControlName: name,
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildFileSelector(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveFileSelector<String>(
+      formControlName: name,
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildDropdownMenu(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveDropdownMenu<String, String>(
+      formControlName: 'input',
+      dropdownMenuEntries: [],
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildDropdownButton(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveDropdownButton2<String, String>(
+      formControlName: 'input',
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildCodeTextField(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveCodeTextField<String>(
+      formControlName: 'input',
+      controller: CodeController(),
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildCheckboxListTile(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveCheckboxListTile(
+      formControlName: 'input',
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildRadioListTile(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveRadioListTile(
+      formControlName: 'input',
+      value: null,
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildSwitchListTile(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveSwitchListTile(
+      formControlName: 'input',
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildAnimatedToggleSwitch(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveCodeTextField<String>(
+      formControlName: 'input',
+      controller: CodeController(),
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildDropdownSearch(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveDropdownSearch<String, String>(
+      formControlName: 'input',
+      dropdownDecoratorProps: DropDownDecoratorProps(
+        decoration: decoration,
+      ),
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildInputDecorator(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveInputDecorator(
+      formControlName: 'input',
+      decoration: decoration,
+      child: Row(
+        children: [
+          const SizedBox(width: 16),
+          const Expanded(child: Text('Some label')),
+          ReactiveCheckbox(formControlName: 'input'),
+        ],
+      ),
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildPinCode(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget filePicker = ReactiveInputDecorator(
+      formControlName: 'input',
+      decoration: decoration,
+      child: Row(
+        children: [
+          const SizedBox(width: 16),
+          const Expanded(child: Text('Some label')),
+          ReactiveCheckbox(formControlName: 'input'),
+        ],
+      ),
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildLanguagePicker(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+    Widget filePicker = ReactiveLanguagePickerDialog<String>(
+      formControlName: name,
+      valueAccessor: LanguageCodeValueAccessor(),
+      builder: (BuildContext context, Language? language,
+          Future<Language?> Function() showDialog) {
+        return ListTile(
+          onTap: showDialog,
+          title: Text(language?.name ?? "No language selected"),
+        );
+      },
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildWechatAssetsPicker(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+
+    Widget filePicker = ReactiveWechatAssetsPicker<List<AssetEntity>>(
+      formControlName: name,
+      imagePickerBuilder: (Future<void> Function() pick,
+          List<AssetEntity> images, void Function(List<AssetEntity>) onChange) {
+        return Column(
+          children: [
+            SelectedAssetsListView(
+              assets: images,
+              isDisplayingDetail: ValueNotifier(true),
+              onResult: (assets) {},
+              onRemoveAsset: (int index) {
+                images.removeAt(index);
+              },
+            ),
+            ElevatedButton(
+              onPressed: pick,
+              child: Text(AppLocalizations.t('Pick')),
+            ),
+          ],
+        );
+      },
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildWechatCameraPicker(BuildContext context) {
+    var name = platformDataField.name;
+    Color? value = formGroup.value[name] as Color?;
+    if (value == null) {
+      formGroup.value[name] = myself.primary;
+    }
+
+    Widget filePicker = ReactiveWechatCameraPicker<AssetEntity>(
+      formControlName: name,
+      imagePickerBuilder: (pick, image, _) {
+        return Column(
+          children: [
+            if (image != null)
+              SelectedAssetView(
+                asset: image,
+                isDisplayingDetail: ValueNotifier(true),
+                onRemoveAsset: () {},
+              ),
+            ElevatedButton(
+              onPressed: pick,
+              child: Text(AppLocalizations.t('Pick')),
+            ),
+          ],
+        );
+      },
+    );
+
+    return filePicker;
+  }
+
+  Widget _buildPhoneFormField(BuildContext context) {
+    var name = platformDataField.name;
+    var autofocus = platformDataField.autofocus;
+    InputType inputType = platformDataField.inputType;
+    TextInputType textInputType =
+        platformDataField.textInputType ?? TextInputType.text;
+    Map<String, String Function(Object)>? validationMessages =
+        platformDataField.validationMessages;
+
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+
+    return ReactivePhoneFormField<String>(
+        formControlName: name,
+        decoration: decoration,
+        validationMessages: validationMessages,
+        keyboardType: textInputType,
+        obscureText: inputType == InputType.password,
+        inputFormatters: platformDataField.inputFormatters,
+        autofocus: autofocus,
+        focusNode: focusNode,
+        countrySelectorNavigator:
+            const CountrySelectorNavigator.modalBottomSheet(),
+        onChanged: (FormControl<String> formControl) {
+          platformDataField.onChanged?.call(formControl.value);
+        },
+        onEditingComplete: () {
+          platformDataField.onEditingComplete?.call();
+        },
+        onSubmitted: () {
+          platformDataField.onFieldSubmitted?.call(formGroup.value[name]);
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget? dataFieldWidget;
@@ -482,13 +1366,13 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         dataFieldWidget = _buildLabel(context);
         break;
       case InputType.text:
-        dataFieldWidget = _buildTextFormField(context);
+        dataFieldWidget = _buildTextField(context);
         break;
       case InputType.textarea:
-        dataFieldWidget = _buildTextFormField(context);
+        dataFieldWidget = _buildTextField(context);
         break;
       case InputType.password:
-        dataFieldWidget = _buildTextFormField(context);
+        dataFieldWidget = _buildTextField(context);
         break;
       case InputType.pinPut:
         dataFieldWidget = _buildPinPut(context);
@@ -527,150 +1411,151 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         dataFieldWidget = _buildColorPicker(context);
         break;
       case InputType.dateRange:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildDateRangePicker(context);
         break;
       case InputType.calendar:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildDateTimePicker(context);
         break;
       case InputType.custom:
         dataFieldWidget = platformDataField.customWidget!;
         break;
       case InputType.advancedSwitcher:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildAdvancedSwitch(context);
         break;
       case InputType.dropdownSearch:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildDropdownSearch(context);
         break;
       case InputType.file:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildFilePicker(context);
         break;
       case InputType.image:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildImagePicker(context);
         break;
       case InputType.multiImage:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildImagePicker(context);
         break;
       case InputType.segmentedControl:
+        dataFieldWidget = _buildSegmentedControl(context);
         break;
       case InputType.signature:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildSignature(context);
         break;
       case InputType.touchSpin:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildTouchSpin(context);
         break;
       case InputType.rangeSlider:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildRangeSlider(context);
         break;
       case InputType.circularSlider:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildSleekCircularSlider(context);
         break;
       case InputType.cupertinoTextField:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildCupertinoTextField(context);
         break;
       case InputType.ratingBar:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildRatingBar(context);
         break;
       case InputType.macosUi:
         dataFieldWidget = _buildColorPicker(context);
         break;
       case InputType.cupertinoSwitch:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildCupertinoSwitch(context);
         break;
       case InputType.pinCode:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildPinCode(context);
         break;
       case InputType.cupertinoSlidingSegmentedControl:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildSlidingSegmentedControl(context);
         break;
       case InputType.cupertinoSlider:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildSlidingSegmentedControl(context);
         break;
       case InputType.month:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildMonthPicker(context);
         break;
       case InputType.rawAutocomplete:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildRawAutocomplete(context);
         break;
       case InputType.typeahead:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildTypeAhead(context);
         break;
       case InputType.pinInput:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildPinPut(context);
         break;
       case InputType.directSelect:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildMultiSelectDialogField(context);
         break;
       case InputType.markdownEditableTextInput:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildMarkdownEditableTextInput(context);
         break;
       case InputType.code:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildCodeTextField(context);
         break;
       case InputType.phone:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildPhoneFormField(context);
         break;
       case InputType.extendedText:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildExtendedTextField(context);
         break;
       case InputType.checkboxListTile:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildCheckboxListTile(context);
         break;
       case InputType.contact:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildPhoneContactPicker(context);
         break;
       case InputType.animatedToggleSwitch:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildAnimatedToggleSwitch(context);
         break;
       case InputType.choice:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildChoice(context);
         break;
       case InputType.cartStepper:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildCartStepper(context);
         break;
       case InputType.dropdownButton:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildDropdownField(context);
         break;
       case InputType.dropdownMenu:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildDropdownMenu(context);
         break;
       case InputType.fileSelector:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildFileSelector(context);
         break;
       case InputType.fancyPassword:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildFancyPasswordField(context);
         break;
       case InputType.fluentUi:
         dataFieldWidget = _buildColorPicker(context);
         break;
       case InputType.language:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildLanguagePicker(context);
         break;
       case InputType.inputDecorator:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildInputDecorator(context);
         break;
       case InputType.languagetool:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildLanguageToolTextField(context);
         break;
       case InputType.multiSelect:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildMultiSelectDialogField(context);
         break;
       case InputType.signaturePad:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildSignature(context);
         break;
       case InputType.assets:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildWechatAssetsPicker(context);
         break;
       case InputType.camera:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildWechatCameraPicker(context);
         break;
       case InputType.chip:
         dataFieldWidget = _buildChipGroup(context);
         break;
       case InputType.country:
-        dataFieldWidget = _buildColorPicker(context);
+        dataFieldWidget = _buildCountryCodePicker(context);
         break;
     }
 
-    return dataFieldWidget ?? _buildTextFormField(context);
+    return dataFieldWidget ?? _buildTextField(context);
   }
 }

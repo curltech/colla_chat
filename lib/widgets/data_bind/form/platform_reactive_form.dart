@@ -8,7 +8,6 @@ import 'package:colla_chat/widgets/data_bind/form/platform_reactive_data_field.d
 import 'package:flutter/material.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:reactive_forms/reactive_forms.dart';
-import 'package:colla_chat/plugin/talker_logger.dart';
 
 class PlatformReactiveFormController {
   final List<PlatformDataField> dataFields;
@@ -89,6 +88,12 @@ class PlatformReactiveFormController {
           break;
         case DataType.set:
           formControl = FormControl<Set>(
+            value: initValue,
+            validators: validators,
+          );
+          break;
+        case DataType.dateTimeRange:
+          formControl = FormControl<DateTimeRange>(
             value: initValue,
             validators: validators,
           );
@@ -231,6 +236,13 @@ class PlatformReactiveFormController {
       case DataType.color:
         if (value is! Color && value is int) {
           return Color(value);
+        }
+      case DataType.dateTimeRange:
+        if (value is! DateTimeRange && value is Set) {
+          return DateTimeRange<DateTime>(start: value.first, end: value.last);
+        }
+        if (value is! Set && value is DateTimeRange) {
+          return {value.start, value.end};
         }
     }
 
