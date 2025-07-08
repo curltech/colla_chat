@@ -215,24 +215,24 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
 
   List<ActionData> _buildActions(BuildContext context) {
     List<ActionData> children = [
-      ActionData(
-          label: AppLocalizations.t('edit'),
-          icon: const Icon(Icons.edit),
-          onTap: (int index, String label, {String? value}) {
-            String? filename = playlistController.current?.filename;
-            if (filename == null) {
-              return;
-            }
-            String? mimeType = FileUtil.mimeType(filename);
-            if (mimeType != null) {
-              if (mimeType.startsWith('image')) {
-                indexWidgetProvider.push('image_editor');
-              }
-              if (mimeType.startsWith('video')) {
-                indexWidgetProvider.push('video_editor');
-              }
-            }
-          }),
+      // ActionData(
+      //     label: AppLocalizations.t('edit'),
+      //     icon: const Icon(Icons.edit),
+      //     onTap: (int index, String label, {String? value}) {
+      //       String? filename = playlistController.current?.filename;
+      //       if (filename == null) {
+      //         return;
+      //       }
+      //       String? mimeType = FileUtil.mimeType(filename);
+      //       if (mimeType != null) {
+      //         if (mimeType.startsWith('image')) {
+      //           indexWidgetProvider.push('image_editor');
+      //         }
+      //         if (mimeType.startsWith('video')) {
+      //           indexWidgetProvider.push('video_editor');
+      //         }
+      //       }
+      //     }),
       ActionData(
         label: AppLocalizations.t('transfer'),
         onTap: (int index, String label, {String? value}) async {
