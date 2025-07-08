@@ -505,7 +505,7 @@ class PlatformReactiveForm extends StatelessWidget {
 
     Widget widgets = Column(
       mainAxisAlignment: MainAxisAlignment.start,
-      children: _buildFormFieldWidget(),
+      children: children,
     );
 
     final KeyboardActions keyboardActions = KeyboardActions(

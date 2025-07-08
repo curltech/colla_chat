@@ -12,6 +12,7 @@ import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/chi
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/choice.dart';
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/country_code.dart';
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/radio_group.dart';
+import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/reactive_month_picker_dialog.dart';
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/toggle_buttons.dart';
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/wechat/selected_asset_view.dart';
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/wechat/selected_assets_list_view.dart';
@@ -32,8 +33,6 @@ import 'package:reactive_forms/reactive_forms.dart';
 import 'package:reactive_image_picker/reactive_image_picker.dart';
 import 'package:reactive_language_picker/reactive_language_picker.dart';
 import 'package:reactive_languagetool_textfield/reactive_languagetool_textfield.dart';
-import 'package:reactive_md_editable_textinput/reactive_md_editable_textinput.dart';
-import 'package:reactive_month_picker_dialog/reactive_month_picker_dialog.dart';
 import 'package:reactive_multi_select_flutter/reactive_multi_select_flutter.dart';
 import 'package:reactive_phone_form_field/reactive_phone_form_field.dart';
 import 'package:reactive_pinput/reactive_pinput.dart';
@@ -53,7 +52,6 @@ import 'package:reactive_dropdown_menu/reactive_dropdown_menu.dart';
 import 'package:reactive_file_selector/reactive_file_selector.dart';
 import 'package:reactive_cupertino_text_field/reactive_cupertino_text_field.dart';
 import 'package:reactive_flutter_rating_bar/reactive_flutter_rating_bar.dart';
-import 'package:reactive_touch_spin/reactive_touch_spin.dart';
 import 'package:reactive_input_decorator/reactive_input_decorator.dart';
 import 'package:reactive_animated_toggle_switch/reactive_animated_toggle_switch.dart';
 
@@ -818,22 +816,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return filePicker;
   }
 
-  Widget _buildMarkdownEditableTextInput(BuildContext context) {
-    var name = platformDataField.name;
-    Color? value = formGroup.value[name] as Color?;
-    if (value == null) {
-      formGroup.value[name] = myself.primary;
-    }
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget filePicker = ReactiveMarkdownEditableTextInput<String>(
-      formControlName: name,
-      decoration: decoration,
-      maxLines: platformDataField.maxLines ?? 10,
-    );
-
-    return filePicker;
-  }
-
   Widget _buildExtendedTextField(BuildContext context) {
     var name = platformDataField.name;
     var readOnly = platformDataField.readOnly;
@@ -992,21 +974,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       formControlName: name,
       decoration: decoration,
       stepper: 1,
-    );
-
-    return filePicker;
-  }
-
-  Widget _buildTouchSpin(BuildContext context) {
-    var name = platformDataField.name;
-    Color? value = formGroup.value[name] as Color?;
-    if (value == null) {
-      formGroup.value[name] = myself.primary;
-    }
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget filePicker = ReactiveTouchSpin<int>(
-      formControlName: name,
-      decoration: decoration,
     );
 
     return filePicker;
@@ -1425,9 +1392,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       case InputType.signature:
         dataFieldWidget = _buildSignature(context);
         break;
-      case InputType.touchSpin:
-        dataFieldWidget = _buildTouchSpin(context);
-        break;
       case InputType.rangeSlider:
         dataFieldWidget = _buildRangeSlider(context);
         break;
@@ -1469,9 +1433,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         break;
       case InputType.directSelect:
         dataFieldWidget = _buildMultiSelectDialogField(context);
-        break;
-      case InputType.markdownEditableTextInput:
-        dataFieldWidget = _buildMarkdownEditableTextInput(context);
         break;
       case InputType.code:
         dataFieldWidget = _buildCodeTextField(context);
