@@ -68,7 +68,8 @@ class MyShareController {
       await localSharedPreferences.save('subscription', subscription.value,
           encrypt: true);
     }
-    String defaultGroupName = ShareGroupService.defaultGroupName;
+    String defaultGroupName =
+        AppLocalizations.t(ShareGroupService.defaultGroupName);
     groupSubscription[defaultGroupName] = subscription.value;
   }
 
@@ -90,14 +91,15 @@ class MyShareController {
   /// 初始化各个分组和股票
   Future<void> assignGroupSubscription() async {
     Map<String, String> groupSubscription = {};
-    String defaultGroupName = ShareGroupService.defaultGroupName;
+    String defaultGroupName =
+        AppLocalizations.t(ShareGroupService.defaultGroupName);
     groupSubscription[defaultGroupName] = subscription.value;
     try {
       myShareController.showLoading.value = true;
       List<ShareGroup> shareGroups = await shareGroupService.findAll();
       myShareController.showLoading.value = false;
       for (var shareGroup in shareGroups) {
-        if (ShareGroupService.defaultGroupName == shareGroup.groupName) {
+        if (defaultGroupName == shareGroup.groupName) {
           continue;
         }
         String subscription = shareGroup.subscription;
@@ -117,7 +119,9 @@ class MyShareController {
   Future<String?> findSubscription(String groupName) async {
     String? subscription = groupSubscription[groupName];
     if (subscription == null) {
-      if (ShareGroupService.defaultGroupName == groupName) {
+      String defaultGroupName =
+          AppLocalizations.t(ShareGroupService.defaultGroupName);
+      if (defaultGroupName == groupName) {
         subscription = myShareController.subscription.value;
         groupSubscription[groupName] = subscription;
       } else {
@@ -141,8 +145,13 @@ class MyShareController {
 
   /// 删除分组，自选股分组不能删除
   removeGroup(String groupName) async {
-    if (ShareGroupService.defaultGroupName != groupName) {
+    String defaultGroupName =
+        AppLocalizations.t(ShareGroupService.defaultGroupName);
+    if (defaultGroupName != groupName) {
       groupSubscription.remove(groupName);
+      if (this.groupName.value == groupName) {
+        this.groupName.value = defaultGroupName;
+      }
       shareGroupService.delete(where: 'groupName=?', whereArgs: [groupName]);
     }
   }
@@ -175,7 +184,9 @@ class MyShareController {
 
   /// 从分组中删除股票，不能从自选股分组中删除
   Future<bool> removeMember(String groupName, String tsCode) async {
-    if (ShareGroupService.defaultGroupName == groupName) {
+    String defaultGroupName =
+        AppLocalizations.t(ShareGroupService.defaultGroupName);
+    if (defaultGroupName == groupName) {
       return false;
     }
     String? subscription = groupSubscription[groupName];
@@ -206,7 +217,9 @@ class MyShareController {
 
   /// 能否从分组删除股票
   Future<bool> canBeRemove(String groupName, String tsCode) async {
-    if (ShareGroupService.defaultGroupName == groupName) {
+    String defaultGroupName =
+        AppLocalizations.t(ShareGroupService.defaultGroupName);
+    if (defaultGroupName == groupName) {
       return false;
     }
     return !(await canBeAdd(groupName, tsCode));
@@ -216,7 +229,7 @@ class MyShareController {
 MyShareController myShareController = MyShareController();
 
 ///自选股和分组的查询界面
-class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
+class ShareSelectionWidget extends StatefulWidget with TileDataMixin {
   final StockLineChartWidget stockLineChartWidget = StockLineChartWidget();
 
   ShareSelectionWidget({super.key}) {
@@ -236,8 +249,63 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MySelection';
 
+  @override
+  State<StatefulWidget> createState() => _ShareSelectionWidgetState();
+}
+
+class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
+    with TickerProviderStateMixin {
   final DataListController<DayLine> dayLineController =
       DataListController<DayLine>();
+  TabController? tabController;
+
+  @override
+  initState() {
+    super.initState();
+  }
+
+  Widget _buildShareGroupWidget(BuildContext context) {
+    final tabBar = ListenableBuilder(
+        listenable: myShareController.groupSubscription,
+        builder: (context, child) {
+          tabController?.dispose();
+          tabController = TabController(
+              length: myShareController.groupSubscription.length, vsync: this);
+          final List<Tab> tabs = <Tab>[];
+          for (String groupName in myShareController.groupSubscription.keys) {
+            tabs.add(Tab(
+              text: groupName,
+              iconMargin: const EdgeInsets.all(0.0),
+            ));
+          }
+          return TabBar(
+            tabs: tabs,
+            controller: tabController,
+            isScrollable: true,
+            indicatorColor: Colors.amberAccent,
+            labelColor: Colors.amberAccent,
+            unselectedLabelColor: Colors.white,
+            dividerColor: Colors.white.withAlpha(0),
+            padding: const EdgeInsets.all(0.0),
+            labelPadding: const EdgeInsets.fromLTRB(0, 0, 15.0, 0),
+            onTap: (int index) async {
+              Tab tab = tabs[index];
+              String groupName = tab.text!;
+              await _addMember(groupName);
+              myShareController.groupName.value = groupName;
+              _refresh();
+            },
+          );
+        });
+    return tabBar;
+    return Row(children: [
+      IconButton(
+          onPressed: () {},
+          color: Colors.white,
+          icon: Icon(Icons.list_alt_outlined)),
+      Expanded(child: tabBar)
+    ]);
+  }
 
   Widget _buildActionWidget(BuildContext context, int index, dynamic dayLine) {
     Widget actionWidget = IconButton(
@@ -277,7 +345,8 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
 
   _removeMember() async {
     String groupName = myShareController.groupName.value;
-    String defaultGroupName = ShareGroupService.defaultGroupName;
+    String defaultGroupName =
+        AppLocalizations.t(ShareGroupService.defaultGroupName);
 
     List<DayLine> dayLines = dayLineController.selected;
     if (dayLines.isEmpty) {
@@ -338,7 +407,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  Widget _buildShareListView(BuildContext context) {
+  List<PlatformDataColumn> _buildDayLineDataColumns() {
     final List<PlatformDataColumn> dayLineDataColumns = [
       PlatformDataColumn(
         label: '股票代码',
@@ -407,12 +476,17 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
             return _buildActionWidget(context, index, dayLine);
           }),
     ];
+
+    return dayLineDataColumns;
+  }
+
+  Widget _buildDayLineListView(BuildContext context) {
     Widget table = BindingTrinaDataGrid<DayLine>(
         key: UniqueKey(),
         showCheckboxColumn: true,
         horizontalMargin: 10.0,
         columnSpacing: 0.0,
-        platformDataColumns: dayLineDataColumns,
+        platformDataColumns: _buildDayLineDataColumns(),
         controller: dayLineController,
         fixedLeftColumns: 2,
         minWidth: 700);
@@ -433,35 +507,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
     ]);
   }
 
-  /// 股票分组的按钮
-  Widget _buildShareGroupWidget() {
-    return Obx(() {
-      List<Widget> children = [];
-      for (String key in myShareController.groupSubscription.keys) {
-        children.add(TextButton(
-          onPressed: () async {
-            await _addMember(key);
-            myShareController.groupName.value = key;
-            _refresh();
-          },
-          child: Text(AppLocalizations.t(key),
-              style: TextStyle(
-                  backgroundColor: myShareController.groupName.value == key
-                      ? Colors.white
-                      : null,
-                  color: myShareController.groupName.value != key
-                      ? Colors.white
-                      : null)),
-        ));
-      }
-      return SingleChildScrollView(
-          scrollDirection: Axis.horizontal, child: Wrap(children: children));
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    _refresh();
+  List<ActionData> _buildShareActions(BuildContext context) {
     List<ActionData> actions = [
       ActionData(
         label: AppLocalizations.t('Add share'),
@@ -517,16 +563,23 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         icon: const Icon(Icons.refresh),
       ),
     ];
+
+    return actions;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _refresh();
     return AppBarView(
-      title: title,
-      helpPath: routeName,
+      title: widget.title,
+      helpPath: widget.routeName,
       withLeading: true,
-      actions: actions,
+      actions: _buildShareActions(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildShareGroupWidget(),
-          Expanded(child: _buildShareListView(context))
+          _buildShareGroupWidget(context),
+          Expanded(child: _buildDayLineListView(context))
         ],
       ),
     );

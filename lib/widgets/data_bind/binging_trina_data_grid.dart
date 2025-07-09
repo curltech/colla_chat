@@ -21,14 +21,16 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
   final int fixedLeftColumns;
   final Function(int index)? onTap;
   final Function(int index)? onDoubleTap;
-  final Function(int, bool?)? onSelectChanged;
+  final Function(int index, List<dynamic> data)? onSelected;
+  final Function(int?, bool?)? onRowChecked;
   final Function(int index)? onLongPress;
 
   const BindingTrinaDataGrid({
     super.key,
     required this.platformDataColumns,
     this.onTap,
-    this.onSelectChanged,
+    this.onSelected,
+    this.onRowChecked,
     this.onLongPress,
     required this.controller,
     this.onDoubleTap,
@@ -82,7 +84,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
             width: platformDataColumn.width ?? TrinaGridSettings.columnWidth,
             type: type,
             enableRowChecked: i == 0 ? true : false,
-            // enableTitleChecked: true,
+            backgroundColor: myself.primary.withAlpha(128),
             enableSorting: false,
             enableContextMenu: false,
             enableFilterMenuItem: false,
@@ -99,7 +101,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
               type: type,
               width: platformDataColumn.width ?? TrinaGridSettings.columnWidth,
               enableRowChecked: i == 0 ? true : false,
-              // enableTitleChecked: true,
+              backgroundColor: myself.primary.withAlpha(128),
               enableSorting: true,
               enableContextMenu: false,
               enableFilterMenuItem: false,
@@ -119,22 +121,22 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
     List data = controller.data;
     List<TrinaRow> rows = [];
     for (int index = 0; index < data.length; ++index) {
-      dynamic t = data[index];
-      var tMap = JsonUtil.toJson(t);
+      dynamic d = data[index];
+      var dMap = JsonUtil.toJson(d);
       Map<String, TrinaCell> cells = {};
       for (PlatformDataColumn platformDataColumn in platformDataColumns) {
         String name = platformDataColumn.name;
         InputType inputType = platformDataColumn.inputType;
         if (inputType == InputType.custom &&
             platformDataColumn.buildSuffix != null) {
-          Widget suffix = platformDataColumn.buildSuffix!(index, t);
+          Widget suffix = platformDataColumn.buildSuffix!(index, d);
           var dataCell =
               TrinaCell(renderer: (TrinaCellRendererContext context) {
             return Align(alignment: platformDataColumn.align, child: suffix);
           });
           cells[name] = dataCell;
         } else {
-          dynamic fieldValue = tMap[name];
+          dynamic fieldValue = dMap[name];
           TrinaCell dataCell = TrinaCell(value: fieldValue ?? '');
           if (platformDataColumn.positiveColor != null ||
               platformDataColumn.negativeColor != null) {
@@ -176,13 +178,14 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
           cells[name] = dataCell;
         }
       }
-      bool? selected = EntityUtil.getSelected(t);
+      bool? selected = EntityUtil.getSelected(d);
       selected ??= false;
       var dataRow = TrinaRow(
         sortIdx: index,
         type: TrinaRowType.normal(),
         checked: selected,
         cells: cells,
+        data: d,
       );
       rows.add(dataRow);
     }
@@ -206,7 +209,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
     if (brightness == Brightness.dark) {
       trinaGridStyleConfig = TrinaGridStyleConfig.dark(
         enableColumnBorderVertical: true,
-        enableColumnBorderHorizontal: false,
+        enableColumnBorderHorizontal: true,
         enableCellBorderVertical: false,
         enableCellBorderHorizontal: true,
         oddRowColor: myself.primaryColor.withAlpha(32),
@@ -260,24 +263,42 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         onLoaded: (TrinaGridOnLoadedEvent event) {},
         onChanged: (TrinaGridOnChangedEvent event) {},
         onSelected: (TrinaGridOnSelectedEvent event) {
+          List<dynamic> data = [];
+          List<TrinaRow<dynamic>>? selectedRows = event.selectedRows;
+          if (selectedRows != null && selectedRows.isNotEmpty) {
+            for (var row in selectedRows) {
+              dynamic d = row.data;
+              if (d != null) {
+                data.add(d);
+              }
+            }
+          } else {
+            dynamic d = event.row?.data;
+            if (d != null) {
+              data.add(d);
+            }
+          }
           int? index = event.row?.sortIdx;
           controller.setCurrentIndex = index;
-          var fn = onDoubleTap;
+          var fn = onSelected;
           if (fn != null && index != null) {
-            fn(index);
+            fn(index, data);
           }
         },
         onRowChecked: (TrinaGridOnRowCheckedEvent event) {
           dynamic value = event.row?.data;
           int? index = event.row?.sortIdx;
-          bool? selected = event.isChecked;
-          var fn = onSelectChanged;
-          if (fn != null && index != null) {
-            fn(index, selected!);
+          bool? isChecked = event.isChecked;
+          if (value != null) {
+            EntityUtil.setSelected(value, isChecked);
           } else {
-            if (value != null) {
-              EntityUtil.setSelected(value, selected);
+            for (var value in controller.data) {
+              EntityUtil.setSelected(value, isChecked);
             }
+          }
+          var fn = onRowChecked;
+          if (fn != null) {
+            fn(index, isChecked!);
           }
         },
         onRowDoubleTap: (TrinaGridOnRowDoubleTapEvent event) {

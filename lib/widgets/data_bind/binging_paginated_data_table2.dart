@@ -16,14 +16,16 @@ class BindingPaginatedDataTable2<T> extends StatelessWidget {
   final int fixedLeftColumns;
   final Function(int index)? onTap;
   final Function(int index)? onDoubleTap;
-  final Function(int, bool?)? onSelectChanged;
+  final Function(int, List<dynamic>?)? onSelected;
+  final Function(int?, bool?)? onRowChecked;
   final Function(int index)? onLongPress;
 
   const BindingPaginatedDataTable2({
     super.key,
     required this.platformDataColumns,
     this.onTap,
-    this.onSelectChanged,
+    this.onSelected,
+    this.onRowChecked,
     this.onLongPress,
     required this.controller,
     this.onDoubleTap,
@@ -50,7 +52,8 @@ class BindingPaginatedDataTable2<T> extends StatelessWidget {
       onTap: onTap,
       onDoubleTap: onDoubleTap,
       onLongPress: onLongPress,
-      onSelectChanged: onSelectChanged,
+      onSelected: onSelected,
+      onRowChecked: onRowChecked,
     );
   }
 
