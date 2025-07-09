@@ -450,7 +450,7 @@ class DialogUtil {
               child: Text(AppLocalizations.t('Ok')),
             ),
           ],
-        ).asStyle();
+        );
       },
     );
     return result;

@@ -19,8 +19,6 @@ class PlatformReactiveFormController {
   late final FormGroup formGroup;
   final Map<String, FocusNode> focusNodes = {};
   late final KeyboardActionsConfig keyboardActionsConfig;
-  late final StreamSubscription<Map<String, Object?>?>
-      valueChangeStreamSubscription;
 
   PlatformReactiveFormController(this.dataFields) {
     _init();
@@ -128,10 +126,14 @@ class PlatformReactiveFormController {
       }
 
       formControls[name] = formControl;
+      formControl.valueChanges.listen((dynamic value) {
+        onData(name, value);
+      }, onError: onError, onDone: onDone);
+      formControl.touchChanges.listen((bool touch) {
+        onTouch(name, touch);
+      }, onError: onError, onDone: onDone);
     }
     formGroup = FormGroup(formControls);
-    valueChangeStreamSubscription =
-        formGroup.valueChanges.listen(onData, onError: onError, onDone: onDone);
     keyboardActionsConfig = KeyboardActionsConfig(
       keyboardActionsPlatform: KeyboardActionsPlatform.ALL,
       keyboardBarColor: myself.primary,
@@ -140,19 +142,9 @@ class PlatformReactiveFormController {
     );
   }
 
-  onData(Map<String, Object?>? values) {
-    if (values == null || values.isEmpty) {
-      return;
-    }
-    for (var entry in values.entries) {
-      String name = entry.key;
-      Object? value = entry.value;
-      PlatformDataField? platformDataField = dataFieldMap[name];
-      if (platformDataField != null) {
-        platformDataField.onChanged?.call(value);
-      }
-    }
-  }
+  onData(String name, dynamic value) {}
+
+  onTouch(String name, bool touch) {}
 
   onError(Object value, StackTrace stackTrace) {}
 
@@ -259,7 +251,6 @@ class PlatformReactiveFormController {
   }
 
   dispose() {
-    valueChangeStreamSubscription.cancel();
     formGroup.dispose();
   }
 }

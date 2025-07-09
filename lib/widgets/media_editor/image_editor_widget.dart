@@ -61,20 +61,21 @@ class ImageEditorWidget extends StatelessWidget with TileDataMixin {
                 return nilBox;
               }
               return ProImageEditor.file(File(filename),
+                  key: UniqueKey(),
                   callbacks: ProImageEditorCallbacks(
-                    onImageEditingComplete: (Uint8List bytes) async {
-                      String? name = await DialogUtil.showTextFormField(
-                          title: 'Save as', content: 'Filename', tip: filename);
-                      if (name != null) {
-                        await FileUtil.writeFileAsBytes(bytes, name);
-                        DialogUtil.info(
-                            content: 'Save file:$name successfully');
-                      }
-                    },
-                    onCloseEditor: (EditorMode mode) {
-                      indexWidgetProvider.pop(context: context);
-                    },
-                  ));
+                      onImageEditingComplete: (Uint8List bytes) async {
+                        bool? confirm = await DialogUtil.confirm(
+                          context: context,
+                          title: 'Save as',
+                          content: filename,
+                        );
+                        if (confirm != null && confirm) {
+                          await FileUtil.writeFileAsBytes(bytes, filename);
+                          DialogUtil.info(
+                              content: 'Save file:$filename successfully');
+                        }
+                      },
+                      onCloseEditor: (EditorMode mode) {}));
             },
           );
         }

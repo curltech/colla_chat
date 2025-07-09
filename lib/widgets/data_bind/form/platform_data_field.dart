@@ -175,7 +175,7 @@ class PlatformDataField<T> {
 
   final void Function()? onEditingComplete;
 
-  final dynamic Function(dynamic)? onFieldSubmitted;
+  final dynamic Function(dynamic)? onSubmitted;
 
   final bool autoValidate;
 
@@ -212,7 +212,7 @@ class PlatformDataField<T> {
     this.validationMessages,
     this.onChanged,
     this.onEditingComplete,
-    this.onFieldSubmitted,
+    this.onSubmitted,
     this.autoValidate = false,
     this.onSort,
     this.customWidget,

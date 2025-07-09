@@ -327,7 +327,8 @@ class PlaylistWidget extends StatelessWidget {
       if (tileData.isEmpty) {
         return Container(
             alignment: Alignment.center,
-            child: AutoSizeText(AppLocalizations.t('Playlist is empty')));
+            child: AutoSizeText(AppLocalizations.t('Playlist is empty'),
+                style: TextStyle(fontSize: AppFontSize.maxFontSize)));
       }
       int crossAxisCount = (appDataProvider.secondaryBodyWidth / 250).ceil();
       if (gridMode.isTrue) {

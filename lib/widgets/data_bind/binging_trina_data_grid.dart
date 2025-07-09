@@ -215,6 +215,10 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         menuBackgroundColor: Colors.white.withAlpha(0),
         rowColor: Colors.white.withAlpha(0),
         activatedColor: Colors.blueGrey,
+        gridBorderColor: Colors.white.withAlpha(0),
+        borderColor: Colors.white,
+        activatedBorderColor: myself.primaryColor,
+        inactivatedBorderColor: Colors.white.withAlpha(0),
       );
     } else {
       trinaGridStyleConfig = TrinaGridStyleConfig(
@@ -222,12 +226,16 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         enableColumnBorderHorizontal: false,
         enableCellBorderVertical: false,
         enableCellBorderHorizontal: true,
-        oddRowColor: myself.secondary.withAlpha(32),
+        oddRowColor: myself.primaryColor.withAlpha(32),
         evenRowColor: Colors.grey.withAlpha(32),
         gridBackgroundColor: Colors.white.withAlpha(0),
         menuBackgroundColor: Colors.white.withAlpha(0),
         rowColor: Colors.white.withAlpha(0),
         activatedColor: Colors.green.shade50,
+        gridBorderColor: Colors.white.withAlpha(0),
+        borderColor: Colors.white,
+        activatedBorderColor: myself.primaryColor,
+        inactivatedBorderColor: Colors.white.withAlpha(0),
       );
     }
     return TrinaGridConfiguration(

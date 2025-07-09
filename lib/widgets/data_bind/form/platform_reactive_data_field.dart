@@ -172,7 +172,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
           platformDataField.onEditingComplete?.call();
         },
         onSubmitted: (FormControl<String> formControl) {
-          platformDataField.onFieldSubmitted?.call(formControl.value);
+          platformDataField.onSubmitted?.call(formControl.value);
         });
   }
 
@@ -185,7 +185,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       keyboardType: platformDataField.textInputType!,
       readOnly: platformDataField.readOnly,
       inputFormatters: platformDataField.inputFormatters ?? const [],
-      onSubmitted: platformDataField.onFieldSubmitted,
+      onSubmitted: platformDataField.onSubmitted,
       length: platformDataField.length!,
       onCompleted: platformDataField.onChanged,
     );
@@ -1304,7 +1304,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
           platformDataField.onEditingComplete?.call();
         },
         onSubmitted: () {
-          platformDataField.onFieldSubmitted?.call(formGroup.value[name]);
+          platformDataField.onSubmitted?.call(formGroup.value[name]);
         });
   }
 

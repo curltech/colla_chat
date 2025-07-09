@@ -5,7 +5,6 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -27,6 +26,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
     super.key,
   }) {
     scrollController.addListener(_onScroll);
+    playlistController.currentIndex.addListener(_update);
   }
 
   @override
@@ -69,13 +69,18 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
+  _update() {
+    _splitImageFiles();
+  }
+
   /// 将视频文件按帧分离成图像
-  _splitImageFiles(BuildContext context) async {
+  _splitImageFiles() async {
     String? videoFilename = playlistController.current?.filename;
     if (videoFilename == null) {
       return;
     }
     imageFileController.clear();
+    _delete();
     int pos = displayPosition.value;
     Duration startTime = Duration(minutes: pos);
     Duration endTime = Duration(seconds: startTime.inSeconds + 10);
@@ -101,6 +106,13 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
       });
     } catch (e) {
       DialogUtil.error(content: '$e');
+    }
+  }
+
+  _delete() {
+    List<String> filenames = imageFileController.data;
+    for (var filename in filenames) {
+      File(filename).delete();
     }
   }
 
@@ -148,6 +160,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
           thumbColor: myself.primary,
           onChanged: (double value) {
             displayPosition(value.toInt());
+            _splitImageFiles();
           },
         );
       },
@@ -161,81 +174,83 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildImageSlide(context) {
-    List<Widget> children = [];
-    String? current = imageFileController.current;
-    for (String imageFile in imageFileController.data) {
-      Widget image = InkWell(
-        child: Container(
-            decoration: current == imageFile
-                ? BoxDecoration(
-                    border: Border.all(width: 2, color: myself.primary))
-                : null,
-            padding: EdgeInsets.zero,
-            child: Card(
-                elevation: 0.0,
-                margin: EdgeInsets.zero,
-                shape: const ContinuousRectangleBorder(),
-                child: ImageUtil.buildImageWidget(
-                    imageContent: imageFile, height: 80, fit: BoxFit.contain))),
-        onTap: () {
-          imageFileController.current = imageFile;
-        },
-      );
-      children.add(image);
-    }
-    return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        controller: scrollController,
-        child: Row(
-          children: children,
-        ));
+    return Obx(() {
+      List<Widget> children = [];
+      String? current = imageFileController.current;
+      for (String imageFile in imageFileController.data) {
+        Widget image = InkWell(
+          child: Container(
+              decoration: current == imageFile
+                  ? BoxDecoration(
+                      border: Border.all(width: 2, color: myself.primary))
+                  : null,
+              padding: EdgeInsets.zero,
+              child: Card(
+                  elevation: 0.0,
+                  margin: EdgeInsets.zero,
+                  shape: const ContinuousRectangleBorder(),
+                  child: ImageUtil.buildImageWidget(
+                      imageContent: imageFile,
+                      height: 80,
+                      fit: BoxFit.contain))),
+          onTap: () {
+            imageFileController.current = imageFile;
+          },
+        );
+        children.add(image);
+      }
+      return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          controller: scrollController,
+          child: Wrap(
+            children: children,
+          ));
+    });
   }
 
   Widget _buildVideoEditor(BuildContext context) {
     Widget mediaView = Swiper(
-      itemCount: 2,
-      index: index.value,
-      controller: swiperController,
-      onIndexChanged: (int index) {
-        this.index.value = index;
-      },
-      itemBuilder: (BuildContext context, int index) {
-        if (index == 0) {
-          return playlistWidget;
-        }
-        if (index == 1) {
-          return Obx(() {
-            String? filename = imageFileController.current;
-            if (filename == null) {
-              return nilBox;
-            }
+        itemCount: 2,
+        index: index.value,
+        controller: swiperController,
+        onIndexChanged: (int index) {
+          this.index.value = index;
+        },
+        itemBuilder: (BuildContext context, int index) {
+          if (index == 0) {
+            return playlistWidget;
+          }
+          if (index == 1) {
             return Column(children: [
-              Expanded(
-                  child: ProImageEditor.file(
-                      key: UniqueKey(),
-                      File(filename),
-                      callbacks: ProImageEditorCallbacks(
-                          onImageEditingComplete: (Uint8List bytes) async {
-                        String? name = await DialogUtil.showTextFormField(
-                            title: 'Save as',
-                            content: 'Filename',
-                            tip: filename);
-                        if (name != null) {
-                          await FileUtil.writeFileAsBytes(bytes, name);
-                          DialogUtil.info(
-                              content: 'Save file:$name successfully');
-                        }
-                      }, onCloseEditor: (EditorMode mode) {
-                        indexWidgetProvider.pop();
-                      }))),
+              Expanded(child: Obx(() {
+                String? filename = imageFileController.current;
+                if (filename == null) {
+                  return nilBox;
+                }
+                return ProImageEditor.file(File(filename),
+                    key: UniqueKey(),
+                    callbacks: ProImageEditorCallbacks(
+                        onImageEditingComplete: (Uint8List bytes) async {
+                      bool? confirm = await DialogUtil.confirm(
+                        context: context,
+                        title: 'Save as',
+                        content: filename,
+                      );
+                      if (confirm != null && confirm) {
+                        await FileUtil.writeFileAsBytes(bytes, filename);
+                        DialogUtil.info(
+                            content: 'Save file:$filename successfully');
+                      }
+                    }, onCloseEditor: (EditorMode mode) {
+                      imageFileController.clear();
+                    }));
+              })),
               _buildSeekBar(context),
               _buildImageSlide(context),
             ]);
-          });
-        }
-        return nilBox;
-      },
-    );
+          }
+          return nilBox;
+        });
 
     return Center(
       child: mediaView,
@@ -283,7 +298,6 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    _splitImageFiles(context);
     return AppBarView(
       title: title,
       helpPath: routeName,
@@ -291,12 +305,5 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
       rightWidgets: _buildRightWidgets(context),
       child: _buildVideoEditor(context),
     );
-  }
-
-  _delete() {
-    List<String> filenames = imageFileController.data;
-    for (var filename in filenames) {
-      File(filename).delete();
-    }
   }
 }
