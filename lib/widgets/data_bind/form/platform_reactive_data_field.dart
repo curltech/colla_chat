@@ -219,7 +219,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       },
       options: options,
     );
-    children.add(radioGroup);
+    children.add(Expanded(child: radioGroup));
 
     return Row(children: children);
   }
@@ -266,7 +266,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       const SizedBox(
         width: 15.0,
       ),
-      toggleSwitch
+      Expanded(child: toggleSwitch)
     ]);
     return Row(children: children);
   }
@@ -296,7 +296,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       },
       options: options,
     );
-    children.add(checkboxGroup);
+    children.add(Expanded(child: checkboxGroup));
     return Row(
       children: children,
     );
@@ -332,7 +332,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       showCheckmark: false,
       checkmarkColor: myself.primary,
     );
-    children.add(chipGroup);
+    children.add(Expanded(child: chipGroup));
     return Row(
       children: children,
     );
@@ -370,7 +370,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       const SizedBox(
         width: 15,
       ),
-      toggleButtons,
+      Expanded(child: toggleButtons),
     ]);
     var row = Row(
       children: children,
