@@ -191,6 +191,8 @@ class MultiKlineController extends DataListController<String> {
           Share? share = await shareService.findShare(tsCode);
           if (share != null) {
             dayLine.name = share.name;
+            dayLine.industry = share.industry;
+            dayLine.sector = share.sector;
           }
         }
       }

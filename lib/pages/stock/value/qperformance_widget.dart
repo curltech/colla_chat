@@ -14,7 +14,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/binging_paginated_data_table2.dart';
+import 'package:colla_chat/widgets/data_bind/binging_trina_paginated_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
@@ -312,7 +312,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
           }),
     ];
 
-    return BindingPaginatedDataTable2<QPerformance>(
+    return BindingTrinaPaginatedDataGrid<QPerformance>(
       key: UniqueKey(),
       minWidth: 1400,
       showCheckboxColumn: false,

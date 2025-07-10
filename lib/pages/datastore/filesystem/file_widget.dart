@@ -319,11 +319,11 @@ class FileWidget extends StatelessWidget with TileDataMixin {
       platformDataColumns: platformDataColumns,
       controller: fileController,
       fixedLeftColumns: 0,
-      onLongPress: (int index) {
+      onLongPress: (int index, dynamic value) {
         File file = fileController.data[index];
         _onLongPress(context, file);
       },
-      onTap: (int index) {
+      onDoubleTap: (int index) {
         File file = fileController.data[index];
         fileController.current = file;
       },

@@ -5,32 +5,34 @@ import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 
-class BindingPaginatedDataTable2<T> extends StatelessWidget {
+class BindingTrinaPaginatedDataGrid<T> extends StatelessWidget {
   final List<PlatformDataColumn> platformDataColumns;
   final DataPageController<T> controller;
   final bool showCheckboxColumn;
-  final double dataRowHeight;
+  final double? rowHeight;
+  final double? columnHeight;
   final double? minWidth;
   final double horizontalMargin;
   final double columnSpacing;
   final int fixedLeftColumns;
-  final Function(int index)? onTap;
+  final Function(int, dynamic)? onChanged;
+  final Function(int, dynamic)? onLongPress;
   final Function(int index)? onDoubleTap;
   final Function(int, List<dynamic>?)? onSelected;
-  final Function(int?, bool?)? onRowChecked;
-  final Function(int index)? onLongPress;
+  final Function(int, bool?)? onRowChecked;
 
-  const BindingPaginatedDataTable2({
+  const BindingTrinaPaginatedDataGrid({
     super.key,
     required this.platformDataColumns,
-    this.onTap,
     this.onSelected,
-    this.onRowChecked,
     this.onLongPress,
+    this.onChanged,
+    this.onRowChecked,
     required this.controller,
     this.onDoubleTap,
     this.showCheckboxColumn = true,
-    this.dataRowHeight = kMinInteractiveDimension,
+    this.rowHeight,
+    this.columnHeight,
     this.minWidth,
     this.horizontalMargin = 24.0,
     this.columnSpacing = 56.0,
@@ -41,7 +43,8 @@ class BindingPaginatedDataTable2<T> extends StatelessWidget {
   Widget _buildDataTable(BuildContext context) {
     return BindingTrinaDataGrid(
       key: UniqueKey(),
-      dataRowHeight: dataRowHeight,
+      rowHeight: rowHeight,
+      columnHeight: columnHeight,
       minWidth: minWidth,
       showCheckboxColumn: showCheckboxColumn,
       horizontalMargin: horizontalMargin,
@@ -49,9 +52,9 @@ class BindingPaginatedDataTable2<T> extends StatelessWidget {
       fixedLeftColumns: fixedLeftColumns,
       platformDataColumns: platformDataColumns,
       controller: controller,
-      onTap: onTap,
-      onDoubleTap: onDoubleTap,
       onLongPress: onLongPress,
+      onChanged: onChanged,
+      onDoubleTap: onDoubleTap,
       onSelected: onSelected,
       onRowChecked: onRowChecked,
     );

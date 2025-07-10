@@ -7,7 +7,7 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/binging_paginated_data_table2.dart';
+import 'package:colla_chat/widgets/data_bind/binging_trina_paginated_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
@@ -88,7 +88,7 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
           ));
         }
       }
-      return BindingPaginatedDataTable2<Map<String, dynamic>>(
+      return BindingTrinaPaginatedDataGrid<Map<String, dynamic>>(
         key: UniqueKey(),
         showCheckboxColumn: false,
         horizontalMargin: 10.0,
@@ -109,7 +109,8 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
         rightWidgets: [
           IconButton(
               onPressed: () async {
-                DataSource? current = dataSourceController.current as DataSource?;
+                DataSource? current =
+                    dataSourceController.current as DataSource?;
                 if (current == null) {
                   return;
                 }

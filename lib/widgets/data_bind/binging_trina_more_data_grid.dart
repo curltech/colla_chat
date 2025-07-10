@@ -3,34 +3,36 @@ import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 
-class BindingMoreDataTable2<T> extends StatelessWidget {
+class BindingTrinaMoreDataGrid<T> extends StatelessWidget {
   final List<PlatformDataColumn> platformDataColumns;
   final DataPageController<T> controller;
   final bool showCheckboxColumn;
-  final double dataRowHeight;
+  final double? rowHeight;
+  final double? columnHeight;
   final double? minWidth;
   final double horizontalMargin;
   final double columnSpacing;
   final int fixedLeftColumns;
-  final Function(int index)? onTap;
   final Function(int index)? onDoubleTap;
   final Function(int, List<dynamic>?)? onSelected;
   final Function(int?, bool?)? onRowChecked;
-  final Function(int index)? onLongPress;
+  final Function(int, dynamic)? onChanged;
+  final Function(int, dynamic)? onLongPress;
   final Future<void> Function()? onRefresh;
 
-  const BindingMoreDataTable2({
+  const BindingTrinaMoreDataGrid({
     super.key,
     required this.platformDataColumns,
-    this.onTap,
     this.onSelected,
-    this.onRowChecked,
     this.onLongPress,
+    this.onChanged,
+    this.onRowChecked,
     required this.controller,
     this.onDoubleTap,
     this.onRefresh,
     this.showCheckboxColumn = true,
-    this.dataRowHeight = kMinInteractiveDimension,
+    this.rowHeight,
+    this.columnHeight,
     this.minWidth,
     this.horizontalMargin = 24.0,
     this.columnSpacing = 56.0,
@@ -53,7 +55,8 @@ class BindingMoreDataTable2<T> extends StatelessWidget {
         //notificationPredicate: _notificationPredicate,
         child: BindingTrinaDataGrid(
           key: UniqueKey(),
-          dataRowHeight: dataRowHeight,
+          rowHeight: rowHeight,
+          columnHeight: columnHeight,
           minWidth: minWidth ?? 2000,
           showCheckboxColumn: showCheckboxColumn,
           horizontalMargin: horizontalMargin,
@@ -61,9 +64,9 @@ class BindingMoreDataTable2<T> extends StatelessWidget {
           fixedLeftColumns: fixedLeftColumns,
           platformDataColumns: platformDataColumns,
           controller: controller,
-          onTap: onTap,
           onDoubleTap: onDoubleTap,
           onLongPress: onLongPress,
+          onChanged: onChanged,
           onSelected: onSelected,
           onRowChecked: onRowChecked,
         ));

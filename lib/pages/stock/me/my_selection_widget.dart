@@ -272,12 +272,20 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
           tabController = TabController(
               length: myShareController.groupSubscription.length, vsync: this);
           final List<Tab> tabs = <Tab>[];
-          for (String groupName in myShareController.groupSubscription.keys) {
+          int index = 0;
+          List<String> groupNames =
+              myShareController.groupSubscription.keys.toList();
+          for (int i = 0; i < groupNames.length; ++i) {
+            String groupName = groupNames[i];
             tabs.add(Tab(
               text: groupName,
               iconMargin: const EdgeInsets.all(0.0),
             ));
+            if (groupName == myShareController.groupName.value) {
+              index = i;
+            }
           }
+          tabController!.index = index;
           return TabBar(
             tabs: tabs,
             controller: tabController,
@@ -424,10 +432,17 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
             dayLineController.sort((t) => t.name, index, 'name', ascending),
       ),
       PlatformDataColumn(
-        label: '交易日期',
-        name: 'trade_date',
-        width: 90,
+        label: '行业',
+        name: 'industry',
+        width: 80,
+        onSort: (int index, bool ascending) =>
+            dayLineController.sort((t) => t.industry, index, 'industry', ascending),
       ),
+      // PlatformDataColumn(
+      //   label: '交易日期',
+      //   name: 'trade_date',
+      //   width: 90,
+      // ),
       PlatformDataColumn(
         label: '收盘价',
         name: 'close',

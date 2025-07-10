@@ -4,6 +4,8 @@ class StockLine extends BaseEntity {
   String tsCode;
   int tradeDate;
   String? name;
+  String? industry; // str 所属行业
+  String? sector; // str 所属细分行业行业
   num? shareNumber;
   num? open;
   num? high;
@@ -24,6 +26,8 @@ class StockLine extends BaseEntity {
   StockLine.fromJson(super.json)
       : tsCode = json['ts_code'],
         name = json['name'],
+        industry = json['industry'],
+        sector = json['sector'],
         tradeDate = json['trade_date'],
         shareNumber = json['share_number'],
         open = json['open'],
@@ -47,6 +51,8 @@ class StockLine extends BaseEntity {
     json.addAll({
       'ts_code': tsCode,
       'name': name,
+      'industry': industry,
+      'sector': sector,
       'trade_date': tradeDate,
       'share_number': shareNumber,
       'open': open,

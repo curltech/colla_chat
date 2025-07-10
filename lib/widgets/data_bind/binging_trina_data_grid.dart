@@ -14,28 +14,30 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
   final List<PlatformDataColumn> platformDataColumns;
   final DataListController<T> controller;
   final bool showCheckboxColumn;
-  final double? dataRowHeight;
+  final double? rowHeight;
+  final double? columnHeight;
   final double? minWidth;
   final double? horizontalMargin;
   final double? columnSpacing;
   final int fixedLeftColumns;
-  final Function(int index)? onTap;
   final Function(int index)? onDoubleTap;
   final Function(int index, List<dynamic> data)? onSelected;
-  final Function(int?, bool?)? onRowChecked;
-  final Function(int index)? onLongPress;
+  final Function(int, bool?)? onRowChecked;
+  final Function(int, dynamic)? onChanged;
+  final Function(int, dynamic)? onLongPress;
 
   const BindingTrinaDataGrid({
     super.key,
     required this.platformDataColumns,
-    this.onTap,
     this.onSelected,
-    this.onRowChecked,
+    this.onChanged,
     this.onLongPress,
+    this.onRowChecked,
     required this.controller,
     this.onDoubleTap,
     this.showCheckboxColumn = true,
-    this.dataRowHeight,
+    this.rowHeight,
+    this.columnHeight,
     this.minWidth,
     this.horizontalMargin,
     this.columnSpacing,
@@ -83,7 +85,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
             textAlign: align,
             width: platformDataColumn.width ?? TrinaGridSettings.columnWidth,
             type: type,
-            enableRowChecked: i == 0 ? true : false,
+            enableRowChecked: i == 0 ? showCheckboxColumn : false,
             backgroundColor: myself.primary.withAlpha(128),
             enableSorting: false,
             enableContextMenu: false,
@@ -102,13 +104,13 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
               width: platformDataColumn.width ?? TrinaGridSettings.columnWidth,
               enableRowChecked: i == 0 ? true : false,
               backgroundColor: myself.primary.withAlpha(128),
-              enableSorting: true,
-              enableContextMenu: false,
-              enableFilterMenuItem: false,
-              enableHideColumnMenuItem: false,
-              enableSetColumnsMenuItem: false,
+              enableSorting: platformDataColumn.sort,
+              enableContextMenu: platformDataColumn.menu,
+              enableFilterMenuItem: platformDataColumn.filter,
+              enableHideColumnMenuItem: true,
+              enableSetColumnsMenuItem: true,
               enableAutoEditing: false,
-              enableEditingMode: false,
+              enableEditingMode: !platformDataColumn.readOnly,
               sort: TrinaColumnSort.ascending),
         );
       }
@@ -212,16 +214,18 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         enableColumnBorderHorizontal: true,
         enableCellBorderVertical: false,
         enableCellBorderHorizontal: true,
+        rowHeight: rowHeight ?? TrinaGridSettings.rowHeight,
+        columnHeight: columnHeight ?? TrinaGridSettings.rowHeight,
         oddRowColor: myself.primaryColor.withAlpha(32),
         evenRowColor: Colors.grey.withAlpha(32),
         gridBackgroundColor: Colors.white.withAlpha(0),
-        menuBackgroundColor: Colors.white.withAlpha(0),
         rowColor: Colors.white.withAlpha(0),
         activatedColor: Colors.blueGrey,
         gridBorderColor: Colors.white.withAlpha(0),
         borderColor: Colors.white,
         activatedBorderColor: myself.primaryColor,
         inactivatedBorderColor: Colors.white.withAlpha(0),
+        filterHeaderIconColor: myself.primaryColor,
       );
     } else {
       trinaGridStyleConfig = TrinaGridStyleConfig(
@@ -229,16 +233,18 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         enableColumnBorderHorizontal: false,
         enableCellBorderVertical: false,
         enableCellBorderHorizontal: true,
+        rowHeight: rowHeight ?? TrinaGridSettings.rowHeight,
+        columnHeight: columnHeight ?? TrinaGridSettings.rowHeight,
         oddRowColor: myself.primaryColor.withAlpha(32),
         evenRowColor: Colors.grey.withAlpha(32),
         gridBackgroundColor: Colors.white.withAlpha(0),
-        menuBackgroundColor: Colors.white.withAlpha(0),
         rowColor: Colors.white.withAlpha(0),
         activatedColor: Colors.green.shade50,
         gridBorderColor: Colors.white.withAlpha(0),
         borderColor: Colors.white,
         activatedBorderColor: myself.primaryColor,
         inactivatedBorderColor: Colors.white.withAlpha(0),
+        filterHeaderIconColor: myself.primaryColor,
       );
     }
     return TrinaGridConfiguration(
@@ -256,12 +262,32 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
     return Obx(() {
       return TrinaGrid(
         key: UniqueKey(),
-        mode: TrinaGridMode.select,
+        mode: TrinaGridMode.normal,
         configuration: _buildTrinaGridConfiguration(context),
         columns: _buildDataColumns(),
         rows: _buildDataRows(),
         onLoaded: (TrinaGridOnLoadedEvent event) {},
-        onChanged: (TrinaGridOnChangedEvent event) {},
+        onChanged: (TrinaGridOnChangedEvent event) {
+          dynamic value = event.row.data;
+          int? index = event.row.sortIdx;
+          var fn = onChanged;
+          if (fn != null) {
+            fn(index, value);
+          }
+        },
+        rowWrapper: (context, row, stateManager) {
+          return InkWell(
+            onLongPress: () {
+              dynamic value = stateManager.currentRow?.data;
+              int? index = stateManager.currentRow?.sortIdx;
+              var fn = onLongPress;
+              if (fn != null && index != null) {
+                fn(index, value);
+              }
+            },
+            child: row,
+          );
+        },
         onSelected: (TrinaGridOnSelectedEvent event) {
           List<dynamic> data = [];
           List<TrinaRow<dynamic>>? selectedRows = event.selectedRows;
@@ -297,7 +323,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
             }
           }
           var fn = onRowChecked;
-          if (fn != null) {
+          if (fn != null && index != null) {
             fn(index, isChecked!);
           }
         },
@@ -311,6 +337,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         },
         onRowSecondaryTap: (TrinaGridOnRowSecondaryTapEvent event) {},
         onRowsMoved: (TrinaGridOnRowsMovedEvent event) {},
+        columnMenuDelegate: TrinaColumnMenuDelegateDefault(),
       ).asStyle();
     });
   }

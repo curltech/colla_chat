@@ -184,7 +184,6 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
       horizontalMargin: 10.0,
       columnSpacing: 0.0,
       fixedLeftColumns: 1,
-      dataRowHeight: 100,
       platformDataColumns: eventFilterColumns,
       controller: eventFilterController,
       onDoubleTap: _onDoubleTap,

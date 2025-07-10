@@ -97,6 +97,10 @@ class PlatformDataColumn {
   final InputType inputType;
   final DataType dataType;
   final Alignment align;
+  final bool readOnly;
+  final bool menu;
+  final bool sort;
+  final bool filter;
   final double? width;
   final Color? positiveColor;
   final Color? negativeColor;
@@ -107,6 +111,10 @@ class PlatformDataColumn {
   PlatformDataColumn(
       {required this.name,
       required this.label,
+      this.readOnly = true,
+      this.sort = true,
+      this.menu = true,
+      this.filter = false,
       this.hintText,
       this.dataType = DataType.string,
       this.positiveColor,
