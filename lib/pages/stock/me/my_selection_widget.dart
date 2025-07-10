@@ -235,7 +235,6 @@ class ShareSelectionWidget extends StatefulWidget with TileDataMixin {
 
   ShareSelectionWidget({super.key}) {
     indexWidgetProvider.define(stockLineChartWidget);
-    myShareController.subscription;
   }
 
   @override
@@ -263,6 +262,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
   @override
   initState() {
     super.initState();
+    myShareController.subscription;
   }
 
   Widget _buildShareGroupWidget(BuildContext context) {

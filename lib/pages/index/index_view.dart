@@ -696,7 +696,7 @@ class _IndexViewState extends State<IndexView>
           child: SafeArea(
               child: Stack(children: <Widget>[
             Opacity(
-              opacity: 1,
+              opacity: 0.3,
               child: loadingWidget,
             ),
             Center(
