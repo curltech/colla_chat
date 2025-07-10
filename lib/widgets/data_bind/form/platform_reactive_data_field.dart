@@ -152,7 +152,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
 
     InputDecoration decoration = _buildInputDecoration(platformDataField);
 
-    return ReactiveTextField<String>(
+    return ReactiveTextField<T>(
         formControlName: name,
         decoration: decoration,
         validationMessages: validationMessages,
@@ -165,13 +165,13 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         maxLines:
             inputType == InputType.password ? 1 : platformDataField.maxLines,
         minLines: platformDataField.minLines,
-        onChanged: (FormControl<String> formControl) {
+        onChanged: (FormControl<T> formControl) {
           platformDataField.onChanged?.call(formControl.value);
         },
-        onEditingComplete: (FormControl<String> formControl) {
+        onEditingComplete: (FormControl<T> formControl) {
           platformDataField.onEditingComplete?.call();
         },
-        onSubmitted: (FormControl<String> formControl) {
+        onSubmitted: (FormControl<T> formControl) {
           platformDataField.onSubmitted?.call(formControl.value);
         });
   }

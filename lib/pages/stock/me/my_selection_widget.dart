@@ -16,6 +16,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
+import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -305,14 +306,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
             },
           );
         });
-    return tabBar;
-    return Row(children: [
-      IconButton(
-          onPressed: () {},
-          color: Colors.white,
-          icon: Icon(Icons.list_alt_outlined)),
-      Expanded(child: tabBar)
-    ]);
+    return tabBar.asStyle(blur: 128);
   }
 
   Widget _buildActionWidget(BuildContext context, int index, dynamic dayLine) {

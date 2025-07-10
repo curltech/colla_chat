@@ -97,6 +97,7 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
       PlatformDataColumn(
         label: '交易日期',
         name: 'trade_date',
+        dataType : DataType.int,
         width: 90,
       ),
       PlatformDataColumn(
@@ -193,21 +194,16 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
   _buildSearchView(BuildContext context) {
     int tradeDate = DateUtil.formatDateInt(DateUtil.currentDateTime());
     searchController.values = {'tradeDate': tradeDate};
-    List<FormButton> formButtonDefs = [
-      FormButton(
-          label: 'Ok',
-          onTap: (Map<String, dynamic> values) {
-            _onOk(context, values);
-          }),
-    ];
     Widget formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
         child: PlatformReactiveForm(
           height: appDataProvider.portraitSize.height * 0.5,
           spacing: 5.0,
           platformReactiveFormController: searchController,
-          formButtons: formButtonDefs,
-        ));
+          onSubmit: (Map<String, dynamic> values) {
+            onSubmit(context, values);
+          }),
+        );
 
     formInputWidget = ExpansionTile(
       title: Text(AppLocalizations.t('Search')),
@@ -218,7 +214,7 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
     return formInputWidget;
   }
 
-  _onOk(BuildContext context, Map<String, dynamic> values) async {
+  onSubmit(BuildContext context, Map<String, dynamic> values) async {
     int? tradeDate = values['tradeDate'];
     String? filterContents = values['filterContents'];
     String? filterParas = values['filterParas'];
