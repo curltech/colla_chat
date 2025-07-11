@@ -57,8 +57,8 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
             color: myself.primary,
           )),
       PlatformDataField(
-        name: 'filterContent',
-        label: 'FilterContent',
+        name: 'condContent',
+        label: 'CondContent',
         dataType: DataType.string,
         minLines: 4,
         cancel: true,
@@ -70,12 +70,12 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
         validators: [Validators.required],
         validationMessages: {
           ValidationMessage.required: (_) =>
-              'The filterContent must not be empty',
+              'The condContent must not be empty',
         },
       ),
       PlatformDataField(
-          name: 'filterParas',
-          label: 'FilterParas',
+          name: 'condParas',
+          label: 'CondParas',
           dataType: DataType.string,
           minLines: 4,
           textInputType: TextInputType.multiline,
@@ -225,12 +225,12 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
 
   onSubmit(BuildContext context, Map<String, dynamic> values) async {
     int? tradeDate = values['tradeDate'];
-    String? filterContent = values['filterContent'];
-    String? filterParas = values['filterParas'];
+    String? condContent = values['condContent'];
+    String? condParas = values['condParas'];
     refresh(
         tradeDate: tradeDate!,
-        filterContent: filterContent!,
-        filterParas: filterParas);
+        condContent: condContent!,
+        condParas: condParas);
     expansibleController.collapse();
     DialogUtil.info(
         content: AppLocalizations.t('stock dayline search completely'));
@@ -238,14 +238,14 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
 
   refresh(
       {required int tradeDate,
-      required String filterContent,
-      String? filterParas}) async {
+      required String condContent,
+      String? condParas}) async {
     DateTime start = DateTime.now();
     List<DayLine> dayLines = await remoteDayLineService.sendFindFlexPoint(
-        filterContent,
+        condContent,
         tradeDate: tradeDate,
-        filterParas:
-            filterParas != null ? JsonUtil.toJsonString(filterParas) : null);
+        condParas:
+        condParas != null ? JsonUtil.toJsonString(condParas) : null);
     DateTime end = DateTime.now();
     logger.i(
         'find more day line data duration:${end.difference(start).inMilliseconds}');

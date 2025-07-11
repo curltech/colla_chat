@@ -259,40 +259,27 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
     List<EventFilter> eventFilters = await eventFilterService
         .find(where: 'eventCode=?', whereArgs: [eventCode]);
     if (eventFilters.isNotEmpty) {
-      String? filterContents;
-      List<dynamic>? filterParas;
+      String condContent = '1=1';
+      List<dynamic>? condParas = [];
       for (var eventFilter in eventFilters) {
-        String? filterContent = eventFilter.condContent;
-        if (filterContent != null) {
-          if (filterContents == null) {
-            filterContents = filterContent;
-          } else {
-            filterContents = '$filterContents and $filterContent';
-          }
+        if (eventFilter.condContent != null) {
+          condContent = '$condContent and $eventFilter.condContent';
         }
-        String? condParas = eventFilter.condParas;
-        if (condParas != null) {
-          if (filterParas == null) {
-            filterParas = JsonUtil.toJson(condParas);
-          } else {
-            filterParas.addAll(JsonUtil.toJson(condParas));
-          }
+        if (eventFilter.condParas != null) {
+          condParas.addAll(JsonUtil.toJson(eventFilter.condParas));
         }
       }
-      if (filterContents != null) {
-        DateTime start = DateTime.now();
-        dayLines = await remoteDayLineService.sendFindFlexPoint(filterContents,
-            tsCode: tsCode,
-            tradeDate: tradeDate,
-            startDate: startDate,
-            endDate: endDate,
-            filterParas: filterParas != null
-                ? JsonUtil.toJsonString(filterParas)
-                : null);
-        DateTime end = DateTime.now();
-        logger.i(
-            'find more data duration:${end.difference(start).inMilliseconds}');
-      }
+      DateTime start = DateTime.now();
+      dayLines = await remoteDayLineService.sendFindFlexPoint(condContent,
+          tsCode: tsCode,
+          tradeDate: tradeDate,
+          startDate: startDate,
+          endDate: endDate,
+          condParas:
+              condParas.isNotEmpty ? JsonUtil.toJsonString(condParas) : null);
+      DateTime end = DateTime.now();
+      logger
+          .i('find more data duration:${end.difference(start).inMilliseconds}');
     } else {
       logger.e('eventCode has no filters');
 
