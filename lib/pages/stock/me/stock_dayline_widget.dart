@@ -18,6 +18,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 
 /// 查询满足条件的日线数据
 class DayLineWidget extends StatelessWidget with TileDataMixin {
@@ -49,24 +50,32 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
           name: 'tradeDate',
           label: 'TradeDate',
           dataType: DataType.int,
+          cancel: true,
           textInputType: TextInputType.number,
           prefixIcon: Icon(
             Icons.calendar_view_day_outlined,
             color: myself.primary,
           )),
       PlatformDataField(
-          name: 'condContent',
-          label: 'condContent',
-          dataType: DataType.string,
-          minLines: 4,
-          textInputType: TextInputType.multiline,
-          prefixIcon: Icon(
-            Icons.content_paste,
-            color: myself.primary,
-          )),
+        name: 'condContent',
+        label: 'CondContent',
+        dataType: DataType.string,
+        minLines: 4,
+        cancel: true,
+        textInputType: TextInputType.multiline,
+        prefixIcon: Icon(
+          Icons.content_paste,
+          color: myself.primary,
+        ),
+        validators: [Validators.required],
+        validationMessages: {
+          ValidationMessage.required: (_) =>
+              'The condContent must not be empty',
+        },
+      ),
       PlatformDataField(
           name: 'condParas',
-          label: 'condParas',
+          label: 'CondParas',
           dataType: DataType.string,
           minLines: 4,
           textInputType: TextInputType.multiline,
@@ -97,7 +106,7 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
       PlatformDataColumn(
         label: '交易日期',
         name: 'trade_date',
-        dataType : DataType.int,
+        dataType: DataType.int,
         width: 90,
       ),
       PlatformDataColumn(
@@ -195,15 +204,15 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
     int tradeDate = DateUtil.formatDateInt(DateUtil.currentDateTime());
     searchController.values = {'tradeDate': tradeDate};
     Widget formInputWidget = Container(
-        padding: const EdgeInsets.all(10.0),
-        child: PlatformReactiveForm(
+      padding: const EdgeInsets.all(10.0),
+      child: PlatformReactiveForm(
           height: appDataProvider.portraitSize.height * 0.5,
           spacing: 5.0,
           platformReactiveFormController: searchController,
           onSubmit: (Map<String, dynamic> values) {
             onSubmit(context, values);
           }),
-        );
+    );
 
     formInputWidget = ExpansionTile(
       title: Text(AppLocalizations.t('Search')),

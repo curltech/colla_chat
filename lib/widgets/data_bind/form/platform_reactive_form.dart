@@ -246,7 +246,7 @@ class PlatformReactiveFormController {
     return formGroup.control(name).markAsPristine();
   }
 
-  valid() {
+  bool get valid {
     return formGroup.valid;
   }
 
@@ -430,14 +430,20 @@ class PlatformReactiveForm extends StatelessWidget {
       ));
     }
     if (formButtons == null && onSubmit != null) {
-      btns.add(TextButton(
-        style: mainStyle,
-        child: AutoSizeText(AppLocalizations.t(submitLabel)),
-        onPressed: () {
-          if (onSubmit != null) {
-            var values = platformReactiveFormController.values;
-            onSubmit?.call(values);
-          }
+      btns.add(ReactiveFormConsumer(
+        builder: (context, formGroup, child) {
+          return TextButton(
+            style: platformReactiveFormController.valid ? mainStyle : style,
+            onPressed: platformReactiveFormController.valid
+                ? () {
+                    if (onSubmit != null) {
+                      var values = platformReactiveFormController.values;
+                      onSubmit?.call(values);
+                    }
+                  }
+                : null,
+            child: AutoSizeText(AppLocalizations.t(submitLabel)),
+          );
         },
       ));
     } else {

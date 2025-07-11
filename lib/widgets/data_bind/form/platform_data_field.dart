@@ -173,8 +173,8 @@ class PlatformDataField<T> {
 
   final List<TextInputFormatter>? inputFormatters;
 
-  final String? Function(T?)? validator;
-
+  /// custom Validator: create a class that extends Validator and overrides the validate method
+  /// or call Validators.delegate(requiredTrue), requiredTrue is function
   final List<Validator<T>>? validators;
 
   final Map<String, String Function(Object)>? validationMessages;
@@ -215,7 +215,6 @@ class PlatformDataField<T> {
     this.options,
     this.groupName,
     this.inputFormatters,
-    this.validator,
     this.validators,
     this.validationMessages,
     this.onChanged,

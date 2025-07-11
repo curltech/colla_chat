@@ -28,6 +28,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
 class P2pLoginWidget extends StatelessWidget {
@@ -72,6 +73,10 @@ class P2pLoginWidget extends StatelessWidget {
               ),
             )
           : null,
+      validators: [Validators.required],
+      validationMessages: {
+        ValidationMessage.required: (_) => 'The credential must not be empty',
+      },
     ));
     platformDataFields.add(PlatformDataField(
       name: 'password',
@@ -82,6 +87,10 @@ class P2pLoginWidget extends StatelessWidget {
         Icons.password,
         color: myself.primary,
       ),
+      validators: [Validators.required],
+      validationMessages: {
+        ValidationMessage.required: (_) => 'The password must not be empty',
+      },
     ));
     platformReactiveFormController =
         PlatformReactiveFormController(platformDataFields);
