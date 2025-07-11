@@ -57,8 +57,8 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
             color: myself.primary,
           )),
       PlatformDataField(
-        name: 'condContent',
-        label: 'CondContent',
+        name: 'filterContent',
+        label: 'FilterContent',
         dataType: DataType.string,
         minLines: 4,
         cancel: true,
@@ -70,12 +70,12 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
         validators: [Validators.required],
         validationMessages: {
           ValidationMessage.required: (_) =>
-              'The condContent must not be empty',
+              'The filterContent must not be empty',
         },
       ),
       PlatformDataField(
-          name: 'condParas',
-          label: 'CondParas',
+          name: 'filterParas',
+          label: 'FilterParas',
           dataType: DataType.string,
           minLines: 4,
           textInputType: TextInputType.multiline,
@@ -225,11 +225,11 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
 
   onSubmit(BuildContext context, Map<String, dynamic> values) async {
     int? tradeDate = values['tradeDate'];
-    String? filterContents = values['filterContents'];
+    String? filterContent = values['filterContent'];
     String? filterParas = values['filterParas'];
     refresh(
         tradeDate: tradeDate!,
-        filterContents: filterContents!,
+        filterContent: filterContent!,
         filterParas: filterParas);
     expansibleController.collapse();
     DialogUtil.info(
@@ -238,11 +238,11 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
 
   refresh(
       {required int tradeDate,
-      required String filterContents,
+      required String filterContent,
       String? filterParas}) async {
     DateTime start = DateTime.now();
     List<DayLine> dayLines = await remoteDayLineService.sendFindFlexPoint(
-        filterContents,
+        filterContent,
         tradeDate: tradeDate,
         filterParas:
             filterParas != null ? JsonUtil.toJsonString(filterParas) : null);
