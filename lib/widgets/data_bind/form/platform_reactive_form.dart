@@ -468,7 +468,11 @@ class PlatformReactiveForm extends StatelessWidget {
   }
 
   List<Widget> _buildFormFieldWidget() {
-    List<Widget> children = [];
+    List<Widget> children = [
+      SizedBox(
+        height: spacing,
+      )
+    ];
     if (heads != null) {
       children.addAll(heads!);
       children.add(SizedBox(
