@@ -59,11 +59,13 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         align = TrinaColumnTextAlign.left;
       }
       DataType dataType = platformDataColumn.dataType;
-      if (dataType == DataType.double || dataType == DataType.num) {
-        type = TrinaColumnType.number(format: '#,###.00');
+      if (dataType == DataType.int) {
+        type = TrinaColumnType.number(
+            format: platformDataColumn.format ?? '#,###');
         align = TrinaColumnTextAlign.end;
-      } else if (dataType == DataType.int) {
-        type = TrinaColumnType.number(format: '#,###');
+      } else if (dataType == DataType.double || dataType == DataType.num) {
+        type = TrinaColumnType.number(
+            format: platformDataColumn.format ?? '#,###.00');
         align = TrinaColumnTextAlign.end;
       } else if (dataType == DataType.percentage) {
         type = TrinaColumnType.percentage();

@@ -96,6 +96,7 @@ class PlatformDataColumn {
   final String label;
   final InputType inputType;
   final DataType dataType;
+  final String? format;
   final Alignment align;
   final bool readOnly;
   final bool menu;
@@ -115,6 +116,7 @@ class PlatformDataColumn {
       this.sort = true,
       this.menu = true,
       this.filter = false,
+      this.format,
       this.hintText,
       this.dataType = DataType.string,
       this.positiveColor,

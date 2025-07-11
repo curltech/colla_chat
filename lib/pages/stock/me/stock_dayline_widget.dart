@@ -107,6 +107,7 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
         label: '交易日期',
         name: 'trade_date',
         dataType: DataType.int,
+        format: '#',
         width: 90,
       ),
       PlatformDataColumn(
@@ -228,9 +229,7 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
     String? condContent = values['condContent'];
     String? condParas = values['condParas'];
     refresh(
-        tradeDate: tradeDate!,
-        condContent: condContent!,
-        condParas: condParas);
+        tradeDate: tradeDate!, condContent: condContent!, condParas: condParas);
     expansibleController.collapse();
     DialogUtil.info(
         content: AppLocalizations.t('stock dayline search completely'));
@@ -244,8 +243,7 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
     List<DayLine> dayLines = await remoteDayLineService.sendFindFlexPoint(
         condContent,
         tradeDate: tradeDate,
-        condParas:
-        condParas != null ? JsonUtil.toJsonString(condParas) : null);
+        condParas: condParas != null ? JsonUtil.toJsonString(condParas) : null);
     DateTime end = DateTime.now();
     logger.i(
         'find more day line data duration:${end.difference(start).inMilliseconds}');
