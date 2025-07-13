@@ -87,6 +87,36 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
     searchController = PlatformReactiveFormController(searchDataField);
   }
 
+  Widget _buildDayLineChipGroup() {
+    DayLine dayLine = DayLine('', 0);
+    Map<String, Object> dayLineMap = JsonUtil.toJson(dayLine);
+    List<Widget> chipChildren = [];
+    for (var name in dayLineMap.keys) {
+      var chip = ActionChip(
+        label: Text(name),
+        onPressed: () {
+          _onActionChip(name);
+        },
+      );
+      chipChildren.add(chip);
+    }
+    return Wrap(
+      spacing: 5,
+      runSpacing: 5,
+      alignment: WrapAlignment.start,
+      crossAxisAlignment: WrapCrossAlignment.start,
+      runAlignment: WrapAlignment.start,
+      children: chipChildren,
+    );
+  }
+
+  _onActionChip(String name) {
+    String? condContent =
+        searchController.values['condContent']?.toString() ?? '';
+    condContent += name;
+    searchController.setValue(name, condContent);
+  }
+
   Widget _buildDayLineView(BuildContext context) {
     final List<PlatformDataColumn> dayLineDataColumns = [
       PlatformDataColumn(
