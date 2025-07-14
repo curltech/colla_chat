@@ -156,17 +156,17 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
   Widget _buildEventFilterListView(BuildContext context) {
     final List<PlatformDataColumn> eventFilterColumns = [
       PlatformDataColumn(
-        label: '事件代码',
+        label: AppLocalizations.t('eventCode'),
         name: 'eventCode',
         width: 150,
       ),
       PlatformDataColumn(
-        label: '事件名',
+        label: AppLocalizations.t('eventName'),
         name: 'eventName',
         width: 150,
       ),
       PlatformDataColumn(
-        label: '条件内容',
+        label: AppLocalizations.t('condContent'),
         name: 'condContent',
         width: 270,
       ),
@@ -211,12 +211,12 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
             _onCopy(values);
           }),
       FormButton(
-          label: 'Ok',
+          label: 'Submit',
           onTap: (Map<String, dynamic> values) {
-            _onOk(context, values);
+            _onSubmit(context, values);
           }),
     ];
-    var formInputWidget = Container(
+    var platformReactiveForm = Container(
         padding: const EdgeInsets.all(10.0),
         child: PlatformReactiveForm(
           height: appDataProvider.portraitSize.height * 0.7,
@@ -225,10 +225,10 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
           formButtons: formButtonDefs,
         ));
 
-    return formInputWidget;
+    return platformReactiveForm;
   }
 
-  _onOk(BuildContext context, Map<String, dynamic> values) async {
+  _onSubmit(BuildContext context, Map<String, dynamic> values) async {
     EventFilter currentFilterCond = EventFilter.fromJson(values);
     if (currentFilterCond.id == null) {
       await eventFilterService.insert(currentFilterCond);

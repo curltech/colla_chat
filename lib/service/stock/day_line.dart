@@ -109,7 +109,7 @@ class RemoteDayLineService extends GeneralRemoteService<DayLine> {
   }
 
   /// 查询股票的买卖点
-  Future<List<DayLine>> sendFindFlexPoint(String condContent,
+  Future<List<DayLine>> sendFindByCondContent(String condContent,
       {String? tsCode,
       int? tradeDate,
       int? startDate,
@@ -133,7 +133,7 @@ class RemoteDayLineService extends GeneralRemoteService<DayLine> {
     if (endDate != null) {
       params['cond_paras'] = condParas;
     }
-    var responseData = await send('/dayline/FindFlexPoint', data: params);
+    var responseData = await send('/dayline/FindByCondContent', data: params);
     List<DayLine> dayLines = [];
     if (responseData != null &&
         responseData is Map &&

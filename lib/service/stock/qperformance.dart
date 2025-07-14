@@ -9,9 +9,9 @@ class RemoteQPerformanceService extends GeneralRemoteService<QPerformance> {
   }
 
   /// 查询自选股的最新日线
-  Future<dynamic> sendFindByQDate(
+  Future<dynamic> sendFindByCondContent(String condContent,
       {String? tsCode,
-      String? startDate,
+      int? tradeDate,
       String? orderBy,
       int? from,
       int? limit,
@@ -20,8 +20,8 @@ class RemoteQPerformanceService extends GeneralRemoteService<QPerformance> {
     if (tsCode != null) {
       params['ts_code'] = tsCode;
     }
-    if (startDate != null) {
-      params['start_date'] = startDate;
+    if (tradeDate != null) {
+      params['trade_date'] = tradeDate;
     }
     if (orderBy != null) {
       params['orderby'] = orderBy;
@@ -36,7 +36,7 @@ class RemoteQPerformanceService extends GeneralRemoteService<QPerformance> {
       params['count'] = count;
     }
     dynamic responseData =
-        await send('/qperformance/FindByQDate', data: params);
+        await send('/qperformance/FindByCondContent', data: params);
     List<QPerformance> performances = [];
     for (var m in responseData['data']) {
       var o = post(m);

@@ -270,7 +270,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
         }
       }
       DateTime start = DateTime.now();
-      dayLines = await remoteDayLineService.sendFindFlexPoint(condContent,
+      dayLines = await remoteDayLineService.sendFindByCondContent(condContent,
           tsCode: tsCode,
           tradeDate: tradeDate,
           startDate: startDate,

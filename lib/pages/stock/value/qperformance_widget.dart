@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:colla_chat/entity/stock/qperformance.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
@@ -14,38 +12,12 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/binging_trina_paginated_data_grid.dart';
+import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-
-class QPerformanceDataPageController extends DataPageController<QPerformance> {
-  @override
-  sort<S>(Comparable<S>? Function(QPerformance t) getFieldValue,
-      int columnIndex, String columnName, bool ascending) {
-    findCondition.value = findCondition.value
-        .copy(sortColumns: [SortColumn(columnIndex, columnName, ascending)]);
-  }
-
-  @override
-  FutureOr<void> findData() async {
-    Map<String, dynamic> responseData =
-        await remoteQPerformanceService.sendFindByQDate(
-            tsCode: findCondition.value.whereColumns['tsCode'],
-            startDate: findCondition.value.whereColumns['startDate'],
-            from: findCondition.value.offset,
-            limit: findCondition.value.limit,
-            orderBy: orderBy(),
-            count: findCondition.value.count);
-    findCondition.value.count = responseData['count'];
-    List<QPerformance> qperformances = responseData['data'];
-    replaceAll(qperformances);
-  }
-}
-
-/// 自选股当前日线的控制器
-final QPerformanceDataPageController qperformanceDataPageController =
-    QPerformanceDataPageController();
+import 'package:get/get.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 
 ///自选股和分组的查询界面
 class QPerformanceWidget extends StatelessWidget with TileDataMixin {
@@ -68,14 +40,15 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
   late final List<PlatformDataField> searchDataField;
   late final PlatformReactiveFormController searchController;
   final ExpansibleController expansibleController = ExpansibleController();
+  final DataListController<QPerformance> qperformanceController =
+      DataListController<QPerformance>();
+  final RxBool showLoading = false.obs;
 
   _init() {
-    qperformanceDataPageController.findCondition
-        .addListener(_updateQPerformance);
     searchDataField = [
       PlatformDataField(
         name: 'tsCode',
-        label: 'TsCode',
+        label: AppLocalizations.t('tsCode'),
         cancel: true,
         prefixIcon: IconButton(
           onPressed: () {
@@ -89,22 +62,95 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         ),
       ),
       PlatformDataField(
-          name: 'startDate',
-          label: 'StartDate',
+          name: 'tradeDate',
+          label: AppLocalizations.t('tradeDate'),
+          dataType: DataType.int,
+          cancel: true,
+          textInputType: TextInputType.number,
           prefixIcon: Icon(
-            Icons.date_range_outlined,
+            Icons.calendar_view_day_outlined,
             color: myself.primary,
           )),
+      PlatformDataField(
+        name: 'condContent',
+        label: AppLocalizations.t('condContent'),
+        dataType: DataType.string,
+        minLines: 4,
+        cancel: true,
+        textInputType: TextInputType.multiline,
+        prefixIcon: IconButton(
+          color: myself.primary,
+          onPressed: () {
+            DialogUtil.popModalBottomSheet(builder: (context) {
+              return _buildDayLineChipGroup();
+            });
+          },
+          icon: Icon(Icons.content_paste),
+        ),
+        validators: [Validators.required],
+        validationMessages: {
+          ValidationMessage.required: (_) =>
+              'The condContent must not be empty',
+        },
+      )
     ];
     searchController = PlatformReactiveFormController(searchDataField);
     searchController.setValue(
-        'startDate', DateUtil.formatDateQuarter(DateTime.now()));
+        'tradeDate', DateUtil.formatDateQuarter(DateTime.now()));
   }
 
-  _updateQPerformance() {
-    Map<String, dynamic> values = searchController.values;
-    qperformanceDataPageController.findCondition.value.whereColumns = values;
-    qperformanceDataPageController.findData();
+  Widget _buildDayLineChipGroup() {
+    List<String> dayLineFields = [
+      'tsCode',
+      'industry',
+      'qDate',
+      'tradeDate',
+      'pe',
+      'peg',
+      'high',
+      'close',
+      'pctChgHigh',
+      'pctChgClose',
+      'pctChgMarketValue',
+      'weightAvgRoe',
+      'grossProfitMargin',
+      'orLastMonth',
+      'npLastMonth',
+      'yoySales',
+      'yoyDeduNp',
+      'cfps',
+      'dividendYieldRatio',
+    ];
+    List<Widget> chipChildren = [];
+    for (var name in dayLineFields) {
+      var chip = ActionChip(
+        label: Text(AppLocalizations.t(name),
+            style: TextStyle(color: Colors.white)),
+        backgroundColor: myself.primary,
+        onPressed: () {
+          _onActionChip(name);
+        },
+      );
+      chipChildren.add(chip);
+    }
+    return SingleChildScrollView(
+        child: Container(
+            padding: EdgeInsets.all(10.0),
+            child: Wrap(
+              spacing: 5,
+              runSpacing: 5,
+              alignment: WrapAlignment.start,
+              crossAxisAlignment: WrapCrossAlignment.start,
+              runAlignment: WrapAlignment.start,
+              children: chipChildren,
+            )));
+  }
+
+  _onActionChip(String name) {
+    String? condContent =
+        searchController.values['condContent']?.toString() ?? '';
+    condContent += ' and $name';
+    searchController.setValue('condContent', condContent);
   }
 
   Widget _buildActionWidget(int index, dynamic qperformance) {
@@ -134,9 +180,9 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
   Widget _buildSearchView(BuildContext context) {
     List<FormButton> formButtonDefs = [
       FormButton(
-          label: 'Ok',
+          label: 'Submit',
           onTap: (Map<String, dynamic> values) {
-            _onOk(context, values);
+            _onSubmit(context, values);
           }),
     ];
     Widget formInputWidget = Container(
@@ -158,118 +204,149 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
     return formInputWidget;
   }
 
-  _onOk(BuildContext context, Map<String, dynamic> values) async {
-    qperformanceDataPageController.findCondition.value.whereColumns = values;
-    await qperformanceDataPageController.findData();
+  _onSubmit(BuildContext context, Map<String, dynamic> values) async {
+    String? tsCode = values['tsCode'];
+    int? tradeDate = values['tradeDate'];
+    String? condContent = values['condContent'];
+    query(tradeDate: tradeDate!, condContent: condContent!, tsCode: tsCode);
     expansibleController.collapse();
     DialogUtil.info(
-        content: AppLocalizations.t('QPerformance search completely'));
+        content: AppLocalizations.t('stock qperformance query completely'));
+  }
+
+  query(
+      {required int tradeDate,
+      required String condContent,
+      String? tsCode}) async {
+    List<QPerformance> qperformances = await remoteQPerformanceService
+        .sendFindByCondContent(condContent, tsCode: tsCode, tradeDate: tradeDate);
+    qperformanceController.replaceAll(qperformances);
+    List<String> tsCodes = [];
+    for (QPerformance qperformance in qperformances) {
+      tsCodes.add(qperformance.tsCode!);
+    }
+    multiKlineController.replaceAll(tsCodes);
   }
 
   Widget _buildQPerformanceListView(BuildContext context) {
     final List<PlatformDataColumn> qperformanceDataColumns = [
       PlatformDataColumn(
-        label: '股票名',
+        label: AppLocalizations.t('tsCode'),
+        name: 'ts_code',
+        width: 100,
+      ),
+      PlatformDataColumn(
+        label: AppLocalizations.t('securityName'),
         name: 'security_name',
         width: 80,
       ),
       PlatformDataColumn(
-        label: 'pe',
+        label: AppLocalizations.t('qDate'),
+        name: 'qdate',
+        width: 90,
+      ),
+      PlatformDataColumn(
+        label: AppLocalizations.t('tradeDate'),
+        name: 'trade_date',
+        width: 80,
+      ),
+      PlatformDataColumn(
+        label: AppLocalizations.t('pe'),
         name: 'pe',
         width: 50,
         dataType: DataType.double,
         align: Alignment.centerRight,
-        onSort: (int index, bool ascending) => qperformanceDataPageController
+        onSort: (int index, bool ascending) => qperformanceController
             .sort((t) => t.pe, index, 'pe', ascending),
       ),
       PlatformDataColumn(
-        label: 'peg',
+        label: AppLocalizations.t('peg'),
         name: 'peg',
         width: 70,
         dataType: DataType.double,
         align: Alignment.centerRight,
-        onSort: (int index, bool ascending) => qperformanceDataPageController
+        onSort: (int index, bool ascending) => qperformanceController
             .sort((t) => t.peg, index, 'peg', ascending),
       ),
       PlatformDataColumn(
-        label: '收盘价',
+        label: AppLocalizations.t('close'),
         name: 'close',
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 80,
-        onSort: (int index, bool ascending) => qperformanceDataPageController
+        onSort: (int index, bool ascending) => qperformanceController
             .sort((t) => t.close, index, 'close', ascending),
       ),
       PlatformDataColumn(
-        label: '涨幅',
+        label: AppLocalizations.t('pctChgClose'),
         name: 'pct_chg_close',
         dataType: DataType.percentage,
         align: Alignment.centerRight,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         width: 80,
-        onSort: (int index, bool ascending) => qperformanceDataPageController
+        onSort: (int index, bool ascending) => qperformanceController
             .sort((t) => t.pctChgClose, index, 'pctChgClose', ascending),
       ),
       PlatformDataColumn(
-        label: '年营收增长',
+        label: AppLocalizations.t('yoySales'),
         name: 'yoy_sales',
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 100,
-        onSort: (int index, bool ascending) => qperformanceDataPageController
+        onSort: (int index, bool ascending) => qperformanceController
             .sort((t) => t.yoySales, index, 'yoySales', ascending),
       ),
       PlatformDataColumn(
-        label: '年净利润增长',
+        label: AppLocalizations.t('yoyDeduNp'),
         name: 'yoy_dedu_np',
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 110,
-        onSort: (int index, bool ascending) => qperformanceDataPageController
+        onSort: (int index, bool ascending) => qperformanceController
             .sort((t) => t.yoyDeduNp, index, 'yoyDeduNp', ascending),
       ),
       PlatformDataColumn(
-        label: '环比营收增长',
+        label: AppLocalizations.t('orLastMonth'),
         name: 'or_last_month',
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 110,
-        onSort: (int index, bool ascending) => qperformanceDataPageController
+        onSort: (int index, bool ascending) => qperformanceController
             .sort((t) => t.orLastMonth, index, 'orLastMonth', ascending),
       ),
       PlatformDataColumn(
-        label: '环比净利润增长',
+        label: AppLocalizations.t('npLastMonth'),
         name: 'np_last_month',
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 130,
-        onSort: (int index, bool ascending) => qperformanceDataPageController
+        onSort: (int index, bool ascending) => qperformanceController
             .sort((t) => t.npLastMonth, index, 'npLastMonth', ascending),
       ),
       PlatformDataColumn(
-        label: '净资产收益率',
+        label: AppLocalizations.t('weightAvgRoe'),
         name: 'weight_avg_roe',
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 100,
-        onSort: (int index, bool ascending) => qperformanceDataPageController
+        onSort: (int index, bool ascending) => qperformanceController
             .sort((t) => t.weightAvgRoe, index, 'weightAvgRoe', ascending),
       ),
       PlatformDataColumn(
-        label: '毛利率',
+        label: AppLocalizations.t('grossProfitMargin'),
         name: 'gross_profit_margin',
         dataType: DataType.double,
         positiveColor: Colors.red,
@@ -277,31 +354,8 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         align: Alignment.centerRight,
         width: 80,
         onSort: (int index, bool ascending) =>
-            qperformanceDataPageController.sort((t) => t.grossProfitMargin,
+            qperformanceController.sort((t) => t.grossProfitMargin,
                 index, 'grossProfitMargin', ascending),
-      ),
-      PlatformDataColumn(
-          label: '',
-          name: 'action',
-          inputType: InputType.custom,
-          width: 20,
-          buildSuffix: (int index, dynamic data) {
-            return nilBox;
-          }),
-      PlatformDataColumn(
-        label: '股票代码',
-        name: 'ts_code',
-        width: 100,
-      ),
-      PlatformDataColumn(
-        label: '业绩日期',
-        name: 'qdate',
-        width: 90,
-      ),
-      PlatformDataColumn(
-        label: '交易日期',
-        name: 'trade_date',
-        width: 80,
       ),
       PlatformDataColumn(
           label: '',
@@ -312,16 +366,28 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
           }),
     ];
 
-    return BindingTrinaPaginatedDataGrid<QPerformance>(
-      key: UniqueKey(),
-      minWidth: 1400,
-      showCheckboxColumn: false,
-      horizontalMargin: 10.0,
-      columnSpacing: 0.0,
-      platformDataColumns: qperformanceDataColumns,
-      controller: qperformanceDataPageController,
-      fixedLeftColumns: 1,
-    );
+    Widget table = BindingTrinaDataGrid<QPerformance>(
+        key: UniqueKey(),
+        showCheckboxColumn: true,
+        horizontalMargin: 10.0,
+        columnSpacing: 0.0,
+        platformDataColumns: qperformanceDataColumns,
+        controller: qperformanceController);
+    return Stack(children: <Widget>[
+      table,
+      Obx(() {
+        if (showLoading.value) {
+          return Container(
+            width: double.infinity,
+            height: 450,
+            alignment: Alignment.center,
+            child: const CircularProgressIndicator(),
+          );
+        } else {
+          return nilBox;
+        }
+      }),
+    ]);
   }
 
   @override
@@ -330,6 +396,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
     return AppBarView(
       title: title,
       withLeading: true,
+      helpPath: routeName,
       rightWidgets: rightWidgets,
       child: Column(
         children: [

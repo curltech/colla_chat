@@ -412,40 +412,35 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
   List<PlatformDataColumn> _buildDayLineDataColumns() {
     final List<PlatformDataColumn> dayLineDataColumns = [
       PlatformDataColumn(
-        label: '股票代码',
+        label: AppLocalizations.t('tsCode'),
         name: 'ts_code',
         width: 120,
         onSort: (int index, bool ascending) => dayLineController.sort(
             (t) => t.tsCode, index, 'ts_code', ascending),
       ),
       PlatformDataColumn(
-        label: '股票名',
+        label: AppLocalizations.t('tsName'),
         name: 'name',
         width: 80,
         onSort: (int index, bool ascending) =>
             dayLineController.sort((t) => t.name, index, 'name', ascending),
       ),
       PlatformDataColumn(
-        label: '行业',
+        label: AppLocalizations.t('industry'),
         name: 'industry',
         width: 80,
-        onSort: (int index, bool ascending) =>
-            dayLineController.sort((t) => t.industry, index, 'industry', ascending),
+        onSort: (int index, bool ascending) => dayLineController.sort(
+            (t) => t.industry, index, 'industry', ascending),
       ),
-      // PlatformDataColumn(
-      //   label: '交易日期',
-      //   name: 'trade_date',
-      //   width: 90,
-      // ),
       PlatformDataColumn(
-        label: '收盘价',
+        label: AppLocalizations.t('close'),
         name: 'close',
         dataType: DataType.double,
         align: Alignment.centerRight,
         width: 70,
       ),
       PlatformDataColumn(
-        label: '涨幅',
+        label: AppLocalizations.t('pctChgClose'),
         name: 'pct_chg_close',
         dataType: DataType.percentage,
         positiveColor: Colors.red,
@@ -456,7 +451,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
             (t) => t.pctChgClose, index, 'pct_chg_close', ascending),
       ),
       PlatformDataColumn(
-        label: '量变化',
+        label: AppLocalizations.t('pctChgVol'),
         name: 'pct_chg_vol',
         dataType: DataType.percentage,
         positiveColor: Colors.red,
@@ -467,7 +462,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
             (t) => t.pctChgVol, index, 'pct_chg_vol', ascending),
       ),
       PlatformDataColumn(
-        label: '换手率',
+        label: AppLocalizations.t('turnover'),
         name: 'turnover',
         dataType: DataType.double,
         align: Alignment.centerRight,
