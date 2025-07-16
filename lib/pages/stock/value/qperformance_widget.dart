@@ -62,13 +62,11 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         ),
       ),
       PlatformDataField(
-          name: 'tradeDate',
-          label: AppLocalizations.t('tradeDate'),
-          dataType: DataType.int,
+          name: 'qDate',
+          label: AppLocalizations.t('qDate'),
           cancel: true,
-          textInputType: TextInputType.number,
           prefixIcon: Icon(
-            Icons.calendar_view_day_outlined,
+            Icons.date_range_outlined,
             color: myself.primary,
           )),
       PlatformDataField(
@@ -96,7 +94,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
     ];
     searchController = PlatformReactiveFormController(searchDataField);
     searchController.setValue(
-        'tradeDate', DateUtil.formatDateQuarter(DateTime.now()));
+        'qDate', DateUtil.formatDateQuarter(DateTime.now()));
   }
 
   Widget _buildDayLineChipGroup() {
@@ -185,41 +183,52 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
             _onSubmit(context, values);
           }),
     ];
-    Widget formInputWidget = Container(
+    Widget platformReactiveForm = Container(
         padding: const EdgeInsets.all(10.0),
         child: PlatformReactiveForm(
-          height: appDataProvider.portraitSize.height * 0.2,
+          height: appDataProvider.portraitSize.height * 0.4,
           spacing: 5.0,
           platformReactiveFormController: searchController,
           formButtons: formButtonDefs,
         ));
 
-    formInputWidget = ExpansionTile(
+    platformReactiveForm = ExpansionTile(
       title: Text(AppLocalizations.t('Search')),
       initiallyExpanded: true,
       controller: expansibleController,
-      children: [formInputWidget],
+      children: [platformReactiveForm],
     );
 
-    return formInputWidget;
+    return platformReactiveForm;
   }
 
   _onSubmit(BuildContext context, Map<String, dynamic> values) async {
     String? tsCode = values['tsCode'];
     int? tradeDate = values['tradeDate'];
+    String? qDate = values['qDate'];
     String? condContent = values['condContent'];
-    query(tradeDate: tradeDate!, condContent: condContent!, tsCode: tsCode);
+    query(
+        tradeDate: tradeDate!,
+        qDate: qDate,
+        condContent: condContent!,
+        tsCode: tsCode);
     expansibleController.collapse();
     DialogUtil.info(
         content: AppLocalizations.t('stock qperformance query completely'));
   }
 
-  query(
-      {required int tradeDate,
-      required String condContent,
-      String? tsCode}) async {
-    List<QPerformance> qperformances = await remoteQPerformanceService
-        .sendFindByCondContent(condContent, tsCode: tsCode, tradeDate: tradeDate);
+  query({
+    String? tsCode,
+    String? qDate,
+    int? tradeDate,
+    String? condContent,
+  }) async {
+    List<QPerformance> qperformances =
+        await remoteQPerformanceService.sendFindByCondContent(
+            condContent: condContent,
+            qDate: qDate,
+            tsCode: tsCode,
+            tradeDate: tradeDate);
     qperformanceController.replaceAll(qperformances);
     List<String> tsCodes = [];
     for (QPerformance qperformance in qperformances) {
@@ -256,8 +265,8 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         width: 50,
         dataType: DataType.double,
         align: Alignment.centerRight,
-        onSort: (int index, bool ascending) => qperformanceController
-            .sort((t) => t.pe, index, 'pe', ascending),
+        onSort: (int index, bool ascending) =>
+            qperformanceController.sort((t) => t.pe, index, 'pe', ascending),
       ),
       PlatformDataColumn(
         label: AppLocalizations.t('peg'),
@@ -265,8 +274,8 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         width: 70,
         dataType: DataType.double,
         align: Alignment.centerRight,
-        onSort: (int index, bool ascending) => qperformanceController
-            .sort((t) => t.peg, index, 'peg', ascending),
+        onSort: (int index, bool ascending) =>
+            qperformanceController.sort((t) => t.peg, index, 'peg', ascending),
       ),
       PlatformDataColumn(
         label: AppLocalizations.t('close'),
@@ -276,8 +285,8 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 80,
-        onSort: (int index, bool ascending) => qperformanceController
-            .sort((t) => t.close, index, 'close', ascending),
+        onSort: (int index, bool ascending) => qperformanceController.sort(
+            (t) => t.close, index, 'close', ascending),
       ),
       PlatformDataColumn(
         label: AppLocalizations.t('pctChgClose'),
@@ -287,8 +296,8 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         width: 80,
-        onSort: (int index, bool ascending) => qperformanceController
-            .sort((t) => t.pctChgClose, index, 'pctChgClose', ascending),
+        onSort: (int index, bool ascending) => qperformanceController.sort(
+            (t) => t.pctChgClose, index, 'pctChgClose', ascending),
       ),
       PlatformDataColumn(
         label: AppLocalizations.t('yoySales'),
@@ -298,8 +307,8 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 100,
-        onSort: (int index, bool ascending) => qperformanceController
-            .sort((t) => t.yoySales, index, 'yoySales', ascending),
+        onSort: (int index, bool ascending) => qperformanceController.sort(
+            (t) => t.yoySales, index, 'yoySales', ascending),
       ),
       PlatformDataColumn(
         label: AppLocalizations.t('yoyDeduNp'),
@@ -309,8 +318,8 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 110,
-        onSort: (int index, bool ascending) => qperformanceController
-            .sort((t) => t.yoyDeduNp, index, 'yoyDeduNp', ascending),
+        onSort: (int index, bool ascending) => qperformanceController.sort(
+            (t) => t.yoyDeduNp, index, 'yoyDeduNp', ascending),
       ),
       PlatformDataColumn(
         label: AppLocalizations.t('orLastMonth'),
@@ -320,8 +329,8 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 110,
-        onSort: (int index, bool ascending) => qperformanceController
-            .sort((t) => t.orLastMonth, index, 'orLastMonth', ascending),
+        onSort: (int index, bool ascending) => qperformanceController.sort(
+            (t) => t.orLastMonth, index, 'orLastMonth', ascending),
       ),
       PlatformDataColumn(
         label: AppLocalizations.t('npLastMonth'),
@@ -331,8 +340,8 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 130,
-        onSort: (int index, bool ascending) => qperformanceController
-            .sort((t) => t.npLastMonth, index, 'npLastMonth', ascending),
+        onSort: (int index, bool ascending) => qperformanceController.sort(
+            (t) => t.npLastMonth, index, 'npLastMonth', ascending),
       ),
       PlatformDataColumn(
         label: AppLocalizations.t('weightAvgRoe'),
@@ -342,8 +351,8 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 100,
-        onSort: (int index, bool ascending) => qperformanceController
-            .sort((t) => t.weightAvgRoe, index, 'weightAvgRoe', ascending),
+        onSort: (int index, bool ascending) => qperformanceController.sort(
+            (t) => t.weightAvgRoe, index, 'weightAvgRoe', ascending),
       ),
       PlatformDataColumn(
         label: AppLocalizations.t('grossProfitMargin'),
@@ -353,9 +362,8 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 80,
-        onSort: (int index, bool ascending) =>
-            qperformanceController.sort((t) => t.grossProfitMargin,
-                index, 'grossProfitMargin', ascending),
+        onSort: (int index, bool ascending) => qperformanceController.sort(
+            (t) => t.grossProfitMargin, index, 'grossProfitMargin', ascending),
       ),
       PlatformDataColumn(
           label: '',

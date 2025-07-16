@@ -61,6 +61,13 @@ class ShareService extends GeneralBaseService<Share> {
     };
   }
 
+  Future<List<Share>> search(String keyword) async {
+    var conds = "name like ? or tscode like ? or pinyin like ?";
+    List<Share> shares = await find(where: conds, whereArgs: [keyword, keyword, keyword]);
+
+    return shares;
+  }
+
   Future<Share?> findShare(String tsCode) async {
     if (!shares.containsKey(tsCode)) {
       Share? share = await findOne(where: 'tscode=?', whereArgs: [tsCode]);

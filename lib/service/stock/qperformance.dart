@@ -9,9 +9,11 @@ class RemoteQPerformanceService extends GeneralRemoteService<QPerformance> {
   }
 
   /// 查询自选股的最新日线
-  Future<dynamic> sendFindByCondContent(String condContent,
+  Future<dynamic> sendFindByCondContent(
       {String? tsCode,
+      String? qDate,
       int? tradeDate,
+      String? condContent,
       String? orderBy,
       int? from,
       int? limit,
@@ -19,6 +21,9 @@ class RemoteQPerformanceService extends GeneralRemoteService<QPerformance> {
     Map<String, dynamic> params = {};
     if (tsCode != null) {
       params['ts_code'] = tsCode;
+    }
+    if (qDate != null) {
+      params['qdate'] = qDate;
     }
     if (tradeDate != null) {
       params['trade_date'] = tradeDate;

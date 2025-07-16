@@ -91,24 +91,6 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
             Icons.code,
             color: myself.primary,
           )),
-      PlatformDataField(
-          name: 'startDate',
-          label: 'StartDate',
-          dataType: DataType.int,
-          textInputType: TextInputType.number,
-          prefixIcon: Icon(
-            Icons.type_specimen_outlined,
-            color: myself.primary,
-          )),
-      PlatformDataField(
-          name: 'endDate',
-          label: 'EndDate',
-          dataType: DataType.int,
-          textInputType: TextInputType.number,
-          prefixIcon: Icon(
-            Icons.person,
-            color: myself.primary,
-          )),
     ];
     inoutEventColumns = [
       PlatformDataColumn(
@@ -192,43 +174,35 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
     searchController.values = {'eventCode': inoutEventController.eventCode};
     int tradeDate = DateUtil.formatDateInt(DateUtil.currentDateTime());
     searchController.values = {'tradeDate': tradeDate};
-    List<FormButton> formButtonDefs = [
-      FormButton(
-          label: 'Ok',
-          onTap: (Map<String, dynamic> values) {
-            _onOk(context, values);
-          }),
-    ];
-    Widget formInputWidget = Container(
+    Widget platformReactiveForm = Container(
         padding: const EdgeInsets.all(10.0),
         child: PlatformReactiveForm(
           height: appDataProvider.portraitSize.height * 0.5,
           spacing: 5.0,
           platformReactiveFormController: searchController,
-          formButtons: formButtonDefs,
+          onSubmit: (Map<String, dynamic> values) {
+            _onSubmit(context, values);
+          },
         ));
 
-    formInputWidget = ExpansionTile(
+    platformReactiveForm = ExpansionTile(
       title: Text(AppLocalizations.t('Search')),
       controller: expansibleController,
-      children: [formInputWidget],
+      children: [platformReactiveForm],
     );
 
-    return formInputWidget;
+    return platformReactiveForm;
   }
 
-  _onOk(BuildContext context, Map<String, dynamic> values) async {
+  _onSubmit(BuildContext context, Map<String, dynamic> values) async {
     String? eventCode = values['eventCode'];
     String? tsCode = values['tsCode'];
     int? tradeDate = values['tradeDate'];
-    int? startDate = values['startDate'];
-    int? endDate = values['endDate'];
     refresh(
-        eventCode: eventCode,
-        tsCode: tsCode,
-        tradeDate: tradeDate,
-        startDate: startDate,
-        endDate: endDate);
+      eventCode: eventCode,
+      tsCode: tsCode,
+      tradeDate: tradeDate,
+    );
     expansibleController.collapse();
     DialogUtil.info(content: AppLocalizations.t('Inout search completely'));
   }
@@ -244,12 +218,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
     );
   }
 
-  refresh(
-      {String? eventCode,
-      String? tsCode,
-      int? tradeDate,
-      int? startDate,
-      int? endDate}) async {
+  refresh({String? eventCode, String? tsCode, int? tradeDate}) async {
     eventCode ??= inoutEventController.eventCode;
     if (eventCode == null) {
       return;
@@ -270,11 +239,10 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
         }
       }
       DateTime start = DateTime.now();
-      dayLines = await remoteDayLineService.sendFindByCondContent(condContent,
+      dayLines = await remoteDayLineService.sendFindByCondContent(
+          condContent: condContent,
           tsCode: tsCode,
           tradeDate: tradeDate,
-          startDate: startDate,
-          endDate: endDate,
           condParas:
               condParas.isNotEmpty ? JsonUtil.toJsonString(condParas) : null);
       DateTime end = DateTime.now();

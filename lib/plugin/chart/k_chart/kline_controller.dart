@@ -27,7 +27,6 @@ class KlineController extends DataListController<dynamic> {
 class MultiKlineController extends DataListController<String> {
   /// 加载数据的方式，true表示直接从网站加载，false表示从服务器加载，支持分批获取
   final RxBool online = true.obs;
-
   /// 当前线型
   final RxInt lineType = 101.obs;
 

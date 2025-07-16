@@ -377,11 +377,11 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
   }
 
   query(
-      {required int tradeDate,
-      required String condContent}) async {
+      { int? tradeDate,
+       String? condContent}) async {
     DateTime start = DateTime.now();
     List<DayLine> dayLines = await remoteDayLineService.sendFindByCondContent(
-        condContent,
+        condContent:condContent,
         tradeDate: tradeDate);
     DateTime end = DateTime.now();
     logger.i(

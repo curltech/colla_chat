@@ -6,6 +6,7 @@ import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/share.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -83,8 +84,16 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
 
   _searchShare(String keyword) async {
     if (keyword.isNotEmpty) {
-      shares.value = await remoteShareService.sendSearchShare(keyword);
-      tileData.value = await _buildShareTileData();
+      try {
+        if (myShareController.online.value) {
+          shares.value = await shareService.search(keyword);
+        } else {
+          shares.value = await remoteShareService.sendSearchShare(keyword);
+        }
+        tileData.value = await _buildShareTileData();
+      } catch (e) {
+        DialogUtil.error(content: 'Search share failure:$e');
+      }
     }
   }
 
