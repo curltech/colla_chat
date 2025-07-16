@@ -47,6 +47,16 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
   _init() {
     searchDataField = [
       PlatformDataField(
+          name: 'tradeDate',
+          label: 'TradeDate',
+          dataType: DataType.int,
+          cancel: true,
+          textInputType: TextInputType.number,
+          prefixIcon: Icon(
+            Icons.calendar_view_day_outlined,
+            color: myself.primary,
+          )),
+      PlatformDataField(
         name: 'tsCode',
         label: AppLocalizations.t('tsCode'),
         cancel: true,
@@ -93,8 +103,6 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
       )
     ];
     searchController = PlatformReactiveFormController(searchDataField);
-    searchController.setValue(
-        'qDate', DateUtil.formatDateQuarter(DateTime.now()));
   }
 
   Widget _buildDayLineChipGroup() {
@@ -179,21 +187,18 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
 
   /// 构建搜索条件
   Widget _buildSearchView(BuildContext context) {
-    List<FormButton> formButtonDefs = [
-      FormButton(
-          label: 'Submit',
-          onTap: (Map<String, dynamic> values) {
-            _onSubmit(context, values);
-          }),
-    ];
+    searchController.setValue(
+        'qDate', DateUtil.formatDateQuarter(DateTime.now()));
     Widget platformReactiveForm = Container(
-        padding: const EdgeInsets.all(10.0),
-        child: PlatformReactiveForm(
-          height: appDataProvider.portraitSize.height * 0.4,
+      padding: const EdgeInsets.all(10.0),
+      child: PlatformReactiveForm(
+          height: appDataProvider.portraitSize.height * 0.5,
           spacing: 5.0,
           platformReactiveFormController: searchController,
-          formButtons: formButtonDefs,
-        ));
+          onSubmit: (Map<String, dynamic> values) {
+            _onSubmit(context, values);
+          }),
+    );
 
     platformReactiveForm = ExpansionTile(
       title: Text(AppLocalizations.t('Search')),
