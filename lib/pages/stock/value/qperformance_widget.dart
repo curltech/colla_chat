@@ -48,7 +48,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
     searchDataField = [
       PlatformDataField(
           name: 'tradeDate',
-          label: 'TradeDate',
+          label: AppLocalizations.t('tradeDate'),
           dataType: DataType.int,
           cancel: true,
           textInputType: TextInputType.number,

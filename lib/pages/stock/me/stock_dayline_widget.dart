@@ -47,7 +47,7 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
     final List<PlatformDataField> searchDataField = [
       PlatformDataField(
           name: 'tradeDate',
-          label: 'TradeDate',
+          label: AppLocalizations.t('tradeDate'),
           dataType: DataType.int,
           cancel: true,
           textInputType: TextInputType.number,
@@ -57,7 +57,7 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
           )),
       PlatformDataField(
         name: 'condContent',
-        label: 'CondContent',
+        label: AppLocalizations.t('condContent'),
         dataType: DataType.string,
         minLines: 4,
         cancel: true,
