@@ -225,9 +225,12 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
   }
 
   _onActionChip(String name) {
-    String? condContent =
-        searchController.values['condContent']?.toString() ?? '';
-    condContent += ' and $name';
+    String? condContent = searchController.values['condContent']?.toString();
+    if (condContent == null) {
+      condContent = '$name=?';
+    } else {
+      condContent += ' and $name=?';
+    }
     searchController.setValue('condContent', condContent);
   }
 
@@ -369,20 +372,16 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
   onSubmit(BuildContext context, Map<String, dynamic> values) async {
     int? tradeDate = values['tradeDate'];
     String? condContent = values['condContent'];
-    query(
-        tradeDate: tradeDate!, condContent: condContent!);
+    query(tradeDate: tradeDate!, condContent: condContent!);
     expansibleController.collapse();
     DialogUtil.info(
         content: AppLocalizations.t('stock dayline query completely'));
   }
 
-  query(
-      { int? tradeDate,
-       String? condContent}) async {
+  query({int? tradeDate, String? condContent}) async {
     DateTime start = DateTime.now();
     List<DayLine> dayLines = await remoteDayLineService.sendFindByCondContent(
-        condContent:condContent,
-        tradeDate: tradeDate);
+        condContent: condContent, tradeDate: tradeDate);
     DateTime end = DateTime.now();
     logger.i(
         'find more day line data duration:${end.difference(start).inMilliseconds}');

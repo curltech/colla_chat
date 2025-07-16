@@ -145,9 +145,12 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
   }
 
   _onActionChip(String name) {
-    String? condContent =
-        searchController.values['condContent']?.toString() ?? '';
-    condContent += ' and $name';
+    String? condContent = searchController.values['condContent']?.toString();
+    if (condContent == null) {
+      condContent = '$name=?';
+    } else {
+      condContent += ' and $name=?';
+    }
     searchController.setValue('condContent', condContent);
   }
 
