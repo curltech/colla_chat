@@ -349,7 +349,7 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
     Widget platformReactiveForm = Container(
       padding: const EdgeInsets.all(10.0),
       child: PlatformReactiveForm(
-          height: appDataProvider.portraitSize.height * 0.5,
+          height: appDataProvider.portraitSize.height * 0.35,
           spacing: 5.0,
           platformReactiveFormController: searchController,
           onSubmit: (Map<String, dynamic> values) {
