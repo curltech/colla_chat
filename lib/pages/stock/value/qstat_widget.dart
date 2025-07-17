@@ -16,6 +16,7 @@ import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 
 ///自选股和分组的查询界面
 class QStatWidget extends StatelessWidget with TileDataMixin {
@@ -43,12 +44,17 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
   _init() {
     searchDataField = [
       PlatformDataField(
-          name: 'startDate',
-          label: AppLocalizations.t('startDate'),
-          prefixIcon: Icon(
-            Icons.date_range_outlined,
-            color: myself.primary,
-          )),
+        name: 'startDate',
+        label: AppLocalizations.t('startDate'),
+        prefixIcon: Icon(
+          Icons.date_range_outlined,
+          color: myself.primary,
+        ),
+        validators: [Validators.required],
+        validationMessages: {
+          ValidationMessage.required: (_) => 'The startDate must not be empty',
+        },
+      ),
       PlatformDataField(
         name: 'tsCode',
         label: AppLocalizations.t('tsCode'),
