@@ -15,6 +15,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 
 class EventFilterController extends DataListController<EventFilter> {
   final Rx<String?> _eventCode = Rx<String?>(null);
@@ -63,44 +64,59 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
   final List<PlatformDataField> eventFilterDataField = [
     PlatformDataField(
         name: 'id',
-        label: 'Id',
+        label: AppLocalizations.t('id'),
         inputType: InputType.label,
         prefixIcon: Icon(
           Icons.perm_identity_outlined,
           color: myself.primary,
         )),
     PlatformDataField(
-        name: 'eventCode',
-        label: 'EventCode',
-        prefixIcon: Icon(
-          Icons.code,
-          color: myself.primary,
-        )),
+      name: 'eventCode',
+      label: AppLocalizations.t('eventCode'),
+      prefixIcon: Icon(
+        Icons.code,
+        color: myself.primary,
+      ),
+      validators: [Validators.required],
+      validationMessages: {
+        ValidationMessage.required: (_) => 'The eventCode must not be empty',
+      },
+    ),
     PlatformDataField(
-        name: 'eventName',
-        label: 'EventName',
-        prefixIcon: Icon(
-          Icons.person,
-          color: myself.primary,
-        )),
+      name: 'eventName',
+      label: AppLocalizations.t('eventName'),
+      prefixIcon: Icon(
+        Icons.person,
+        color: myself.primary,
+      ),
+      validators: [Validators.required],
+      validationMessages: {
+        ValidationMessage.required: (_) => 'The eventName must not be empty',
+      },
+    ),
     PlatformDataField(
-        name: 'condContent',
-        label: 'CondContent',
-        minLines: 4,
-        prefixIcon: Icon(
-          Icons.content_paste,
-          color: myself.primary,
-        )),
+      name: 'condContent',
+      label: AppLocalizations.t('condContent'),
+      minLines: 4,
+      prefixIcon: Icon(
+        Icons.content_paste,
+        color: myself.primary,
+      ),
+      validators: [Validators.required],
+      validationMessages: {
+        ValidationMessage.required: (_) => 'The condContent must not be empty',
+      },
+    ),
     PlatformDataField(
         name: 'condParas',
-        label: 'CondParas',
+        label: AppLocalizations.t('condParas'),
         prefixIcon: Icon(
           Icons.attribution_outlined,
           color: myself.primary,
         )),
     PlatformDataField(
         name: 'descr',
-        label: 'Descr',
+        label: AppLocalizations.t('Descr'),
         prefixIcon: Icon(
           Icons.description_outlined,
           color: myself.primary,
@@ -204,25 +220,15 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
       }
       platformReactiveFormController.values = json;
     }
-    List<FormButton> formButtonDefs = [
-      FormButton(
-          label: 'Copy',
-          onTap: (Map<String, dynamic> values) {
-            _onCopy(values);
-          }),
-      FormButton(
-          label: 'Submit',
-          onTap: (Map<String, dynamic> values) {
-            _onSubmit(context, values);
-          }),
-    ];
     var platformReactiveForm = Container(
         padding: const EdgeInsets.all(10.0),
         child: PlatformReactiveForm(
           height: appDataProvider.portraitSize.height * 0.7,
           spacing: 5.0,
           platformReactiveFormController: platformReactiveFormController,
-          formButtons: formButtonDefs,
+          onSubmit: (Map<String, dynamic> values) {
+            _onSubmit(context, values);
+          },
         ));
 
     return platformReactiveForm;

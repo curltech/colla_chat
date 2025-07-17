@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:colla_chat/entity/stock/performance.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
@@ -12,42 +10,12 @@ import 'package:colla_chat/service/stock/performance.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/binging_trina_paginated_data_grid.dart';
+import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-
-class PerformanceDataPageController extends DataPageController<Performance> {
-  PerformanceDataPageController();
-
-  @override
-  sort<S>(Comparable<S>? Function(Performance t) getFieldValue, int columnIndex,
-      String columnName, bool ascending) {
-    findCondition.value = findCondition.value
-        .copy(sortColumns: [SortColumn(columnIndex, columnName, ascending)]);
-  }
-
-  @override
-  FutureOr<void> findData() async {
-    Map<String, dynamic> responseData =
-        await remotePerformanceService.sendFindByQDate(
-            securityCode: findCondition.value.whereColumns['tsCode'],
-            startDate: findCondition.value.whereColumns['startDate'],
-            from: findCondition.value.offset,
-            limit: findCondition.value.limit,
-            orderBy: orderBy(),
-            count: findCondition.value.count);
-    findCondition.value.count = responseData['count'];
-    List<Performance> performances = responseData['data'];
-    replaceAll(performances);
-  }
-}
-
-/// 自选股当前日线的控制器
-final PerformanceDataPageController performanceDataPageController =
-    PerformanceDataPageController();
+import 'package:reactive_forms/reactive_forms.dart';
 
 ///自选股和分组的查询界面
 class PerformanceWidget extends StatelessWidget with TileDataMixin {
@@ -67,132 +35,127 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Performance';
 
+  final DataListController<Performance> performanceController =
+      DataListController<Performance>();
+
   late final List<PlatformDataColumn> performanceDataColumns = [
     PlatformDataColumn(
-      label: '股票名',
+      label: AppLocalizations.t('securityCode'),
+      name: 'security_code',
+      align: Alignment.centerRight,
+      width: 120,
+    ),
+    PlatformDataColumn(
+      label: AppLocalizations.t('dataType'),
+      name: 'data_type',
+      width: 100,
+    ),
+    PlatformDataColumn(
+      label: AppLocalizations.t('securityNameAbbr'),
       name: 'security_name_abbr',
       width: 80,
     ),
     PlatformDataColumn(
-      label: '业绩日期',
+      label: AppLocalizations.t('qDate'),
       name: 'qdate',
       width: 60,
     ),
     PlatformDataColumn(
-      label: '年营收增长',
+      label: AppLocalizations.t('yoySales'),
       name: 'yoy_sales',
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
       align: Alignment.centerRight,
       width: 100,
-      onSort: (int index, bool ascending) => performanceDataPageController.sort(
+      onSort: (int index, bool ascending) => performanceController.sort(
           (t) => t.yoySales, index, 'yoySales', ascending),
     ),
     PlatformDataColumn(
-      label: '年净利润增长',
+      label: AppLocalizations.t('yoyDeduNp'),
       name: 'yoy_dedu_np',
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
       align: Alignment.centerRight,
       width: 110,
-      onSort: (int index, bool ascending) => performanceDataPageController.sort(
+      onSort: (int index, bool ascending) => performanceController.sort(
           (t) => t.yoyDeduNp, index, 'yoyDeduNp', ascending),
     ),
     PlatformDataColumn(
-      label: '环比营收增长',
+      label: AppLocalizations.t('orLastMonth'),
       name: 'or_last_month',
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
       align: Alignment.centerRight,
       width: 110,
-      onSort: (int index, bool ascending) => performanceDataPageController.sort(
+      onSort: (int index, bool ascending) => performanceController.sort(
           (t) => t.orLastMonth, index, 'orLastMonth', ascending),
     ),
     PlatformDataColumn(
-      label: '环比净利润增长',
+      label: AppLocalizations.t('npLastMonth'),
       name: 'np_last_month',
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
       align: Alignment.centerRight,
       width: 130,
-      onSort: (int index, bool ascending) => performanceDataPageController.sort(
+      onSort: (int index, bool ascending) => performanceController.sort(
           (t) => t.npLastMonth, index, 'npLastMonth', ascending),
     ),
     PlatformDataColumn(
-      label: '净资产收益率',
+      label: AppLocalizations.t('weightAvgRoe'),
       name: 'weight_avg_roe',
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
       align: Alignment.centerRight,
       width: 100,
-      onSort: (int index, bool ascending) => performanceDataPageController.sort(
+      onSort: (int index, bool ascending) => performanceController.sort(
           (t) => t.weightAvgRoe, index, 'weightAvgRoe', ascending),
     ),
     PlatformDataColumn(
-      label: '毛利率',
+      label: AppLocalizations.t('grossProfitMargin'),
       name: 'gross_profit_margin',
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
       align: Alignment.centerRight,
       width: 80,
-      onSort: (int index, bool ascending) => performanceDataPageController.sort(
+      onSort: (int index, bool ascending) => performanceController.sort(
           (t) => t.grossProfitMargin, index, 'grossProfitMargin', ascending),
     ),
     PlatformDataColumn(
-      label: '基本每股收益',
+      label: AppLocalizations.t('basicEps'),
       name: 'basic_eps',
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
       align: Alignment.centerRight,
       width: 110,
-      onSort: (int index, bool ascending) => performanceDataPageController.sort(
+      onSort: (int index, bool ascending) => performanceController.sort(
           (t) => t.basicEps, index, 'basicEps', ascending),
     ),
     PlatformDataColumn(
-      label: '总营收',
+      label: AppLocalizations.t('totalOperateIncome'),
       name: 'total_operate_income',
       dataType: DataType.double,
       align: Alignment.centerRight,
       width: 140,
-      onSort: (int index, bool ascending) => performanceDataPageController.sort(
+      onSort: (int index, bool ascending) => performanceController.sort(
           (t) => t.totalOperateIncome, index, 'totalOperateIncome', ascending),
     ),
     PlatformDataColumn(
-      label: '归母净利润',
+      label: AppLocalizations.t('parentNetProfit'),
       name: 'parent_net_profit',
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
       align: Alignment.centerRight,
       width: 140,
-      onSort: (int index, bool ascending) => performanceDataPageController.sort(
+      onSort: (int index, bool ascending) => performanceController.sort(
           (t) => t.parentNetProfit, index, 'parentNetProfit', ascending),
-    ),
-    PlatformDataColumn(
-        label: '',
-        name: 'action',
-        inputType: InputType.custom,
-        width: 20,
-        buildSuffix: (int index, dynamic data) {
-          return nilBox;
-        }),
-    PlatformDataColumn(
-      label: '股票代码',
-      name: 'security_code',
-      align: Alignment.centerRight,
-      width: 120,
-    ),
-    PlatformDataColumn(
-      label: '业绩类型',
-      name: 'data_type',
-      width: 100,
     ),
     PlatformDataColumn(
         label: '',
@@ -205,40 +168,49 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   final ExpansibleController expansibleController = ExpansibleController();
 
   _init() {
-    performanceDataPageController.findCondition.addListener(_updatePerformance);
     searchDataField = [
       PlatformDataField(
-        name: 'tsCode',
-        label: 'TsCode',
+        name: 'securityCode',
+        label: AppLocalizations.t('securityCode'),
         cancel: true,
         prefixIcon: IconButton(
           onPressed: () {
             searchController.setValue(
-                'tsCode', myShareController.subscription.value);
+                'securityCode', myShareController.subscription.value);
           },
           icon: Icon(
             Icons.perm_identity_outlined,
             color: myself.primary,
           ),
         ),
+        validators: [Validators.required],
+        validationMessages: {
+          ValidationMessage.required: (_) =>
+              'The securityCode must not be empty',
+        },
       ),
       PlatformDataField(
-          name: 'startDate',
-          label: 'StartDate',
-          prefixIcon: Icon(
-            Icons.date_range_outlined,
-            color: myself.primary,
-          )),
+        name: 'startDate',
+        label: AppLocalizations.t('startDate'),
+        prefixIcon: Icon(
+          Icons.date_range_outlined,
+          color: myself.primary,
+        ),
+        validators: [Validators.required],
+        validationMessages: {
+          ValidationMessage.required: (_) => 'The startDate must not be empty',
+        },
+      ),
     ];
     searchController = PlatformReactiveFormController(searchDataField);
-    searchController.setValue(
-        'startDate', DateUtil.formatDateQuarter(DateTime.now()));
   }
 
-  _updatePerformance() {
-    Map<String, dynamic> values = searchController.values;
-    performanceDataPageController.findCondition.value.whereColumns = values;
-    performanceDataPageController.findData();
+  refresh(String securityCode, String startDate) async {
+    Map<String, dynamic> responseData = await remotePerformanceService
+        .sendFindByQDate(securityCode: securityCode, startDate: startDate);
+    var count = responseData['count'];
+    List<Performance> performances = responseData['data'];
+    performanceController.replaceAll(performances);
   }
 
   Widget _buildActionWidget(int index, dynamic performance) {
@@ -266,49 +238,53 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
 
   /// 构建搜索条件
   Widget _buildSearchView(BuildContext context) {
-    List<FormButton> formButtonDefs = [
-      FormButton(
-          label: 'Ok',
-          onTap: (Map<String, dynamic> values) {
-            _onOk(values);
-          }),
-    ];
-    Widget formInputWidget = Container(
+    Widget platformReactiveForm = Container(
         padding: const EdgeInsets.all(10.0),
         child: PlatformReactiveForm(
-          height: appDataProvider.portraitSize.height * 0.22,
+          height: appDataProvider.portraitSize.height * 0.3,
           spacing: 10.0,
           platformReactiveFormController: searchController,
-          formButtons: formButtonDefs,
+          onSubmit: (Map<String, dynamic> values) {
+            _onSubmit(values);
+          },
         ));
 
-    formInputWidget = ExpansionTile(
+    platformReactiveForm = ExpansionTile(
       title: Text(AppLocalizations.t('Search')),
       initiallyExpanded: true,
       controller: expansibleController,
-      children: [formInputWidget],
+      children: [platformReactiveForm],
     );
 
-    return formInputWidget;
+    return platformReactiveForm;
   }
 
-  _onOk(Map<String, dynamic> values) async {
-    performanceDataPageController.findCondition.value.whereColumns = values;
-    await performanceDataPageController.findData();
+  _onSubmit(Map<String, dynamic> values) async {
+    String? securityCode = values['security_code'];
+    String? startDate = values['start_date'];
+    if (securityCode == null || startDate == null) {
+      DialogUtil.error(
+          content:
+              AppLocalizations.t('securityCode and startDate are not empty'));
+
+      return;
+    }
+    await refresh(securityCode, startDate);
     expansibleController.collapse();
     DialogUtil.info(
         content: AppLocalizations.t('Performance search completely'));
   }
 
   Widget _buildPerformanceListView(BuildContext context) {
-    return BindingTrinaPaginatedDataGrid<Performance>(
+    searchController.setValue(
+        'startDate', DateUtil.formatDateQuarter(DateTime.now()));
+    return BindingTrinaDataGrid<Performance>(
       key: UniqueKey(),
-      minWidth: 1500,
       showCheckboxColumn: false,
       horizontalMargin: 10.0,
       columnSpacing: 0.0,
       platformDataColumns: performanceDataColumns,
-      controller: performanceDataPageController,
+      controller: performanceController,
       fixedLeftColumns: 1,
     );
   }

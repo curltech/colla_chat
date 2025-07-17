@@ -19,6 +19,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 
 /// 日线数据列表控制器
 class InoutEventController extends DataListController<DayLine> {
@@ -69,22 +70,27 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
   _init() {
     final List<PlatformDataField> searchDataField = [
       PlatformDataField(
-          name: 'eventCode',
-          label: 'EventCode',
-          prefixIcon: Icon(
-            Icons.event_available_outlined,
-            color: myself.primary,
-          )),
+        name: 'eventCode',
+        label: AppLocalizations.t('eventCode'),
+        prefixIcon: Icon(
+          Icons.event_available_outlined,
+          color: myself.primary,
+        ),
+        validators: [Validators.required],
+        validationMessages: {
+          ValidationMessage.required: (_) => 'The eventCode must not be empty',
+        },
+      ),
       PlatformDataField(
           name: 'tsCode',
-          label: 'TsCode',
+          label: AppLocalizations.t('tsCode'),
           prefixIcon: Icon(
             Icons.perm_identity_outlined,
             color: myself.primary,
           )),
       PlatformDataField(
           name: 'tradeDate',
-          label: 'TradeDate',
+          label: AppLocalizations.t('tradeDate'),
           dataType: DataType.int,
           textInputType: TextInputType.number,
           prefixIcon: Icon(
@@ -94,29 +100,29 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
     ];
     inoutEventColumns = [
       PlatformDataColumn(
-        label: '股票代码',
+        label: AppLocalizations.t('tsCode'),
         name: 'ts_code',
         width: 100,
         onSort: (int index, bool ascending) => inoutEventController.sort(
             (t) => t.tsCode, index, 'tsCode', ascending),
       ),
       PlatformDataColumn(
-        label: '股票名',
+        label: AppLocalizations.t('name'),
         name: 'name',
         width: 100,
       ),
       PlatformDataColumn(
-        label: '交易日期',
+        label: AppLocalizations.t('tradeDate'),
         name: 'trade_date',
         width: 100,
       ),
       PlatformDataColumn(
-        label: '收盘价',
+        label: AppLocalizations.t('close'),
         name: 'close',
         width: 100,
       ),
       PlatformDataColumn(
-        label: '涨幅',
+        label: AppLocalizations.t('pctChgClose'),
         name: 'pct_chg_close',
         dataType: DataType.percentage,
         positiveColor: Colors.red,
@@ -125,7 +131,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
         width: 70,
       ),
       PlatformDataColumn(
-        label: '量变化',
+        label: AppLocalizations.t('pctChgVol'),
         name: 'pct_chg_vol',
         dataType: DataType.percentage,
         positiveColor: Colors.red,
@@ -134,7 +140,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
         width: 90,
       ),
       PlatformDataColumn(
-        label: '换手率',
+        label: AppLocalizations.t('turnover'),
         name: 'turnover',
         dataType: DataType.double,
         align: Alignment.centerRight,
@@ -177,7 +183,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
     Widget platformReactiveForm = Container(
         padding: const EdgeInsets.all(10.0),
         child: PlatformReactiveForm(
-          height: appDataProvider.portraitSize.height * 0.5,
+          height: appDataProvider.portraitSize.height * 0.3,
           spacing: 5.0,
           platformReactiveFormController: searchController,
           onSubmit: (Map<String, dynamic> values) {

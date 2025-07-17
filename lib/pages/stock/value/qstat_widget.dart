@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:colla_chat/entity/stock/qstat.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
@@ -12,42 +10,12 @@ import 'package:colla_chat/service/stock/qstat.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-
-class QStatDataPageController extends DataPageController<QStat> {
-  @override
-  sort<S>(Comparable<S>? Function(QStat t) getFieldValue, int columnIndex,
-      String columnName, bool ascending) {
-    findCondition.value = findCondition.value
-        .copy(sortColumns: [SortColumn(columnIndex, columnName, ascending)]);
-  }
-
-  @override
-  FutureOr<void> findData() async {
-    Map<String, dynamic> responseData =
-        await remoteQStatService.sendFindQStatBy(
-            tsCode: findCondition.value.whereColumns['tsCode'],
-            terms: findCondition.value.whereColumns['terms'],
-            source: findCondition.value.whereColumns['source'],
-            from: findCondition.value.offset,
-            // limit: findCondition.value.limit,
-            orderBy: orderBy(),
-            count: findCondition.value.count);
-    findCondition.value.count = responseData['count'];
-    List<QStat> qstats = responseData['data'];
-    replaceAll(qstats);
-  }
-}
-
-/// 统计指标
-final QStatDataPageController qstatDataPageController =
-    QStatDataPageController();
 
 ///自选股和分组的查询界面
 class QStatWidget extends StatelessWidget with TileDataMixin {
@@ -69,21 +37,21 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
 
   late final List<PlatformDataField> searchDataField;
   late final PlatformReactiveFormController searchController;
+  final DataListController<QStat> qstatController = DataListController<QStat>();
   final ExpansibleController expansibleController = ExpansibleController();
 
   _init() {
-    qstatDataPageController.findCondition.addListener(_updateQStat);
     searchDataField = [
       PlatformDataField(
           name: 'startDate',
-          label: 'StartDate',
+          label: AppLocalizations.t('startDate'),
           prefixIcon: Icon(
             Icons.date_range_outlined,
             color: myself.primary,
           )),
       PlatformDataField(
         name: 'tsCode',
-        label: 'TsCode',
+        label: AppLocalizations.t('tsCode'),
         cancel: true,
         prefixIcon: IconButton(
           onPressed: () {
@@ -98,7 +66,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
       ),
       PlatformDataField(
           name: 'terms',
-          label: 'Terms',
+          label: AppLocalizations.t('terms'),
           inputType: InputType.checkbox,
           dataType: DataType.set,
           options: [
@@ -116,7 +84,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
           )),
       PlatformDataField(
           name: 'source',
-          label: 'Source',
+          label: AppLocalizations.t('source'),
           inputType: InputType.checkbox,
           dataType: DataType.set,
           options: [
@@ -137,14 +105,14 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
           )),
     ];
     searchController = PlatformReactiveFormController(searchDataField);
-    searchController.setValue(
-        'startDate', DateUtil.formatDateQuarter(DateTime.now()));
   }
 
-  _updateQStat() {
-    Map<String, dynamic> values = searchController.values;
-    qstatDataPageController.findCondition.value.whereColumns = values;
-    qstatDataPageController.findData();
+  refresh(String tsCode, {List<dynamic>? terms, List<dynamic>? source}) async {
+    Map<String, dynamic> responseData = await remoteQStatService
+        .sendFindQStatBy(tsCode: tsCode, terms: terms, source: source);
+    var count = responseData['count'];
+    List<QStat> qstats = responseData['data'];
+    qstatController.replaceAll(qstats);
   }
 
   Widget _buildActionWidget(int index, dynamic qstat) {
@@ -173,21 +141,15 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
 
   /// 构建搜索条件
   Widget _buildSearchView(BuildContext context) {
-    List<FormButton> formButtonDefs = [
-      FormButton(
-          label: 'Ok',
-          onTap: (Map<String, dynamic> values) {
-            _onOk(context, values);
-          }),
-    ];
     Widget platformReactiveForm = Container(
         padding: const EdgeInsets.all(10.0),
         child: PlatformReactiveForm(
-          height: appDataProvider.portraitSize.height * 0.35,
-          spacing: 5.0,
-          platformReactiveFormController: searchController,
-          formButtons: formButtonDefs,
-        ));
+            height: appDataProvider.portraitSize.height * 0.35,
+            spacing: 5.0,
+            platformReactiveFormController: searchController,
+            onSubmit: (Map<String, dynamic> values) {
+              _onSubmit(context, values);
+            }));
 
     platformReactiveForm = ExpansionTile(
       title: Text(AppLocalizations.t('Search')),
@@ -199,18 +161,14 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
     return platformReactiveForm;
   }
 
-  _onOk(BuildContext context, Map<String, dynamic> values) async {
+  _onSubmit(BuildContext context, Map<String, dynamic> values) async {
     String? tsCode = values['tsCode'];
     if (tsCode == null) {
       DialogUtil.error(content: 'tsCode must be value');
       return;
     }
-    qstatDataPageController.findCondition.value.whereColumns = {
-      'tsCode': tsCode,
-      'terms': values['terms']?.toList(),
-      'source': values['source']?.toList(),
-    };
-    await qstatDataPageController.findData();
+    await refresh(tsCode,
+        terms: values['terms']?.toList(), source: values['source']?.toList());
     expansibleController.collapse();
     DialogUtil.info(content: AppLocalizations.t('QStat search completely'));
   }
@@ -218,143 +176,135 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
   Widget _buildQStatListView(BuildContext context) {
     final List<PlatformDataColumn> qstatDataColumns = [
       PlatformDataColumn(
-        label: '股票名',
+        label: AppLocalizations.t('tsCode'),
+        name: 'ts_code',
+        width: 100,
+      ),
+      PlatformDataColumn(
+        label: AppLocalizations.t('term'),
+        name: 'term',
+        width: 90,
+      ),
+      PlatformDataColumn(
+        label: AppLocalizations.t('tradeDate'),
+        name: 'trade_date',
+        width: 80,
+      ),
+      PlatformDataColumn(
+        label: AppLocalizations.t('securityName'),
         name: 'security_name',
         width: 80,
       ),
       PlatformDataColumn(
-        label: '指标',
+        label: AppLocalizations.t('source'),
         name: 'source',
         width: 80,
       ),
       PlatformDataColumn(
-        label: 'pe',
+        label: AppLocalizations.t('pe'),
         name: 'pe',
         width: 50,
         dataType: DataType.double,
         align: Alignment.centerRight,
         onSort: (int index, bool ascending) =>
-            qstatDataPageController.sort((t) => t.pe, index, 'pe', ascending),
+            qstatController.sort((t) => t.pe, index, 'pe', ascending),
       ),
       PlatformDataColumn(
-        label: 'peg',
+        label: AppLocalizations.t('peg'),
         name: 'peg',
         width: 70,
         dataType: DataType.double,
         align: Alignment.centerRight,
         onSort: (int index, bool ascending) =>
-            qstatDataPageController.sort((t) => t.peg, index, 'peg', ascending),
+            qstatController.sort((t) => t.peg, index, 'peg', ascending),
       ),
       PlatformDataColumn(
-        label: '收盘价',
+        label: AppLocalizations.t('close'),
         name: 'close',
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 80,
-        onSort: (int index, bool ascending) => qstatDataPageController.sort(
-            (t) => t.close, index, 'close', ascending),
+        onSort: (int index, bool ascending) =>
+            qstatController.sort((t) => t.close, index, 'close', ascending),
       ),
       PlatformDataColumn(
-        label: '涨幅',
+        label: AppLocalizations.t('pctChgClose'),
         name: 'pct_chg_close',
         dataType: DataType.percentage,
         align: Alignment.centerRight,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         width: 80,
-        onSort: (int index, bool ascending) => qstatDataPageController.sort(
+        onSort: (int index, bool ascending) => qstatController.sort(
             (t) => t.pctChgClose, index, 'pctChgClose', ascending),
       ),
       PlatformDataColumn(
-        label: '年营收增长',
+        label: AppLocalizations.t('yoySales'),
         name: 'yoy_sales',
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 100,
-        onSort: (int index, bool ascending) => qstatDataPageController.sort(
+        onSort: (int index, bool ascending) => qstatController.sort(
             (t) => t.yoySales, index, 'yoySales', ascending),
       ),
       PlatformDataColumn(
-        label: '年净利润增长',
+        label: AppLocalizations.t('yoyDeduNp'),
         name: 'yoy_dedu_np',
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 110,
-        onSort: (int index, bool ascending) => qstatDataPageController.sort(
+        onSort: (int index, bool ascending) => qstatController.sort(
             (t) => t.yoyDeduNp, index, 'yoyDeduNp', ascending),
       ),
       PlatformDataColumn(
-        label: '环比营收增长',
+        label: AppLocalizations.t('orLastMonth'),
         name: 'or_last_month',
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 110,
-        onSort: (int index, bool ascending) => qstatDataPageController.sort(
+        onSort: (int index, bool ascending) => qstatController.sort(
             (t) => t.orLastMonth, index, 'orLastMonth', ascending),
       ),
       PlatformDataColumn(
-        label: '环比净利润增长',
+        label: AppLocalizations.t('npLastMonth'),
         name: 'np_last_month',
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 130,
-        onSort: (int index, bool ascending) => qstatDataPageController.sort(
+        onSort: (int index, bool ascending) => qstatController.sort(
             (t) => t.npLastMonth, index, 'npLastMonth', ascending),
       ),
       PlatformDataColumn(
-        label: '净资产收益率',
+        label: AppLocalizations.t('weightAvgRoe'),
         name: 'weight_avg_roe',
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 100,
-        onSort: (int index, bool ascending) => qstatDataPageController.sort(
+        onSort: (int index, bool ascending) => qstatController.sort(
             (t) => t.weightAvgRoe, index, 'weightAvgRoe', ascending),
       ),
       PlatformDataColumn(
-        label: '毛利率',
+        label: AppLocalizations.t('grossProfitMargin'),
         name: 'gross_profit_margin',
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         align: Alignment.centerRight,
         width: 80,
-        onSort: (int index, bool ascending) => qstatDataPageController.sort(
+        onSort: (int index, bool ascending) => qstatController.sort(
             (t) => t.grossProfitMargin, index, 'grossProfitMargin', ascending),
-      ),
-      PlatformDataColumn(
-          label: '',
-          name: 'action',
-          inputType: InputType.custom,
-          width: 20,
-          buildSuffix: (int index, dynamic data) {
-            return nilBox;
-          }),
-      PlatformDataColumn(
-        label: '股票代码',
-        name: 'ts_code',
-        width: 100,
-      ),
-      PlatformDataColumn(
-        label: '年份',
-        name: 'term',
-        width: 90,
-      ),
-      PlatformDataColumn(
-        label: '交易日期',
-        name: 'trade_date',
-        width: 80,
       ),
       PlatformDataColumn(
           label: '',
@@ -363,14 +313,15 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
           buildSuffix: _buildActionWidget),
     ];
 
+    searchController.setValue(
+        'startDate', DateUtil.formatDateQuarter(DateTime.now()));
     return BindingTrinaDataGrid<QStat>(
       key: UniqueKey(),
-      minWidth: 1400,
       showCheckboxColumn: false,
       horizontalMargin: 10.0,
       columnSpacing: 0.0,
       platformDataColumns: qstatDataColumns,
-      controller: qstatDataPageController,
+      controller: qstatController,
       fixedLeftColumns: 1,
     );
   }

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:colla_chat/entity/stock/stat_score.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
@@ -11,40 +9,12 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/stat_score.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-
-class StatScoreDataPageController extends DataPageController<StatScore> {
-  @override
-  sort<S>(Comparable<S>? Function(StatScore t) getFieldValue, int columnIndex,
-      String columnName, bool ascending) {
-    findCondition.value = findCondition.value
-        .copy(sortColumns: [SortColumn(columnIndex, columnName, ascending)]);
-  }
-
-  @override
-  FutureOr<void> findData() async {
-    Map<String, dynamic> responseData = await remoteStatScoreService.sendSearch(
-        tsCode: findCondition.value.whereColumns['tsCode'],
-        terms: findCondition.value.whereColumns['terms'],
-        from: findCondition.value.offset,
-        // limit: findCondition.value.limit,
-        orderBy: orderBy(),
-        count: findCondition.value.count);
-    findCondition.value.count = responseData['count'];
-    List<StatScore> statScores = responseData['data'];
-    replaceAll(statScores);
-  }
-}
-
-/// 统计指标
-final StatScoreDataPageController statScoreDataPageController =
-    StatScoreDataPageController();
 
 ///自选股和分组的查询界面
 class StatScoreWidget extends StatelessWidget with TileDataMixin {
@@ -67,9 +37,10 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
   late final List<PlatformDataField> searchDataField;
   late final PlatformReactiveFormController searchController;
   final ExpansibleController expansibleController = ExpansibleController();
+  final DataListController<StatScore> statScoreController =
+      DataListController<StatScore>();
 
   _init() {
-    statScoreDataPageController.findCondition.addListener(_updateStatScore);
     searchDataField = [
       PlatformDataField(
         name: 'keyword',
@@ -117,10 +88,15 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
     searchController = PlatformReactiveFormController(searchDataField);
   }
 
-  _updateStatScore() {
-    Map<String, dynamic> values = searchController.values;
-    statScoreDataPageController.findCondition.value.whereColumns = values;
-    statScoreDataPageController.findData();
+  refresh(
+    String tsCode, {
+    List<dynamic>? terms,
+  }) async {
+    Map<String, dynamic> responseData =
+        await remoteStatScoreService.sendSearch(tsCode: tsCode, terms: terms);
+    var count = responseData['count'];
+    List<StatScore> statScores = responseData['data'];
+    statScoreController.replaceAll(statScores);
   }
 
   Widget _buildActionWidget(int index, dynamic qstat) {
@@ -148,39 +124,38 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
 
   /// 构建搜索条件
   Widget _buildSearchView(BuildContext context) {
-    List<FormButton> formButtonDefs = [
-      FormButton(
-          label: 'Ok',
-          onTap: (Map<String, dynamic> values) {
-            _onOk(values);
-          }),
-    ];
-    Widget formInputWidget = Container(
-        padding: const EdgeInsets.all(10.0),
-        child: PlatformReactiveForm(
-          height: appDataProvider.portraitSize.height * 0.3,
+    Widget platformReactiveForm = Container(
+      padding: const EdgeInsets.all(10.0),
+      child: PlatformReactiveForm(
+          height: appDataProvider.portraitSize.height * 0.4,
           spacing: 5.0,
           platformReactiveFormController: searchController,
-          formButtons: formButtonDefs,
-        ));
+          onSubmit: (Map<String, dynamic> values) {
+            _onSubmit(values);
+          }),
+    );
 
-    formInputWidget = ExpansionTile(
+    platformReactiveForm = ExpansionTile(
       title: Text(AppLocalizations.t('Search')),
       initiallyExpanded: true,
       controller: expansibleController,
-      children: [formInputWidget],
+      children: [platformReactiveForm],
     );
 
-    return formInputWidget;
+    return platformReactiveForm;
   }
 
-  _onOk(Map<String, dynamic> values) async {
+  _onSubmit(Map<String, dynamic> values) async {
     String? tsCode = values['tsCode'];
-    statScoreDataPageController.findCondition.value.whereColumns = {
+    if (tsCode == null) {
+      DialogUtil.error(content: 'tsCode must be value');
+      return;
+    }
+    statScoreController.findCondition.value.whereColumns = {
       'tsCode': tsCode,
       'terms': values['terms']?.toList(),
     };
-    await statScoreDataPageController.findData();
+    await refresh(tsCode, terms: values['terms']?.toList());
     expansibleController.collapse();
     DialogUtil.info(content: AppLocalizations.t('StatScore search completely'));
   }
@@ -188,98 +163,113 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
   Widget _buildStatScoreListView(BuildContext context) {
     final List<PlatformDataColumn> statScoreDataColumns = [
       PlatformDataColumn(
-        label: '股票名',
+        label: AppLocalizations.t('tsCode'),
+        name: 'ts_code',
+        width: 100,
+      ),
+      PlatformDataColumn(
+        label: AppLocalizations.t('term'),
+        name: 'term',
+        width: 90,
+      ),
+      PlatformDataColumn(
+        label: AppLocalizations.t('tradeDate'),
+        name: 'trade_date',
+        width: 80,
+      ),
+      PlatformDataColumn(
+        label: AppLocalizations.t('securityName'),
         name: 'security_name',
         width: 80,
       ),
       PlatformDataColumn(
-        label: '风险',
+        label: AppLocalizations.t('riskScore'),
         name: 'risk_score',
         width: 50,
         dataType: DataType.double,
         align: Alignment.centerRight,
-        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+        onSort: (int index, bool ascending) => statScoreController.sort(
             (t) => t.riskScore, index, 'riskScore', ascending),
       ),
       PlatformDataColumn(
-        label: '稳定',
+        label: AppLocalizations.t('stableScore'),
         name: 'stable_score',
         width: 70,
         dataType: DataType.double,
         align: Alignment.centerRight,
-        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+        onSort: (int index, bool ascending) => statScoreController.sort(
             (t) => t.stableScore, index, 'stableScore', ascending),
       ),
       PlatformDataColumn(
-        label: '增长',
+        label: AppLocalizations.t('increaseScore'),
         name: 'increase_score',
         dataType: DataType.double,
         align: Alignment.centerRight,
         width: 80,
-        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+        onSort: (int index, bool ascending) => statScoreController.sort(
             (t) => t.increaseScore, index, 'increaseScore', ascending),
       ),
       PlatformDataColumn(
-        label: '累计业绩',
+        label: AppLocalizations.t('accScore'),
         name: 'acc_score',
         dataType: DataType.double,
         align: Alignment.centerRight,
         width: 80,
-        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+        onSort: (int index, bool ascending) => statScoreController.sort(
             (t) => t.accScore, index, 'accScore', ascending),
       ),
       PlatformDataColumn(
-        label: '相关性',
+        label: AppLocalizations.t('corrScore'),
         name: 'corr_score',
         dataType: DataType.double,
         align: Alignment.centerRight,
         width: 100,
-        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+        onSort: (int index, bool ascending) => statScoreController.sort(
             (t) => t.corrScore, index, 'corrScore', ascending),
       ),
       PlatformDataColumn(
-        label: '最新业绩',
+        label: AppLocalizations.t('prosScore'),
         name: 'pros_score',
         dataType: DataType.double,
         align: Alignment.centerRight,
         width: 110,
-        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+        onSort: (int index, bool ascending) => statScoreController.sort(
             (t) => t.prosScore, index, 'prosScore', ascending),
       ),
       PlatformDataColumn(
-        label: '趋势',
+        label: AppLocalizations.t('trendScore'),
         name: 'trend_score',
         dataType: DataType.double,
         align: Alignment.centerRight,
         width: 110,
-        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+        onSort: (int index, bool ascending) => statScoreController.sort(
             (t) => t.trendScore, index, 'trendScore', ascending),
       ),
       PlatformDataColumn(
-        label: '运营',
+        label: AppLocalizations.t('operationScore'),
         name: 'operation_score',
         dataType: DataType.double,
         align: Alignment.centerRight,
         width: 130,
-        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+        onSort: (int index, bool ascending) => statScoreController.sort(
             (t) => t.operationScore, index, 'operationScore', ascending),
       ),
       PlatformDataColumn(
-        label: '总分',
+        label: AppLocalizations.t('totalScore'),
         name: 'total_score',
         dataType: DataType.double,
         align: Alignment.centerRight,
         width: 100,
-        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+        onSort: (int index, bool ascending) => statScoreController.sort(
             (t) => t.totalScore, index, 'totalScore', ascending),
       ),
       PlatformDataColumn(
-        label: '总分分位数',
+        label: AppLocalizations.t('percentileTotalScore'),
         name: 'percentile_total_score',
         dataType: DataType.double,
         align: Alignment.centerRight,
         width: 100,
-        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+        onSort: (int index, bool ascending) => statScoreController.sort(
             (t) => t.percentileTotalScore,
             index,
             'percentileTotalScore',
@@ -289,39 +279,15 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
           label: '',
           name: 'action',
           inputType: InputType.custom,
-          width: 20,
-          buildSuffix: (int index, dynamic data) {
-            return nilBox;
-          }),
-      PlatformDataColumn(
-        label: '股票代码',
-        name: 'ts_code',
-        width: 100,
-      ),
-      PlatformDataColumn(
-        label: '年份',
-        name: 'term',
-        width: 90,
-      ),
-      PlatformDataColumn(
-        label: '交易日期',
-        name: 'trade_date',
-        width: 80,
-      ),
-      PlatformDataColumn(
-          label: '',
-          name: 'action',
-          inputType: InputType.custom,
           buildSuffix: _buildActionWidget),
     ];
     return BindingTrinaDataGrid<StatScore>(
       key: UniqueKey(),
-      minWidth: 1400,
       showCheckboxColumn: false,
       horizontalMargin: 10.0,
       columnSpacing: 0.0,
       platformDataColumns: statScoreDataColumns,
-      controller: statScoreDataPageController,
+      controller: statScoreController,
       fixedLeftColumns: 1,
     );
   }
