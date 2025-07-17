@@ -35,57 +35,56 @@ class ReactiveCheckboxGroup<T> extends ReactiveFormField<T, Set<T>> {
     Widget? prefixIcon,
     String? label,
   }) : super(builder: (field) {
-    Set<T>? value = field.value;
-    List<Widget> checkChildren = [];
-    if (options.isNotEmpty) {
-      value ??= {};
-      for (var i = 0; i < options.length; ++i) {
-        var option = options[i];
-        var checkbox = Checkbox(
-          onChanged: (bool? selected) {
-            if (selected == null || !selected) {
-              value!.remove(option.value);
-            } else if (selected) {
-              value!.add(option.value);
+          Set<T>? value = field.value;
+          List<Widget> checkChildren = [];
+          if (options.isNotEmpty) {
+            value ??= {};
+            for (var i = 0; i < options.length; ++i) {
+              var option = options[i];
+              var checkbox = Checkbox(
+                onChanged: (bool? selected) {
+                  if (selected == null || !selected) {
+                    value!.remove(option.value);
+                  } else if (selected) {
+                    value!.add(option.value);
+                  }
+                  field.control.markAsTouched(updateParent: false);
+                  field.didChange(value);
+                  onChanged?.call(field.control);
+                },
+                value: value.contains(option.value),
+                tristate: tristate,
+                mouseCursor: mouseCursor,
+                activeColor: activeColor,
+                fillColor: fillColor,
+                checkColor: checkColor,
+                focusColor: focusColor,
+                hoverColor: hoverColor,
+                overlayColor: overlayColor,
+                splashRadius: splashRadius,
+                materialTapTargetSize: materialTapTargetSize,
+                visualDensity: visualDensity,
+                focusNode: focusNode,
+                autofocus: autofocus,
+                shape: shape,
+                side: side,
+                isError: isError,
+                semanticLabel: semanticLabel,
+              );
+              var row = SizedBox(
+                  width: width,
+                  child: Row(
+                    children: [
+                      checkbox,
+                      Expanded(
+                          child: AutoSizeText(AppLocalizations.t(option.label)))
+                    ],
+                  ));
+              checkChildren.add(row);
             }
-
-            field.didChange(value);
-            onChanged?.call(field.control);
-          },
-          value: value.contains(option.value),
-          tristate: tristate,
-          mouseCursor: mouseCursor,
-          activeColor: activeColor,
-          fillColor: fillColor,
-          checkColor: checkColor,
-          focusColor: focusColor,
-          hoverColor: hoverColor,
-          overlayColor: overlayColor,
-          splashRadius: splashRadius,
-          materialTapTargetSize: materialTapTargetSize,
-          visualDensity: visualDensity,
-          focusNode: focusNode,
-          autofocus: autofocus,
-          shape: shape,
-          side: side,
-          isError: isError,
-          semanticLabel: semanticLabel,
-        );
-        var row = SizedBox(
-            width: width,
-            child: Row(
-              children: [
-                checkbox,
-                Expanded(
-                    child: AutoSizeText(
-                        AppLocalizations.t(option.label)))
-              ],
-            ));
-        checkChildren.add(row);
-      }
-    }
-    return Wrap(
-      children: checkChildren,
-    );
-  });
+          }
+          return Wrap(
+            children: checkChildren,
+          );
+        });
 }

@@ -36,6 +36,7 @@ class ReactiveRadioGroup<T> extends ReactiveFormField<T, T> {
           var option = options[i];
           var radio = Radio<T>(
             onChanged: (T? value) {
+              field.control.markAsTouched(updateParent: false);
               field.didChange(value);
               onChanged?.call(field.control);
             },

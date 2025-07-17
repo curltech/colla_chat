@@ -65,7 +65,7 @@ class ReactiveChipGroup<T> extends ReactiveFormField<T, Set<T>> {
                       } else if (selected) {
                         value!.add(option.value);
                       }
-
+                      field.control.markAsTouched(updateParent: false);
                       field.didChange(value);
                       onSelected?.call(field.control);
                     },
