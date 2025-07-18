@@ -57,38 +57,28 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
         },
       ),
       PlatformDataField(
-        name: 'tsCode',
-        label: 'TsCode',
-        cancel: true,
-        prefixIcon: IconButton(
-          onPressed: () {
-            searchController.setValue(
-                'tsCode', myShareController.subscription.value);
-          },
-          icon: Icon(
-            Icons.perm_identity_outlined,
-            color: myself.primary,
-          ),
+        name: 'terms',
+        label: 'Terms',
+        inputType: InputType.checkbox,
+        dataType: DataType.set,
+        options: [
+          Option('全部', 0),
+          Option('1年', 1),
+          Option('3年', 3),
+          Option('5年', 5),
+          Option('8年', 8),
+          Option('10年', 10),
+          Option('15年', 15)
+        ],
+        prefixIcon: Icon(
+          Icons.date_range_outlined,
+          color: myself.primary,
         ),
+        validators: [Validators.required],
+        validationMessages: {
+          ValidationMessage.required: (_) => 'The terms must not be empty',
+        },
       ),
-      PlatformDataField(
-          name: 'terms',
-          label: 'Terms',
-          inputType: InputType.checkbox,
-          dataType: DataType.set,
-          options: [
-            Option('全部', 0),
-            Option('1年', 1),
-            Option('3年', 3),
-            Option('5年', 5),
-            Option('8年', 8),
-            Option('10年', 10),
-            Option('15年', 15)
-          ],
-          prefixIcon: Icon(
-            Icons.date_range_outlined,
-            color: myself.primary,
-          )),
     ];
     searchController = PlatformReactiveFormController(searchDataField);
   }

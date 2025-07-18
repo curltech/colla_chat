@@ -155,7 +155,7 @@ class FileUtil {
     FileType type = FileType.any,
     List<String>? allowedExtensions,
     dynamic Function(FilePickerStatus)? onFileLoading,
-    bool allowCompression = true,
+    int compressionQuality = 0,
     bool allowMultiple = false,
     bool withData = false,
     bool withReadStream = false,
@@ -175,7 +175,7 @@ class FileUtil {
       type: type,
       allowedExtensions: allowedExtensions,
       onFileLoading: onFileLoading,
-      allowCompression: allowCompression,
+      compressionQuality: compressionQuality,
       allowMultiple: allowMultiple,
       withData: withData,
       withReadStream: withReadStream,
@@ -287,8 +287,8 @@ class FileUtil {
     String ext, {
     MimeType mimeType = MimeType.other,
   }) async {
-    return await FileSaver.instance
-        .saveFile(bytes: bytes, ext: ext, mimeType: mimeType, name: name);
+    return await FileSaver.instance.saveFile(
+        bytes: bytes, fileExtension: ext, mimeType: mimeType, name: name);
   }
 
   ///仅支持macOS,ios,android，另存为文件
@@ -303,7 +303,7 @@ class FileUtil {
         name: name,
         bytes: bytes,
         filePath: filePath,
-        ext: ext,
+        fileExtension: ext,
         mimeType: mimeType);
   }
 
@@ -499,7 +499,7 @@ class FileUtil {
     FileType type = FileType.image,
     List<String>? allowedExtensions,
     dynamic Function(FilePickerStatus)? onFileLoading,
-    bool allowCompression = true,
+    int compressionQuality = 0,
     bool allowMultiple = false,
     bool withData = false,
     bool withReadStream = false,
@@ -512,7 +512,7 @@ class FileUtil {
           dialogTitle: dialogTitle,
           initialDirectory: initialDirectory,
           allowedExtensions: allowedExtensions,
-          allowCompression: allowCompression,
+          compressionQuality: compressionQuality,
           allowMultiple: allowMultiple,
           withData: withData,
           withReadStream: withReadStream,

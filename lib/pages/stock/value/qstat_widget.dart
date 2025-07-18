@@ -71,23 +71,28 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
         ),
       ),
       PlatformDataField(
-          name: 'terms',
-          label: AppLocalizations.t('terms'),
-          inputType: InputType.checkbox,
-          dataType: DataType.set,
-          options: [
-            Option('全部', 0),
-            Option('1年', 1),
-            Option('3年', 3),
-            Option('5年', 5),
-            Option('8年', 8),
-            Option('10年', 10),
-            Option('15年', 15)
-          ],
-          prefixIcon: Icon(
-            Icons.date_range_outlined,
-            color: myself.primary,
-          )),
+        name: 'terms',
+        label: AppLocalizations.t('terms'),
+        inputType: InputType.checkbox,
+        dataType: DataType.set,
+        options: [
+          Option('全部', 0),
+          Option('1年', 1),
+          Option('3年', 3),
+          Option('5年', 5),
+          Option('8年', 8),
+          Option('10年', 10),
+          Option('15年', 15)
+        ],
+        prefixIcon: Icon(
+          Icons.date_range_outlined,
+          color: myself.primary,
+        ),
+        validators: [Validators.required],
+        validationMessages: {
+          ValidationMessage.required: (_) => 'The terms must not be empty',
+        },
+      ),
       PlatformDataField(
           name: 'source',
           label: AppLocalizations.t('source'),
@@ -150,7 +155,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
     Widget platformReactiveForm = Container(
         padding: const EdgeInsets.all(10.0),
         child: PlatformReactiveForm(
-            height: appDataProvider.portraitSize.height * 0.35,
+            height: appDataProvider.portraitSize.height * 0.5,
             spacing: 5.0,
             platformReactiveFormController: searchController,
             onSubmit: (Map<String, dynamic> values) {

@@ -293,7 +293,7 @@ class KChartPlusWidget extends StatelessWidget {
               isLine: kChartPlusController.isLine,
               mBaseHeight: 360,
               isTrendLine: kChartPlusController.isTrendLine.value,
-              mainState: kChartPlusController.mainState.value,
+              mainStateLi: {kChartPlusController.mainState.value},
               volHidden: !kChartPlusController.showVol.value,
               secondaryStateLi: kChartPlusController.secondaryState.toSet(),
               showNowPrice: kChartPlusController.showNowPrice.value,

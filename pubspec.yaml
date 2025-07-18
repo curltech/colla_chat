@@ -133,13 +133,12 @@ dependencies:
   liquid_glass_renderer: ^0.1.1-dev.9
   #flui: 0.9.2
   trina_grid: ^1.6.9
-  data_table_2: ^2.6.0
   material_table_view: ^5.3.0
   multi_split_view: ^3.6.0
   calendar_view: ^1.4.0
   easy_image_viewer: ^1.5.1
   tab_container: ^3.5.3
-  file_saver: ^0.3.0
+  file_saver: ^0.3.1
   material_neumorphic: ^1.2.1
   extended_text: ^15.0.0 #文本扩展显示
   extended_text_field: ^16.0.2 #文字表情混入
@@ -148,7 +147,7 @@ dependencies:
   # fl_chart: ^1.0.0
   # k_chart: ^0.7.1
   community_charts_flutter: ^1.0.4
-  k_chart_plus: ^1.0.2
+  k_chart_plus: ^1.0.3
   graphic: ^2.5.0 # 各种图表，取代flutter_echarts
   # flutter_unity_widget: ^2022.2.1
   # flutter_embed_unity: ^1.2.3
