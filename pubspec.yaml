@@ -148,6 +148,7 @@ dependencies:
   # k_chart: ^0.7.1
   community_charts_flutter: ^1.0.4
   k_chart_plus: ^1.0.3
+  financial_chart: ^0.3.3
   graphic: ^2.5.0 # 各种图表，取代flutter_echarts
   # flutter_unity_widget: ^2022.2.1
   # flutter_embed_unity: ^1.2.3
