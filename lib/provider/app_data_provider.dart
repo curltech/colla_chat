@@ -57,6 +57,9 @@ class AppDataProvider with ChangeNotifier {
     double totalBodyWidth = portraitSize.width;
     double secondaryBodyWidth = portraitSize.width;
     double bodyWidth;
+    if (context == null) {
+      return;
+    }
     _totalSize = MediaQuery.sizeOf(context!);
     if (landscape) {
       if (_totalSize.width >= largeBreakpointLimit) {

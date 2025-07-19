@@ -241,7 +241,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         evenRowColor: Colors.grey.withAlpha(32),
         gridBackgroundColor: Colors.white.withAlpha(0),
         rowColor: Colors.white.withAlpha(0),
-        activatedColor: Colors.green.shade50,
+        activatedColor: Colors.blueGrey,
         gridBorderColor: Colors.white.withAlpha(0),
         borderColor: Colors.white.withAlpha(0),
         activatedBorderColor: myself.primaryColor,
