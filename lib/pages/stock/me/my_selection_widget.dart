@@ -11,7 +11,6 @@ import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/share_group.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -488,30 +487,28 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
   }
 
   Widget _buildDayLineListView(BuildContext context) {
-    Widget table = BindingTrinaDataGrid<DayLine>(
+    return Obx(() {
+      Widget table = BindingTrinaDataGrid<DayLine>(
         key: UniqueKey(),
         showCheckboxColumn: true,
         horizontalMargin: 10.0,
         columnSpacing: 0.0,
         platformDataColumns: _buildDayLineDataColumns(),
         controller: dayLineController,
-        fixedLeftColumns: 2,
-        minWidth: 700);
-    return Stack(children: <Widget>[
-      table,
-      Obx(() {
-        if (myShareController.showLoading.value) {
-          return Container(
-            width: double.infinity,
-            height: 450,
-            alignment: Alignment.center,
-            child: const CircularProgressIndicator(),
-          );
-        } else {
-          return nilBox;
-        }
-      }),
-    ]);
+      );
+      if (!myShareController.showLoading.value) {
+        return table;
+      }
+      return Stack(children: <Widget>[
+        table,
+        Container(
+          width: double.infinity,
+          height: 450,
+          alignment: Alignment.center,
+          child: const CircularProgressIndicator(),
+        )
+      ]);
+    });
   }
 
   List<ActionData> _buildShareActions(BuildContext context) {
