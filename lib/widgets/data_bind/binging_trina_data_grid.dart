@@ -262,12 +262,13 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
   /// 过滤条件的多项选择框的表
   Widget _buildDataTable(BuildContext context) {
     return Obx(() {
+      List<TrinaRow<dynamic>> rows=_buildDataRows();
       return TrinaGrid(
         key: UniqueKey(),
         mode: TrinaGridMode.normal,
         configuration: _buildTrinaGridConfiguration(context),
         columns: _buildDataColumns(),
-        rows: _buildDataRows(),
+        rows: rows,
         onLoaded: (TrinaGridOnLoadedEvent event) {},
         onChanged: (TrinaGridOnChangedEvent event) {
           dynamic value = event.row.data;

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/entity/stock/day_line.dart';
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/entity/stock/share_group.dart';
@@ -10,6 +12,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/share_group.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
@@ -35,11 +38,9 @@ class MyShareController {
   /// 加载数据的方式，true表示直接从网站加载，false表示从服务器加载，支持分批获取
   final RxBool online = true.obs;
 
-  MyShareController() {
-    _init();
-  }
+  MyShareController();
 
-  _init() async {
+  Future<void> init() async {
     String? value =
         await localSharedPreferences.get('subscription', encrypt: true);
     subscription.value = value ?? '';
@@ -264,7 +265,9 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
   @override
   initState() {
     super.initState();
-    myShareController.subscription;
+    myShareController.init().then((value) async {
+      await _refresh();
+    });
   }
 
   Widget _buildShareGroupWidget(BuildContext context) {
@@ -487,27 +490,20 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
   }
 
   Widget _buildDayLineListView(BuildContext context) {
+    Widget table = BindingTrinaDataGrid<DayLine>(
+      key: UniqueKey(),
+      showCheckboxColumn: true,
+      horizontalMargin: 10.0,
+      columnSpacing: 0.0,
+      platformDataColumns: _buildDayLineDataColumns(),
+      controller: dayLineController,
+    );
     return Obx(() {
-      Widget table = BindingTrinaDataGrid<DayLine>(
-        key: UniqueKey(),
-        showCheckboxColumn: true,
-        horizontalMargin: 10.0,
-        columnSpacing: 0.0,
-        platformDataColumns: _buildDayLineDataColumns(),
-        controller: dayLineController,
-      );
       if (!myShareController.showLoading.value) {
         return table;
       }
-      return Stack(children: <Widget>[
-        table,
-        Container(
-          width: double.infinity,
-          height: 450,
-          alignment: Alignment.center,
-          child: const CircularProgressIndicator(),
-        )
-      ]);
+      return Stack(
+          children: <Widget>[table, LoadingUtil.buildLoadingIndicator()]);
     });
   }
 
@@ -573,7 +569,6 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
 
   @override
   Widget build(BuildContext context) {
-    _refresh();
     return AppBarView(
       title: widget.title,
       helpPath: widget.routeName,

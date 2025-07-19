@@ -17,30 +17,35 @@ class LoadingUtil {
         myself.primary,
       ],
     );
-    if (width == null) {
-      return loadingWidget;
-    }
     return Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-      SizedBox(height: width, width: height, child: loadingWidget),
-      const SizedBox(
-        height: 10,
-      ),
-      Expanded(
-          child: AutoSizeText(
-              AppLocalizations.t("Loading, please waiting...")))
-    ]));
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+          SizedBox(
+              height: height ?? 64, width: width ?? 64, child: loadingWidget),
+          const SizedBox(
+            height: 10,
+          ),
+          Expanded(
+              child: AutoSizeText(
+                  AppLocalizations.t("Loading, please waiting...")))
+        ]));
   }
 
-  static Widget buildLoadingAnimation() {
+  static Widget buildLoadingAnimation({double? size}) {
     return Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-      LoadingAnimationWidget.discreteCircle(color: myself.primary, size: 200),
-      const SizedBox(
-        height: 10,
-      ),
-      AutoSizeText(AppLocalizations.t("Loading, please waiting..."))
-    ]));
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+          LoadingAnimationWidget.discreteCircle(
+              color: myself.primary, size: size ?? 100),
+          const SizedBox(
+            height: 10,
+          ),
+          AutoSizeText(AppLocalizations.t("Loading, please waiting..."))
+        ]));
   }
 
   // static Widget buildCircularLoadingWidget() {
