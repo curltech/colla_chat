@@ -41,6 +41,9 @@ class MyShareController {
   MyShareController();
 
   Future<void> init() async {
+    if (subscription.value.isNotEmpty) {
+      return;
+    }
     String? value =
         await localSharedPreferences.get('subscription', encrypt: true);
     subscription.value = value ?? '';
