@@ -169,6 +169,8 @@ class PlatformDataField<T> {
 
   final List<Option<T>>? options;
 
+  final Map<String, dynamic>? params;
+
   String? groupName; //分页功能
 
   final bool enableColumnFilter = false;
@@ -211,6 +213,7 @@ class PlatformDataField<T> {
     this.minLines = 1,
     this.maxLines = 4,
     this.length,
+    this.params,
     this.width,
     this.readOnly = false,
     this.autofocus = false,
