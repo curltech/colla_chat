@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:pro_video_editor/pro_video_editor.dart' as pro;
 
 /// ProVideoEditor实现的适用于移动和mac平台的视频编辑类
-class ProVideoEditor {
+/// 输入的视频可以是文件格式或者是数据
+class ProVideoRender {
   final String? videoInputPath;
   final Uint8List? videoBytes;
   late final pro.ProVideoEditor editor = pro.ProVideoEditor.instance;
   late pro.EditorVideo editorVideo;
 
-  ProVideoEditor({this.videoInputPath, this.videoBytes}) {
+  ProVideoRender({this.videoInputPath, this.videoBytes}) {
     if (videoInputPath != null) {
       editorVideo = pro.EditorVideo.file(videoInputPath);
     }
@@ -20,7 +21,8 @@ class ProVideoEditor {
     }
   }
 
-  Future<String?> edit(
+  /// 对视频进行各种渲染操作
+  Future<String?> render(
       {int? startTimeMs,
       int? endTimeMs,
       double? blur,
@@ -84,6 +86,7 @@ class ProVideoEditor {
     return filename;
   }
 
+  /// 渲染任务的流
   StreamBuilder getProgressStreamBuilder(String taskId,
       {Function(double)? onProgress}) {
     return StreamBuilder<pro.ProgressModel>(
@@ -112,20 +115,21 @@ class ProVideoEditor {
     );
   }
 
+  /// 生成缩略图
   Future<List<ImageProvider<Object>>> getThumbnails(
-      {required int positionMs,
+      {required int thumbnailCount,
       required double height,
       required double width,
       pro.ThumbnailFormat outputFormat = pro.ThumbnailFormat.jpeg}) async {
     final pro.VideoMetadata videoMetadata =
         await editor.getMetadata(editorVideo);
     final duration = videoMetadata.duration;
-    final segmentDuration = duration.inMilliseconds / positionMs;
+    final segmentDuration = duration.inMilliseconds / thumbnailCount;
     final pro.ThumbnailConfigs thumbnailConfigs = pro.ThumbnailConfigs(
       video: editorVideo,
       outputSize: Size(width, height),
       boxFit: pro.ThumbnailBoxFit.cover,
-      timestamps: List.generate(positionMs, (i) {
+      timestamps: List.generate(thumbnailCount, (i) {
         final midpointMs = (i + 0.5) * segmentDuration;
         return Duration(milliseconds: midpointMs.round());
       }),
@@ -139,6 +143,10 @@ class ProVideoEditor {
     return thumbnails;
   }
 
+  /// 获取关键帧
+  /// On android `getKeyFrames` is a way faster than `getThumbnails` but
+  //  the timestamps are more "random". If you want the best results i
+  //  recommend you to use only `getThumbnails`.
   Future<List<ImageProvider<Object>>> getKeyFrames({
     required double height,
     required double width,
@@ -160,6 +168,7 @@ class ProVideoEditor {
     return thumbnails;
   }
 
+  /// 获取视频的元数据
   Future<pro.VideoMetadata> getMetadata() async {
     final pro.VideoMetadata videoMetadata =
         await editor.getMetadata(editorVideo);

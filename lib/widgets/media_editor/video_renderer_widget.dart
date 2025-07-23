@@ -10,7 +10,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:colla_chat/widgets/media/video/mediakit_video_player.dart';
-import 'package:colla_chat/widgets/media_editor/pro_video_editor.dart';
+import 'package:colla_chat/widgets/media_editor/pro_video_render.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
@@ -18,6 +18,7 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:pro_video_editor/core/models/video/video_metadata_model.dart';
 
 /// 视频渲染处理界面，包括旋转，裁剪
+/// 包含原视频的播放和渲染后的视频播放
 class VideoRendererWidget extends StatelessWidget with TileDataMixin {
   VideoRendererWidget({super.key});
 
@@ -39,20 +40,31 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
   );
   final ValueNotifier<int> index = ValueNotifier<int>(0);
   final SwiperController swiperController = SwiperController();
+
+  // 原视频播放器
   late final _player = Player();
   late final _videoController = VideoController(_player);
+
+  // 渲染后视频播放器
   late final _previewPlayer = Player();
   late final _previewVideoController = VideoController(_previewPlayer);
   final ValueNotifier<bool> isExporting = ValueNotifier<bool>(false);
   final ValueNotifier<Duration> elapsedTime =
       ValueNotifier<Duration>(Duration.zero);
-  late final ProVideoEditor _videoEditor;
+
+  // 视频渲染类
+  late final ProVideoRender _videoRender;
+
+  // 原视频和输出视频的元数据
   final ValueNotifier<VideoMetadata?> outputMetadata =
       ValueNotifier<VideoMetadata?>(null);
   final ValueNotifier<VideoMetadata?> inputMetadata =
       ValueNotifier<VideoMetadata?>(null);
+
+  // 视频渲染的流
   StreamBuilder? streamBuilder;
 
+  // 播放原视频，获取元数据
   Future<void> init() async {
     String? filename = playlistController.current?.filename;
     if (filename != null) {
@@ -63,8 +75,8 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
           play: true,
         );
       }
-      _videoEditor = ProVideoEditor(videoInputPath: filename);
-      inputMetadata.value = await _videoEditor.getMetadata();
+      _videoRender = ProVideoRender(videoInputPath: filename);
+      inputMetadata.value = await _videoRender.getMetadata();
     }
   }
 
@@ -90,7 +102,7 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
     isExporting.value = true;
     Stopwatch sp = Stopwatch()..start();
 
-    final outputFilename = await _videoEditor.edit(
+    final outputFilename = await _videoRender.render(
         startTimeMs: startTimeMs,
         endTimeMs: endTimeMs,
         blur: blur,
@@ -113,8 +125,9 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
         });
 
     elapsedTime.value = sp.elapsed;
-    ProVideoEditor videoEditor = ProVideoEditor(videoInputPath: outputFilename);
-    outputMetadata.value = await videoEditor.getMetadata();
+    // 获取输出视频的元数据并播放
+    ProVideoRender videoRender = ProVideoRender(videoInputPath: outputFilename);
+    outputMetadata.value = await videoRender.getMetadata();
 
     Media? media = MediaKitMediaSource.media(filename: outputFilename!);
     if (media != null) {
@@ -124,6 +137,7 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
     isExporting.value = false;
   }
 
+  // 设置渲染视频的参数
   PlatformReactiveForm _buildPlatformReactiveForm(BuildContext context) {
     List<PlatformDataField> dataFields = [
       PlatformDataField(
@@ -289,13 +303,13 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
       // height: appDataProvider.portraitSize.height * 0.3,
       spacing: 10.0,
       onSubmit: (Map<String, dynamic> values) async {
-        _onOk(values);
+        await _onSubmit(values);
       },
       platformReactiveFormController: platformReactiveFormController,
     );
   }
 
-  _onOk(Map<String, dynamic> values) {
+  _onSubmit(Map<String, dynamic> values) async {
     int? startTimeMs = values['startTimeMs'];
     int? endTimeMs = values['endTimeMs'];
     double? blur = values['blur'];
@@ -313,7 +327,7 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
     int rotateTurns = values['rotateTurns'];
     bool enableAudio = values['enableAudio'];
 
-    _renderVideo(
+    await _renderVideo(
         startTimeMs: startTimeMs,
         endTimeMs: endTimeMs,
         blur: blur,
@@ -374,6 +388,7 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
     );
   }
 
+  /// 原视频播放
   Widget _buildSourceVideoPlayer() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -391,6 +406,7 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
     );
   }
 
+  // 输出视频播放
   Widget _buildTargetVideoPlayer() {
     return ValueListenableBuilder(
         valueListenable: isExporting,
@@ -450,6 +466,7 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
           }
         });
     children.add(btn);
+    // 渲染参数输入界面的按钮
     children.add(IconButton(
         onPressed: () {
           DialogUtil.popModalBottomSheet(
