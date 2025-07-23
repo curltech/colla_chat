@@ -148,6 +148,7 @@ class ProVideoEditorWidget extends StatelessWidget with TileDataMixin {
   Future<void> generateVideo(CompleteParameters parameters) async {
     _outputVideoFile = await _videoRender.render(
       blur: parameters.blur,
+      enableAudio: _proVideoController?.isAudioEnabled ?? true,
       colorMatrixList: parameters.colorFilters,
       startTimeMs: parameters.startTime?.inMilliseconds,
       endTimeMs: parameters.endTime?.inMilliseconds,
