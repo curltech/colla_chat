@@ -2,8 +2,6 @@ import 'dart:io' as io;
 
 import 'package:auto_size_text_field/auto_size_text_field.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/datastore/filesystem/file_node.dart';
-import 'package:colla_chat/pages/datastore/filesystem/file_system_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
@@ -11,9 +9,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
@@ -22,25 +18,18 @@ import 'package:get/get.dart';
 import 'package:mimecon/mimecon.dart';
 import 'package:path/path.dart' as p;
 
+import 'directory_controller.dart';
+import 'file_node.dart';
+
 /// 文件管理功能主页面，带有路由回调函数
-class FileWidget extends StatelessWidget with TileDataMixin {
-  FileWidget({super.key}) {
-    fileSystemController.currentNode.addListener(() {
+class FileWidget extends StatelessWidget {
+  final DirectoryController directoryController;
+
+  FileWidget({super.key, required this.directoryController}) {
+    directoryController.currentNode.addListener(() {
       _buildFiles();
     });
   }
-
-  @override
-  bool get withLeading => true;
-
-  @override
-  String get routeName => 'file';
-
-  @override
-  IconData get iconData => Icons.explore;
-
-  @override
-  String get title => 'File';
 
   final DataListController<File> fileController = DataListController<File>();
 
@@ -67,7 +56,7 @@ class FileWidget extends StatelessWidget with TileDataMixin {
   }
 
   _searchFile(String keyword) async {
-    Folder? folder = fileSystemController.currentNode.value?.value as Folder?;
+    Folder? folder = directoryController.currentNode.value?.value as Folder?;
     io.Directory? directory = folder?.directory;
     if (directory == null) {
       fileController.replaceAll([]);
@@ -75,7 +64,7 @@ class FileWidget extends StatelessWidget with TileDataMixin {
     }
     try {
       List<File> files =
-          fileSystemController.findFile(folder!, keyword: keyword);
+          directoryController.findFile(folder!, keyword: keyword);
       fileController.replaceAll(files);
     } catch (e) {
       logger.e('list file failure:$e');
@@ -138,7 +127,7 @@ class FileWidget extends StatelessWidget with TileDataMixin {
   }
 
   Future<void> _addFile(BuildContext context) async {
-    FolderNode? folderNode = fileSystemController.currentNode.value;
+    FolderNode? folderNode = directoryController.currentNode.value;
     if (folderNode == null) {
       return;
     }
@@ -203,14 +192,14 @@ class FileWidget extends StatelessWidget with TileDataMixin {
   }
 
   _buildFiles() {
-    Folder? folder = fileSystemController.currentNode.value?.value as Folder?;
+    Folder? folder = directoryController.currentNode.value?.value as Folder?;
     io.Directory? directory = folder?.directory;
     if (directory == null) {
       fileController.replaceAll([]);
       return;
     }
     try {
-      List<File> files = fileSystemController.findFile(folder!);
+      List<File> files = directoryController.findFile(folder!);
       fileController.replaceAll(files);
     } catch (e) {
       logger.e('list file failure:$e');
@@ -348,29 +337,25 @@ class FileWidget extends StatelessWidget with TileDataMixin {
           tooltip: AppLocalizations.t('Toggle grid mode'),
         )
       ];
-      return AppBarView(
-          title: title,
-          withLeading: true,
-          rightWidgets: rightWidgets,
-          child: Column(
-            children: [
-              Padding(
-                  padding: EdgeInsets.all(
-                    10.0,
-                  ),
-                  child: _buildFilePathWidget(context)),
-              Padding(
-                  padding: EdgeInsets.all(
-                    10.0,
-                  ),
-                  child: _buildSearchTextWidget(context)),
-              Expanded(
-                child: gridMode.isTrue
-                    ? _buildFileWrapWidget(context)
-                    : _buildFileTableWidget(context),
-              )
-            ],
-          ));
+      return Column(
+        children: [
+          Padding(
+              padding: EdgeInsets.all(
+                10.0,
+              ),
+              child: _buildFilePathWidget(context)),
+          Padding(
+              padding: EdgeInsets.all(
+                10.0,
+              ),
+              child: _buildSearchTextWidget(context)),
+          Expanded(
+            child: gridMode.isTrue
+                ? _buildFileWrapWidget(context)
+                : _buildFileTableWidget(context),
+          )
+        ],
+      );
     });
   }
 }

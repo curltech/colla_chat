@@ -2,18 +2,19 @@ import 'dart:core';
 import 'dart:io' as io;
 
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/datastore/filesystem/file_node.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/widgets/data_bind/tree_view.dart';
 import 'package:get/get.dart';
 
-class FileSystemController extends DataListController<FolderNode> {
+import 'file_node.dart';
+
+class DirectoryController extends DataListController<FolderNode> {
   late final TreeViewController treeViewController;
   Rx<FolderNode?> currentNode = Rx<FolderNode?>(null);
 
-  FileSystemController() {
+  DirectoryController() {
     init();
   }
 
@@ -137,5 +138,3 @@ class FileSystemController extends DataListController<FolderNode> {
     return files;
   }
 }
-
-final FileSystemController fileSystemController = FileSystemController();
