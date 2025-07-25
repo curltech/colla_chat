@@ -55,6 +55,7 @@ import 'package:reactive_flutter_rating_bar/reactive_flutter_rating_bar.dart';
 import 'package:reactive_input_decorator/reactive_input_decorator.dart';
 import 'package:reactive_animated_toggle_switch/reactive_animated_toggle_switch.dart';
 import 'package:reactive_pin_code_fields/reactive_pin_code_fields.dart';
+import 'package:reactive_fluent_ui/reactive_fluent_ui.dart' as fui;
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class PlatformReactiveDataField<T> extends StatelessWidget {
@@ -177,6 +178,139 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         });
   }
 
+  Widget _buildCupertinoTextField(BuildContext context) {
+    var name = platformDataField.name;
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget textField = ReactiveCupertinoTextField<String>(
+        formControlName: name,
+        decoration: _buildBoxDecoration(),
+        validationMessages: platformDataField.validationMessages,
+        keyboardType: platformDataField.textInputType,
+        readOnly: platformDataField.readOnly,
+        obscureText: platformDataField.inputType == InputType.password,
+        inputFormatters: platformDataField.inputFormatters,
+        autofocus: platformDataField.autofocus,
+        focusNode: focusNode,
+        inputDecoration: decoration,
+        prefix: platformDataField.prefix,
+        suffix: platformDataField.suffix,
+        maxLines: platformDataField.inputType == InputType.password
+            ? 1
+            : platformDataField.maxLines,
+        minLines: platformDataField.minLines,
+        onEditingComplete: () {
+          platformDataField.onEditingComplete?.call();
+        },
+        onSubmitted: () {
+          platformDataField.onSubmitted?.call(formGroup.value[name]);
+        });
+
+    return textField;
+  }
+
+  Widget _buildExtendedTextField(BuildContext context) {
+    var name = platformDataField.name;
+    var readOnly = platformDataField.readOnly;
+    var autofocus = platformDataField.autofocus;
+    InputType inputType = platformDataField.inputType;
+    TextInputType textInputType =
+        platformDataField.textInputType ?? TextInputType.text;
+    Map<String, String Function(Object)>? validationMessages =
+        platformDataField.validationMessages;
+
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+
+    return ReactiveExtendedTextField<String>(
+      formControlName: name,
+      decoration: decoration,
+      validationMessages: validationMessages,
+      keyboardType: textInputType,
+      readOnly: readOnly,
+      obscureText: inputType == InputType.password,
+      inputFormatters: platformDataField.inputFormatters,
+      autofocus: autofocus,
+      focusNode: focusNode,
+      maxLines: platformDataField.maxLines,
+      minLines: platformDataField.minLines,
+    );
+  }
+
+  Widget _buildFancyPasswordField(BuildContext context) {
+    var name = platformDataField.name;
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget fancyPasswordField = ReactiveFancyPasswordField<String>(
+      formControlName: name,
+      validationMessages: platformDataField.validationMessages,
+      decoration: decoration,
+      validationRules: {
+        UppercaseValidationRule(),
+        LowercaseValidationRule(),
+        DigitValidationRule(),
+        SpecialCharacterValidationRule(),
+        MinCharactersValidationRule(6),
+      },
+    );
+
+    return fancyPasswordField;
+  }
+
+  Widget _buildNativeTextInput(BuildContext context) {
+    var name = platformDataField.name;
+    Widget nativeTextInput = ReactiveFlutterNativeTextInput<String>(
+        formControlName: name,
+        validationMessages: platformDataField.validationMessages,
+        decoration: _buildBoxDecoration(),
+        maxLines: platformDataField.maxLines ?? 1,
+        minLines: platformDataField.minLines ?? 1,
+        focusNode: focusNode,
+        onChanged: (value) {
+          platformDataField.onChanged?.call(value);
+        });
+
+    return nativeTextInput;
+  }
+
+  Widget _buildFluentTextFormBox(BuildContext context) {
+    var name = platformDataField.name;
+    Widget fluentTextFormBox = fui.ReactiveFluentTextFormBox<String>(
+        formControlName: name,
+        validationMessages: platformDataField.validationMessages,
+        keyboardType: platformDataField.textInputType,
+        readOnly: platformDataField.readOnly,
+        obscureText: platformDataField.inputType == InputType.password,
+        inputFormatters: platformDataField.inputFormatters,
+        autofocus: platformDataField.autofocus,
+        prefix: platformDataField.prefix,
+        suffix: platformDataField.suffix,
+        maxLines: platformDataField.inputType == InputType.password
+            ? 1
+            : platformDataField.maxLines,
+        minLines: platformDataField.minLines,
+        onEditingComplete: () {
+          platformDataField.onEditingComplete?.call();
+        });
+
+    return fluentTextFormBox;
+  }
+
+  Widget _buildCodeTextField(BuildContext context) {
+    var name = platformDataField.name;
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget codeTextField = ReactiveCodeTextField<String>(
+      formControlName: name,
+      validationMessages: platformDataField.validationMessages,
+      focusNode: focusNode,
+      inputDecoration: decoration,
+      keyboardType: platformDataField.textInputType,
+      minLines: platformDataField.minLines,
+      maxLines: platformDataField.maxLines,
+      readOnly: platformDataField.readOnly,
+      controller: CodeController(),
+    );
+
+    return codeTextField;
+  }
+
   Widget _buildPinPut(BuildContext context) {
     var name = platformDataField.name;
     var pinputField = ReactivePinPut(
@@ -227,6 +361,67 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return Row(children: children);
   }
 
+  ///多个字符串选择多个，对应的字段是字符串的Set
+  Widget _buildCheckboxGroup(BuildContext context) {
+    var name = platformDataField.name;
+    var label = platformDataField.label;
+    var options = platformDataField.options ?? [];
+
+    List<Widget> children = [];
+    var prefixIcon = _buildPrefixWidget();
+    if (prefixIcon != null) {
+      children.add(const SizedBox(
+        width: 10.0,
+      ));
+      children.add(prefixIcon);
+      children.add(const SizedBox(
+        width: 15.0,
+      ));
+    }
+    children.add(Text(AppLocalizations.t(label)));
+    var checkboxGroup = ReactiveCheckboxGroup<T>(
+      formControlName: name,
+      validationMessages: platformDataField.validationMessages,
+      onChanged: (FormControl<T> formControl) {
+        platformDataField.onChanged?.call(formControl.value);
+      },
+      options: options,
+    );
+    children.add(Expanded(child: checkboxGroup));
+    return Row(
+      children: children,
+    );
+  }
+
+  Widget _buildFluentToggleSwitch(BuildContext context) {
+    var name = platformDataField.name;
+    var label = platformDataField.label;
+    var options = platformDataField.options ?? [];
+
+    List<Widget> children = [];
+    var prefixIcon = _buildPrefixWidget();
+    if (prefixIcon != null) {
+      children.add(const SizedBox(
+        width: 10.0,
+      ));
+      children.add(prefixIcon);
+      children.add(const SizedBox(
+        width: 15.0,
+      ));
+    }
+    children.add(Text(AppLocalizations.t(label)));
+    var fluentToggleSwitch = fui.ReactiveFluentToggleSwitch<bool>(
+      formControlName: name,
+      validationMessages: platformDataField.validationMessages,
+      focusNode: focusNode,
+      autofocus: platformDataField.autofocus,
+    );
+    children.add(Expanded(child: fluentToggleSwitch));
+    return Row(
+      children: children,
+    );
+  }
+
   ///多个字符串选择一个，对应的字段是字符串
   Widget _buildToggleSwitch(BuildContext context) {
     var name = platformDataField.name;
@@ -275,73 +470,26 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return Row(children: children);
   }
 
-  ///多个字符串选择多个，对应的字段是字符串的Set
-  Widget _buildCheckboxGroup(BuildContext context) {
+  Widget _buildAnimatedToggleSwitch(BuildContext context) {
     var name = platformDataField.name;
-    var label = platformDataField.label;
-    var options = platformDataField.options ?? [];
-
-    List<Widget> children = [];
-    var prefixIcon = _buildPrefixWidget();
-    if (prefixIcon != null) {
-      children.add(const SizedBox(
-        width: 10.0,
-      ));
-      children.add(prefixIcon);
-      children.add(const SizedBox(
-        width: 15.0,
-      ));
+    var options = platformDataField.options;
+    List<DropdownMenuItem<String>> items = [];
+    if (options != null && options.isNotEmpty) {
+      for (var i = 0; i < options.length; ++i) {
+        var option = options[i];
+        var item = DropdownMenuItem<String>(
+            value: option.value.toString(), child: Text(option.label));
+        items.add(item);
+      }
     }
-    children.add(Text(AppLocalizations.t(label)));
-    var checkboxGroup = ReactiveCheckboxGroup<T>(
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget toggleSwitchRolling = ReactiveAnimatedToggleSwitchRolling<int, int>(
       formControlName: name,
       validationMessages: platformDataField.validationMessages,
-      onChanged: (FormControl<T> formControl) {
-        platformDataField.onChanged?.call(formControl.value);
-      },
-      options: options,
+      values: [],
     );
-    children.add(Expanded(child: checkboxGroup));
-    return Row(
-      children: children,
-    );
-  }
 
-  //多个字符串选择多个，对应的字段是字符串的Set
-  Widget _buildChipGroup(BuildContext context) {
-    var name = platformDataField.name;
-    var label = platformDataField.label;
-    var options = platformDataField.options ?? [];
-
-    List<Widget> children = [];
-    var prefixIcon = _buildPrefixWidget();
-    if (prefixIcon != null) {
-      children.add(const SizedBox(
-        width: 10.0,
-      ));
-      children.add(prefixIcon);
-      children.add(const SizedBox(
-        width: 15.0,
-      ));
-    }
-    children.add(Text(AppLocalizations.t(label)));
-    var chipGroup = ReactiveChipGroup<T>(
-      formControlName: name,
-      validationMessages: platformDataField.validationMessages,
-      onSelected: (FormControl<T> formControl) {
-        platformDataField.onChanged?.call(formControl.value);
-      },
-      options: options,
-      disabledColor: Colors.white,
-      selectedColor: myself.primary,
-      backgroundColor: Colors.white,
-      showCheckmark: false,
-      checkmarkColor: myself.primary,
-    );
-    children.add(Expanded(child: chipGroup));
-    return Row(
-      children: children,
-    );
+    return toggleSwitchRolling;
   }
 
   /// 多个字符串选择一个
@@ -460,6 +608,161 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         child: Row(children: children));
   }
 
+  /// CupertinoSlidingSegmentedControl
+  Widget _buildSlidingSegmentedControl(BuildContext context) {
+    var name = platformDataField.name;
+    var options = platformDataField.options ?? [];
+    Map<String, Widget> children = {};
+    for (var i = 0; i < options.length; ++i) {
+      var option = options[i];
+      if (option.icon != null) {
+        children[option.label] = Icon(option.icon!);
+      } else {
+        children[option.label] = Text(option.label);
+      }
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget slidingSegmentedControl =
+        ReactiveSlidingSegmentedControl<String, String>(
+      formControlName: name,
+      validationMessages: platformDataField.validationMessages,
+      decoration: decoration,
+      children: children,
+    );
+
+    return slidingSegmentedControl;
+  }
+
+  /// FluentSlider
+  Widget _buildFluentSlider(BuildContext context) {
+    var name = platformDataField.name;
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget fluentSlider = fui.ReactiveFluentSlider<double>(
+      formControlName: name,
+      validationMessages: platformDataField.validationMessages,
+      min: platformDataField.params?['min'],
+      max: platformDataField.params?['max'],
+    );
+
+    return fluentSlider;
+  }
+
+  Widget _buildCupertinoSwitch(BuildContext context) {
+    var name = platformDataField.name;
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget cupertinoSwitch = ReactiveCupertinoSwitch<bool>(
+      formControlName: name,
+      validationMessages: platformDataField.validationMessages,
+      focusNode: focusNode,
+      autofocus: platformDataField.autofocus,
+      activeTrackColor: myself.primary,
+      inactiveTrackColor: Colors.grey,
+    );
+
+    return cupertinoSwitch;
+  }
+
+  Widget _buildSleekCircularSlider(BuildContext context) {
+    var name = platformDataField.name;
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget sleekCircularSlider = ReactiveSleekCircularSlider<double>(
+        formControlName: name,
+        validationMessages: platformDataField.validationMessages,
+        decoration: decoration,
+        min: platformDataField.params?['min'],
+        max: platformDataField.params?['max'],
+        heightFactor: platformDataField.params?['heightFactor'],
+        widthFactor: platformDataField.params?['widthFactor'],
+        onChange: (value) {});
+
+    return sleekCircularSlider;
+  }
+
+  /// CupertinoSegmentedControl，分段控制，类似单选框
+  Widget _buildSegmentedControl(BuildContext context) {
+    var name = platformDataField.name;
+    var options = platformDataField.options ?? [];
+    Map<String, Widget> children = {};
+    for (var i = 0; i < options.length; ++i) {
+      var option = options[i];
+      if (option.icon != null) {
+        children[option.label] = Icon(option.icon!);
+      } else {
+        children[option.label] = Text(option.label);
+      }
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget segmentedControl = ReactiveSegmentedControl<String, String>(
+      formControlName: name,
+      validationMessages: platformDataField.validationMessages,
+      decoration: decoration,
+      unselectedColor: Colors.grey,
+      selectedColor: myself.primary,
+      borderColor: myself.primary,
+      children: children,
+    );
+
+    return segmentedControl;
+  }
+
+  Widget _buildRangeSlider(BuildContext context) {
+    var name = platformDataField.name;
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget rangeSlider = ReactiveRangeSlider<RangeValues>(
+        formControlName: name,
+        validationMessages: platformDataField.validationMessages,
+        decoration: decoration,
+        min: platformDataField.params?['min'],
+        max: platformDataField.params?['max'],
+        divisions: platformDataField.params?['divisions'],
+        activeColor: myself.primary,
+        inactiveColor: Colors.grey,
+        labelBuilder: (values) => RangeLabels(
+              values.start.round().toString(),
+              values.end.round().toString(),
+            ),
+        onChanged: (value) {});
+
+    return rangeSlider;
+  }
+
+  //多个字符串选择多个，对应的字段是字符串的Set
+  Widget _buildChipGroup(BuildContext context) {
+    var name = platformDataField.name;
+    var label = platformDataField.label;
+    var options = platformDataField.options ?? [];
+
+    List<Widget> children = [];
+    var prefixIcon = _buildPrefixWidget();
+    if (prefixIcon != null) {
+      children.add(const SizedBox(
+        width: 10.0,
+      ));
+      children.add(prefixIcon);
+      children.add(const SizedBox(
+        width: 15.0,
+      ));
+    }
+    children.add(Text(AppLocalizations.t(label)));
+    var chipGroup = ReactiveChipGroup<T>(
+      formControlName: name,
+      validationMessages: platformDataField.validationMessages,
+      onSelected: (FormControl<T> formControl) {
+        platformDataField.onChanged?.call(formControl.value);
+      },
+      options: options,
+      disabledColor: Colors.white,
+      selectedColor: myself.primary,
+      backgroundColor: Colors.white,
+      showCheckmark: false,
+      checkmarkColor: myself.primary,
+    );
+    children.add(Expanded(child: chipGroup));
+    return Row(
+      children: children,
+    );
+  }
+
   Widget _buildDropdownField(BuildContext context) {
     var name = platformDataField.name;
     var options = platformDataField.options;
@@ -565,6 +868,62 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return datePicker;
   }
 
+  Widget _buildFluentDatePicker(BuildContext context) {
+    var name = platformDataField.name;
+    List<Widget> children = [];
+    var prefixIcon = platformDataField.prefixIcon;
+    if (prefixIcon != null) {
+      children.add(prefixIcon);
+      children.add(const SizedBox(
+        width: 15.0,
+      ));
+    }
+    var label = platformDataField.label;
+    if (prefixIcon != null) {
+      children.add(Text(AppLocalizations.t(label)));
+      children.add(const SizedBox(
+        width: 20.0,
+      ));
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget datePicker = fui.ReactiveFluentDatePicker<DateTime>(
+        formControlName: name,
+        validationMessages: platformDataField.validationMessages,
+        focusNode: focusNode,
+        autofocus: platformDataField.autofocus,
+        locale: myself.locale);
+
+    return datePicker;
+  }
+
+  Widget _buildFluentTimePicker(BuildContext context) {
+    var name = platformDataField.name;
+    List<Widget> children = [];
+    var prefixIcon = platformDataField.prefixIcon;
+    if (prefixIcon != null) {
+      children.add(prefixIcon);
+      children.add(const SizedBox(
+        width: 15.0,
+      ));
+    }
+    var label = platformDataField.label;
+    if (prefixIcon != null) {
+      children.add(Text(AppLocalizations.t(label)));
+      children.add(const SizedBox(
+        width: 20.0,
+      ));
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget timePicker = fui.ReactiveFluentTimePicker<DateTime>(
+      formControlName: name,
+      validationMessages: platformDataField.validationMessages,
+      autofocus: platformDataField.autofocus,
+      locale: myself.locale,
+    );
+
+    return timePicker;
+  }
+
   /// 返回值是DateTimeRange
   Widget _buildDateRangePicker(BuildContext context) {
     var name = platformDataField.name;
@@ -622,7 +981,10 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     Widget countryCodePicker = ReactiveCountryCodePicker(
         formControlName: name,
         validationMessages: platformDataField.validationMessages,
-        searchDecoration: decoration);
+        searchDecoration: decoration,
+        onChanged: (value) {
+          platformDataField.onChanged?.call(value.value);
+        });
 
     return countryCodePicker;
   }
@@ -643,25 +1005,27 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
   Widget _buildImagePicker(BuildContext context) {
     var name = platformDataField.name;
     InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget filePicker = ReactiveImagePicker(
+    Widget imagePicker = ReactiveImagePicker(
       formControlName: name,
       validationMessages: platformDataField.validationMessages,
       decoration: decoration,
     );
 
-    return filePicker;
+    return imagePicker;
   }
 
   ///
   Widget _buildTypeAhead(BuildContext context) {
     var name = platformDataField.name;
     InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget filePicker = ReactiveTypeAhead<String, String>(
+    Widget typeAhead = ReactiveTypeAhead<String, String>(
       formControlName: name,
       validationMessages: platformDataField.validationMessages,
       autofocus: platformDataField.autofocus,
       stringify: (value) => value,
-      suggestionsCallback: (pattern) {},
+      suggestionsCallback: (pattern) {
+        return null;
+      },
       itemBuilder: (context, city) {
         return Text(city);
       },
@@ -670,7 +1034,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       decoration: decoration,
     );
 
-    return filePicker;
+    return typeAhead;
   }
 
   ///
@@ -678,7 +1042,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     var name = platformDataField.name;
     var options = platformDataField.options;
     InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget filePicker = ReactiveRawAutocomplete<String, String>(
+    Widget rawAutocomplete = ReactiveRawAutocomplete<String, String>(
       formControlName: name,
       validationMessages: platformDataField.validationMessages,
       decoration: decoration,
@@ -723,7 +1087,58 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       },
     );
 
-    return filePicker;
+    return rawAutocomplete;
+  }
+
+  Widget _buildFluentAutoSuggestBox(BuildContext context) {
+    var name = platformDataField.name;
+    var options = platformDataField.options;
+    List<fui.AutoSuggestBoxItem<String>> items = [];
+    if (options != null && options.isNotEmpty) {
+      for (var i = 0; i < options.length; ++i) {
+        var option = options[i];
+        var item = fui.AutoSuggestBoxItem<String>(
+            value: option.value.toString(), label: option.label);
+        items.add(item);
+      }
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget fluentAutoSuggestBox =
+        fui.ReactiveFluentAutoSuggestBox<String, String>(
+      formControlName: name,
+      validationMessages: platformDataField.validationMessages,
+      autofocus: platformDataField.autofocus,
+      inputFormatters: platformDataField.inputFormatters,
+      items: items,
+    );
+
+    return fluentAutoSuggestBox;
+  }
+
+  Widget _buildFluentComboBox(BuildContext context) {
+    var name = platformDataField.name;
+    var options = platformDataField.options;
+    List<fui.ComboBoxItem<String>> items = [];
+    if (options != null && options.isNotEmpty) {
+      for (var i = 0; i < options.length; ++i) {
+        var option = options[i];
+        var item = fui.ComboBoxItem<String>(
+          value: option.value.toString(),
+          child: Text(option.label),
+        );
+        items.add(item);
+      }
+    }
+    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    Widget fluentComboBox = fui.ReactiveFluentComboBox<String, String>(
+      formControlName: name,
+      validationMessages: platformDataField.validationMessages,
+      autofocus: platformDataField.autofocus,
+      focusNode: focusNode,
+      items: items,
+    );
+
+    return fluentComboBox;
   }
 
   Widget _buildMonthPicker(BuildContext context) {
@@ -742,126 +1157,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     );
 
     return filePicker;
-  }
-
-  /// CupertinoSlidingSegmentedControl
-  Widget _buildSlidingSegmentedControl(BuildContext context) {
-    var name = platformDataField.name;
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget filePicker = ReactiveSlidingSegmentedControl<String, String>(
-      formControlName: name,
-      validationMessages: platformDataField.validationMessages,
-      decoration: decoration,
-      children: {},
-    );
-
-    return filePicker;
-  }
-
-  Widget _buildCupertinoSwitch(BuildContext context) {
-    var name = platformDataField.name;
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget filePicker = ReactiveCupertinoSwitch<bool>(
-      formControlName: name,
-      validationMessages: platformDataField.validationMessages,
-      focusNode: focusNode,
-      autofocus: platformDataField.autofocus,
-      activeTrackColor: myself.primary,
-      inactiveTrackColor: Colors.grey,
-    );
-
-    return filePicker;
-  }
-
-  Widget _buildSleekCircularSlider(BuildContext context) {
-    var name = platformDataField.name;
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget filePicker = ReactiveSleekCircularSlider<double>(
-        formControlName: name,
-        validationMessages: platformDataField.validationMessages,
-        decoration: decoration,
-        min: platformDataField.params?['min'],
-        max: platformDataField.params?['max'],
-        heightFactor: platformDataField.params?['heightFactor'],
-        widthFactor: platformDataField.params?['widthFactor'],
-        onChange: (value) {});
-
-    return filePicker;
-  }
-
-  /// CupertinoSegmentedControl，分段控制，类似单选框
-  Widget _buildSegmentedControl(BuildContext context) {
-    var name = platformDataField.name;
-    var options = platformDataField.options ?? [];
-    Map<String, Widget> children = {};
-    for (var i = 0; i < options.length; ++i) {
-      var option = options[i];
-      if (option.icon != null) {
-        children[option.label] = Icon(option.icon!);
-      } else {
-        children[option.label] = Text(option.label);
-      }
-    }
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget filePicker = ReactiveSegmentedControl<String, String>(
-      formControlName: name,
-      validationMessages: platformDataField.validationMessages,
-      decoration: decoration,
-      unselectedColor: Colors.grey,
-      selectedColor: myself.primary,
-      borderColor: myself.primary,
-      children: children,
-    );
-
-    return filePicker;
-  }
-
-  Widget _buildRangeSlider(BuildContext context) {
-    var name = platformDataField.name;
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget filePicker = ReactiveRangeSlider<RangeValues>(
-        formControlName: name,
-        validationMessages: platformDataField.validationMessages,
-        decoration: decoration,
-        min: platformDataField.params?['min'],
-        max: platformDataField.params?['max'],
-        divisions: platformDataField.params?['divisions'],
-        activeColor: myself.primary,
-        inactiveColor: Colors.grey,
-        labelBuilder: (values) => RangeLabels(
-              values.start.round().toString(),
-              values.end.round().toString(),
-            ),
-        onChanged: (value) {});
-
-    return filePicker;
-  }
-
-  Widget _buildExtendedTextField(BuildContext context) {
-    var name = platformDataField.name;
-    var readOnly = platformDataField.readOnly;
-    var autofocus = platformDataField.autofocus;
-    InputType inputType = platformDataField.inputType;
-    TextInputType textInputType =
-        platformDataField.textInputType ?? TextInputType.text;
-    Map<String, String Function(Object)>? validationMessages =
-        platformDataField.validationMessages;
-
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-
-    return ReactiveExtendedTextField<String>(
-      formControlName: name,
-      decoration: decoration,
-      validationMessages: validationMessages,
-      keyboardType: textInputType,
-      readOnly: readOnly,
-      obscureText: inputType == InputType.password,
-      inputFormatters: platformDataField.inputFormatters,
-      autofocus: autofocus,
-      focusNode: focusNode,
-      maxLines: platformDataField.maxLines,
-      minLines: platformDataField.minLines,
-    );
   }
 
   Widget _buildSignature(BuildContext context) {
@@ -930,25 +1225,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return dropdownButton;
   }
 
-  Widget _buildFancyPasswordField(BuildContext context) {
-    var name = platformDataField.name;
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget fancyPasswordField = ReactiveFancyPasswordField<String>(
-      formControlName: name,
-      validationMessages: platformDataField.validationMessages,
-      decoration: decoration,
-      validationRules: {
-        UppercaseValidationRule(),
-        LowercaseValidationRule(),
-        DigitValidationRule(),
-        SpecialCharacterValidationRule(),
-        MinCharactersValidationRule(6),
-      },
-    );
-
-    return fancyPasswordField;
-  }
-
   Widget _buildLanguageToolTextField(BuildContext context) {
     var name = platformDataField.name;
     InputDecoration decoration = _buildInputDecoration(platformDataField);
@@ -965,20 +1241,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         onSubmitted: () {});
 
     return languageToolTextField;
-  }
-
-  Widget _buildNativeTextInput(BuildContext context) {
-    var name = platformDataField.name;
-    Widget nativeTextInput = ReactiveFlutterNativeTextInput<String>(
-        formControlName: name,
-        validationMessages: platformDataField.validationMessages,
-        decoration: _buildBoxDecoration(),
-        maxLines: platformDataField.maxLines ?? 1,
-        minLines: platformDataField.minLines ?? 1,
-        focusNode: focusNode,
-        onChanged: (value) {});
-
-    return nativeTextInput;
   }
 
   Widget _buildCartStepper(BuildContext context) {
@@ -1010,36 +1272,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     );
 
     return ratingBar;
-  }
-
-  Widget _buildCupertinoTextField(BuildContext context) {
-    var name = platformDataField.name;
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget textField = ReactiveCupertinoTextField<String>(
-        formControlName: name,
-        decoration: _buildBoxDecoration(),
-        validationMessages: platformDataField.validationMessages,
-        keyboardType: platformDataField.textInputType,
-        readOnly: platformDataField.readOnly,
-        obscureText: platformDataField.inputType == InputType.password,
-        inputFormatters: platformDataField.inputFormatters,
-        autofocus: platformDataField.autofocus,
-        focusNode: focusNode,
-        inputDecoration: decoration,
-        prefix: platformDataField.prefix,
-        suffix: platformDataField.suffix,
-        maxLines: platformDataField.inputType == InputType.password
-            ? 1
-            : platformDataField.maxLines,
-        minLines: platformDataField.minLines,
-        onEditingComplete: () {
-          platformDataField.onEditingComplete?.call();
-        },
-        onSubmitted: () {
-          platformDataField.onSubmitted?.call(formGroup.value[name]);
-        });
-
-    return textField;
   }
 
   Widget _buildFileSelector(BuildContext context) {
@@ -1103,24 +1335,6 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return dropdownButton;
   }
 
-  Widget _buildCodeTextField(BuildContext context) {
-    var name = platformDataField.name;
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget codeTextField = ReactiveCodeTextField<String>(
-      formControlName: name,
-      validationMessages: platformDataField.validationMessages,
-      focusNode: focusNode,
-      inputDecoration: decoration,
-      keyboardType: platformDataField.textInputType,
-      minLines: platformDataField.minLines,
-      maxLines: platformDataField.maxLines,
-      readOnly: platformDataField.readOnly,
-      controller: CodeController(),
-    );
-
-    return codeTextField;
-  }
-
   Widget _buildCheckboxListTile(BuildContext context) {
     var name = platformDataField.name;
     Color? value = formGroup.value[name] as Color?;
@@ -1160,51 +1374,39 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return switchListTile;
   }
 
-  Widget _buildAnimatedToggleSwitch(BuildContext context) {
-    var name = platformDataField.name;
-    var options = platformDataField.options;
-    List<DropdownMenuItem<String>> items = [];
-    if (options != null && options.isNotEmpty) {
-      for (var i = 0; i < options.length; ++i) {
-        var option = options[i];
-        var item = DropdownMenuItem<String>(
-            value: option.value.toString(), child: Text(option.label));
-        items.add(item);
-      }
-    }
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget toggleSwitchRolling = ReactiveAnimatedToggleSwitchRolling<int, int>(
-      formControlName: name,
-      values: [],
-    );
-
-    return toggleSwitchRolling;
-  }
-
   Widget _buildDropdownSearch(BuildContext context) {
     var name = platformDataField.name;
     var options = platformDataField.options;
-    List<DropdownMenuItem<String>> items = [];
+    List<String> items = [];
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
-        var item = DropdownMenuItem<String>(
-            value: option.value.toString(), child: Text(option.label));
-        items.add(item);
+        items.add(option.label);
       }
     }
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget dropdownSearch = ReactiveDropdownSearch<String, String>(
       formControlName: name,
+      validationMessages: platformDataField.validationMessages,
       dropdownDecoratorProps: DropDownDecoratorProps(
         decoration: decoration,
       ),
+      items: (_, __) => items,
+    );
+    ReactiveDropdownSearchMultiSelection<String, String>(
+      formControlName: name,
+      validationMessages: platformDataField.validationMessages,
+      dropdownDecoratorProps: DropDownDecoratorProps(
+        decoration: decoration,
+      ),
+      items: (_, __) => items,
     );
 
     return dropdownSearch;
   }
 
-  Widget _buildInputDecorator(BuildContext context) {
+  /// 对子组件设置外观
+  Widget _buildInputDecorator(BuildContext context, Widget child) {
     var name = platformDataField.name;
     Color? value = formGroup.value[name] as Color?;
     if (value == null) {
@@ -1212,16 +1414,10 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     }
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget inputDecorator = ReactiveInputDecorator(
-      formControlName: name,
-      decoration: decoration,
-      child: Row(
-        children: [
-          const SizedBox(width: 16),
-          const Expanded(child: Text('Some label')),
-          ReactiveCheckbox(formControlName: 'input'),
-        ],
-      ),
-    );
+        formControlName: name,
+        decoration: decoration,
+        validationMessages: platformDataField.validationMessages,
+        child: child);
 
     return inputDecorator;
   }
@@ -1237,6 +1433,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       readOnly: platformDataField.readOnly,
       length: platformDataField.length!,
       onCompleted: (value) {},
+      onSubmitted: (value) {},
     );
 
     return pinCodeTextField;
@@ -1250,7 +1447,11 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     }
     Widget languagePicker = ReactiveLanguagePickerDialog<String>(
       formControlName: name,
+      validationMessages: platformDataField.validationMessages,
       valueAccessor: LanguageCodeValueAccessor(),
+      focusNode: focusNode,
+      title: Text(platformDataField.label),
+      searchInputDecoration: _buildInputDecoration(platformDataField),
       builder: (BuildContext context, Language? language,
           Future<Language?> Function() showDialog) {
         return ListTile(
@@ -1259,6 +1460,9 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
               AppLocalizations.t(language?.name ?? 'No language selected')),
         );
       },
+      onValuePicked: (value) {
+        platformDataField.onChanged?.call(value);
+      },
     );
 
     return languagePicker;
@@ -1266,9 +1470,10 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
 
   Widget _buildWechatAssetsPicker(BuildContext context) {
     var name = platformDataField.name;
-
     Widget wechatAssetsPicker = ReactiveWechatAssetsPicker<List<AssetEntity>>(
       formControlName: name,
+      decoration: _buildInputDecoration(platformDataField),
+      validationMessages: platformDataField.validationMessages,
       imagePickerBuilder: (Future<void> Function() pick,
           List<AssetEntity> images, void Function(List<AssetEntity>) onChange) {
         return Column(
@@ -1295,9 +1500,11 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
 
   Widget _buildWechatCameraPicker(BuildContext context) {
     var name = platformDataField.name;
-
     Widget wechatCameraPicker = ReactiveWechatCameraPicker<AssetEntity>(
       formControlName: name,
+      decoration: _buildInputDecoration(platformDataField),
+      validationMessages: platformDataField.validationMessages,
+      locale: myself.locale,
       imagePickerBuilder: (pick, image, _) {
         return Column(
           children: [
@@ -1521,7 +1728,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         dataFieldWidget = _buildLanguagePicker(context);
         break;
       case InputType.inputDecorator:
-        dataFieldWidget = _buildInputDecorator(context);
+        dataFieldWidget = _buildInputDecorator(context, Container());
         break;
       case InputType.languagetool:
         dataFieldWidget = _buildLanguageToolTextField(context);
