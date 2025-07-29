@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
@@ -15,8 +14,16 @@ import 'file_node.dart';
 /// 文件管理功能主页面，带有路由回调函数
 class DirectoryWidget extends StatelessWidget {
   late final DirectoryController directoryController;
+  final Function(FolderNode folderNode)? onSelected;
+  final Function(FolderNode folderNode)? onToggleNodeExpansion;
+  final bool readOnly;
 
-  DirectoryWidget({super.key, DirectoryController? directoryController}) {
+  DirectoryWidget(
+      {super.key,
+      DirectoryController? directoryController,
+      this.readOnly = true,
+      this.onSelected,
+      this.onToggleNodeExpansion}) {
     if (directoryController == null) {
       this.directoryController = DirectoryController();
     } else {
@@ -27,7 +34,7 @@ class DirectoryWidget extends StatelessWidget {
   /// 单击表示编辑属性
   void _onTap(BuildContext context, FolderNode folderNode) {
     directoryController.currentNode.value = folderNode;
-    indexWidgetProvider.push('file');
+    onSelected?.call(folderNode);
   }
 
   Widget _buildFolderButtonWidget(BuildContext context) {
@@ -141,10 +148,14 @@ class DirectoryWidget extends StatelessWidget {
         DialogUtil.error(content: 'list directory failure:$e');
       }
     }
+    onToggleNodeExpansion?.call(node);
   }
 
   @override
   Widget build(BuildContext context) {
+    if (readOnly) {
+      return _buildTreeViewWidget(context);
+    }
     return Column(
       children: [
         _buildFolderButtonWidget(context),

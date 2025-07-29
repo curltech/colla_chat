@@ -9,7 +9,6 @@ import 'package:colla_chat/widgets/adaptive_scaffold/slot_layout.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
 
 ///横屏左边栏，用于指示当前主页面
@@ -86,6 +85,7 @@ class PrimaryNavigation {
       IconButton(
         color: Colors.white,
         hoverColor: myself.primary,
+        isSelected: appDataProvider.bodyWidth == 0.0,
         onPressed: () {
           if (appDataProvider.bodyWidth == 0.0) {
             appDataProvider.bodyWidth = -1.0;
@@ -93,8 +93,9 @@ class PrimaryNavigation {
             appDataProvider.bodyWidth = 0.0;
           }
         },
-        tooltip: AppLocalizations.t('toggle'),
-        icon: Icon(Icons.safety_divider_outlined),
+        tooltip: AppLocalizations.t('split'),
+        icon: Icon(Icons.vertical_split),
+        selectedIcon: Icon(Icons.swipe),
       ),
     ]);
   }

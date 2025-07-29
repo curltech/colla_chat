@@ -213,13 +213,7 @@ class FileWidget extends StatelessWidget {
       File? file = fileController.current;
       String? path = file?.file.path;
 
-      return AutoSizeTextField(
-        decoration: buildInputDecoration(
-          labelText: AppLocalizations.t('Path'),
-        ),
-        readOnly: true,
-        controller: TextEditingController(text: path ?? ''),
-      );
+      return AutoSizeText(path ?? '');
     });
   }
 
@@ -321,42 +315,41 @@ class FileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      List<Widget> rightWidgets = [
-        IconButton(
-          color: myself.primary,
-          icon: Obx(() {
-            return Icon(
-              gridMode.isTrue ? Icons.list : Icons.grid_on,
-              color: Colors.white,
-            );
-          }),
-          onPressed: () {
-            gridMode(!gridMode.value);
-          },
-          tooltip: AppLocalizations.t('Toggle grid mode'),
+    List<Widget> rightWidgets = [
+      IconButton(
+        color: myself.primary,
+        icon: Obx(() {
+          return Icon(
+            gridMode.isTrue ? Icons.list : Icons.grid_on,
+            color: Colors.white,
+          );
+        }),
+        onPressed: () {
+          gridMode(!gridMode.value);
+        },
+        tooltip: AppLocalizations.t('Toggle grid mode'),
+      )
+    ];
+    return Column(
+      crossAxisAlignment : CrossAxisAlignment.start,
+      children: [
+        Padding(
+            padding: EdgeInsets.all(
+              10.0,
+            ),
+            child: _buildFilePathWidget(context)),
+        Padding(
+            padding: EdgeInsets.all(
+              10.0,
+            ),
+            child: _buildSearchTextWidget(context)),
+        Expanded(
+          child: gridMode.isTrue
+              ? _buildFileWrapWidget(context)
+              : _buildFileTableWidget(context),
         )
-      ];
-      return Column(
-        children: [
-          Padding(
-              padding: EdgeInsets.all(
-                10.0,
-              ),
-              child: _buildFilePathWidget(context)),
-          Padding(
-              padding: EdgeInsets.all(
-                10.0,
-              ),
-              child: _buildSearchTextWidget(context)),
-          Expanded(
-            child: gridMode.isTrue
-                ? _buildFileWrapWidget(context)
-                : _buildFileTableWidget(context),
-          )
-        ],
-      );
-    });
+      ],
+    );
   }
 }
 

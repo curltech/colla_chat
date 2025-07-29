@@ -502,6 +502,7 @@ dependency_overrides:
   markdown_widget: ^2.3.2+6
   gpt_markdown: ^1.0.16
   flutter_slider_drawer: ^3.0.2
+  flutter_zoom_drawer: ^3.2.0
   lottie: ^3.1.2
   flutter_quill: ^11.4.0
   flutter_quill_extensions: ^11.0.0

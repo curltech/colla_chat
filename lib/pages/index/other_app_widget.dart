@@ -64,6 +64,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(flutterPipWindowWidget);
     indexWidgetProvider.define(platformMapLauncherWidget);
     indexWidgetProvider.define(sherpaInstallWidget);
+    indexWidgetProvider.define(fileSystemWidget);
   }
 
   @override
@@ -78,8 +79,10 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Apps';
 
+  /// 用于制定在body部分显示的页面
   late final RxString name = routeName.obs;
 
+  /// 修改name的值，从body的页面转向新的body页面
   Widget _buildOtherAppTileData(BuildContext context) {
     List<TileData> otherAppTileData = [];
     otherAppTileData.add(TileData(
@@ -186,7 +189,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
         prefix: fileSystemWidget.iconData,
         helpPath: fileSystemWidget.routeName,
         onTap: (int index, String title, {String? subtitle}) {
-          name.value = fileSystemWidget.routeName;
+          indexWidgetProvider.push(fileSystemWidget.routeName);
         }));
     Widget otherAppWidget = DataListView(
       itemCount: otherAppTileData.length,

@@ -51,7 +51,7 @@ class AppBarView extends StatelessWidget {
             AutoSizeText(
               AppLocalizations.t(title ?? ''),
               style: const TextStyle(color: Colors.white),
-              //softWrap: true,
+              softWrap: true,
               wrapWords: false,
               overflow: TextOverflow.visible,
               //maxLines: 2
