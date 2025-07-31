@@ -67,22 +67,19 @@ class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
         platformReactiveFormController.values =
             JsonUtil.toJson(dataIndexNode.value);
       }
-      var formInputWidget = PlatformReactiveForm(
+      var platformReactiveForm = PlatformReactiveForm(
         spacing: 15.0,
         onSubmit: (Map<String, dynamic> values) {
-          _onOk(values);
+          _onSubmit(values);
         },
         platformReactiveFormController: platformReactiveFormController,
       );
 
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
-        child: formInputWidget,
-      );
+      return platformReactiveForm;
     });
   }
 
-  data_source.DataIndex? _onOk(Map<String, dynamic> values) {
+  data_source.DataIndex? _onSubmit(Map<String, dynamic> values) {
     data_source.DataIndex current = data_source.DataIndex.fromJson(values);
     if (StringUtil.isEmpty(current.name)) {
       DialogUtil.error(content: AppLocalizations.t('Must has dataIndex name'));

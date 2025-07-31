@@ -128,22 +128,19 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
           'sourceType': sourceType.value
         };
       }
-      var formInputWidget = PlatformReactiveForm(
+      var platformReactiveForm = PlatformReactiveForm(
         spacing: 15.0,
         onSubmit: (Map<String, dynamic> values) {
-          _onOk(values);
+          _onSubmit(values);
         },
         platformReactiveFormController: platformReactiveFormController!,
       );
 
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
-        child: formInputWidget,
-      );
+      return platformReactiveForm;
     });
   }
 
-  DataSource? _onOk(Map<String, dynamic> values) {
+  DataSource? _onSubmit(Map<String, dynamic> values) {
     DataSource current = DataSource.fromJson(values);
     if (StringUtil.isEmpty(current.name)) {
       DialogUtil.error(content: AppLocalizations.t('Must has dataSource name'));

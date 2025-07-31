@@ -91,18 +91,18 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
 
       platformReactiveFormController?.values =
           JsonUtil.toJson(dataTableNode.value);
-      var formInputWidget = PlatformReactiveForm(
+      var platformReactiveForm = PlatformReactiveForm(
         spacing: 10.0,
         height: 160,
         onSubmit: (Map<String, dynamic> values) {
-          _onOk(values);
+          _onSubmit(values);
         },
         platformReactiveFormController: platformReactiveFormController!,
         formButtons: [
           FormButton(
               label: 'Generate',
               onTap: (Map<String, dynamic> values) async {
-                await _onOk(values);
+                await _onSubmit(values);
                 String? sql = createTableAndIndex();
 
                 if (sql != null) {
@@ -112,7 +112,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
           FormButton(
               label: 'Execute',
               onTap: (Map<String, dynamic> values) async {
-                await _onOk(values);
+                await _onSubmit(values);
                 try {
                   String? sql = createTableAndIndex(mock: false);
                   if (sql != null) {
@@ -126,14 +126,11 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         ],
       );
 
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
-        child: formInputWidget,
-      );
+      return platformReactiveForm;
     });
   }
 
-  Future<data_source.DataTable?> _onOk(Map<String, dynamic> values) async {
+  Future<data_source.DataTable?> _onSubmit(Map<String, dynamic> values) async {
     data_source.DataTable current = data_source.DataTable.fromJson(values);
     if (StringUtil.isEmpty(current.name)) {
       DialogUtil.error(content: AppLocalizations.t('Must has dataTable name'));

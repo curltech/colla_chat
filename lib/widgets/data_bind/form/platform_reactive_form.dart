@@ -387,6 +387,7 @@ class PlatformReactiveForm extends StatelessWidget {
   final String submitLabel;
   final double? height; //高度
   final double? width; //宽度
+  final EdgeInsetsGeometry padding;
   final MainAxisAlignment mainAxisAlignment;
   final double spacing;
   final double buttonSpacing;
@@ -409,6 +410,7 @@ class PlatformReactiveForm extends StatelessWidget {
     this.buttonSpacing = 10.0,
     this.heads,
     this.tails,
+    this.padding = const EdgeInsets.all(10.0),
   });
 
   Widget _buildButtonBar() {
@@ -533,6 +535,7 @@ class PlatformReactiveForm extends StatelessWidget {
       ),
     );
 
-    return SizedBox(height: height, width: width, child: reactiveForm);
+    return Container(
+        padding: padding, height: height, width: width, child: reactiveForm);
   }
 }

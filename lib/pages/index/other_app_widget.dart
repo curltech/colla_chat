@@ -58,6 +58,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   };
 
   OtherAppWidget({super.key}) {
+    indexWidgetProvider.define(poemWidget);
     indexWidgetProvider.define(webViewWidget);
     indexWidgetProvider.define(openVpnWidget);
     indexWidgetProvider.define(flutterOverlayWindowWidget);
@@ -90,7 +91,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
         prefix: poemWidget.iconData,
         helpPath: poemWidget.routeName,
         onTap: (int index, String title, {String? subtitle}) {
-          name.value = poemWidget.routeName;
+          indexWidgetProvider.push(poemWidget.routeName);
         }));
     final bool emailSwitch = myself.peerProfile.emailSwitch;
     if (emailSwitch) {

@@ -72,6 +72,7 @@ class AdaptiveContainer extends StatelessWidget {
     if (zoomDrawerController != null) {
       zoomDrawerController!.close!();
     }
+    resizableController?.setSizes([ResizableSize.pixels(0)]);
   }
 
   openSlider() {
@@ -80,6 +81,7 @@ class AdaptiveContainer extends StatelessWidget {
     if (zoomDrawerController != null) {
       zoomDrawerController!.open!();
     }
+    resizableController?.setSizes([ResizableSize.pixels(pixels)]);
   }
 
   toggle() {

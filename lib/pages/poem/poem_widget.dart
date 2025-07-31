@@ -1,18 +1,19 @@
 import 'dart:io';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/entity/poem/poem.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/poem/poem_content_widget.dart';
 import 'package:colla_chat/plugin/platform_text_to_speech_widget.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/poem/poem.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/adaptive_container.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -22,14 +23,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart' as p;
 
-final DataListController<Poem> poemController = DataListController<Poem>();
-
 class PoemWidget extends StatelessWidget with TileDataMixin {
-  final PoemContentWidget poemContentWidget = PoemContentWidget();
+  final DataListController<Poem> poemController = DataListController<Poem>();
+  late final PoemContentWidget poemContentWidget = PoemContentWidget(
+    poemController: poemController,
+  );
 
-  PoemWidget({super.key}) {
-    indexWidgetProvider.define(poemContentWidget);
-  }
+  PoemWidget({super.key});
 
   @override
   bool get withLeading => true;
@@ -43,7 +43,6 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Poem';
 
-  @override
   String? get information => 'Search over 800k chinese poems';
 
   final List<PlatformDataField> searchDataField = [
@@ -89,19 +88,16 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
   final ExpansibleController expansibleController = ExpansibleController();
 
   Widget _buildPlatformReactiveForm(BuildContext context) {
-    var formInputWidget = Container(
-        height: 280,
-        padding: const EdgeInsets.all(10.0),
-        child: PlatformReactiveForm(
-          height: 280,
-          spacing: 5.0,
-          submitLabel: 'Search',
-          platformReactiveFormController: platformReactiveFormController,
-          onSubmit: (Map<String, dynamic> values) {
-            poemController.clear();
-            _onOk(context, values);
-          },
-        ));
+    var platformReactiveForm = PlatformReactiveForm(
+      height: 350,
+      spacing: 5.0,
+      submitLabel: 'Search',
+      platformReactiveFormController: platformReactiveFormController,
+      onSubmit: (Map<String, dynamic> values) {
+        poemController.clear();
+        _onSubmit(context, values);
+      },
+    );
     Widget expansionTile = ExpansionTile(
       controller: expansibleController,
       childrenPadding: const EdgeInsets.all(0),
@@ -110,13 +106,13 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
         AppLocalizations.t('Search condition'),
       ),
       initiallyExpanded: true,
-      children: [formInputWidget],
+      children: [platformReactiveForm],
     );
 
     return expansionTile;
   }
 
-  _onOk(BuildContext context, Map<String, dynamic> values,
+  _onSubmit(BuildContext context, Map<String, dynamic> values,
       {int from = 0, int limit = 10}) async {
     String? title = values['title'];
     String? author = values['author'];
@@ -190,7 +186,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
   Future<void> _onRefresh(BuildContext context) async {
     int length = poemController.data.length;
     Map<String, dynamic> values = platformReactiveFormController.values;
-    _onOk(context, values, from: length);
+    _onSubmit(context, values, from: length);
   }
 
   Widget _buildPoemListWidget(BuildContext context) {
@@ -213,7 +209,6 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
                 titleTail: '${poem.dynasty} ${poem.author}',
                 onTap: (int index, String title, {String? subtitle}) {
                   poemController.setCurrentIndex = index;
-                  indexWidgetProvider.push(poemContentWidget.routeName);
                 },
               ));
               i++;
@@ -231,8 +226,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
               },
             );
           }
-          return Center(
-              child: AutoSizeText(AppLocalizations.t('No poem')));
+          return Center(child: AutoSizeText(AppLocalizations.t('No poem')));
         },
       )),
     ]);
@@ -240,7 +234,13 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    var poemWidget = _buildPoemListWidget(context);
+    var poemWidget = AppBarView(
+        title: title,
+        withLeading: true,
+        child: AdaptiveContainer(
+            pixels: 380,
+            main: _buildPoemListWidget(context),
+            body: poemContentWidget));
 
     return poemWidget;
   }

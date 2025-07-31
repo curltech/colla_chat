@@ -10,7 +10,7 @@ import 'package:colla_chat/widgets/filesystem/file_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../widgets/filesystem/file_node.dart';
+import 'package:colla_chat/widgets/filesystem/file_node.dart';
 
 /// 文件管理功能主页面，带有路由回调函数
 class FileSystemWidget extends StatelessWidget with TileDataMixin {

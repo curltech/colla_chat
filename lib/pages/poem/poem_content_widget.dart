@@ -1,43 +1,29 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/poem/poem.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/poem/poem_widget.dart';
 import 'package:colla_chat/plugin/platform_text_to_speech_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_text_to_speech_widget.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class PoemContentWidget extends StatelessWidget with TileDataMixin {
-  PoemContentWidget({super.key});
+class PoemContentWidget extends StatelessWidget {
+  final DataListController<Poem> poemController;
 
-  @override
-  bool get withLeading => true;
-
-  @override
-  String get routeName => 'poem_content';
-
-  @override
-  IconData get iconData => Icons.library_music_outlined;
-
-  @override
-  String get title => 'Poem content';
-
-
-
-  PlatformTextToSpeechWidget platformTextToSpeechWidget =
+  final PlatformTextToSpeechWidget platformTextToSpeechWidget =
       PlatformTextToSpeechWidget();
 
-  SherpaTextToSpeechWidget sherpaTextToSpeechWidget =
+  final SherpaTextToSpeechWidget sherpaTextToSpeechWidget =
       SherpaTextToSpeechWidget();
 
-  RxBool platformTextToSpeech = true.obs;
+  final RxBool platformTextToSpeech = true.obs;
+
+  PoemContentWidget({super.key, required this.poemController});
 
   speak(Poem poem) async {
     var platformTextToSpeech = this.platformTextToSpeech.value;
@@ -236,12 +222,7 @@ class PoemContentWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    var poemContentWidget = AppBarView(
-      title: title,
-      helpPath: routeName,
-      withLeading: withLeading,
-      child: _buildPoemContent(context),
-    );
+    var poemContentWidget = _buildPoemContent(context);
 
     return poemContentWidget;
   }
