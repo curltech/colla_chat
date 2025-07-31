@@ -39,18 +39,21 @@ class LoadingUtil {
   }
 
   static Widget buildLoadingAnimation({double? size}) {
-    return Center(
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-          LoadingAnimationWidget.discreteCircle(
-              color: myself.primary, size: size ?? 100),
-          const SizedBox(
-            height: 10,
-          ),
-          AutoSizeText(AppLocalizations.t("Loading, please waiting..."))
-        ]));
+    return SizedBox(
+        height: size ?? 196,
+        width: size ?? 196,
+        child: Center(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+              LoadingAnimationWidget.discreteCircle(
+                  color: myself.primary, size: size ?? 100),
+              const SizedBox(
+                height: 10,
+              ),
+              AutoSizeText(AppLocalizations.t("Loading, please waiting..."))
+            ])));
   }
 
   // static Widget buildCircularLoadingWidget() {
