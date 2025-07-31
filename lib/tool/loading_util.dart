@@ -17,20 +17,25 @@ class LoadingUtil {
         myself.primary,
       ],
     );
-    return Center(
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-          SizedBox(
-              height: height ?? 64, width: width ?? 64, child: loadingWidget),
-          const SizedBox(
-            height: 10,
-          ),
-          Expanded(
-              child: AutoSizeText(
-                  AppLocalizations.t("Loading, please waiting...")))
-        ]));
+    return SizedBox(
+        height: height ?? 128,
+        width: width ?? 128,
+        child: Center(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+              SizedBox(
+                  height: height ?? 64,
+                  width: width ?? 64,
+                  child: loadingWidget),
+              const SizedBox(
+                height: 10,
+              ),
+              Expanded(
+                  child: AutoSizeText(
+                      AppLocalizations.t("Loading, please waiting...")))
+            ])));
   }
 
   static Widget buildLoadingAnimation({double? size}) {
