@@ -10,7 +10,6 @@ import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
@@ -30,8 +29,6 @@ class ManualAddWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'MailAddressManualAdd';
-
-  
 
   late final PlatformReactiveFormController platformReactiveFormController =
       PlatformReactiveFormController(_getManualDiscoveryColumnField());
@@ -135,26 +132,24 @@ class ManualAddWidget extends StatelessWidget with TileDataMixin {
 
   Widget _buildPlatformReactiveForm(BuildContext context) {
     double height = appDataProvider.portraitSize.height * 0.7;
-    var formInputWidget = SingleChildScrollView(
-        child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Column(children: [
-              const SizedBox(height: 10.0),
-              PlatformReactiveForm(
-                height: height,
-                spacing: 5.0,
-                formButtons: [
-                  FormButton(
-                      label: 'Connect',
-                      onTap: (Map<String, dynamic> values) {
-                        _connect(values);
-                      }),
-                ],
-                platformReactiveFormController: platformReactiveFormController,
-              )
-            ])));
+    var platformReactiveForm = SingleChildScrollView(
+        child: Column(children: [
+      const SizedBox(height: 10.0),
+      PlatformReactiveForm(
+        height: height,
+        spacing: 5.0,
+        formButtons: [
+          FormButton(
+              label: 'Connect',
+              onTap: (Map<String, dynamic> values) {
+                _connect(values);
+              }),
+        ],
+        platformReactiveFormController: platformReactiveFormController,
+      )
+    ]));
 
-    return formInputWidget;
+    return platformReactiveForm;
   }
 
   _connect(Map<String, dynamic> values) async {

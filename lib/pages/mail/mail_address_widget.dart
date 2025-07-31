@@ -10,6 +10,7 @@ import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/pages/mail/new_mail_widget.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -48,9 +49,9 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
   IconData get iconData => Icons.mail;
 
   @override
-  String get title => 'Mail';
-
-  
+  String get title {
+    return 'Mail';
+  }
 
   final RxInt index = 0.obs;
   final SwiperController swiperController = SwiperController();
@@ -90,7 +91,7 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
               icon: const Icon(Icons.delete_outline),
               tooltip: AppLocalizations.t('Delete'),
             ),
-            selected: mailAddressController.currentIndex == i);
+            selected: mailAddressController.currentIndex.value == i);
         List<TileData> tiles = [];
         List<String>? mailboxNames =
             mailboxController.getMailboxNames(mailAddress.email);
@@ -128,7 +129,7 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
 
   String getMailboxName() {
     MailAddress? current = mailAddressController.current;
-    String email = current?.email ?? 'Mail';
+    String email = current?.email ?? AppLocalizations.t('No address');
     String? name = mailboxController.currentMailboxName;
     if (name == null) {
       return email;
@@ -139,68 +140,69 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> rightWidgets = [];
-    rightWidgets.add(IconButton(
+    List<Widget> toolBars = [];
+    toolBars.add(IconButton(
         onPressed: () {
           indexWidgetProvider.push('mail_address_auto_discover');
         },
-        icon: const Icon(Icons.auto_mode, color: Colors.white),
+        icon: Icon(Icons.auto_mode, color: myself.primary),
         tooltip: AppLocalizations.t('Auto discover address')));
-    rightWidgets.add(IconButton(
+    toolBars.add(IconButton(
         onPressed: () {
           indexWidgetProvider.push('mail_address_manual_add');
         },
-        icon: const Icon(Icons.handyman, color: Colors.white),
+        icon: Icon(Icons.handyman, color: myself.primary),
         tooltip: AppLocalizations.t('Manual add address')));
-    rightWidgets.add(IconButton(
+    toolBars.add(IconButton(
         onPressed: () {
           mailMimeMessageController.fetchMessages();
         },
-        icon: const Icon(Icons.refresh, color: Colors.white),
+        icon: Icon(Icons.refresh, color: myself.primary),
         tooltip: AppLocalizations.t('Refresh')));
-    rightWidgets.add(IconButton(
+    toolBars.add(IconButton(
         onPressed: () {
           indexWidgetProvider.push('new_mail');
         },
-        icon: const Icon(Icons.note_add, color: Colors.white),
+        icon: Icon(Icons.note_add, color: myself.primary),
         tooltip: AppLocalizations.t('New mail')));
+    Widget titleWidget = InkWell(
+        onTap: () {
+          swiperController.move(1);
+        },
+        child: AutoSizeText(
+          getMailboxName(),
+          style: const TextStyle(color: Colors.black),
+          softWrap: true,
+          maxLines: 1,
+          overflow: TextOverflow.visible,
+        ));
+    toolBars.add(Spacer());
+    toolBars.add(titleWidget);
+    var appBarView = Swiper(
+        itemCount: 2,
+        index: index.value,
+        controller: swiperController,
+        onIndexChanged: (int index) {
+          this.index.value = index;
+        },
+        itemBuilder: (BuildContext context, int index) {
+          if (index == 1) {
+            return _buildMailAddressWidget(context);
+          }
+          return mailListWidget;
+        });
 
-    rightWidgets.add(const SizedBox(
-      width: 10.0,
-    ));
-    return Obx(() {
-      logger.i('mail address build');
-      Widget titleWidget = InkWell(
-          onTap: () {
-            swiperController.move(1);
-          },
-          child: AutoSizeText(
-            getMailboxName(),
-            style: const TextStyle(color: Colors.white),
-            softWrap: true,
-            maxLines: 1,
-            overflow: TextOverflow.visible,
-          ));
-      var appBarView = AppBarView(
-          titleWidget: titleWidget,
-          helpPath: routeName,
-          withLeading: withLeading,
-          rightWidgets: rightWidgets,
-          child: Swiper(
-              itemCount: 2,
-              index: index.value,
-              controller: swiperController,
-              onIndexChanged: (int index) {
-                this.index.value = index;
-              },
-              itemBuilder: (BuildContext context, int index) {
-                if (index == 1) {
-                  return _buildMailAddressWidget(context);
-                }
-                return mailListWidget;
-              }));
-
-      return appBarView;
-    });
+    return Column(
+      children: [
+        Card(
+            elevation: 0,
+            margin: EdgeInsets.zero,
+            shape: RoundedRectangleBorder(),
+            child: Row(
+              children: toolBars,
+            )),
+        Expanded(child: appBarView)
+      ],
+    );
   }
 }

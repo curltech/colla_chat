@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/entity/mail/mail_address.dart';
 import 'package:colla_chat/pages/mail/address/email_service_provider.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
@@ -8,11 +9,9 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
-import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:enough_mail/discover.dart';
@@ -22,7 +21,8 @@ import 'package:get/get.dart';
 /// 自动邮件发现视图，一个card下的录入框和按钮组合
 class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
   AutoDiscoverWidget({super.key}) {
-    platformReactiveFormController = PlatformReactiveFormController(_getAutoDiscoveryColumnField());
+    platformReactiveFormController =
+        PlatformReactiveFormController(_getAutoDiscoveryColumnField());
     _updateEmailServiceProviderOptions();
   }
 
@@ -139,27 +139,25 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildPlatformReactiveForm(BuildContext context) {
-    var formInputWidget = Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: PlatformReactiveForm(
-          height: appDataProvider.portraitSize.height * 0.4,
-          spacing: 5.0,
-          formButtons: [
-            FormButton(
-                label: 'Discover',
-                onTap: (Map<String, dynamic> values) {
-                  _discover(values);
-                }),
-            FormButton(
-                label: 'Connect',
-                onTap: (Map<String, dynamic> values) {
-                  _connect(values);
-                }),
-          ],
-          platformReactiveFormController: platformReactiveFormController,
-        ));
+    var platformReactiveForm = PlatformReactiveForm(
+      height: appDataProvider.portraitSize.height * 0.4,
+      spacing: 5.0,
+      formButtons: [
+        FormButton(
+            label: 'Discover',
+            onTap: (Map<String, dynamic> values) {
+              _discover(values);
+            }),
+        FormButton(
+            label: 'Connect',
+            onTap: (Map<String, dynamic> values) {
+              _connect(values);
+            }),
+      ],
+      platformReactiveFormController: platformReactiveFormController,
+    );
 
-    return formInputWidget;
+    return platformReactiveForm;
   }
 
   Future<void> _discover(Map<String, dynamic> values) async {
@@ -247,18 +245,15 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
     for (final ConfigEmailProvider provider in clientConfig.emailProviders!) {
       configWidgets
           .add(AutoSizeText('displayName:${provider.displayName ?? ''}'));
-      configWidgets
-          .add(AutoSizeText('domains:${provider.domains.toString()}'));
+      configWidgets.add(AutoSizeText('domains:${provider.domains.toString()}'));
       configWidgets.add(const AutoSizeText('preferredIncomingServer:'));
       configWidgets.add(Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          child:
-              AutoSizeText(provider.preferredIncomingServer.toString())));
+          child: AutoSizeText(provider.preferredIncomingServer.toString())));
       configWidgets.add(const AutoSizeText('preferredOutgoingServer:'));
       configWidgets.add(Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          child:
-              AutoSizeText(provider.preferredOutgoingServer.toString())));
+          child: AutoSizeText(provider.preferredOutgoingServer.toString())));
     }
     return configWidgets;
   }

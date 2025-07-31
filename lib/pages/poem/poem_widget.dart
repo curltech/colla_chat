@@ -6,7 +6,9 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/poem/poem_content_widget.dart';
 import 'package:colla_chat/plugin/platform_text_to_speech_widget.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/poem/poem.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -22,6 +24,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart' as p;
+import 'package:provider/provider.dart';
 
 class PoemWidget extends StatelessWidget with TileDataMixin {
   final DataListController<Poem> poemController = DataListController<Poem>();
@@ -234,14 +237,26 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    var poemWidget = AppBarView(
-        title: title,
-        withLeading: true,
-        child: AdaptiveContainer(
-            pixels: 380,
-            main: _buildPoemListWidget(context),
-            body: poemContentWidget));
+    var provider = Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(
+        builder:
+            (context, appDataProvider, indexWidgetProvider, myself, child) {
+      ContainerType containerType = ContainerType.swiper;
+      if (appDataProvider.landscape) {
+        if (appDataProvider.bodyWidth == 0) {
+          containerType = ContainerType.resizeable;
+        }
+      }
+      var poemWidget = AppBarView(
+          title: title,
+          withLeading: true,
+          child: AdaptiveContainer(
+              pixels: 380,
+              containerType: containerType,
+              main: _buildPoemListWidget(context),
+              body: poemContentWidget));
 
-    return poemWidget;
+      return poemWidget;
+    });
+    return provider;
   }
 }
