@@ -1,3 +1,5 @@
+import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
+
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -145,9 +147,10 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       icon: Icon(Icons.arrow_back_ios_new, color: foregroundColor),
       onPressed: () async {
         if (leadingCallBack != null) {
-          await leadingCallBack!();
+          await leadingCallBack.call();
+        } else {
+          indexWidgetProvider.pop(context: context);
         }
-        indexWidgetProvider.pop(context: context);
       },
     );
     return leadingButton;
