@@ -427,7 +427,7 @@ class NewMailWidget extends StatelessWidget with TileDataMixin {
         helpPath: routeName,
         withLeading: withLeading,
         rightWidgets: rightWidgets,
-        child: Column(children: [
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
           _buildMailSubjectWidget(context),
           Expanded(child: _buildEnoughHtmlEditorWidget(context)),
           _buildAttachmentWidget(context),
