@@ -358,24 +358,27 @@ class DialogUtil {
       context: context,
       builder: (context) {
         return AlertDialog(
-          icon: icon ?? Icon(Icons.confirmation_num_outlined),
-          title: AppBarWidget(
-              isAppBar: false,
-              title: Text(
-                AppLocalizations.t(title),
-                style: const TextStyle(color: Colors.white),
-              )),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8.0))),
           titlePadding: EdgeInsets.zero,
           content: SizedBox(
               width: appDataProvider.totalSize.width * 0.8,
               height: appDataProvider.totalSize.height * 0.5,
               child: Center(
-                  child: AutoSizeText(
-                      style: TextStyle(color: Colors.white),
+                  child: Row(
+                children: [
+                  icon ??
+                      Icon(
+                        Icons.info,
+                        color: Colors.green,
+                      ),
+                  AutoSizeText(
                       softWrap: true,
                       maxLines: 4,
                       overflow: TextOverflow.ellipsis,
-                      AppLocalizations.t(content)))),
+                      AppLocalizations.t(content))
+                ],
+              ))),
           actions: <Widget>[
             TextButton(
               style: style,
@@ -418,20 +421,24 @@ class DialogUtil {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: AppBarWidget(
-              isAppBar: false,
-              title: Text(
-                AppLocalizations.t(title),
-                style: const TextStyle(color: Colors.white),
-              )),
           titlePadding: EdgeInsets.zero,
-          content: TextFormField(
-            keyboardType: TextInputType.text,
-            decoration: buildInputDecoration(
-              labelText: AppLocalizations.t(content),
-            ),
-            controller: controller,
-          ),
+          content: SizedBox(
+              width: appDataProvider.totalSize.width * 0.8,
+              height: appDataProvider.totalSize.height * 0.5,
+              child: Center(
+                  child: Row(children: [
+                Icon(
+                  Icons.input,
+                  color: Colors.green,
+                ),
+                TextFormField(
+                  keyboardType: TextInputType.text,
+                  decoration: buildInputDecoration(
+                    labelText: AppLocalizations.t(content),
+                  ),
+                  controller: controller,
+                )
+              ]))),
           actions: <Widget>[
             TextButton(
               style: style,
