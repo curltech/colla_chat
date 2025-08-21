@@ -177,6 +177,7 @@ dependencies:
   flutter_carousel_widget: ^3.1.0 #类似carousel_slider，支持单页多item
   carousel_slider_plus: ^7.1.1  #fork carousel_slider，支持单页多item
   flutter_card_swiper: ^7.0.0 #不错的swiper的组件
+  card_swiper: ^3.0.1
   another_transformer_page_view: ^2.0.1
   appinio_swiper: ^2.0.2 #不错的swiper的组件，可定制动画的角度
   flutter_drawing_board: ^0.9.8 #绘画工具

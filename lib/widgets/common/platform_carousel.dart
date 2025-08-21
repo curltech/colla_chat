@@ -1,6 +1,8 @@
 import 'dart:async';
 
-import 'package:another_transformer_page_view/another_transformer_page_view.dart';
+import 'package:another_transformer_page_view/another_transformer_page_view.dart'
+    as page;
+import 'package:card_swiper/card_swiper.dart';
 import 'package:carousel_slider_plus/carousel_slider_plus.dart'
     as carousel_slider;
 import 'package:flutter/gestures.dart';
@@ -13,34 +15,39 @@ import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 
 enum PlatformSwiperDirection { none, left, right, top, bottom }
 
-enum PlatformCarouselType { swiper, slide, carousel, page }
+enum PlatformCarouselType { card, swiper, slide, carousel, page }
 
 class PlatformCarouselController {
   final PlatformCarouselType platformCarouselType;
+  SwiperController? swiperController;
   carousel_slider.CarouselSliderController? carouselSliderController;
   flutter_carousel.FlutterCarouselController? flutterCarouselController;
-  IndexController? indexController;
+  page.IndexController? indexController;
   CardSwiperController? cardSwiperController;
 
   PlatformCarouselController(
-      {this.platformCarouselType = PlatformCarouselType.slide,
+      {this.platformCarouselType = PlatformCarouselType.card,
       this.carouselSliderController,
       this.flutterCarouselController,
       this.indexController,
       this.cardSwiperController}) {
-    if (platformCarouselType == PlatformCarouselType.carousel) {
+    if (platformCarouselType == PlatformCarouselType.card) {
+      swiperController = SwiperController();
+    } else if (platformCarouselType == PlatformCarouselType.carousel) {
       carouselSliderController = carousel_slider.CarouselSliderController();
     } else if (platformCarouselType == PlatformCarouselType.slide) {
       flutterCarouselController = flutter_carousel.FlutterCarouselController();
     } else if (platformCarouselType == PlatformCarouselType.swiper) {
       cardSwiperController = CardSwiperController();
     } else if (platformCarouselType == PlatformCarouselType.page) {
-      indexController = IndexController();
+      indexController = page.IndexController();
     }
   }
 
   move(int index) {
-    if (carouselSliderController != null) {
+    if (swiperController != null) {
+      swiperController!.move(index);
+    } else if (carouselSliderController != null) {
       carouselSliderController!.animateToPage(index);
     } else if (flutterCarouselController != null) {
       flutterCarouselController!.animateToPage(index);
@@ -52,7 +59,9 @@ class PlatformCarouselController {
   }
 
   next() {
-    if (carouselSliderController != null) {
+    if (swiperController != null) {
+      swiperController!.next();
+    } else if (carouselSliderController != null) {
       carouselSliderController!.nextPage();
     } else if (cardSwiperController != null) {
       flutterCarouselController!.nextPage();
@@ -261,7 +270,7 @@ class PlatformCarouselWidget extends StatelessWidget {
   }
 
   Widget _buildTransformerPageView() {
-    return TransformerPageView(
+    return page.TransformerPageView(
         key: key,
         index: initialPage,
         duration: autoPlayAnimationDuration,
@@ -275,7 +284,7 @@ class PlatformCarouselWidget extends StatelessWidget {
           onPageChanged?.call(index!);
         },
         controller: controller.indexController,
-        pageController: TransformerPageController(),
+        pageController: page.TransformerPageController(),
         transformer: ThreeDTransformer(),
         itemBuilder: (context, index) {
           return itemBuilder.call(context, index);
@@ -304,9 +313,7 @@ class PlatformCarouselWidget extends StatelessWidget {
         int horizontalOffsetPercentage,
         int verticalOffsetPercentage,
       ) {
-        itemBuilder(context, index);
-
-        return null;
+        return itemBuilder(context, index);
       },
       cardsCount: itemCount,
       controller: controller.cardSwiperController,
@@ -316,13 +323,33 @@ class PlatformCarouselWidget extends StatelessWidget {
       onSwipe: onCardSwipe,
       allowedSwipeDirection: const AllowedSwipeDirection.all(),
       isLoop: autoPlay,
-      numberOfCardsDisplayed: 2,
+      // numberOfCardsDisplayed: 2,
+    );
+  }
+
+  Swiper _buildSwiper() {
+    return Swiper(
+      key: key,
+      autoplay: autoPlay,
+      controller: controller.swiperController,
+      onIndexChanged: (int index) {
+        onPageChanged?.call(index);
+      },
+      itemCount: itemCount,
+      itemBuilder: (BuildContext context, int index) {
+        return itemBuilder(context, index);
+      },
+      index: initialPage,
+      physics: physics,
+      scrollDirection: scrollDirection,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     switch (controller.platformCarouselType) {
+      case PlatformCarouselType.card:
+        return _buildSwiper();
       case PlatformCarouselType.carousel:
         return _buildCarouselSlider();
       case PlatformCarouselType.slide:
