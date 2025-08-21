@@ -1,8 +1,7 @@
-import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +20,7 @@ class IndexWidgetProvider with ChangeNotifier {
   List<TileDataMixin> views = [];
   List<TileDataMixin> recentViews = [];
 
-  SwiperController? controller;
+  PlatformCarouselController? controller;
 
   //当前的主视图，左边栏和底部栏的指示，范围0-mainViews.length-1
   int _currentMainIndex = 0;
@@ -30,7 +29,7 @@ class IndexWidgetProvider with ChangeNotifier {
   IndexWidgetProvider();
 
   ///初始化主菜单视图
-  initMainView(SwiperController controller, List<TileDataMixin> views) {
+  initMainView(PlatformCarouselController controller, List<TileDataMixin> views) {
     this.controller = controller;
     for (TileDataMixin view in views) {
       define(view);

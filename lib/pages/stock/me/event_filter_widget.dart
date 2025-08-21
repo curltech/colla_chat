@@ -1,4 +1,4 @@
-import 'package:card_swiper/card_swiper.dart';
+import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/entity/stock/event_filter.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/trade/in_out_event_widget.dart';
@@ -9,6 +9,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/event_filter.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
@@ -124,7 +125,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
   ];
   late final PlatformReactiveFormController platformReactiveFormController =
       PlatformReactiveFormController(eventFilterDataField);
-  final SwiperController swiperController = SwiperController();
+  final PlatformCarouselController controller = PlatformCarouselController();
   final RxInt index = 0.obs;
 
   Widget _buildActionWidget(
@@ -166,7 +167,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
 
   _onDoubleTap(int index) {
     eventFilterController.setCurrentIndex = index;
-    swiperController.move(1);
+    controller.move(1);
   }
 
   Widget _buildEventFilterListView(BuildContext context) {
@@ -262,7 +263,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
             tooltip: AppLocalizations.t('Add'),
             onPressed: () {
               eventFilterController.setCurrentIndex = -1;
-              swiperController.move(1);
+              controller.move(1);
             },
             icon: const Icon(Icons.add_circle_outline),
           ),
@@ -289,7 +290,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
             tooltip: AppLocalizations.t('List'),
             onPressed: () {
               eventFilterController.setCurrentIndex = -1;
-              swiperController.move(0);
+              controller.move(0);
             },
             icon: const Icon(Icons.list_alt_outlined),
           ),
@@ -307,18 +308,21 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
       withLeading: true,
       rightWidgets: [_buildRightWidget(context)],
       child: Obx(() {
-        return Swiper(
-          controller: swiperController,
+        return PlatformCarouselWidget(
+          controller: controller,
           itemCount: 2,
-          index: index.value,
-          itemBuilder: (BuildContext context, int index) {
+          initialPage: index.value,
+          itemBuilder: (BuildContext context, int index, {int? realIndex}) {
             Widget view = _buildEventFilterListView(context);
             if (index == 1) {
               view = _buildEventFilterEditView(context);
             }
             return view;
           },
-          onIndexChanged: (int index) {
+          onPageChanged: (int index,
+              {PlatformSwiperDirection? direction,
+                int? oldIndex,
+                CarouselPageChangedReason? reason}) {
             this.index.value = index;
           },
         );

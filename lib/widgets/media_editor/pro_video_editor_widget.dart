@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:io' as io;
-import 'package:card_swiper/card_swiper.dart' show SwiperController, Swiper;
+import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
+import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:colla_chat/widgets/media_editor/pro_video_render.dart';
@@ -33,7 +34,7 @@ class ProVideoEditorWidget extends StatelessWidget with TileDataMixin {
     playlistController: playlistController,
   );
   final ValueNotifier<int> index = ValueNotifier<int>(0);
-  final SwiperController swiperController = SwiperController();
+  final PlatformCarouselController controller = PlatformCarouselController();
 
   final _outputFormat = VideoOutputFormat.mp4;
 
@@ -165,23 +166,26 @@ class ProVideoEditorWidget extends StatelessWidget with TileDataMixin {
   /// 关闭视频编辑
   void onCloseEditor(EditorMode editorMode) async {
     if (editorMode != EditorMode.main) {
-      await swiperController.move(0);
+      await controller.move(0);
     }
     if (_outputVideoFile != null) {
     } else {
-      await swiperController.move(0);
+      await controller.move(0);
     }
   }
 
   Widget _buildVideoEditor(BuildContext context) {
-    Widget mediaView = Swiper(
+    Widget mediaView = PlatformCarouselWidget(
         itemCount: 2,
-        index: index.value,
-        controller: swiperController,
-        onIndexChanged: (int index) {
+        initialPage: index.value,
+        controller: controller,
+        onPageChanged: (int index,
+            {PlatformSwiperDirection? direction,
+            int? oldIndex,
+            CarouselPageChangedReason? reason}) {
           this.index.value = index;
         },
-        itemBuilder: (BuildContext context, int index) {
+        itemBuilder: (BuildContext context, int index, {int? realIndex}) {
           if (index == 0) {
             return playlistWidget;
           }
@@ -206,7 +210,7 @@ class ProVideoEditorWidget extends StatelessWidget with TileDataMixin {
               IconButton(
                 tooltip: AppLocalizations.t('Pro video editor'),
                 onPressed: () async {
-                  await swiperController.move(1);
+                  await controller.move(1);
                 },
                 icon: const Icon(Icons.task_alt_outlined),
               ),
@@ -223,7 +227,7 @@ class ProVideoEditorWidget extends StatelessWidget with TileDataMixin {
               IconButton(
                 tooltip: AppLocalizations.t('Playlist'),
                 onPressed: () async {
-                  await swiperController.move(0);
+                  await controller.move(0);
                 },
                 icon: const Icon(Icons.featured_play_list_outlined),
               ),

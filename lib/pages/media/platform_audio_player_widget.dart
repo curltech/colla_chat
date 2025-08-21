@@ -31,7 +31,7 @@ class PlatformAudioPlayerWidget extends StatelessWidget with TileDataMixin {
               return IconButton(
                 tooltip: AppLocalizations.t('Audio player'),
                 onPressed: () {
-                  platformAudioPlayer.swiperController
+                  platformAudioPlayer.controller
                       .move(1);
                 },
                 icon: const Icon(Icons.audiotrack),
@@ -40,7 +40,7 @@ class PlatformAudioPlayerWidget extends StatelessWidget with TileDataMixin {
               return IconButton(
                 tooltip: AppLocalizations.t('Playlist'),
                 onPressed: () {
-                  platformAudioPlayer.swiperController
+                  platformAudioPlayer.controller
                       .move(0);
                 },
                 icon: const Icon(Icons.featured_play_list_outlined),

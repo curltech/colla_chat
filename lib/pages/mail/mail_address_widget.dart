@@ -1,4 +1,4 @@
-import 'package:card_swiper/card_swiper.dart';
+import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/entity/mail/mail_address.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/mail/address/auto_discover_widget.dart';
@@ -15,6 +15,7 @@ import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -54,7 +55,7 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
   }
 
   final RxInt index = 0.obs;
-  final SwiperController swiperController = SwiperController();
+  final PlatformCarouselController controller = PlatformCarouselController();
 
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
     int i = 0;
@@ -66,7 +67,7 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
       i++;
     }
     mailboxController.setCurrentMailbox(title);
-    swiperController.move(0);
+    controller.move(0);
   }
 
   Widget _buildMailAddressWidget(BuildContext context) {
@@ -167,7 +168,7 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
         tooltip: AppLocalizations.t('New mail')));
     Widget titleWidget = InkWell(
         onTap: () {
-          swiperController.move(1);
+          controller.move(1);
         },
         child: AutoSizeText(
           getMailboxName(),
@@ -178,14 +179,17 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
         ));
     toolBars.add(Spacer());
     toolBars.add(titleWidget);
-    var appBarView = Swiper(
+    var appBarView = PlatformCarouselWidget(
         itemCount: 2,
-        index: index.value,
-        controller: swiperController,
-        onIndexChanged: (int index) {
+        initialPage: index.value,
+        controller: controller,
+        onPageChanged: (int index,
+            {PlatformSwiperDirection? direction,
+              int? oldIndex,
+              CarouselPageChangedReason? reason}) {
           this.index.value = index;
         },
-        itemBuilder: (BuildContext context, int index) {
+        itemBuilder: (BuildContext context, int index, {int? realIndex}) {
           if (index == 1) {
             return _buildMailAddressWidget(context);
           }

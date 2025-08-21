@@ -174,9 +174,8 @@ dependencies:
   filesystem_picker: ^4.1.0
   wechat_assets_picker: ^9.5.1 #移动平台，选择图像，视频等媒体并展示
   #下面是各种轮播图组件
-  carousel_slider: ^5.0.0 #不错的类似swiper的组件 CarouselSlider
-  flutter_carousel_widget: ^3.0.1 #类似carousel_slider，支持单页多item
-  card_swiper: ^3.0.1 #不错的swiper的组件
+  flutter_carousel_widget: ^3.1.0 #类似carousel_slider，支持单页多item
+  carousel_slider_plus: ^7.1.1  #fork carousel_slider，支持单页多item
   flutter_card_swiper: ^7.0.0 #不错的swiper的组件
   another_transformer_page_view: ^2.0.1
   appinio_swiper: ^2.0.2 #不错的swiper的组件，可定制动画的角度
@@ -305,7 +304,8 @@ dependencies:
   image: ^4.5.3 #所有平台，装载，保存，管理图像
   flutter_luban: ^0.1.15
   dismissible_page: ^1.0.2
-  infinite_scroll_pagination: ^5.0.0
+  infinite_scroll_pagination: ^5.1.0
+  indexed_list_view: ^4.0.0
 
   #应用
   i18n_extension: ^15.0.5

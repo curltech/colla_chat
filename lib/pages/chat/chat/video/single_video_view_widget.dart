@@ -1,4 +1,4 @@
-import 'package:card_swiper/card_swiper.dart';
+import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
@@ -9,6 +9,7 @@ import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.d
 import 'package:colla_chat/transport/webrtc/peer_media_render_view.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 
@@ -42,7 +43,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
 
   late OverlayEntry _popupDialog;
   int index = 0;
-  SwiperController swiperController = SwiperController();
+  PlatformCarouselController controller = PlatformCarouselController();
   late List<PeerMediaStream> peerMediaStreams;
 
   @override
@@ -97,8 +98,8 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   }
 
   Widget _buildPopupVideoView() {
-    Widget mediaRenderView = Center(
-        child: AutoSizeText(AppLocalizations.t('No media stream')));
+    Widget mediaRenderView =
+        Center(child: AutoSizeText(AppLocalizations.t('No media stream')));
     if (peerMediaStreams.isEmpty) {
       return mediaRenderView;
     }
@@ -229,8 +230,8 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   ///单个视频窗口
   Widget _buildSingleVideoView(
       BuildContext context, double? height, double? width) {
-    Widget mediaRenderView = Center(
-        child: AutoSizeText(AppLocalizations.t('No media stream')));
+    Widget mediaRenderView =
+        Center(child: AutoSizeText(AppLocalizations.t('No media stream')));
     if (peerMediaStreams.isEmpty) {
       return mediaRenderView;
     }
@@ -248,16 +249,19 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
             peerMediaStream: peerMediaStream, height: height, width: width);
         views.add(mediaRenderView);
       }
-      mediaRenderView = Swiper(
-        controller: swiperController,
+      mediaRenderView = PlatformCarouselWidget(
+        controller: controller,
         itemCount: views.length,
-        itemBuilder: (BuildContext context, int index) {
+        itemBuilder: (BuildContext context, int index, {int? realIndex}) {
           return views[index];
         },
-        onIndexChanged: (int index) {
+        onPageChanged: (int index,
+            {PlatformSwiperDirection? direction,
+            int? oldIndex,
+            CarouselPageChangedReason? reason}) {
           this.index = index;
         },
-        index: index,
+        initialPage: index,
       );
     }
     Widget singleVideoView = Builder(
@@ -318,7 +322,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
               padding: const EdgeInsets.all(10.0),
               child: IconButton(
                 onPressed: () {
-                  swiperController.next();
+                  controller.next();
                 },
                 icon: const Icon(
                     size: 36.0,
@@ -404,7 +408,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         break;
       case 'Close':
         if (peerMediaStreams.length > 1) {
-          swiperController.next();
+          controller.next();
         }
         await widget.peerMediaStreamController.close(peerMediaStream);
         break;

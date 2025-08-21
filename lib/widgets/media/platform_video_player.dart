@@ -1,6 +1,7 @@
-import 'package:card_swiper/card_swiper.dart';
+import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
+import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
@@ -14,7 +15,7 @@ import 'package:flutter/material.dart';
 
 /// 平台的多个视频媒体播放器组件
 class PlatformVideoPlayer extends StatelessWidget {
-  final SwiperController swiperController = SwiperController();
+  final PlatformCarouselController controller = PlatformCarouselController();
   final List<AbstractMediaPlayerController> mediaPlayerControllers = [];
   final bool showPlaylist;
   final PlaylistController playlistController = PlaylistController();
@@ -101,14 +102,17 @@ class PlatformVideoPlayer extends StatelessWidget {
   }
 
   Widget _buildVideoPlayer(BuildContext context) {
-    Widget mediaView = Swiper(
+    Widget mediaView = PlatformCarouselWidget(
       itemCount: 2,
-      index: index.value,
-      controller: swiperController,
-      onIndexChanged: (int index) {
+      initialPage: index.value,
+      controller: controller,
+      onPageChanged: (int index,
+          {PlatformSwiperDirection? direction,
+            int? oldIndex,
+            CarouselPageChangedReason? reason}) {
         this.index.value = index;
       },
-      itemBuilder: (BuildContext context, int index) {
+      itemBuilder: (BuildContext context, int index, {int? realIndex}) {
         if (index == 0) {
           return playlistWidget;
         }

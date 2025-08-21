@@ -1,5 +1,6 @@
-import 'package:card_swiper/card_swiper.dart';
+import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
+import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
@@ -9,7 +10,7 @@ import 'package:get/get.dart';
 
 /// 平台的单个音频媒体播放器组件
 class PlatformAudioPlayer extends StatelessWidget {
-  final SwiperController swiperController = SwiperController();
+  final PlatformCarouselController controller = PlatformCarouselController();
   final bool showPlaylist;
   final PlaylistController playlistController = PlaylistController();
   late final PlaylistWidget playlistWidget = PlaylistWidget(
@@ -32,14 +33,17 @@ class PlatformAudioPlayer extends StatelessWidget {
   }
 
   Widget _buildAudioPlayer(BuildContext context) {
-    Widget mediaView = Swiper(
+    Widget mediaView = PlatformCarouselWidget(
       itemCount: 2,
-      index: index.value,
-      controller: swiperController,
-      onIndexChanged: (int index) {
+      initialPage: index.value,
+      controller: controller,
+      onPageChanged: (int index,
+          {PlatformSwiperDirection? direction,
+          int? oldIndex,
+          CarouselPageChangedReason? reason}) {
         this.index.value = index;
       },
-      itemBuilder: (BuildContext context, int index) {
+      itemBuilder: (BuildContext context, int index, {int? realIndex}) {
         if (index == 0) {
           return playlistWidget;
         }

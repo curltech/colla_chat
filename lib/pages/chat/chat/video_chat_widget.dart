@@ -1,4 +1,5 @@
-import 'package:card_swiper/card_swiper.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -14,9 +15,9 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
+import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -126,7 +127,7 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
 
 class _VideoChatWidgetState extends State<VideoChatWidget> {
   ChatSummary chatSummary = chatMessageController.chatSummary!;
-  SwiperController swiperController = SwiperController();
+  PlatformCarouselController controller = PlatformCarouselController();
   ValueNotifier<int> index = ValueNotifier<int>(0);
 
   @override
@@ -141,18 +142,21 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   }
 
   Widget _buildVideoChatView(BuildContext context) {
-    return Swiper(
-      controller: swiperController,
+    return PlatformCarouselWidget(
+      controller: controller,
       itemCount: 2,
-      index: index.value,
-      itemBuilder: (BuildContext context, int index) {
+      initialPage: index.value,
+      itemBuilder: (BuildContext context, int index, {int? realIndex}) {
         Widget view = widget.localVideoWidget;
         if (index == 1) {
           view = widget.remoteVideoWidget;
         }
         return view;
       },
-      onIndexChanged: (int index) {
+      onPageChanged: (int index,
+          {PlatformSwiperDirection? direction,
+            int? oldIndex,
+            CarouselPageChangedReason? reason}) {
         this.index.value = index;
       },
     );
@@ -168,7 +172,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
           if (value == 1) {
             return IconButton(
               onPressed: () {
-                swiperController.move(0);
+                controller.move(0);
               },
               icon: const Icon(Icons.local_library),
               tooltip: AppLocalizations.t('Local'),
@@ -184,7 +188,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
           if (value == 0) {
             return IconButton(
               onPressed: () {
-                swiperController.move(1);
+                controller.move(1);
               },
               icon: const Icon(Icons.devices_other),
               tooltip: AppLocalizations.t('Remote'),

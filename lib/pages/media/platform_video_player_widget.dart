@@ -33,7 +33,7 @@ class PlatformVideoPlayerWidget extends StatelessWidget with TileDataMixin {
             return IconButton(
               tooltip: AppLocalizations.t('Video player'),
               onPressed: () async {
-                await platformVideoPlayer.swiperController.move(1);
+                await platformVideoPlayer.controller.move(1);
                 platformVideoPlayer.play();
               },
               icon: const Icon(Icons.video_call),
@@ -43,7 +43,7 @@ class PlatformVideoPlayerWidget extends StatelessWidget with TileDataMixin {
               IconButton(
                 tooltip: AppLocalizations.t('Playlist'),
                 onPressed: () async {
-                  await platformVideoPlayer.swiperController.move(0);
+                  await platformVideoPlayer.controller.move(0);
                 },
                 icon: const Icon(Icons.featured_play_list_outlined),
               ),

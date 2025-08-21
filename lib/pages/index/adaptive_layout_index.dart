@@ -1,4 +1,4 @@
-import 'package:card_swiper/card_swiper.dart';
+import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/pages/chat/channel/subscribe_channel_list_widget.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
@@ -13,6 +13,7 @@ import 'package:colla_chat/widgets/adaptive_scaffold/adaptive_layout.dart';
 import 'package:colla_chat/widgets/adaptive_scaffold/adaptive_scaffold.dart';
 import 'package:colla_chat/widgets/adaptive_scaffold/breakpoints.dart';
 import 'package:colla_chat/widgets/adaptive_scaffold/slot_layout.dart';
+import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +31,7 @@ class AdaptiveLayoutIndex extends StatefulWidget {
       MeWidget(),
       OtherAppWidget(),
     ];
-    indexWidgetProvider.initMainView(SwiperController(), views);
+    indexWidgetProvider.initMainView(PlatformCarouselController(), views);
   }
 
   @override
@@ -73,12 +74,15 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
   ///SecondaryBody视图
   Widget _buildSecondaryBodyView(BuildContext context) {
     ScrollPhysics? physics = const NeverScrollableScrollPhysics();
-    var pageView = Swiper(
+    var pageView = PlatformCarouselWidget(
         physics: physics,
         controller: indexWidgetProvider.controller,
-        onIndexChanged: (int index) {},
+        onPageChanged: (int index,
+            {PlatformSwiperDirection? direction,
+            int? oldIndex,
+            CarouselPageChangedReason? reason}) {},
         itemCount: indexWidgetProvider.views.length,
-        itemBuilder: (BuildContext context, int index) {
+        itemBuilder: (BuildContext context, int index, {int? realIndex}) {
           if (appDataProvider.smallBreakpoint.isActive(context)) {
             return indexWidgetProvider.views[index];
           }

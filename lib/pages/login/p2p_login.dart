@@ -1,4 +1,4 @@
-import 'package:card_swiper/card_swiper.dart';
+import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_peer_controller.dart';
@@ -11,6 +11,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
+import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -19,10 +20,10 @@ import 'package:window_manager/window_manager.dart';
 
 /// 远程登录页面，一个Scaffold，IndexStack下的远程登录组件，注册组件和配置组件
 class P2pLogin extends StatelessWidget with WindowListener {
-  final SwiperController swiperController = SwiperController();
+  final PlatformCarouselController controller = PlatformCarouselController();
   final P2pLoginWidget p2pLoginWidget = P2pLoginWidget();
   late final P2pRegisterWidget p2pRegisterWidget = P2pRegisterWidget(
-    swiperController: swiperController,
+    controller: controller,
   );
   late final P2pSettingWidget p2pSettingWidget = const P2pSettingWidget();
   late final List<Widget> _children;
@@ -52,7 +53,7 @@ class P2pLogin extends StatelessWidget with WindowListener {
   }
 
   _animateToPage(int index) {
-    swiperController.move(index);
+    controller.move(index);
   }
 
   Widget _buildRightWidget(BuildContext context) {
@@ -120,16 +121,19 @@ class P2pLogin extends StatelessWidget with WindowListener {
       listenable: appDataProvider,
       builder: (BuildContext context, Widget? child) {
         var pageView = Obx(() {
-          return Swiper(
-            controller: swiperController,
+          return PlatformCarouselWidget(
+            controller: controller,
             itemCount: _children.length,
-            itemBuilder: (BuildContext context, int index) {
+            itemBuilder: (BuildContext context, int index, {int? realIndex}) {
               return _children[index];
             },
-            onIndexChanged: (int index) {
+            onPageChanged: (int index,
+                {PlatformSwiperDirection? direction,
+                int? oldIndex,
+                CarouselPageChangedReason? reason}) {
               this.index(index);
             },
-            index: index.value,
+            initialPage: index.value,
           );
         });
         return Center(

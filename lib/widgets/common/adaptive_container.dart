@@ -1,4 +1,5 @@
-import 'package:card_swiper/card_swiper.dart';
+import 'package:carousel_slider_plus/carousel_options.dart';
+import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_resizable_container/flutter_resizable_container.dart';
@@ -11,7 +12,7 @@ enum ContainerType { resizeable, slider, card, swiper, zoom }
 /// 自适应的容器，在竖屏的时候显示单个组件，滑动屏幕切换
 /// 横屏的时候横向排列，可拖拽调整尺寸
 class AdaptiveContainer extends StatelessWidget {
-  late final SwiperController? swiperController;
+  late final PlatformCarouselController? controller;
   late final ResizableController? resizableController;
   late final GlobalKey<SliderDrawerState>? sliderDrawerKey;
   late final ZoomDrawerController? zoomDrawerController;
@@ -35,31 +36,31 @@ class AdaptiveContainer extends StatelessWidget {
       this.pixels = 320}) {
     if (containerType == ContainerType.resizeable) {
       resizableController = ResizableController();
-      swiperController = null;
+      controller = null;
       sliderDrawerKey = null;
       zoomDrawerController = null;
       cardSwiperController = null;
     } else if (containerType == ContainerType.swiper) {
-      swiperController = SwiperController();
+      controller = PlatformCarouselController();
       resizableController = null;
       sliderDrawerKey = null;
       zoomDrawerController = null;
       cardSwiperController = null;
     } else if (containerType == ContainerType.slider) {
       sliderDrawerKey = GlobalKey<SliderDrawerState>();
-      swiperController = null;
+      controller = null;
       resizableController = null;
       zoomDrawerController = null;
       cardSwiperController = null;
     } else if (containerType == ContainerType.zoom) {
       zoomDrawerController = ZoomDrawerController();
-      swiperController = null;
+      controller = null;
       sliderDrawerKey = null;
       resizableController = null;
       cardSwiperController = null;
     } else {
       cardSwiperController = CardSwiperController();
-      swiperController = null;
+      controller = null;
       sliderDrawerKey = null;
       resizableController = null;
       zoomDrawerController = null;
@@ -68,7 +69,7 @@ class AdaptiveContainer extends StatelessWidget {
 
   closeSlider() {
     sliderDrawerKey?.currentState?.closeSlider();
-    swiperController?.move(1);
+    controller?.move(1);
     if (zoomDrawerController != null) {
       zoomDrawerController!.close!();
     }
@@ -77,7 +78,7 @@ class AdaptiveContainer extends StatelessWidget {
 
   openSlider() {
     sliderDrawerKey?.currentState?.openSlider();
-    swiperController?.move(0);
+    controller?.move(0);
     if (zoomDrawerController != null) {
       zoomDrawerController!.open!();
     }
@@ -87,9 +88,9 @@ class AdaptiveContainer extends StatelessWidget {
   toggle() {
     sliderDrawerKey?.currentState?.toggle();
     if (index.value == 0) {
-      swiperController?.move(1);
+      controller?.move(1);
     } else if (index.value == 1) {
-      swiperController?.move(0);
+      controller?.move(0);
     }
     if (zoomDrawerController != null) {
       zoomDrawerController!.toggle!();
@@ -100,7 +101,7 @@ class AdaptiveContainer extends StatelessWidget {
     if (sliderDrawerKey != null) {
       return sliderDrawerKey?.currentState?.isDrawerOpen;
     }
-    if (swiperController != null) index.value == 0;
+    if (controller != null) index.value == 0;
     if (zoomDrawerController != null) {
       return zoomDrawerController!.isOpen!();
     }
@@ -148,18 +149,17 @@ class AdaptiveContainer extends StatelessWidget {
       );
     }
     if (containerType == ContainerType.swiper) {
-      return Swiper(
-        controller: swiperController,
-        index: index.value,
-        pagination: SwiperPagination(),
-        onIndexChanged: (index) {
+      return PlatformCarouselWidget(
+        controller: controller,
+        initialPage: index.value,
+        onPageChanged: (int index,
+            {PlatformSwiperDirection? direction,
+            int? oldIndex,
+            CarouselPageChangedReason? reason}) {
           this.index.value = index;
         },
-        onTap: (index) {
-          swiperController?.move(index == 0 ? 1 : 0);
-        },
         itemCount: 2,
-        itemBuilder: (BuildContext context, int index) {
+        itemBuilder: (BuildContext context, int index, {int? realIndex}) {
           if (index == 0) {
             return main;
           } else {

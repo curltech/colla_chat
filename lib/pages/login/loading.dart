@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:card_swiper/card_swiper.dart';
+import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
@@ -80,7 +82,7 @@ final BackgroundImages backgroundImages = BackgroundImages();
 class Loading extends StatelessWidget {
   final bool autoPlay = true;
 
-  final SwiperController swiperController = SwiperController();
+  final PlatformCarouselController controller = PlatformCarouselController();
 
   Loading({super.key}) {
     init();
@@ -99,7 +101,7 @@ class Loading extends StatelessWidget {
         backgroundImages.currentIndex = random.nextInt(count);
         try {
           if (backgroundImages.currentIndex < count) {
-            swiperController.move(backgroundImages.currentIndex);
+            controller.move(backgroundImages.currentIndex);
           }
         } catch (e) {
           logger.e(e.toString());
@@ -117,16 +119,20 @@ class Loading extends StatelessWidget {
         if (myself.getBrightness(context) == Brightness.dark) {
           children = backgroundImages.darkChildren;
         }
-        return Swiper(
-          controller: swiperController,
-          onIndexChanged: (int index) {
+        return PlatformCarouselWidget(
+          height: appDataProvider.totalSize.height,
+          controller: controller,
+          onPageChanged: (index,
+              {PlatformSwiperDirection? direction,
+              int? oldIndex,
+              CarouselPageChangedReason? reason}) {
             backgroundImages.currentIndex = index;
           },
           itemCount: children.length,
-          itemBuilder: (BuildContext context, int index) {
+          itemBuilder: (BuildContext context, int index, {int? realIndex}) {
             return children[index];
           },
-          index: 0,
+          initialPage: 0,
         );
       },
     );

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:card_swiper/card_swiper.dart';
+import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -11,6 +11,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
+import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -53,7 +54,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   final ValueNotifier<String?> output = ValueNotifier<String?>(null);
   final Map<String, FFMpegHelperSession> ffmpegSessions = {};
   final ValueNotifier<int> index = ValueNotifier<int>(0);
-  final SwiperController swiperController = SwiperController();
+  final PlatformCarouselController controller = PlatformCarouselController();
 
   Future<bool> checkFFMpeg() async {
     ffmpegPresent.value = await FFMpegHelper.initialize();
@@ -314,14 +315,17 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildFfmpegMedia(BuildContext context) {
-    Widget mediaView = Swiper(
+    Widget mediaView = PlatformCarouselWidget(
       itemCount: 2,
-      index: index.value,
-      controller: swiperController,
-      onIndexChanged: (int index) {
+      initialPage: index.value,
+      controller: controller,
+      onPageChanged: (int index,
+          {PlatformSwiperDirection? direction,
+            int? oldIndex,
+            CarouselPageChangedReason? reason}) {
         this.index.value = index;
       },
-      itemBuilder: (BuildContext context, int index) {
+      itemBuilder: (BuildContext context, int index, {int? realIndex}) {
         if (index == 0) {
           return playlistWidget;
         }
@@ -369,7 +373,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
               IconButton(
                 tooltip: AppLocalizations.t('Ffmpeg task'),
                 onPressed: () async {
-                  await swiperController.move(1);
+                  await controller.move(1);
                 },
                 icon: const Icon(Icons.task_alt_outlined),
               ),
@@ -397,7 +401,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
               IconButton(
                 tooltip: AppLocalizations.t('Playlist'),
                 onPressed: () async {
-                  await swiperController.move(0);
+                  await controller.move(0);
                 },
                 icon: const Icon(Icons.featured_play_list_outlined),
               ),

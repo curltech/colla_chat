@@ -1,10 +1,11 @@
-import 'package:card_swiper/card_swiper.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -25,9 +26,7 @@ class FullScreenChatMessageWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'FullScreenChatMessage';
 
-  
-
-  final SwiperController swiperController = SwiperController();
+  final PlatformCarouselController controller = PlatformCarouselController();
 
   Future<Widget> _buildMessageWidget(BuildContext context, int index) async {
     ChatMessage chatMessage = chatMessageController.data[index];
@@ -54,9 +53,9 @@ class FullScreenChatMessageWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildFullScreenWidget(BuildContext context) {
-    return Swiper(
-      controller: swiperController,
-      itemBuilder: (BuildContext context, int index) {
+    return PlatformCarouselWidget(
+      controller: controller,
+      itemBuilder: (BuildContext context, int index, {int? realIndex}) {
         return Center(
             child: PlatformFutureBuilder(
           future: _buildMessageWidget(context, index),
@@ -66,8 +65,11 @@ class FullScreenChatMessageWidget extends StatelessWidget with TileDataMixin {
         ));
       },
       itemCount: chatMessageController.length,
-      index: chatMessageController.currentIndex.value,
-      onIndexChanged: (index) {
+      initialPage: chatMessageController.currentIndex.value ?? 0,
+      onPageChanged: (index,
+          {PlatformSwiperDirection? direction,
+          int? oldIndex,
+          CarouselPageChangedReason? reason}) {
         chatMessageController.setCurrentIndex = index;
       },
     );
@@ -84,7 +86,7 @@ class FullScreenChatMessageWidget extends StatelessWidget with TileDataMixin {
         rightWidgets: [
           IconButton(
               onPressed: () {
-                swiperController.next();
+                controller.next();
               },
               icon: const Icon(Icons.more_horiz_outlined))
         ],

@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/entity/dht/myselfpeer.dart';
@@ -22,6 +21,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
+import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:cross_file/cross_file.dart';
@@ -34,9 +34,9 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 /// 用户注册组件，一个card下的录入框和按钮组合
 class P2pRegisterWidget extends StatelessWidget {
-  final SwiperController? swiperController;
+  final PlatformCarouselController? controller;
 
-  P2pRegisterWidget({super.key, this.swiperController}) {
+  P2pRegisterWidget({super.key, this.controller}) {
     if (platformParams.mobile) {
       MobileUtil.carrierRegionCode().then((value) {
         countryCode.value = value;
@@ -243,7 +243,7 @@ class P2pRegisterWidget extends StatelessWidget {
           title: 'same name account exist',
           content: 'Do you want to login using exist account?');
       if (confirm == true) {
-        swiperController?.move(0);
+        controller?.move(0);
       }
       return;
     }
@@ -254,7 +254,7 @@ class P2pRegisterWidget extends StatelessWidget {
           title: 'same loginName account exist',
           content: 'Do you want to login using exist account?');
       if (confirm == true) {
-        swiperController?.move(0);
+        controller?.move(0);
       }
       return;
     }
@@ -297,6 +297,6 @@ class P2pRegisterWidget extends StatelessWidget {
     DialogUtil.info(
         content:
             '${AppLocalizations.t('Successfully')} ${AppLocalizations.t('create account name')}:$name, ${AppLocalizations.t('loginName')}:$loginName');
-    swiperController?.move(0);
+    controller?.move(0);
   }
 }
