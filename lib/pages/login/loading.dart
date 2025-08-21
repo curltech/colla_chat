@@ -82,9 +82,7 @@ final BackgroundImages backgroundImages = BackgroundImages();
 class Loading extends StatelessWidget {
   final bool autoPlay = true;
 
-  final PlatformCarouselController controller = PlatformCarouselController(
-    platformCarouselType: PlatformCarouselType.swiper,
-  );
+  final PlatformCarouselController controller = PlatformCarouselController(platformCarouselType : PlatformCarouselType.card,);
 
   Loading({super.key}) {
     init();
