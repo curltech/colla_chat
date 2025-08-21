@@ -58,6 +58,20 @@ class PlatformCarouselController {
     }
   }
 
+  previous() {
+    if (swiperController != null) {
+      swiperController!.previous();
+    } else if (carouselSliderController != null) {
+      carouselSliderController!.previousPage();
+    } else if (cardSwiperController != null) {
+      flutterCarouselController!.previousPage();
+    } else if (cardSwiperController != null) {
+      cardSwiperController!.swipe(CardSwiperDirection.left);
+    } else if (indexController != null) {
+      indexController!.previous();
+    }
+  }
+
   next() {
     if (swiperController != null) {
       swiperController!.next();
