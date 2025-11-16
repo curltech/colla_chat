@@ -262,7 +262,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
   /// 过滤条件的多项选择框的表
   Widget _buildDataTable(BuildContext context) {
     return Obx(() {
-      List<TrinaRow<dynamic>> rows=_buildDataRows();
+      List<TrinaRow<dynamic>> rows = _buildDataRows();
       return TrinaGrid(
         key: UniqueKey(),
         mode: TrinaGridMode.normal,
@@ -278,7 +278,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
             fn(index, value);
           }
         },
-        rowWrapper: (context, row, stateManager) {
+        rowWrapper: (context, rowWidget, rowData, stateManager) {
           return InkWell(
             onLongPress: () {
               dynamic value = stateManager.currentRow?.data;
@@ -288,7 +288,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
                 fn(index, value);
               }
             },
-            child: row,
+            child: rowWidget,
           );
         },
         onSelected: (TrinaGridOnSelectedEvent event) {

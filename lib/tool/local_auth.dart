@@ -15,15 +15,12 @@ class LocalAuthUtil {
     bool biometricOnly = false,
   }) async {
     bool authenticated = false;
-    AuthenticationOptions options = AuthenticationOptions(
-      useErrorDialogs: useErrorDialogs,
-      stickyAuth: stickyAuth,
-      biometricOnly: biometricOnly,
-    );
     try {
       authenticated = await auth.authenticate(
         localizedReason: localizedReason,
-        options: options,
+        biometricOnly: biometricOnly,
+        sensitiveTransaction: sensitiveTransaction,
+        persistAcrossBackgrounding: false,
       );
     } on PlatformException catch (e) {
       logger.e('local authenticate failure:$e');

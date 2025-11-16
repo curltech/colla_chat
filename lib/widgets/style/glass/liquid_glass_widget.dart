@@ -15,11 +15,9 @@ extension LiquidGlassWidget<T extends Widget> on T {
         width: width,
         child: LiquidGlass(
           key: key,
-          shape: shape ??
-              LiquidRoundedSuperellipse(borderRadius: Radius.circular(0)),
+          shape: shape ?? LiquidRoundedSuperellipse(borderRadius: 0),
           glassContainsChild: glassContainsChild,
           clipBehavior: clipBehavior,
-          settings: settings,
           child: this,
         ));
   }
@@ -44,8 +42,7 @@ class LiquidGlassContainer extends LiquidGlass {
       {super.key,
       this.height,
       this.width,
-      super.shape =
-          const LiquidRoundedSuperellipse(borderRadius: Radius.circular(0)),
+      super.shape = const LiquidRoundedSuperellipse(borderRadius: 0),
       super.glassContainsChild = true,
       super.clipBehavior = Clip.hardEdge,
       this.settings = const LiquidGlassSettings(),

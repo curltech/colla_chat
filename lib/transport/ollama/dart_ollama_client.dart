@@ -39,7 +39,7 @@ class DartOllamaClient {
     String? template,
     List<int>? context,
     RequestOptions? options,
-    ResponseFormat? format,
+    GenerateCompletionRequestFormat? format,
     bool? raw,
     bool stream = false,
     int? keepAlive,
@@ -72,7 +72,7 @@ class DartOllamaClient {
     String? template,
     List<int>? context,
     RequestOptions? options,
-    ResponseFormat? format,
+    GenerateCompletionRequestFormat? format,
     bool? raw,
     bool stream = false,
     int? keepAlive,
@@ -104,7 +104,7 @@ class DartOllamaClient {
 
   Future<String?> chat(
     List<String> contents, {
-    ResponseFormat? format,
+    GenerateChatCompletionRequestFormat? format,
     RequestOptions? options,
     bool stream = false,
     int? keepAlive,
@@ -130,7 +130,7 @@ class DartOllamaClient {
 
   Future<String> chatStream(
     List<String> contents, {
-    ResponseFormat? format,
+    GenerateChatCompletionRequestFormat? format,
     RequestOptions? options,
     bool stream = false,
     int? keepAlive,

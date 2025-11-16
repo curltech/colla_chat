@@ -425,7 +425,7 @@ class GeolocatorUtil {
       zoomButtonsColor: zoomButtonsColor,
       locationButtonsColor: locationButtonsColor,
       markerIcon: markerIcon,
-      loadingWidget: loadingWidget,
+      loadingWidget: loadingWidget, userAgent: '',
     );
   }
 

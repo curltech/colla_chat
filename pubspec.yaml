@@ -32,17 +32,17 @@ dependencies:
     sdk: flutter
   # 尝试使用的功能
   get: ^5.0.0-release-candidate-6
-  bonsoir: ^5.1.9
+  bonsoir: ^6.0.1
   process_runner: ^4.2.0
-  network_tools: ^5.0.2
-  network_tools_flutter: ^2.0.2
+  network_tools: ^6.0.5
+  network_tools_flutter: ^3.0.3
   # 系统功能，获取系统信息和操作，需要调用插件才能完成
   flutter_background: ^1.3.0+1  #android,后台运行，可以保持网络连接
   flutter_foreground_service: ^0.4.1 #android,后台运行，可以保持网络连接，和flutter_background功能一样
   flutter_foreground_task: ^9.1.0
   flutter_background_service: ^5.0.10
   flutter_background_executor: ^1.0.0
-  upgrader: ^11.4.0
+  upgrader: ^12.3.0
   path_provider: ^2.0.11
   url_launcher: ^6.1.11 #打开系统浏览器
   open_filex: ^4.6.0 #打开文件,
@@ -50,35 +50,32 @@ dependencies:
   camera_linux: ^0.0.8
   camera_web: ^0.3.1+4
   camera_macos: ^0.0.8
-  wechat_camera_picker: ^4.3.6 #移动平台，wechat_assets_picker的扩展，照相，录像
+  wechat_camera_picker: ^4.4.0 #移动平台，wechat_assets_picker的扩展，照相，录像
   photo_manager: ^3.7.1 #移动平台，图像等媒体的抽象，wechat_assets_picker使用
   screenshot: ^3.0.0
   no_screenshot: ^0.3.2-beta.1
   screenshot_callback: ^3.0.1
-  screen_brightness: ^2.1.4
+  screen_brightness: ^2.1.7
   orientation: ^1.2.0 # 控制屏幕旋转
   geocoding: ^4.0.0
-  network_info_plus: ^6.0.0
+  network_info_plus: ^7.0.0
   beamer: ^1.4.1+1
-  battery_plus: ^6.2.1
   flutter_contacts: ^1.1.8
   fluttercontactpicker: ^5.0.0
   nearby_connections: ^4.0.0 #android
   nfc_manager: ^4.0.2 #mobile
   flutter_nfc_kit: ^3.4.2 #mobile
   mimecon: ^1.0.1
-  wakelock_plus: ^1.3.2 #让系统不会睡眠
+  wakelock_plus: ^1.4.0 #让系统不会睡眠
 
   # 存储
   flutter_secure_storage: ^9.2.4
-  sqlite3: ^2.7.6
-  sqlite3_flutter_libs: 0.5.33
   # sqflite: ^2.4.1
   idb_shim: ^2.0.1
   postgres: ^3.5.5
 
   #网络
-  dio: ^5.8.0+1
+  dio: ^5.9.0
   dio_http2_adapter: ^2.6.0
   dio_smart_retry: ^7.0.1
   telephony: #不再维护了
@@ -90,8 +87,7 @@ dependencies:
 
   #界面
   bubble: ^1.2.1
-  fluttertoast: ^8.2.1
-  flutter_local_notifications: ^19.3.0
+  flutter_local_notifications: ^19.5.0
   alarm: ^5.1.1
   stacked_notification_cards: ^0.1.0-dev.6
   toastification: ^3.0.2
@@ -107,15 +103,15 @@ dependencies:
   unicons: ^3.0.0 #Icon(UniconsLine.camera),Icon(UniconsSolid.airplay)
   flutter_animated_icons: ^1.0.1
   flutter_material_design_icons: ^1.1.7447 #Icon(MdiIcons.abacus)
-  hugeicons: ^0.0.10 #HugeIcons.strokeRoundedHome01
-  country_code_picker: ^3.3.0
+  hugeicons: ^1.1.1 #HugeIcons.strokeRoundedHome01
+  country_code_picker: ^3.4.1
   multi_dropdown: ^3.0.1
-  font_awesome_flutter: ^10.1.0
-  unicode_emojis: ^0.4.0
+  font_awesome_flutter: ^10.12.0
+  unicode_emojis: ^0.5.1
   fluro: ^2.0.3
   flutter_multi_formatter: ^2.13.7
   chips_choice: ^3.0.0
-  validation_pro: 2.1.0
+  validation_pro: 3.0.0
   flutter_pw_validator: ^1.6.0 #FlutterPwValidator放在TextFormField下面显示校验结果
   fzregex: ^2.1.1 #静态方法：Fzregex.hasMatch
   regexpattern: ^2.5.0
@@ -130,11 +126,11 @@ dependencies:
   glassmorphic_ui_kit: ^1.1.5
   liquid_glass_effect: ^1.0.1
   liquid_glass_ui_design: ^1.0.4
-  liquid_glass_renderer: ^0.1.1-dev.9
+  liquid_glass_renderer: ^0.2.0-dev.4
   #flui: 0.9.2
-  trina_grid: ^1.6.9
+  trina_grid: ^2.1.0
   material_table_view: ^5.3.0
-  multi_split_view: ^3.6.0
+  multi_split_view: ^3.6.1
   calendar_view: ^1.4.0
   easy_image_viewer: ^1.5.1
   tab_container: ^3.5.3
@@ -148,18 +144,16 @@ dependencies:
   # k_chart: ^0.7.1
   community_charts_flutter: ^1.0.4
   k_chart_plus: ^1.0.3
-  financial_chart: ^0.3.3
+  financial_chart: ^0.4.0
   graphic: ^2.5.0 # 各种图表，取代flutter_echarts
   # flutter_unity_widget: ^2022.2.1
   # flutter_embed_unity: ^1.2.3
   #  opencv_dart: ^1.2.5
-  flame: ^1.30.0
+  flame: ^1.33.0
   interactive_chart: ^0.3.6 #candlesticks
   #  candlesticks:
   #    git:
   #      url: https://github.com/r-mzy47/candlesticks.git
-  fluent_ui: ^4.12.0
-  fluentui_system_icons: ^1.1.201 #FluentIcons.access_time_24_regular
   macos_ui: ^2.1.4
   flutter_material_color_picker: ^1.2.0
   responsive_framework: ^1.5.1
@@ -168,15 +162,15 @@ dependencies:
   snapping_sheet: ^3.1.0 #在上下可以滑出的sheet
   device_preview: ^1.2.0
   flutter_screenutil: ^6.0.0-alpha.1 # Flutter 屏幕适配 https://github.com/OpenFlutter/flutter_screenutil
-  easy_stepper: ^0.8.1
-  flex_color_scheme: ^8.2.0
+  easy_stepper: ^0.9.1
+  flex_color_scheme: ^8.3.1
   file_selector: ^1.0.3
   filesystem_picker: ^4.1.0
-  wechat_assets_picker: ^9.5.1 #移动平台，选择图像，视频等媒体并展示
+  wechat_assets_picker: ^9.8.0 #移动平台，选择图像，视频等媒体并展示
   #下面是各种轮播图组件
   flutter_carousel_widget: ^3.1.0 #类似carousel_slider，支持单页多item
   carousel_slider_plus: ^7.1.1  #fork carousel_slider，支持单页多item
-  flutter_card_swiper: ^7.0.0 #不错的swiper的组件
+  flutter_card_swiper: ^7.2.0 #不错的swiper的组件
   card_swiper: ^3.0.1
   another_transformer_page_view: ^2.0.1
   appinio_swiper: ^2.0.2 #不错的swiper的组件，可定制动画的角度
@@ -194,7 +188,7 @@ dependencies:
   auto_size_text: ^3.0.0
   auto_size_text_field: ^2.2.1
   responsive_sizer: ^3.1.1
-  introduction_screen: ^3.1.14
+  introduction_screen: ^4.0.0
   pinput: ^5.0.0
   align_positioned: ^5.0.1
   super_drag_and_drop: ^0.9.1
@@ -217,11 +211,11 @@ dependencies:
 #  cryptography_plus: ^2.7.1
 #  cryptography_flutter_plus: ^2.3.4
   encrypt: ^5.0.3 #aes
-  openpgp: ^3.10.1 #rsa,sha
+  openpgp: ^3.10.7 #rsa,sha
   libsignal_protocol_dart: ^0.7.1
   crypto: ^3.0.3 #sha
   bs58: ^1.0.2
-  local_auth: ^2.2.0
+  local_auth: ^3.0.0
 
   #基本开发工具
   keyboard_actions: ^4.2.0
@@ -231,7 +225,7 @@ dependencies:
   flutter_json_view: ^1.1.5
   flutter_code_editor: ^0.3.3
   json_editor_flutter: ^1.4.2
-  re_editor: ^0.7.0
+  re_editor: ^0.8.0
   flutter_highlight: ^0.7.0
   highlight: ^0.7.0
   re_highlight: ^0.0.3
@@ -240,12 +234,12 @@ dependencies:
   percent_indicator: ^4.2.5
   flutter_sharing_intent: ^1.1.1
   date_format: ^2.0.6
-  omni_datetime_picker: ^2.1.1
+  omni_datetime_picker: ^2.3.1
   toggle_switch: ^2.3.0
-  talker: ^4.7.1
-  talker_flutter: ^4.7.9
-  cross_file: ^0.3.4+1
-  mobile_scanner: ^7.0.0-rc.2
+  talker: ^5.0.2
+  talker_flutter: ^5.0.2
+  cross_file: ^0.3.5
+  mobile_scanner: ^7.1.3
   qr_flutter:
     git:
       url: https://github.com/theyakka/qr.flutter.git
@@ -261,9 +255,9 @@ dependencies:
   #      url: https://github.com/Sahad2701/ffmpeg_kit_flutter_full_gpl.git
   #      ref: flutter-upgrade/remove-v1-embedding
   #  ffmpeg_kit_flutter_minimal: ^6.0.8
-  ffmpeg_kit_flutter_new: ^2.0.0
+  ffmpeg_kit_flutter_new: ^4.1.0
   photo_view: ^0.15.0 #图片显示
-  pro_image_editor: ^10.2.2 #9.13.0
+  pro_image_editor: ^11.12.2 #9.13.0
   flutter_sound: ^9.28.0
   audioplayers: ^6.4.0 #音频处理,所有平台
   audioplayers_platform_interface: ^7.1.0
@@ -274,7 +268,7 @@ dependencies:
   audioplayers_android: ^5.0.0
   audio_waveforms: ^1.3.0
   waved_audio_player: ^1.3.0
-  waveform_recorder: ^1.7.0
+  waveform_recorder: ^1.8.0
   # flutter_recorder: ^1.1.0
   flutter_cache_manager: ^3.4.1
   flutter_pip_player: ^0.1.0
@@ -283,21 +277,23 @@ dependencies:
   #  native_video_player: ^1.3.1
   #  fvp: ^0.31.1
   fl_video: ^1.4.0  #video_Player control panel
-  better_player_plus: ^1.0.8
-  chewie: ^1.11.3 #video_player的封装
-  media_kit: ^1.2.0                            # Primary package.
-  media_kit_video: ^1.3.0                       # For video rendering.
-  media_kit_libs_video: ^1.0.6
-  video_player_media_kit: ^1.0.6
+  better_player_plus: ^1.1.5
+  chewie: ^1.13.0 #video_player的封装
+  media_kit: ^1.2.2                            # Primary package.
+  media_kit_video: ^2.0.0                       # For video rendering.
+  media_kit_libs_video: ^1.0.7
+  video_player_media_kit: ^2.0.0
   universal_video_controls: ^1.1.0
   audio_service: ^0.18.17
-  flutter_tts: ^4.2.2
-  speech_to_text: ^7.1.0
-  sherpa_onnx: ^1.12.0
+  stts: ^1.2.6
+  flutter_tts: ^4.2.3
+  speech_to_text: ^7.3.0
+  sherpa_onnx: ^1.12.17
+  kokoro_tts_flutter: ^0.2.0+1
   flutter_image_compress: ^2.4.0
   video_thumbnail: ^0.5.6
   easy_video_editor: ^0.1.2 #mobile
-  pro_video_editor: ^0.1.8 #mobile,macos
+  pro_video_editor: ^0.3.0 #mobile,macos
   video_editor_2: ^3.1.1 #mobile
   video_compress: ^3.1.3
   fc_native_video_thumbnail: ^0.17.2
@@ -315,20 +311,20 @@ dependencies:
   #  quill_html_editor_v2: ^2.2.10 ios下编译错误
   appflowy_editor: ^6.0.0
   vsc_quill_delta_to_html: ^1.0.5
-  universal_html: ^2.0.8
+  universal_html: ^2.2.5
   backdrop: ^0.9.0 #Use BackdropScaffold instead of the standard Scaffold in your app
   material_floating_search_bar: ^0.3.7
   flutter_svg: ^2.0.3
   latlong2: ^0.9.0
   apple_maps_flutter: ^1.4.0
-  google_maps_flutter: ^2.12.1 #谷歌地图，移动设备
+  google_maps_flutter: ^2.14.0 #谷歌地图，移动设备
   tencent_map_flutter: ^0.1.0
-  map_launcher: ^3.5.0 #打开设备已安装的地图软件，移动设备
-  location_picker_flutter_map: ^3.1.0 #Open Street Map，需要翻墙
+  map_launcher: ^4.4.2 #打开设备已安装的地图软件，移动设备
+  location_picker_flutter_map: ^4.1.0 #Open Street Map，需要翻墙
 
   #服务
-  firebase_core: ^3.15.1
-  firebase_messaging: ^15.2.9
+  firebase_core: ^4.2.1
+  firebase_messaging: ^16.0.4
   # 支持本地和fcm
   awesome_notifications: ^0.10.0
   # awesome_notifications_fcm: ^0.9.2 #要付钱
@@ -337,20 +333,26 @@ dependencies:
   flutter_native_splash: ^2.4.6
   system_tray: ^2.0.3
   tray_manager: ^0.5.0
-  livekit_client: ^2.4.9 #livekit sfu server flutter client
+  livekit_client: ^2.5.3 #livekit sfu server flutter client
   livekit_server_sdk: ^1.0.1
+
+  #系统
+  system_resources: ^1.6.0
+dependency_overrides:
   langchain: ^0.7.1
   langchain_ollama: ^0.3.0
   langchain_openai: ^0.7.0
   langchain_google: ^0.6.1
-  ollama_dart: ^0.2.0
-  dart_openai: ^5.1.0
-
-  #系统
-  system_resources: ^1.6.0
-  flutter_performance_pulse: ^1.0.6
-dependency_overrides:
+  ollama_dart: ^0.3.0+1
+  dart_openai: ^6.1.0
+  sqlite3: ^3.0.1
+  sqlite3_flutter_libs: 0.5.40
+  petitparser: ^7.0.0
+  fluent_ui: ^4.13.0
+  fluentui_system_icons: ^1.1.201 #FluentIcons.access_time_24_regular
   system_status: ^1.0.7
+  flutter_performance_pulse: ^1.0.6
+  battery_plus: ^7.0.0
   freezed_annotation: ^3.1.0
   reactive_forms: ^18.1.1
   reactive_advanced_switch: ^2.1.1
@@ -401,7 +403,8 @@ dependency_overrides:
   reactive_animated_toggle_switch: ^0.0.4
   uuid: ^4.3.1
   meta: ^1.11.0
-  xml: ^6.0.1
+  xml: ^6.6.1
+  fluttertoast: ^9.0.0
   pointer_interceptor: ^0.10.1
   js: ^0.7.1
   web: ^1.0.0
@@ -413,13 +416,13 @@ dependency_overrides:
   #  web_socket_client: ^0.2.1
   #  websocket_universal: ^1.2.5
   flutter_math_fork: ^0.7.4
-  share_plus: ^11.0.0
-  sensors_plus: ^6.0.1
+  share_plus: ^12.0.1
+  sensors_plus: ^7.0.0
   photo_view: ^0.15.0
   extended_image: ^10.0.0 #所有平台，官方软件，管理图像
   extended_image_library: ^5.0.0
-  device_info_plus: ^11.3.3
-  package_info_plus: ^8.3.0
+  device_info_plus: ^12.2.0
+  package_info_plus: ^9.0.0
   flutter_keyboard_visibility: ^6.0.0
   pointycastle: ^4.0.0
   geolocator: ^14.0.0
@@ -427,11 +430,11 @@ dependency_overrides:
   flutter_map: ^8.1.0 #Open Street Map，需要翻墙
   ffi: 2.1.0
   win32_registry: 2.1.0
-  win32: 5.13.0
+  win32: 5.15.0
   http: ^1.5.0-beta
   dart_webrtc: ^1.5.3+hotfix.2
-  webrtc_interface: 1.2.2+hotfix.2
-  flutter_webrtc: 0.14.2
+  webrtc_interface: 1.3.0
+  flutter_webrtc: 1.2.0
   #  flutter_webrtc_plus: ^0.11.2+5
   #  medea_flutter_webrtc: ^0.11.0
   protobuf: ^4.1.0
@@ -439,7 +442,7 @@ dependency_overrides:
   provider: ^6.1.4
   flex_seed_scheme: ^3.5.1
   flutter_inappwebview: ^6.2.0-beta.2 #不支持linux
-  connectivity_plus: ^6.0.2
+  connectivity_plus: ^7.0.0
   emoji_picker_flutter: ^4.2.0
   webview_flutter: ^4.13.0
   webview_flutter_android: ^4.7.0
@@ -448,8 +451,8 @@ dependency_overrides:
   webview_flutter_platform_interface: ^2.13.0
   webview_win_floating: #2.0.0 #webView for win
     git: https://github.com/jakky1/webview_win_floating.git
-  flutter_widget_from_html: ^0.16.0
-  flutter_widget_from_html_core: ^0.16.0
+  flutter_widget_from_html: ^0.17.1
+  flutter_widget_from_html_core: ^0.17.0
   sprintf: ^7.0.0
   flex_color_picker: ^3.7.0
   permission_handler: ^12.0.0+1
@@ -470,7 +473,7 @@ dependency_overrides:
   google_fonts: ^6.1.0
   material_design_icons_flutter: ^7.0.7296
   full_picker: ^2.1.5
-  image_cropper: ^9.1.0
+  image_cropper: ^11.0.0
   light_compressor: ^2.2.0
   collection: ^1.17.0
   path: ^1.8.3
@@ -484,7 +487,7 @@ dependency_overrides:
   audio_video_progress_bar: ^2.0.1
   azlistview: ^2.0.0 #特殊列表滑动
   scrollable_positioned_list: ^0.3.8
-  pdfrx: ^1.3.4
+  pdfrx: ^2.2.12
   pdfx: ^2.9.2
   #  pdfx:
   #    git:
@@ -492,7 +495,7 @@ dependency_overrides:
   #      path: packages/pdfx
   pdf: ^3.11.3 #所有平台，创建pdf
   audio_session: ^0.2.0
-  record: 6.0.0
+  record: 6.1.2
   # record_darwin: 1.2.2
   secure_application: ^4.1.0
   visibility_detector: ^0.4.0+2 #组建可见性的大小发生变化
@@ -508,7 +511,7 @@ dependency_overrides:
   flutter_quill: ^11.4.0
   flutter_quill_extensions: ^11.0.0
   flutter_quill_delta_from_html: ^1.5.1
-  saver_gallery: 4.0.1
+  saver_gallery: 4.1.0
   gal: ^2.3.0
   flutter_lints: ^5.0.0
   html_editor_enhanced: ^2.6.0

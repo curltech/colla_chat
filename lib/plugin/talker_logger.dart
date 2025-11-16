@@ -157,15 +157,9 @@ class _TalkerLoggerScreenWidgetState extends State<TalkerLoggerScreenWidget> {
         margin: EdgeInsets.zero,
         shape: const ContinuousRectangleBorder(),
         child: TalkerScreen(
-            talker: talkerLogger._talkerLogger,
-            appBarTitle: AppLocalizations.t('Logger'),
-            theme: TalkerScreenTheme(
-              logColors: {
-                TalkerLogType.warning.name: Colors.amber,
-                TalkerLogType.error.name: Colors.red,
-                TalkerLogType.info.name: Colors.green,
-              },
-            )));
+          talker: talkerLogger._talkerLogger,
+          appBarTitle: AppLocalizations.t('Logger'),
+        ));
   }
 
   @override

@@ -282,14 +282,14 @@ class OpenAIClient {
   }
 
   ///生成图像的变种
-  Future<OpenAIImageModel> imageVariation({
+  Future<List<OpenAIImageData>> imageVariation({
     required File image,
     int? n = 1,
     OpenAIImageSize? size = OpenAIImageSize.size1024,
     OpenAIImageResponseFormat? responseFormat = OpenAIImageResponseFormat.url,
     String? user,
   }) async {
-    OpenAIImageModel imageVariation = await openAI.image.variation(
+    List<OpenAIImageData> imageVariation = await openAI.image.variation(
       image: image,
       n: n,
       size: size,
@@ -341,7 +341,7 @@ class OpenAIClient {
   Future<File> createSpeech({
     required String input,
     String model = 'tts-1', //"tts-1"
-    String voice = 'nova', //"nova",
+    required OpenAIAudioVoice voice, //"nova",
     OpenAIAudioSpeechResponseFormat? responseFormat =
         OpenAIAudioSpeechResponseFormat.mp3,
     double? speed,
@@ -363,7 +363,7 @@ class OpenAIClient {
 
   ///语音转录
   /// responseFormat:json, text, srt, verbose_json, or vtt
-  Future<OpenAIAudioModel> createTranscription({
+  Future<OpenAITranscriptionGeneralModel> createTranscription({
     required File file,
     String model = "whisper-1",
     String? prompt,
@@ -371,7 +371,7 @@ class OpenAIClient {
     double? temperature,
     String? language,
   }) async {
-    OpenAIAudioModel transcription = await openAI.audio.createTranscription(
+    OpenAITranscriptionGeneralModel transcription = await openAI.audio.createTranscription(
       file: file,
       model: model,
       prompt: prompt,
@@ -385,14 +385,14 @@ class OpenAIClient {
 
   ///语音转文本
   ///"whisper-1",
-  Future<OpenAIAudioModel> createTranslation({
+  Future<String> createTranslation({
     required File file,
     String model = "whisper-1",
     String? prompt,
     OpenAIAudioResponseFormat? responseFormat = OpenAIAudioResponseFormat.text,
     double? temperature,
   }) async {
-    OpenAIAudioModel translation = await openAI.audio.createTranslation(
+    String translation = await openAI.audio.createTranslation(
       file: file,
       model: model,
       prompt: prompt,
@@ -407,8 +407,8 @@ class OpenAIClient {
   ///{"prompt": "<prompt text>", "completion": "<ideal generated text>"}
   // {"prompt": "<prompt text>", "completion": "<ideal generated text>"}
   // {"prompt": "<prompt text>", "completion": "<ideal generated text>"}
-  Future<List<OpenAIFileModel>> listFiles() async {
-    List<OpenAIFileModel> files = await openAI.file.list();
+  Future<OpenAIFileListModel> listFiles() async {
+    OpenAIFileListModel files = await openAI.file.list();
 
     return files;
   }
