@@ -578,8 +578,6 @@
 					"-l\"sqlite3\"",
 					"-l\"z\"",
 					"-framework",
-					"\"AppKit\"",
-					"-framework",
 					"\"Ass\"",
 					"-framework",
 					"\"Avcodec\"",
@@ -738,8 +736,6 @@
 					"-framework",
 					"\"sqlite3_flutter_libs\"",
 					"-framework",
-					"\"super_native_extensions\"",
-					"-framework",
 					"\"system_tray\"",
 					"-framework",
 					"\"tray_manager\"",
@@ -758,7 +754,6 @@
 					"-framework",
 					"\"window_to_front\"",
 					"-weak_framework",
-					"\"UserNotifications\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.curltech.colla;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -920,8 +915,6 @@
 					"-l\"sqlite3\"",
 					"-l\"z\"",
 					"-framework",
-					"\"AppKit\"",
-					"-framework",
 					"\"Ass\"",
 					"-framework",
 					"\"Avcodec\"",
@@ -1080,8 +1073,6 @@
 					"-framework",
 					"\"sqlite3_flutter_libs\"",
 					"-framework",
-					"\"super_native_extensions\"",
-					"-framework",
 					"\"system_tray\"",
 					"-framework",
 					"\"tray_manager\"",
@@ -1100,7 +1091,6 @@
 					"-framework",
 					"\"window_to_front\"",
 					"-weak_framework",
-					"\"UserNotifications\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.curltech.colla;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1147,8 +1137,6 @@
 					"-l\"sqlite3\"",
 					"-l\"z\"",
 					"-framework",
-					"\"AppKit\"",
-					"-framework",
 					"\"Ass\"",
 					"-framework",
 					"\"Avcodec\"",
@@ -1307,8 +1295,6 @@
 					"-framework",
 					"\"sqlite3_flutter_libs\"",
 					"-framework",
-					"\"super_native_extensions\"",
-					"-framework",
 					"\"system_tray\"",
 					"-framework",
 					"\"tray_manager\"",
@@ -1327,7 +1313,6 @@
 					"-framework",
 					"\"window_to_front\"",
 					"-weak_framework",
-					"\"UserNotifications\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.curltech.colla;
 				PROVISIONING_PROFILE_SPECIFIER = "";

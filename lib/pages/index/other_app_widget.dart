@@ -14,7 +14,6 @@ import 'package:colla_chat/plugin/overlay/flutter_overlay_window.dart';
 import 'package:colla_chat/plugin/pip/flutter_pip_window_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/tool/sherpa/sherpa_install_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -31,7 +30,6 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
       FlutterOverlayWindowWidget();
   final PlatformMapLauncherWidget platformMapLauncherWidget =
       PlatformMapLauncherWidget();
-  final SherpaInstallWidget sherpaInstallWidget = SherpaInstallWidget();
   final MailAddressWidget mailAddressWidget = MailAddressWidget();
   final StockMainWidget stockMainWidget = StockMainWidget();
   final FlutterPipWindowWidget flutterPipWindowWidget =
@@ -52,7 +50,6 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     flutterOverlayWindowWidget.routeName: flutterOverlayWindowWidget,
     flutterPipWindowWidget.routeName: flutterPipWindowWidget,
     platformMapLauncherWidget.routeName: platformMapLauncherWidget,
-    sherpaInstallWidget.routeName: sherpaInstallWidget,
     dataSourceWidget.routeName: dataSourceWidget,
     fileSystemWidget.routeName: fileSystemWidget,
   };
@@ -64,7 +61,6 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(flutterOverlayWindowWidget);
     indexWidgetProvider.define(flutterPipWindowWidget);
     indexWidgetProvider.define(platformMapLauncherWidget);
-    indexWidgetProvider.define(sherpaInstallWidget);
     indexWidgetProvider.define(fileSystemWidget);
   }
 
@@ -143,13 +139,6 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
         helpPath: platformMapLauncherWidget.routeName,
         onTap: (int index, String title, {String? subtitle}) {
           indexWidgetProvider.push(platformMapLauncherWidget.routeName);
-        }));
-    otherAppTileData.add(TileData(
-        title: AppLocalizations.t(sherpaInstallWidget.title),
-        prefix: sherpaInstallWidget.iconData,
-        helpPath: sherpaInstallWidget.routeName,
-        onTap: (int index, String title, {String? subtitle}) {
-          indexWidgetProvider.push(sherpaInstallWidget.routeName);
         }));
     otherAppTileData.add(TileData(
         title: AppLocalizations.t(flutterPipWindowWidget.title),

@@ -41,7 +41,6 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/pdf_util.dart';
 import 'package:colla_chat/tool/share_util.dart';
-import 'package:colla_chat/tool/sherpa/sherpa_speech_to_text.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
@@ -417,14 +416,6 @@ class MessageWidget {
           DialogUtil.error(content: 'No source file data');
           return;
         }
-        SherpaSpeechToText sherpaSpeechToText = SherpaSpeechToText();
-        await sherpaSpeechToText.recognize(audioData: bytes);
-        DialogUtil.show(
-            context: context,
-            builder: (context) {
-              return Dialog(
-                  child: AutoSizeText(sherpaSpeechToText.text!));
-            });
       }
     }
   }

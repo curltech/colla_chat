@@ -7,7 +7,6 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/sherpa/sherpa_text_to_speech_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,9 +16,6 @@ class PoemContentWidget extends StatelessWidget {
 
   final PlatformTextToSpeechWidget platformTextToSpeechWidget =
       PlatformTextToSpeechWidget();
-
-  final SherpaTextToSpeechWidget sherpaTextToSpeechWidget =
-      SherpaTextToSpeechWidget();
 
   final RxBool platformTextToSpeech = true.obs;
 
@@ -33,13 +29,6 @@ class PoemContentWidget extends StatelessWidget {
       if (ttsState == TtsState.stopped || ttsState == TtsState.paused) {
         platformTextToSpeechWidget.speak(poem.paragraphs!);
       }
-    } else {
-      await sherpaTextToSpeechWidget.init();
-      var ttsState = sherpaTextToSpeechWidget.ttsState.value;
-
-      if (ttsState == TtsState.stopped || ttsState == TtsState.paused) {
-        sherpaTextToSpeechWidget.speak(poem.paragraphs!);
-      }
     }
   }
 
@@ -50,11 +39,6 @@ class PoemContentWidget extends StatelessWidget {
       if (ttsState == TtsState.playing) {
         platformTextToSpeechWidget.pause();
       }
-    } else {
-      var ttsState = sherpaTextToSpeechWidget.ttsState.value;
-      if (ttsState == TtsState.playing) {
-        sherpaTextToSpeechWidget.pause();
-      }
     }
   }
 
@@ -62,8 +46,6 @@ class PoemContentWidget extends StatelessWidget {
     var platformTextToSpeech = this.platformTextToSpeech.value;
     if (platformTextToSpeech) {
       platformTextToSpeechWidget.stop();
-    } else {
-      sherpaTextToSpeechWidget.stop();
     }
   }
 
