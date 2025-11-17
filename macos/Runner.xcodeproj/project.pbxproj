@@ -21,13 +21,13 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		1C5613B777793F0AD6C9992C /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39C1F4186D8E30637B0E2313 /* Pods_Runner.framework */; };
 		335BBD1B22A9A15E00E9071D /* GeneratedPluginRegistrant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335BBD1A22A9A15E00E9071D /* GeneratedPluginRegistrant.swift */; };
 		33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC10F02044A3C60003C045 /* AppDelegate.swift */; };
 		33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33CC10F22044A3C60003C045 /* Assets.xcassets */; };
 		33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 33CC10F42044A3C60003C045 /* MainMenu.xib */; };
 		33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC11122044BFA00003C045 /* MainFlutterWindow.swift */; };
 		75E2CCBF05E6B14D72A23B01 /* Pods_ImageNotification.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50CAD25D2C3D68D192F5709C /* Pods_ImageNotification.framework */; };
+		A6E7BC172ECB9EFF00393FD1 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39C1F4186D8E30637B0E2313 /* Pods_Runner.framework */; };
 		AFA546760A0D63F130E8C387 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 00B681B8D6806FA953DDE886 /* GoogleService-Info.plist */; };
 		F40D64AB2ABED36D0088D39C /* NotificationService.m in Sources */ = {isa = PBXBuildFile; fileRef = F40D64AA2ABED36D0088D39C /* NotificationService.m */; };
 /* End PBXBuildFile section */
@@ -101,7 +101,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1C5613B777793F0AD6C9992C /* Pods_Runner.framework in Frameworks */,
+				A6E7BC172ECB9EFF00393FD1 /* Pods_Runner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -578,6 +578,8 @@
 					"-l\"sqlite3\"",
 					"-l\"z\"",
 					"-framework",
+					"\"AppKit\"",
+					"-framework",
 					"\"Ass\"",
 					"-framework",
 					"\"Avcodec\"",
@@ -736,6 +738,8 @@
 					"-framework",
 					"\"sqlite3_flutter_libs\"",
 					"-framework",
+					"\"super_native_extensions\"",
+					"-framework",
 					"\"system_tray\"",
 					"-framework",
 					"\"tray_manager\"",
@@ -754,6 +758,7 @@
 					"-framework",
 					"\"window_to_front\"",
 					"-weak_framework",
+					"\"UserNotifications\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.curltech.colla;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -915,6 +920,8 @@
 					"-l\"sqlite3\"",
 					"-l\"z\"",
 					"-framework",
+					"\"AppKit\"",
+					"-framework",
 					"\"Ass\"",
 					"-framework",
 					"\"Avcodec\"",
@@ -1073,6 +1080,8 @@
 					"-framework",
 					"\"sqlite3_flutter_libs\"",
 					"-framework",
+					"\"super_native_extensions\"",
+					"-framework",
 					"\"system_tray\"",
 					"-framework",
 					"\"tray_manager\"",
@@ -1091,6 +1100,7 @@
 					"-framework",
 					"\"window_to_front\"",
 					"-weak_framework",
+					"\"UserNotifications\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.curltech.colla;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1137,6 +1147,8 @@
 					"-l\"sqlite3\"",
 					"-l\"z\"",
 					"-framework",
+					"\"AppKit\"",
+					"-framework",
 					"\"Ass\"",
 					"-framework",
 					"\"Avcodec\"",
@@ -1295,6 +1307,8 @@
 					"-framework",
 					"\"sqlite3_flutter_libs\"",
 					"-framework",
+					"\"super_native_extensions\"",
+					"-framework",
 					"\"system_tray\"",
 					"-framework",
 					"\"tray_manager\"",
@@ -1313,6 +1327,7 @@
 					"-framework",
 					"\"window_to_front\"",
 					"-weak_framework",
+					"\"UserNotifications\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.curltech.colla;
 				PROVISIONING_PROFILE_SPECIFIER = "";
