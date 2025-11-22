@@ -218,7 +218,7 @@ dependencies:
   local_auth: ^3.0.0
 
   #基本开发工具
-  keyboard_actions: ^4.2.0
+  keyboard_actions: ^4.2.1
   synchronized: ^3.4.0
   flutter_smart_dialog: ^4.9.4
   json_annotation: ^4.3.0
