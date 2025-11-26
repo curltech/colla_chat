@@ -287,7 +287,7 @@ dependencies:
   audio_service: ^0.18.17
   stts: ^1.2.6
   flutter_tts: ^4.2.3
-  speech_to_text: ^7.4.0-beta.6
+  speech_to_text: ^6.6.2
   #  sherpa_onnx: ^1.12.17
   #  kokoro_tts_flutter: ^0.2.0+1
   flutter_image_compress: ^2.4.0
@@ -345,7 +345,7 @@ dependency_overrides:
   langchain_google: ^0.6.1
   ollama_dart: ^0.3.0+1
   dart_openai: ^6.1.0
-  sqlite3: ^3.0.1
+  sqlite3: ^3.1.0
   sqlite3_flutter_libs: 0.5.40
   petitparser: ^7.0.0
   fluent_ui: ^4.13.0
