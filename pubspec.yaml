@@ -69,7 +69,7 @@ dependencies:
   wakelock_plus: ^1.4.0 #让系统不会睡眠
 
   # 存储
-  flutter_secure_storage: ^9.2.4
+  flutter_secure_storage: ^10.0.0
   # sqflite: ^2.4.1
   idb_shim: ^2.0.1
   postgres: ^3.5.5
@@ -111,7 +111,7 @@ dependencies:
   fluro: ^2.0.3
   flutter_multi_formatter: ^2.13.7
   chips_choice: ^3.0.0
-  validation_pro: 3.0.0
+  validation_pro: ^3.0.0
   flutter_pw_validator: ^1.6.0 #FlutterPwValidator放在TextFormField下面显示校验结果
   fzregex: ^2.1.1 #静态方法：Fzregex.hasMatch
   regexpattern: ^2.5.0
@@ -266,7 +266,7 @@ dependencies:
   audioplayers_linux: ^4.0.0
   audioplayers_web: ^5.0.0
   audioplayers_android: ^5.0.0
-  audio_waveforms: ^1.3.0
+  audio_waveforms: ^2.0.1
   waved_audio_player: ^1.3.0
   waveform_recorder: ^1.8.0
   # flutter_recorder: ^1.1.0
@@ -293,7 +293,7 @@ dependencies:
   flutter_image_compress: ^2.4.0
   video_thumbnail: ^0.5.6
   easy_video_editor: ^0.1.2 #mobile
-  pro_video_editor: ^0.3.0 #mobile,macos
+  pro_video_editor: ^0.4.0 #mobile,macos
   video_editor_2: ^3.1.1 #mobile
   video_compress: ^3.1.3
   fc_native_video_thumbnail: ^0.17.2
@@ -333,16 +333,16 @@ dependencies:
   flutter_native_splash: ^2.4.6
   system_tray: ^2.0.3
   tray_manager: ^0.5.0
-  livekit_client: ^2.5.3 #livekit sfu server flutter client
+  livekit_client: ^2.6.0 #livekit sfu server flutter client
   livekit_server_sdk: ^1.0.1
 
   #系统
   system_resources: ^1.6.0
 dependency_overrides:
-  langchain: ^0.7.1
-  langchain_ollama: ^0.3.0
-  langchain_openai: ^0.7.0
-  langchain_google: ^0.6.1
+  langchain: ^0.8.0+1
+  langchain_ollama: ^0.4.0+1
+  langchain_openai: ^0.8.0+1
+  langchain_google: ^0.7.0+1
   ollama_dart: ^0.3.0+1
   dart_openai: ^6.1.0
   sqlite3: ^3.1.0
@@ -429,19 +429,19 @@ dependency_overrides:
   geolocator: ^14.0.0
   flutter_map_location_marker: ^10.0.0
   flutter_map: ^8.1.0 #Open Street Map，需要翻墙
-  ffi: 2.1.0
-  win32_registry: 2.1.0
-  win32: 5.15.0
+  ffi: ^2.1.0
+  win32_registry: ^2.1.0
+  win32: ^5.15.0
   http: ^1.5.0-beta
   dart_webrtc: ^1.5.3+hotfix.2
-  webrtc_interface: 1.3.0
-  flutter_webrtc: 1.2.0
+  webrtc_interface: ^1.3.0
+  flutter_webrtc: ^1.2.0
   #  flutter_webrtc_plus: ^0.11.2+5
   #  medea_flutter_webrtc: ^0.11.0
   protobuf: ^4.1.0
-  analyzer: 7.4.5
+  analyzer: ^9.0.0
   provider: ^6.1.4
-  flex_seed_scheme: ^3.5.1
+  flex_seed_scheme: ^4.0.1
   flutter_inappwebview: ^6.2.0-beta.2 #不支持linux
   connectivity_plus: ^7.0.0
   emoji_picker_flutter: ^4.2.0
@@ -483,7 +483,7 @@ dependency_overrides:
   flutter_float_window: ^0.2.2
   system_alert_window: ^2.0.7
   #  flutter_overlay_window: ^0.5.0 #android悬浮框
-  flutter_floating: ^1.1.0
+  flutter_floating: ^2.0.0
   floating: ^6.0.0
   audio_video_progress_bar: ^2.0.1
   azlistview: ^2.0.0 #特殊列表滑动
@@ -496,7 +496,7 @@ dependency_overrides:
   #      path: packages/pdfx
   pdf: ^3.11.3 #所有平台，创建pdf
   audio_session: ^0.2.0
-  record: 6.1.2
+  record: ^6.1.2
   # record_darwin: 1.2.2
   secure_application: ^4.1.0
   visibility_detector: ^0.4.0+2 #组建可见性的大小发生变化
@@ -512,9 +512,9 @@ dependency_overrides:
   flutter_quill: ^11.4.0
   flutter_quill_extensions: ^11.0.0
   flutter_quill_delta_from_html: ^1.5.1
-  saver_gallery: 4.1.0
+  saver_gallery: ^4.1.0
   gal: ^2.3.0
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   html_editor_enhanced: ^2.6.0
   lints: ^5.0.0
   archive: ^4.0.1
