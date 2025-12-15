@@ -442,7 +442,7 @@ dependency_overrides:
   flutter_webrtc: ^1.2.0
   #  flutter_webrtc_plus: ^0.11.2+5
   #  medea_flutter_webrtc: ^0.11.0
-  protobuf: ^6.0.0
+  protobuf: 4.2.0
   analyzer: ^9.0.0
   provider: ^6.1.4
   flex_seed_scheme: ^4.0.1
