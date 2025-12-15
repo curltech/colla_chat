@@ -2,7 +2,7 @@ import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_peer_controller.dart';
-import 'package:colla_chat/pages/login/loading.dart';
+import 'package:colla_chat/pages/login/background.dart';
 import 'package:colla_chat/pages/login/p2p_login_widget.dart';
 import 'package:colla_chat/pages/login/p2p_register_widget.dart';
 import 'package:colla_chat/pages/login/p2p_setting_widget.dart';
@@ -52,7 +52,7 @@ class P2pLogin extends StatelessWidget with WindowListener {
     appDataProvider.changeWindowSize();
   }
 
-  _animateToPage(int index) {
+  void _animateToPage(int index) {
     controller.move(index);
   }
 
@@ -160,7 +160,7 @@ class P2pLogin extends StatelessWidget with WindowListener {
                   child: Stack(children: <Widget>[
                     Opacity(
                       opacity: 1,
-                      child: loadingWidget,
+                      child: backgroundWidget,
                     ),
                     workspace
                   ])));

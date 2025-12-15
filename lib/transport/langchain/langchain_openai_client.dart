@@ -89,7 +89,7 @@ class LangChainClient {
     String? apiKey,
     String? baseUrl,
     Map<String, String>? headers,
-    Map<String, dynamic>? queryParams,
+    Map<String, String>? queryParams,
     http.Client? client,
     ChatGoogleGenerativeAIOptions defaultOptions =
         const ChatGoogleGenerativeAIOptions(model: 'gemini-pro'),

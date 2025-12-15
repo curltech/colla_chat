@@ -79,12 +79,14 @@ class BackgroundImages {
 
 final BackgroundImages backgroundImages = BackgroundImages();
 
-class Loading extends StatelessWidget {
+class BackgroundWidget extends StatelessWidget {
   final bool autoPlay = true;
 
-  final PlatformCarouselController controller = PlatformCarouselController(platformCarouselType : PlatformCarouselType.card,);
+  final PlatformCarouselController controller = PlatformCarouselController(
+    platformCarouselType: PlatformCarouselType.card,
+  );
 
-  Loading({super.key}) {
+  BackgroundWidget({super.key}) {
     init();
   }
 
@@ -139,4 +141,4 @@ class Loading extends StatelessWidget {
   }
 }
 
-final Loading loadingWidget = Loading();
+final BackgroundWidget backgroundWidget = BackgroundWidget();

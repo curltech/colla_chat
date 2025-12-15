@@ -7,9 +7,6 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_floating/floating/assist/Point.dart';
-import 'package:flutter_floating/floating/assist/floating_slide_type.dart';
-import 'package:flutter_floating/floating/assist/slide_stop_type.dart';
 import 'package:get/get.dart';
 import 'package:system_alert_window/system_alert_window.dart';
 
@@ -39,30 +36,30 @@ class FlutterOverlayWindowWidget extends StatelessWidget with TileDataMixin {
       rightWidgets: [
         IconButton(
             onPressed: () {
-              flutterOverlayWindow.setOverlay(OverlayNotification(
+              flutterOverlayWindow.set(OverlayNotification(
                 key: UniqueKey(),
                 description: AutoSizeText('Text'),
                 onCloseButtonPressed:
                     (OverlayNotification overlayNotification) {
-                  flutterOverlayWindow.closeOverlay();
+                  flutterOverlayWindow.close();
                 },
                 onDismiss: (OverlayNotification overlayNotification) {
-                  flutterOverlayWindow.closeOverlay();
+                  flutterOverlayWindow.close();
                 },
                 onProgressFinished: (OverlayNotification overlayNotification) {
-                  flutterOverlayWindow.closeOverlay();
+                  flutterOverlayWindow.close();
                 },
                 onNotificationPressed:
                     (OverlayNotification overlayNotification) {
-                  flutterOverlayWindow.closeOverlay();
+                  flutterOverlayWindow.close();
                 },
               ));
-              flutterOverlayWindow.showOverlay(context);
+              flutterOverlayWindow.show(context);
             },
             icon: Icon(Icons.folder_open)),
         IconButton(
             onPressed: () {
-              flutterOverlayWindow.closeOverlay();
+              flutterOverlayWindow.close();
             },
             icon: Icon(Icons.folder)),
       ],
@@ -70,71 +67,6 @@ class FlutterOverlayWindowWidget extends StatelessWidget with TileDataMixin {
           flutterOverlayWindow, // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
-}
-
-class MobileOverlayConfig {
-  final SystemWindowGravity gravity;
-  final int? width;
-  final int? height;
-  final String notificationTitle;
-
-  final String notificationBody;
-
-  final SystemWindowPrefMode prefMode;
-
-  final List<SystemWindowFlags>? layoutParamFlags;
-
-  const MobileOverlayConfig(
-      {this.height,
-      this.width,
-      this.notificationTitle = appName,
-      this.notificationBody = appName,
-      this.prefMode = SystemWindowPrefMode.DEFAULT,
-      this.layoutParamFlags,
-      this.gravity = SystemWindowGravity.CENTER});
-}
-
-class DesktopConfig {
-  final FloatingSlideType slideType;
-  final double? top;
-  final double? left;
-  final double? right;
-  final double? bottom;
-  final Point<double>? point;
-  final double moveOpacity;
-
-  final bool isPosCache;
-
-  final bool isShowLog;
-
-  final bool isSnapToEdge;
-
-  final bool isStartScroll;
-
-  final double slideTopHeight;
-
-  final double slideBottomHeight;
-
-  final double snapToEdgeSpace;
-
-  final SlideStopType slideStopType;
-
-  const DesktopConfig(
-      {this.slideType = FloatingSlideType.onRightAndBottom,
-      this.moveOpacity = 0,
-      this.isPosCache = true,
-      this.isShowLog = true,
-      this.isSnapToEdge = true,
-      this.isStartScroll = true,
-      this.slideTopHeight = 0,
-      this.slideBottomHeight = 100,
-      this.snapToEdgeSpace = 0,
-      this.slideStopType = SlideStopType.slideStopAutoType,
-      this.top = 100,
-      this.left = 100,
-      this.right,
-      this.bottom,
-      this.point});
 }
 
 class FlutterOverlayWindow extends StatelessWidget {
@@ -149,51 +81,27 @@ class FlutterOverlayWindow extends StatelessWidget {
       FlutterFloatingHome(disabled: disabled);
   final Rx<String?> floatingKey = Rx<String?>(null);
 
-  showOverlay(BuildContext context,
-      {MobileOverlayConfig mobileOverlayConfig = const MobileOverlayConfig(),
-      DesktopConfig desktopConfig = const DesktopConfig()}) {
+  void show(BuildContext context) {
     if (platformParams.mobile) {
-      mobileSystemAlertHome.showOverlay(
-          gravity: mobileOverlayConfig.gravity,
-          width: mobileOverlayConfig.width,
-          height: mobileOverlayConfig.height,
-          notificationTitle: mobileOverlayConfig.notificationTitle,
-          notificationBody: mobileOverlayConfig.notificationBody,
-          prefMode: mobileOverlayConfig.prefMode,
-          layoutParamFlags: mobileOverlayConfig.layoutParamFlags);
+      mobileSystemAlertHome.showOverlay();
     } else {
       floatingKey.value ??= flutterFloatingHome.flutterFloatingController
-          .createFloating(flutterFloatingOverlay,
-              slideType: desktopConfig.slideType,
-              isShowLog: desktopConfig.isShowLog,
-              isSnapToEdge: desktopConfig.isSnapToEdge,
-              isPosCache: desktopConfig.isPosCache,
-              moveOpacity: desktopConfig.moveOpacity,
-              left: desktopConfig.left,
-              right: desktopConfig.right,
-              top: desktopConfig.top,
-              bottom: desktopConfig.bottom,
-              point: desktopConfig.point,
-              isStartScroll: desktopConfig.isStartScroll,
-              slideTopHeight: desktopConfig.slideTopHeight,
-              snapToEdgeSpace: desktopConfig.snapToEdgeSpace,
-              slideStopType: desktopConfig.slideStopType,
-              slideBottomHeight: desktopConfig.slideBottomHeight);
+          .createFloating(flutterFloatingOverlay);
       flutterFloatingHome.flutterFloatingController.open(context);
-      flutterFloatingHome.flutterFloatingController.showFloating();
+      flutterFloatingHome.flutterFloatingController.show();
     }
   }
 
-  closeOverlay({SystemWindowPrefMode prefMode = SystemWindowPrefMode.DEFAULT}) {
+  void close({SystemWindowPrefMode prefMode = SystemWindowPrefMode.DEFAULT}) {
     if (platformParams.mobile) {
       mobileSystemAlertHome.closeOverlay();
     } else {
-      flutterFloatingHome.flutterFloatingController.closeFloating();
+      flutterFloatingHome.flutterFloatingController.close();
       floatingKey.value = null;
     }
   }
 
-  setOverlay(Widget enabled) {
+  void set(Widget enabled) {
     if (platformParams.desktop) {
       flutterFloatingOverlay.enabled.value = enabled;
     }

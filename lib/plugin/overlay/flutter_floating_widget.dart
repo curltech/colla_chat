@@ -1,81 +1,74 @@
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_floating/floating/assist/Point.dart';
-import 'package:flutter_floating/floating/assist/floating_slide_type.dart';
-import 'package:flutter_floating/floating/assist/slide_stop_type.dart';
-import 'package:flutter_floating/floating/floating.dart';
 import 'package:flutter_floating/floating/manager/floating_manager.dart';
+import 'package:flutter_floating/floating/assist/floating_common_params.dart';
+import 'package:flutter_floating/floating/assist/floating_edge_type.dart';
+import 'package:flutter_floating/floating/assist/fposition.dart';
+import 'package:flutter_floating/floating/assist/snap_stop_type.dart';
+import 'package:flutter_floating/floating/floating_overlay.dart';
 import 'package:get/get.dart';
 
+/// 应用级的悬浮窗控制器
 class FlutterFloatingController {
-  final FloatingManager floatingManager = FloatingManager();
   final Rx<String?> current = Rx<String?>(null);
 
   String createFloating(
     Widget child, {
-    FloatingSlideType slideType = FloatingSlideType.onRightAndBottom,
+    FloatingEdgeType slideType = FloatingEdgeType.onRightAndBottom,
     double? top,
     double? left,
     double? right,
     double? bottom,
-    Point<double>? point,
-    double moveOpacity = 0.3,
-    bool isPosCache = true,
+    FPosition<double>? position,
+    bool enablePositionCache = true,
     bool isShowLog = true,
     bool isSnapToEdge = true,
     bool isStartScroll = true,
     double slideTopHeight = 0,
     double slideBottomHeight = 0,
+    bool isDragEnable = true,
+    double marginTop = 0,
+    double dragOpacity = 0.3,
+    double marginBottom = 0,
     double snapToEdgeSpace = 0,
-    SlideStopType slideStopType = SlideStopType.slideStopAutoType,
+    int snapToEdgeSpeed = 250,
+    SnapEdgeType snapEdgeType = SnapEdgeType.snapEdgeAuto,
+    int notifyThrottleMs = 16,
   }) {
     String key = UniqueKey().toString();
-    floatingManager.createFloating(
-        key,
-        Floating(
-          child,
-          slideType: slideType,
-          top: top,
-          left: left,
-          right: right,
-          bottom: bottom,
-          point: point,
-          moveOpacity: moveOpacity,
-          isPosCache: isPosCache,
+    var floating = FloatingOverlay(
+      child,
+      slideType: slideType,
+      top: top,
+      left: left,
+      right: right,
+      bottom: bottom,
+      params: FloatingParams(
           isShowLog: isShowLog,
           isSnapToEdge: isSnapToEdge,
-          isStartScroll: isStartScroll,
-          slideTopHeight: slideTopHeight,
-          slideBottomHeight: slideBottomHeight,
+          enablePositionCache: enablePositionCache,
+          dragOpacity: dragOpacity,
+          marginTop: marginTop,
+          marginBottom: marginBottom,
           snapToEdgeSpace: snapToEdgeSpace,
-          slideStopType: slideStopType,
-        ));
+          snapEdgeType: snapEdgeType,
+          notifyThrottleMs: notifyThrottleMs),
+    );
+    floatingManager.createFloating(key, floating);
     current.value = key;
 
     return key;
   }
 
-  open(BuildContext context, {String? key}) {
+  void show({String? key}) {
     key ??= current.value;
     if (key == null) {
       return;
     }
     if (floatingManager.containsFloating(key)) {
-      Floating floating = floatingManager.getFloating(key);
+      FloatingOverlay floating = floatingManager.getFloating(key);
 
-      floating.open(context);
-    }
-  }
-
-  showFloating({String? key}) {
-    key ??= current.value;
-    if (key == null) {
-      return;
-    }
-    if (floatingManager.containsFloating(key)) {
-      Floating floating = floatingManager.getFloating(key);
-
-      floating.showFloating();
+      floating.show();
     }
   }
 
@@ -85,26 +78,26 @@ class FlutterFloatingController {
       return false;
     }
     if (floatingManager.containsFloating(key)) {
-      Floating floating = floatingManager.getFloating(key);
+      FloatingOverlay floating = floatingManager.getFloating(key);
 
       return floating.isShowing;
     }
     return true;
   }
 
-  hideFloating({String? key}) {
+  void hide({String? key}) {
     key ??= current.value;
     if (key == null) {
       return;
     }
     if (floatingManager.containsFloating(key)) {
-      Floating floating = floatingManager.getFloating(key);
+      FloatingOverlay floating = floatingManager.getFloating(key);
 
-      floating.hideFloating();
+      floating.hide();
     }
   }
 
-  Floating? getFloating({String? key}) {
+  FloatingOverlay? getFloating({String? key}) {
     key ??= current.value;
     if (key == null) {
       return null;
@@ -115,7 +108,19 @@ class FlutterFloatingController {
     return null;
   }
 
-  closeFloating({String? key}) {
+  void open(BuildContext context, {String? key}) {
+    key ??= current.value;
+    if (key == null) {
+      return;
+    }
+    if (floatingManager.containsFloating(key)) {
+      FloatingOverlay floating = floatingManager.getFloating(key);
+
+      floating.open(context);
+    }
+  }
+
+  void close({String? key}) {
     key ??= current.value;
     if (key == null) {
       return;
@@ -125,7 +130,7 @@ class FlutterFloatingController {
     }
   }
 
-  closeAllFloating() {
+  void closeAll() {
     floatingManager.closeAllFloating();
   }
 }

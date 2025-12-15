@@ -16,7 +16,7 @@ import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/index/adaptive_layout_index.dart';
 import 'package:colla_chat/pages/index/global_chat_message.dart';
 import 'package:colla_chat/pages/index/global_webrtc_event.dart';
-import 'package:colla_chat/pages/login/loading.dart';
+import 'package:colla_chat/pages/login/background.dart';
 import 'package:colla_chat/plugin/pip/inapp_pip_player_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/overlay/overlay_notification.dart';
@@ -697,7 +697,7 @@ class _IndexViewState extends State<IndexView>
               child: Stack(children: <Widget>[
             Opacity(
               opacity: 0.8,
-              child: loadingWidget,
+              child: backgroundWidget,
             ),
             Center(
               child: widget.adaptiveLayoutIndex.asStyle(

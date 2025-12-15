@@ -2,14 +2,19 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/style/glass/glass_kit_widget.dart';
 import 'package:colla_chat/widgets/style/glass/glass_widget.dart';
 import 'package:colla_chat/widgets/style/glass/liquid_glass_effect_widget.dart';
+import 'package:colla_chat/widgets/style/glass/liquid_glass_lens_widget.dart';
 import 'package:colla_chat/widgets/style/neumorphic/neumorphic_widget.dart';
 import 'package:flutter/material.dart';
+
+import 'package:colla_chat/widgets/style/glass/oc_liquid_glass_widget.dart';
 
 enum PlatformStyle {
   material,
   glass,
   glassKit,
   liquidGlass,
+  ocLiquidGlass,
+  liquidGlassLens,
   neumorphic,
   fluent
 }
@@ -21,30 +26,32 @@ const BorderRadius defaultBorderRadius = BorderRadius.zero;
 const Color defaultShadowColor = Colors.black;
 
 extension PlatformStyleWidget<T extends Widget> on T {
-  Widget asStyle(
-      {Key? key,
-      double? height,
-      double? width,
-      double blur = defaultBlur,
-      Color color = Colors.white,
-      BorderRadius borderRadius = defaultBorderRadius,
-      bool frosted = false,
-      Clip clipBehaviour = Clip.antiAlias,
-      TileMode tileMode = TileMode.clamp,
-      CustomClipper<RRect>? clipper,
-      AlignmentGeometry? alignment,
-      Matrix4? transform,
-      AlignmentGeometry? transformAlignment,
-      EdgeInsetsGeometry? padding,
-      EdgeInsetsGeometry? margin,
-      Gradient? gradient,
-      double? borderWidth,
-      Gradient? borderGradient,
-      Color? borderColor,
-      double? elevation,
-      Color? shadowColor = defaultShadowColor,
-      BoxShape shape = BoxShape.rectangle,
-      double? frostedOpacity = defaultFrostedOpacity}) {
+  Widget asStyle({
+    Key? key,
+    double? height,
+    double? width,
+    double blur = defaultBlur,
+    Color color = Colors.white,
+    BorderRadius borderRadius = defaultBorderRadius,
+    bool frosted = false,
+    Clip clipBehaviour = Clip.antiAlias,
+    TileMode tileMode = TileMode.clamp,
+    CustomClipper<RRect>? clipper,
+    AlignmentGeometry? alignment,
+    Matrix4? transform,
+    AlignmentGeometry? transformAlignment,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    Gradient? gradient,
+    double? borderWidth,
+    Gradient? borderGradient,
+    Color? borderColor,
+    double? elevation,
+    Color? shadowColor = defaultShadowColor,
+    BoxShape shape = BoxShape.rectangle,
+    double? frostedOpacity = defaultFrostedOpacity,
+    Widget? backgroundWidget,
+  }) {
     Widget child;
     switch (myself.platformStyle) {
       case PlatformStyle.material:
@@ -86,6 +93,20 @@ extension PlatformStyleWidget<T extends Widget> on T {
       case PlatformStyle.liquidGlass:
         child =
             asLiquidGlassEffect(height: height, width: width, blurAmount: blur);
+      case PlatformStyle.ocLiquidGlass:
+        child = OCLiquidGlassContainer(
+          height: height,
+          width: width,
+          backgroundWidget: backgroundWidget ?? Container(),
+          children: [this],
+        );
+      case PlatformStyle.liquidGlassLens:
+        child = LiquidGlassLensContainer(
+          height: height,
+          width: width,
+          backgroundWidget: backgroundWidget ?? Container(),
+          children: [this],
+        );
       case PlatformStyle.neumorphic:
         child = asNeumorphicStyle(
           height: height,
