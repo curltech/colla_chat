@@ -8,7 +8,6 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:k_chart_plus/chart_translations.dart';
 import 'package:k_chart_plus/k_chart_plus.dart';
 
 class KChartPlusController {
@@ -20,17 +19,79 @@ class KChartPlusController {
   final RxBool isTrendLine = false.obs;
   final Rx<VerticalTextAlignment> verticalTextAlignment =
       VerticalTextAlignment.left.obs;
-  final Rx<MainState> mainState = MainState.MA.obs;
-  final RxList<SecondaryState> secondaryState =
-      <SecondaryState>[SecondaryState.MACD].obs;
+  final List<MainIndicator> defaultMainIndicators = [
+    MAIndicator(),
+    EMAIndicator(),
+    BOLLIndicator(),
+    SARIndicator(),
+  ];
+  final List<SecondaryIndicator> defaultSecondaryIndicators = [
+    MACDIndicator(),
+    KDJIndicator(),
+    RSIIndicator(),
+    WRIndicator(),
+    CCIIndicator(),
+  ];
+  final RxList<MainIndicator> mainIndicators = <MainIndicator>[
+    MAIndicator(
+      calcParams: [
+        5,
+        10,
+        30,
+        60
+      ], // [Optional] Display of MA. Default is [5, 10, 30, 60]
+    ),
+    EMAIndicator(
+      calcParams: [
+        5,
+        10,
+        30,
+        60
+      ], // [Optional] Display of EMA. Default is [5, 10, 30, 60]
+    ),
+    BOLLIndicator(),
+    SARIndicator(),
+  ].obs;
+  final RxList<SecondaryIndicator> secondaryIndicators = <SecondaryIndicator>[
+    MACDIndicator(),
+    KDJIndicator(),
+    RSIIndicator(),
+    WRIndicator(),
+    CCIIndicator(),
+  ].obs;
   final RxList<DepthEntity> bids = <DepthEntity>[].obs;
   final RxList<DepthEntity> asks = <DepthEntity>[].obs;
+  final KChartStyle chartStyle = KChartStyle();
+  final KChartColors lightChartColors = KChartColors(
+    dnColor: const Color(0xFF14AD8F),
+    upColor: const Color(0xFFD5405D),
+    nowPriceUpColor: const Color(0xFFD5405D),
+    nowPriceDnColor: const Color(0xFF14AD8F),
+  );
+  final KChartColors darkChartColors = KChartColors(
+    bgColor: Colors.black,
+    selectFillColor: Colors.black,
+    dnColor: const Color(0xFF14AD8F),
+    upColor: const Color(0xFFD5405D),
+    nowPriceUpColor: const Color(0xFFD5405D),
+    nowPriceDnColor: const Color(0xFF14AD8F),
+  );
+
+  final DepthChartColors lightDepthChartColors = DepthChartColors(
+    dnColor: const Color(0xFF14AD8F),
+    upColor: const Color(0xFFD5405D),
+  );
+  final DepthChartColors darkDepthChartColors = DepthChartColors(
+    selectFillColor: Colors.black,
+    dnColor: const Color(0xFF14AD8F),
+    upColor: const Color(0xFFD5405D),
+  );
 
   KChartPlusController() {
     _init();
   }
 
-  _init() {
+  void _init() {
     multiKlineController.online.addListener(() async {
       multiKlineController.klineController?.clear();
       showLoading.value = true;
@@ -77,7 +138,7 @@ class KChartPlusController {
   }
 
   /// 创建图形的数据
-  buildKlines() {
+  void buildKlines() {
     KlineController? klineController = multiKlineController.klineController;
     if (klineController != null) {
       double width = appDataProvider.secondaryBodyWidth;
@@ -129,7 +190,8 @@ class KChartPlusController {
         klines.add(kline);
       }
       if (klines.isNotEmpty) {
-        DataUtil.calculate(klines, const [5, 10, 30]);
+        DataUtil.calculateAll(
+            klines, mainIndicators.value, secondaryIndicators.value);
       }
       this.klines.assignAll(klines);
     }
@@ -140,25 +202,7 @@ class KChartPlusController {
 class KChartPlusWidget extends StatelessWidget {
   final KChartPlusController kChartPlusController;
 
-  KChartPlusWidget({super.key, required this.kChartPlusController});
-
-  final ChartStyle chartStyle = ChartStyle();
-  final ChartColors lightChartColors = ChartColors(
-    dnColor: const Color(0xFF14AD8F),
-    upColor: const Color(0xFFD5405D),
-    nowPriceUpColor: const Color(0xFFD5405D),
-    nowPriceDnColor: const Color(0xFF14AD8F),
-  );
-  final ChartColors darkChartColors = ChartColors(
-    bgColor: Colors.black,
-    selectFillColor: Colors.black,
-    infoWindowNormalColor: Colors.white,
-    infoWindowTitleColor: Colors.white,
-    dnColor: const Color(0xFF14AD8F),
-    upColor: const Color(0xFFD5405D),
-    nowPriceUpColor: const Color(0xFFD5405D),
-    nowPriceDnColor: const Color(0xFF14AD8F),
-  );
+  const KChartPlusWidget({super.key, required this.kChartPlusController});
 
   void initDepth(List<DepthEntity>? bids, List<DepthEntity>? asks) {
     if (bids == null || asks == null || bids.isEmpty || asks.isEmpty) return;
@@ -179,61 +223,113 @@ class KChartPlusWidget extends StatelessWidget {
     }
   }
 
-  Widget buildVolButton() {
-    return TextButton(
-      onPressed: () {
-        kChartPlusController.showVol.value =
-            !kChartPlusController.showVol.value;
-      },
+  Widget _buildTitle(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 12, 15),
       child: Text(
-        AppLocalizations.t('Trade volume'),
-        style: TextStyle(
-          color: kChartPlusController.showVol.value
-              ? myself.primary
-              : Colors.white,
-        ),
+        title,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              // color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
       ),
     );
   }
 
-  List<Widget> buildMainButtons() {
-    return MainState.values.map((e) {
-      return TextButton(
-        onPressed: () {
-          kChartPlusController.mainState.value = e;
-        },
-        child: Text(
-          AppLocalizations.t(e.name),
-          style: TextStyle(
-            color: kChartPlusController.mainState.value == e
-                ? myself.primary
-                : Colors.white,
-          ),
-        ),
-      );
-    }).toList();
+  Widget buildVolButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: _buildButton(
+            title: 'VOL',
+            isActive: !kChartPlusController.showVol.value,
+            onPress: () {
+              kChartPlusController.showVol.value =
+                  !kChartPlusController.showVol.value;
+            }),
+      ),
+    );
   }
 
-  List<Widget> buildSecondButtons() {
-    return SecondaryState.values.map((e) {
-      return TextButton(
-        onPressed: () {
-          if (kChartPlusController.secondaryState.contains(e)) {
-            kChartPlusController.secondaryState.remove(e);
-          } else {
-            kChartPlusController.secondaryState.add(e);
-          }
-        },
-        child: Text(
-          AppLocalizations.t(e.name),
-          style: TextStyle(
-            color: kChartPlusController.secondaryState.contains(e)
-                ? myself.primary
-                : Colors.white,
-          ),
+  Widget buildMainButtons() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Wrap(
+        alignment: WrapAlignment.start,
+        spacing: 10,
+        runSpacing: 10,
+        children: kChartPlusController.defaultMainIndicators.map((e) {
+          bool isActive = kChartPlusController.mainIndicators.contains(e);
+          return _buildButton(
+            title: e.shortName,
+            isActive: isActive,
+            onPress: () {
+              if (isActive) {
+                kChartPlusController.mainIndicators.remove(e);
+              } else {
+                kChartPlusController.mainIndicators.add(e);
+              }
+            },
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget buildSecondButtons() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Wrap(
+        alignment: WrapAlignment.start,
+        spacing: 10,
+        runSpacing: 5,
+        children: kChartPlusController.defaultSecondaryIndicators.map((e) {
+          bool isActive = kChartPlusController.secondaryIndicators.contains(e);
+          return _buildButton(
+            title: e.shortName,
+            isActive: isActive,
+            onPress: () {
+              if (isActive) {
+                kChartPlusController.secondaryIndicators.remove(e);
+              } else {
+                kChartPlusController.secondaryIndicators.add(e);
+              }
+            },
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildButton({
+    required String title,
+    required isActive,
+    required Function onPress,
+  }) {
+    late Color? bgColor;
+    if (isActive) {
+      bgColor = myself.primaryColor.withAlpha(30);
+    } else {
+      bgColor = Colors.transparent;
+    }
+    return InkWell(
+      onTap: () {
+        onPress();
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(6),
         ),
-      );
-    }).toList();
+        constraints: const BoxConstraints(minWidth: 60),
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        child: Text(
+          title,
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
   }
 
   Widget _buildToolPanel(BuildContext context) {
@@ -242,8 +338,8 @@ class KChartPlusWidget extends StatelessWidget {
         color: Colors.grey,
         child: Wrap(children: [
           buildVolButton(),
-          ...buildMainButtons(),
-          ...buildSecondButtons()
+          buildMainButtons(),
+          buildSecondButtons()
         ]));
   }
 
@@ -256,8 +352,19 @@ class KChartPlusWidget extends StatelessWidget {
         kChartPlusController.bids.value,
         kChartPlusController.asks.value,
         myself.themeMode == ThemeMode.light
-            ? lightChartColors
-            : darkChartColors,
+            ? kChartPlusController.lightDepthChartColors
+            : kChartPlusController.darkDepthChartColors,
+        chartTranslations: DepthChartTranslations(
+            // date: AppLocalizations.t('Trade date'),
+            // open: AppLocalizations.t('Open price'),
+            // high: AppLocalizations.t('High price'),
+            // low: AppLocalizations.t('Low price'),
+            // close: AppLocalizations.t('Close price'),
+            // changeAmount: AppLocalizations.t('Amount change'),
+            // change: AppLocalizations.t('Amount change%'),
+            // amount: AppLocalizations.t('Trade amount'),
+            // vol: AppLocalizations.t('Trade volume'),
+            ),
       ),
     );
   }
@@ -275,35 +382,42 @@ class KChartPlusWidget extends StatelessWidget {
           Stack(children: <Widget>[
             KChartWidget(
               kChartPlusController.klines.value,
-              chartStyle,
+              // Required，Data must be an ordered list，(history=>now)
+              kChartPlusController.chartStyle, // Required for styling purposes
               myself.themeMode == ThemeMode.light
-                  ? lightChartColors
-                  : darkChartColors,
-              chartTranslations: ChartTranslations(
-                date: AppLocalizations.t('Trade date'),
-                open: AppLocalizations.t('Open price'),
-                high: AppLocalizations.t('High price'),
-                low: AppLocalizations.t('Low price'),
-                close: AppLocalizations.t('Close price'),
-                changeAmount: AppLocalizations.t('Amount change'),
-                change: AppLocalizations.t('Amount change%'),
-                amount: AppLocalizations.t('Trade amount'),
-                vol: AppLocalizations.t('Trade volume'),
-              ),
-              isLine: kChartPlusController.isLine,
-              mBaseHeight: 360,
-              isTrendLine: kChartPlusController.isTrendLine.value,
-              mainStateLi: {kChartPlusController.mainState.value},
-              volHidden: !kChartPlusController.showVol.value,
-              secondaryStateLi: kChartPlusController.secondaryState.toSet(),
-              showNowPrice: kChartPlusController.showNowPrice.value,
-              hideGrid: kChartPlusController.hideGrid.value,
-              isTapShowInfoDialog: false,
-              fixedLength: 2,
+                  ? kChartPlusController.lightChartColors
+                  : kChartPlusController
+                      .darkChartColors, // Required for styling purposes
+              mBaseHeight: 350,
+              // height of chart (not contain Vol and Secondary)
+              mSecondaryHeight: 80,
+              // height of secondary chart
+              isTrendLine: false,
+              // You can use Trendline by long-pressing and moving your finger after setting true to isTrendLine property.
+              volHidden: kChartPlusController.showVol.value,
+              // hide volume
+              mainIndicators: kChartPlusController.mainIndicators,
+              // [mainIndicators] Decide what the main view shows
+              secondaryIndicators: kChartPlusController.secondaryIndicators,
+              // [secondaryIndicators] Decide what the sub view shows
+              fixedLength: 6,
+              showNowPrice: true,
+              // show now price
               timeFormat: TimeFormat.YEAR_MONTH_DAY_WITH_HOUR,
-              verticalTextAlignment:
-                  kChartPlusController.verticalTextAlignment.value,
-              maDayList: const [5, 10, 30],
+              isOnDrag: (isDrag) {},
+              // true is on Drag.Don't load data while Draging.
+              xFrontPadding: 100,
+              // padding in front
+              detailBuilder: (entity) {
+                // show detail popup
+                return PopupInfoView(
+                  entity: entity,
+                  chartColors: myself.themeMode == ThemeMode.light
+                      ? kChartPlusController.lightChartColors
+                      : kChartPlusController.darkChartColors,
+                  fixedLength: 2,
+                );
+              },
             ),
             if (kChartPlusController.showLoading.value)
               Container(
@@ -316,9 +430,128 @@ class KChartPlusWidget extends StatelessWidget {
           const SizedBox(height: 30),
           if (kChartPlusController.bids.isNotEmpty &&
               kChartPlusController.asks.isNotEmpty)
-            _buildDepthChart()
+            _buildDepthChart(),
         ],
       );
     });
   }
+}
+
+class PopupInfoView extends StatelessWidget {
+  final KLineEntity entity;
+  final KChartColors chartColors;
+  final int fixedLength;
+
+  const PopupInfoView({
+    super.key,
+    required this.entity,
+    required this.chartColors,
+    required this.fixedLength,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 150,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: chartColors.selectFillColor,
+          border: Border.all(color: chartColors.selectBorderColor, width: 0.5),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(6.0, 6.0, 6.0, 0.0),
+          child: _buildBody(context),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
+    double upDown = entity.change ?? entity.close - entity.open;
+    double upDownPercent = entity.ratio ?? (upDown / entity.open) * 100;
+    final double? entityAmount = entity.amount;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildItem('Date', getDate(entity.time)),
+        _buildItem(
+          'Open',
+          NumberUtil.formatFixed(entity.open, fixedLength) ?? '--',
+        ),
+        _buildItem(
+          'High',
+          NumberUtil.formatFixed(entity.high, fixedLength) ?? '--',
+        ),
+        _buildItem(
+          'Low',
+          NumberUtil.formatFixed(entity.low, fixedLength) ?? '--',
+        ),
+        _buildItem(
+          'Close',
+          NumberUtil.formatFixed(entity.close, fixedLength) ?? '--',
+        ),
+        _buildColorItem(
+          'Change',
+          NumberUtil.formatFixed(upDown, fixedLength) ?? '--',
+          upDown > 0,
+        ),
+        _buildColorItem(
+          'Change%',
+          '${upDownPercent.toStringAsFixed(2)}%',
+          upDownPercent > 0,
+        ),
+        _buildItem(
+          'Volume',
+          NumberUtil.formatCompact(entity.vol),
+        ),
+        if (entityAmount != null)
+          _buildItem(
+            'Amount',
+            entityAmount.toInt().toString(),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildColorItem(String label, String info, bool isUp) {
+    if (isUp) {
+      return _buildItem(
+        label,
+        '+$info',
+        textColor: chartColors.upColor,
+      );
+    }
+    return _buildItem(label, info, textColor: chartColors.dnColor);
+  }
+
+  Widget _buildItem(String label, String info, {Color? textColor}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 3.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            AppLocalizations.t(label),
+            style: TextStyle(color: textColor, fontSize: 10.0),
+          ),
+          Expanded(
+            child: Text(
+              AppLocalizations.t(info),
+              style: TextStyle(color: textColor, fontSize: 10.0),
+              textAlign: TextAlign.right,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String getDate(int? date) => dateFormat(
+        DateTime.fromMillisecondsSinceEpoch(
+            date ?? DateTime.now().millisecondsSinceEpoch),
+        TimeFormat.YEAR_MONTH_DAY_WITH_HOUR,
+      );
 }
