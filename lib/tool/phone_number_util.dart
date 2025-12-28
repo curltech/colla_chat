@@ -31,7 +31,7 @@ class PhoneNumberUtil {
   }
 
   static String format(PhoneNumber phoneNumber, {IsoCode? isoCode}) {
-    String formatted = phoneNumber.getFormattedNsn(isoCode: isoCode);
+    String formatted = phoneNumber.formatNsn(isoCode: isoCode);
 
     return formatted;
   }

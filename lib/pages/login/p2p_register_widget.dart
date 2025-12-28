@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/entity/dht/myselfpeer.dart';
@@ -18,7 +19,6 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/mobile_util.dart';
 import 'package:colla_chat/tool/phone_number_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/platform_carousel.dart';
@@ -36,13 +36,7 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 class P2pRegisterWidget extends StatelessWidget {
   final PlatformCarouselController? controller;
 
-  P2pRegisterWidget({super.key, this.controller}) {
-    if (platformParams.mobile) {
-      MobileUtil.carrierRegionCode().then((value) {
-        countryCode.value = value;
-      });
-    }
-  }
+  P2pRegisterWidget({super.key, this.controller});
 
   final ValueNotifier<String> countryCode = ValueNotifier<String>('CN');
   final PhoneController phoneController = PhoneController(
@@ -167,6 +161,7 @@ class P2pRegisterWidget extends StatelessWidget {
                             phone_numbers_parser.PhoneNumber phoneNumber =
                                 PhoneNumberUtil.fromRaw(mobile);
                             phoneController.value = phoneNumber;
+                            countryCode.value = phoneNumber.countryCode;
                           }
                         },
                         icon: Icon(
