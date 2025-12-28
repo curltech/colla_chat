@@ -61,7 +61,7 @@ dependencies:
   network_info_plus: ^7.0.0
   beamer: ^1.4.1+1
   flutter_contacts: ^1.1.8
-  fluttercontactpicker: ^5.0.0
+  fluttercontactpicker_plus: ^5.1.1
   nearby_connections: ^4.0.0 #android
   nfc_manager: ^4.0.2 #mobile
   flutter_nfc_kit: ^3.4.2 #mobile
@@ -115,10 +115,9 @@ dependencies:
   flutter_pw_validator: ^1.6.0 #FlutterPwValidator放在TextFormField下面显示校验结果
   fzregex: ^2.1.1 #静态方法：Fzregex.hasMatch
   regexpattern: ^2.5.0
-  phone_number: ^2.0.1 #仅支持ios和android，解析电话号码
   phone_form_field: ^10.0.8 #支持所有平台，电话号码的录入字段
   mobile_number: ^3.0.0 #仅支持android，获取电话号码，ios无此功能
-  phone_numbers_parser: ^9.0.0 #支持所有的平台
+  phone_numbers_parser: ^9.0.17 #支持所有的平台
   badges: ^3.1.2
   extended_list: ^3.0.0
   glass_kit: ^4.0.1
@@ -174,7 +173,7 @@ dependencies:
   card_swiper: ^3.0.1
   another_transformer_page_view: ^2.0.1
   appinio_swiper: ^2.0.2 #不错的swiper的组件，可定制动画的角度
-  flutter_drawing_board: ^0.9.8 #绘画工具
+  flutter_drawing_board: ^1.0.1+1 #绘画工具
   custom_pop_up_menu: ^1.2.4
   popup_menu: ^2.1.0
   flutter_popup: ^3.3.0
@@ -286,13 +285,13 @@ dependencies:
   audio_service: ^0.18.17
   stts: ^1.2.6
   flutter_tts: ^4.2.3
-  speech_to_text: ^6.6.2
+  speech_to_text: ^7.3.0
   #  sherpa_onnx: ^1.12.17
   #  kokoro_tts_flutter: ^0.2.0+1
   flutter_image_compress: ^2.4.0
   video_thumbnail: ^0.5.6
   easy_video_editor: ^0.1.2 #mobile
-  pro_video_editor: ^0.4.0 #mobile,macos
+  pro_video_editor: ^1.0.0 #mobile,macos
   video_editor_2: ^3.1.1 #mobile
   video_compress: ^3.1.3
   fc_native_video_thumbnail: ^0.17.2
