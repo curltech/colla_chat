@@ -486,7 +486,7 @@ dependency_overrides:
   flutter_float_window: ^0.2.2
   system_alert_window: ^2.0.7
   #  flutter_overlay_window: ^0.5.0 #android悬浮框
-  flutter_floating: ^2.0.0
+  flutter_floating: ^2.0.1
   floating: ^6.0.0
   audio_video_progress_bar: ^2.0.1
   azlistview: ^2.0.0 #特殊列表滑动

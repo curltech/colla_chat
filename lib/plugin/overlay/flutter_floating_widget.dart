@@ -126,12 +126,12 @@ class FlutterFloatingController {
       return;
     }
     if (floatingManager.containsFloating(key)) {
-      floatingManager.closeFloating(key);
+      floatingManager.disposeFloating(key);
     }
   }
 
   void closeAll() {
-    floatingManager.closeAllFloating();
+    floatingManager.disposeAllFloating();
   }
 }
 
