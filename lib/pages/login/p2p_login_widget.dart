@@ -45,7 +45,7 @@ class P2pLoginWidget extends StatelessWidget {
 
   late final PlatformReactiveFormController platformReactiveFormController;
 
-  _init() {
+  void _init() {
     bool isAuth = (credential != null);
     final List<PlatformDataField> platformDataFields = [];
     platformDataFields.add(PlatformDataField(

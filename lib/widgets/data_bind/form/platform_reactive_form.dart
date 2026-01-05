@@ -22,7 +22,7 @@ class PlatformReactiveFormController {
     _init();
   }
 
-  _init() {
+  void _init() {
     Map<String, FormControl> formControls = {};
     final List<KeyboardActionsItem> actions = [];
     for (var i = 0; i < dataFields.length; i++) {
@@ -140,13 +140,13 @@ class PlatformReactiveFormController {
     );
   }
 
-  onData(String name, dynamic value) {}
+  void onData(String name, dynamic value) {}
 
-  onTouch(String name, bool touch) {}
+  void onTouch(String name, bool touch) {}
 
-  onError(Object value, StackTrace stackTrace) {}
+  void onError(Object value, StackTrace stackTrace) {}
 
-  onDone() {}
+  void onDone() {}
 
   Map<String, Object?> get rawValues {
     return formGroup.value;
@@ -160,7 +160,7 @@ class PlatformReactiveFormController {
     return formGroup.control(name).value;
   }
 
-  setRawValue(String name, dynamic value) {
+  void setRawValue(String name, dynamic value) {
     formGroup.control(name).value = value;
   }
 
@@ -200,47 +200,47 @@ class PlatformReactiveFormController {
     return parse(name, value);
   }
 
-  setValue(String name, dynamic value) {
+  void setValue(String name, dynamic value) {
     formGroup.control(name).value = parse(name, value, vm: false);
   }
 
-  reset({Map<String, Object?>? values}) {
+  void reset({Map<String, Object?>? values}) {
     return formGroup.reset(value: values);
   }
 
-  focus(String name) {
+  void focus(String name) {
     return formGroup.control(name).focus();
   }
 
-  unfocus(String name) {
+  void unfocus(String name) {
     return formGroup.control(name).unfocus();
   }
 
-  markAsEnabled(String name) {
+  void markAsEnabled(String name) {
     return formGroup.control(name).markAsEnabled();
   }
 
-  markAsDisabled(String name) {
+  void markAsDisabled(String name) {
     return formGroup.control(name).markAsDisabled();
   }
 
-  markAsTouched(String name) {
+  void markAsTouched(String name) {
     return formGroup.control(name).markAsTouched();
   }
 
-  markAsUntouched(String name) {
+  void markAsUntouched(String name) {
     return formGroup.control(name).markAsUntouched();
   }
 
-  markAsDirty(String name) {
+  void markAsDirty(String name) {
     return formGroup.control(name).markAsDirty();
   }
 
-  markAsPending(String name) {
+  void markAsPending(String name) {
     return formGroup.control(name).markAsPending();
   }
 
-  markAsPristine(String name) {
+  void markAsPristine(String name) {
     return formGroup.control(name).markAsPristine();
   }
 
@@ -248,7 +248,7 @@ class PlatformReactiveFormController {
     return formGroup.valid;
   }
 
-  dispose() {
+  void dispose() {
     formGroup.dispose();
   }
 }
