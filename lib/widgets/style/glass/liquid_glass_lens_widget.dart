@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:liquid_glass_easy/liquid_glass_easy.dart';
 
 /// ios 26样式的玻璃效果组件
+/// 把组件变成透镜
 extension LiquidGlassLensWidget<T extends Widget> on T {
   LiquidGlass asLiquidGlassLens(
     LiquidGlassController lensController, {
@@ -49,7 +50,7 @@ extension LiquidGlassLensWidget<T extends Widget> on T {
 }
 
 /// ios 26样式的玻璃效果的容器
-/// 必须有背景组件，比如Image，透镜组建列表
+/// 必须有背景组件，比如Image，透镜组件列表
 class LiquidGlassLensContainer extends StatelessWidget {
   final LiquidGlassViewController viewController = LiquidGlassViewController();
   final LiquidGlassController lensController = LiquidGlassController();

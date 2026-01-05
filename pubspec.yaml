@@ -336,7 +336,7 @@ dependencies:
   #系统
   system_resources: ^1.6.0
 dependency_overrides:
-  liquid_glass_easy: ^1.0.0
+  liquid_glass_easy: ^1.1.1
   pretty_qr_code: ^3.5.0
   insta_assets_picker: ^3.4.0
   livekit_client: ^2.6.0 #livekit sfu server flutter client
