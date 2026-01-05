@@ -1114,5 +1114,6 @@
   "yoySales": "同比营业额变化率",
   "yoyDeduNp": "同比净利润变化率",
   "cfps": "每股现金流",
-  "dividendYieldRatio": "股息率"
+  "dividendYieldRatio": "股息率",
+  "The password must not be empty": "密码不能为空"
 }

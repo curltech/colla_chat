@@ -96,7 +96,7 @@ class P2pLoginWidget extends StatelessWidget {
         PlatformReactiveFormController(platformDataFields);
   }
 
-  _initValue() async {
+  Future<void> _initValue() async {
     String? credential = platformReactiveFormController.getValue('credential');
     if (credential == null) {
       credential = this.credential;

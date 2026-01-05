@@ -1,4 +1,5 @@
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
@@ -283,12 +284,12 @@ InputDecoration buildInputDecoration({
       errorBorder: textFormFieldBorder,
       disabledBorder: textFormFieldBorder,
       focusedErrorBorder: textFormFieldBorder,
-      labelText: labelText,
+      labelText: AppLocalizations.t(labelText ?? ''),
       prefixIcon: prefixIcon,
       prefix: prefix,
       suffixIcon: suffixIcon,
       suffix: suffix,
-      hintText: hintText);
+      hintText: AppLocalizations.t(hintText ?? ''));
 
   return inputDecoration;
 }

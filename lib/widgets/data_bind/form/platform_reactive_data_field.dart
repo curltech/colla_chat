@@ -108,6 +108,19 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     );
   }
 
+  Map<String, String Function(Object)> _buildValidationMessages(
+      Map<String, String Function(Object)>? validationMessages) {
+    Map<String, String Function(Object)> messages = {};
+    if (validationMessages != null) {
+      for (var entry in validationMessages.entries) {
+        messages[entry.key] =
+            (Object o) => AppLocalizations.t(entry.value.call(o));
+      }
+    }
+
+    return messages;
+  }
+
   Widget? _buildPrefixWidget() {
     Widget? icon = platformDataField.prefixIcon;
     if (icon == null) {
@@ -157,7 +170,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return ReactiveTextField<T>(
         formControlName: name,
         decoration: decoration,
-        validationMessages: validationMessages,
+        validationMessages: _buildValidationMessages(validationMessages),
         keyboardType: textInputType,
         readOnly: readOnly,
         obscureText: inputType == InputType.password,
@@ -184,7 +197,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     Widget textField = ReactiveCupertinoTextField<String>(
         formControlName: name,
         decoration: _buildBoxDecoration(),
-        validationMessages: platformDataField.validationMessages,
+        validationMessages:
+            _buildValidationMessages(platformDataField.validationMessages),
         keyboardType: platformDataField.textInputType,
         readOnly: platformDataField.readOnly,
         obscureText: platformDataField.inputType == InputType.password,
@@ -223,7 +237,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return ReactiveExtendedTextField<String>(
       formControlName: name,
       decoration: decoration,
-      validationMessages: validationMessages,
+      validationMessages: _buildValidationMessages(validationMessages),
       keyboardType: textInputType,
       readOnly: readOnly,
       obscureText: inputType == InputType.password,
@@ -240,7 +254,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget fancyPasswordField = ReactiveFancyPasswordField<String>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       decoration: decoration,
       validationRules: {
         UppercaseValidationRule(),
@@ -258,7 +273,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     var name = platformDataField.name;
     Widget nativeTextInput = ReactiveFlutterNativeTextInput<String>(
         formControlName: name,
-        validationMessages: platformDataField.validationMessages,
+        validationMessages:
+            _buildValidationMessages(platformDataField.validationMessages),
         decoration: _buildBoxDecoration(),
         maxLines: platformDataField.maxLines ?? 1,
         minLines: platformDataField.minLines ?? 1,
@@ -274,7 +290,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     var name = platformDataField.name;
     Widget fluentTextFormBox = fui.ReactiveFluentTextFormBox<String>(
         formControlName: name,
-        validationMessages: platformDataField.validationMessages,
+        validationMessages:
+            _buildValidationMessages(platformDataField.validationMessages),
         keyboardType: platformDataField.textInputType,
         readOnly: platformDataField.readOnly,
         obscureText: platformDataField.inputType == InputType.password,
@@ -298,7 +315,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget codeTextField = ReactiveCodeTextField<String>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       focusNode: focusNode,
       inputDecoration: decoration,
       keyboardType: platformDataField.textInputType,
@@ -316,7 +334,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     var pinputField = ReactivePinPut(
       formControlName: name,
       focusNode: focusNode,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       autofocus: platformDataField.autofocus,
       keyboardType: platformDataField.textInputType!,
       readOnly: platformDataField.readOnly,
@@ -348,7 +367,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     children.add(Text(AppLocalizations.t(label)));
     var radioGroup = ReactiveRadioGroup<T>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       autofocus: platformDataField.autofocus,
       focusNode: focusNode,
       onChanged: (FormControl<T> formControl) {
@@ -381,7 +401,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     children.add(Text(AppLocalizations.t(label)));
     var checkboxGroup = ReactiveCheckboxGroup<T>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       onChanged: (FormControl<T> formControl) {
         platformDataField.onChanged?.call(formControl.value);
       },
@@ -412,7 +433,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     children.add(Text(AppLocalizations.t(label)));
     var fluentToggleSwitch = fui.ReactiveFluentToggleSwitch<bool>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       focusNode: focusNode,
       autofocus: platformDataField.autofocus,
     );
@@ -447,7 +469,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       totalSwitches: options.length,
       labels: labels,
       icons: icons,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
     );
     List<Widget> children = [];
     var prefixIcon = _buildPrefixWidget();
@@ -485,7 +508,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget toggleSwitchRolling = ReactiveAnimatedToggleSwitchRolling<int, int>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       values: [],
     );
 
@@ -499,7 +523,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     var options = platformDataField.options ?? [];
     var toggleButtons = ReactiveToggleButtons<T>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       borderRadius: borderRadius,
       fillColor: myself.primary,
       selectedColor: Colors.white,
@@ -597,7 +622,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         child: ReactiveAdvancedSwitch<bool>(
           formControlName: name,
           decoration: decoration,
-          validationMessages: platformDataField.validationMessages,
+          validationMessages:
+              _buildValidationMessages(platformDataField.validationMessages),
           activeColor: myself.primary,
           inactiveColor: Colors.grey,
         ));
@@ -625,7 +651,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     Widget slidingSegmentedControl =
         ReactiveSlidingSegmentedControl<String, String>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       decoration: decoration,
       children: children,
     );
@@ -639,7 +666,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget fluentSlider = fui.ReactiveFluentSlider<double>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       min: platformDataField.params?['min'],
       max: platformDataField.params?['max'],
     );
@@ -652,7 +680,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget cupertinoSwitch = ReactiveCupertinoSwitch<bool>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       focusNode: focusNode,
       autofocus: platformDataField.autofocus,
       activeTrackColor: myself.primary,
@@ -667,7 +696,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget sleekCircularSlider = ReactiveSleekCircularSlider<double>(
         formControlName: name,
-        validationMessages: platformDataField.validationMessages,
+        validationMessages:
+            _buildValidationMessages(platformDataField.validationMessages),
         decoration: decoration,
         min: platformDataField.params?['min'],
         max: platformDataField.params?['max'],
@@ -694,7 +724,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget segmentedControl = ReactiveSegmentedControl<String, String>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       decoration: decoration,
       unselectedColor: Colors.grey,
       selectedColor: myself.primary,
@@ -710,7 +741,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget rangeSlider = ReactiveRangeSlider<RangeValues>(
         formControlName: name,
-        validationMessages: platformDataField.validationMessages,
+        validationMessages:
+            _buildValidationMessages(platformDataField.validationMessages),
         decoration: decoration,
         min: platformDataField.params?['min'],
         max: platformDataField.params?['max'],
@@ -746,7 +778,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     children.add(Text(AppLocalizations.t(label)));
     var chipGroup = ReactiveChipGroup<T>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       onSelected: (FormControl<T> formControl) {
         platformDataField.onChanged?.call(formControl.value);
       },
@@ -788,7 +821,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       ReactiveDropdownField<T>(
         formControlName: name,
         dropdownColor: myself.primary,
-        validationMessages: platformDataField.validationMessages,
+        validationMessages:
+            _buildValidationMessages(platformDataField.validationMessages),
         decoration: _buildInputDecoration(platformDataField),
         padding: const EdgeInsets.all(10.0),
         hint: Text(AppLocalizations.t(platformDataField.hintText ?? '')),
@@ -815,7 +849,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       ),
       ReactiveChoice<T>(
         formControlName: name,
-        validationMessages: platformDataField.validationMessages,
+        validationMessages:
+            _buildValidationMessages(platformDataField.validationMessages),
         itemType: ItemType.chip,
         title: AppLocalizations.t(platformDataField.label),
         options: options!,
@@ -858,7 +893,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget datePicker = ReactiveDateTimePicker(
         formControlName: name,
-        validationMessages: platformDataField.validationMessages,
+        validationMessages:
+            _buildValidationMessages(platformDataField.validationMessages),
         type: type,
         showClearIcon: platformDataField.cancel,
         decoration: decoration,
@@ -888,7 +924,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget datePicker = fui.ReactiveFluentDatePicker<DateTime>(
         formControlName: name,
-        validationMessages: platformDataField.validationMessages,
+        validationMessages:
+            _buildValidationMessages(platformDataField.validationMessages),
         focusNode: focusNode,
         autofocus: platformDataField.autofocus,
         locale: myself.locale);
@@ -916,7 +953,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget timePicker = fui.ReactiveFluentTimePicker<DateTime>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       autofocus: platformDataField.autofocus,
       locale: myself.locale,
     );
@@ -946,7 +984,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget datePicker = ReactiveDateRangePicker(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       decoration: decoration,
       showClearIcon: platformDataField.cancel,
       locale: myself.locale,
@@ -964,7 +1003,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget colorPicker = ReactiveColorPicker<Color>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       decoration: decoration,
     );
 
@@ -980,7 +1020,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget countryCodePicker = ReactiveCountryCodePicker(
         formControlName: name,
-        validationMessages: platformDataField.validationMessages,
+        validationMessages:
+            _buildValidationMessages(platformDataField.validationMessages),
         searchDecoration: decoration,
         onChanged: (value) {
           platformDataField.onChanged?.call(value.value);
@@ -994,7 +1035,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget filePicker = ReactiveFilePicker<String>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       decoration: decoration,
     );
 
@@ -1007,7 +1049,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget imagePicker = ReactiveImagePicker(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       decoration: decoration,
     );
 
@@ -1020,7 +1063,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget typeAhead = ReactiveTypeAhead<String, String>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       autofocus: platformDataField.autofocus,
       stringify: (value) => value,
       suggestionsCallback: (pattern) {
@@ -1044,7 +1088,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget rawAutocomplete = ReactiveRawAutocomplete<String, String>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       decoration: decoration,
       optionsBuilder: (TextEditingValue textEditingValue) {
         List<String> values = [];
@@ -1106,7 +1151,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     Widget fluentAutoSuggestBox =
         fui.ReactiveFluentAutoSuggestBox<String, String>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       autofocus: platformDataField.autofocus,
       inputFormatters: platformDataField.inputFormatters,
       items: items,
@@ -1132,7 +1178,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget fluentComboBox = fui.ReactiveFluentComboBox<String, String>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       autofocus: platformDataField.autofocus,
       focusNode: focusNode,
       items: items,
@@ -1150,7 +1197,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget filePicker = ReactiveMonthPickerDialog(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       decoration: decoration,
       locale: myself.locale,
       showClearIcon: platformDataField.cancel,
@@ -1164,7 +1212,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget signature = ReactiveSignature<Uint8List>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       decoration: decoration,
       height: 200,
       backgroundColor: Colors.grey,
@@ -1178,7 +1227,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget phoneContactPicker = ReactivePhoneContactPicker<PhoneContact>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       decoration: decoration,
       contactBuilder: (PhoneContact? contact) {
         return Column(
@@ -1215,7 +1265,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
       // ReactiveMultiSelectChipField
       ReactiveMultiSelectDialogField<String, String>(
         formControlName: name,
-        validationMessages: platformDataField.validationMessages,
+        validationMessages:
+            _buildValidationMessages(platformDataField.validationMessages),
         items: items,
         inputDecoration: _buildInputDecoration(platformDataField),
         onSelectionChanged: (value) {},
@@ -1230,7 +1281,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget languageToolTextField = ReactiveLanguageToolTextField<String>(
         formControlName: name,
-        validationMessages: platformDataField.validationMessages,
+        validationMessages:
+            _buildValidationMessages(platformDataField.validationMessages),
         decoration: decoration,
         keyboardType: platformDataField.textInputType,
         autofocus: platformDataField.autofocus,
@@ -1248,7 +1300,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget cartStepper = ReactiveCartStepper<int, int>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       decoration: decoration,
       stepper: platformDataField.params?['stepper'] ?? 1,
     );
@@ -1261,7 +1314,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget ratingBar = ReactiveRatingBarBuilder<double>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       decoration: decoration,
       itemBuilder: (BuildContext context, int index) {
         return Icon(
@@ -1280,7 +1334,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     Widget fileSelector = ReactiveFileSelector<String>(
       formControlName: name,
       decoration: decoration,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       allowMultiple: platformDataField.params?['allowMultiple'],
     );
 
@@ -1302,7 +1357,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget dropdownMenu = ReactiveDropdownMenu<String, String>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       focusNode: focusNode,
       inputFormatters: platformDataField.inputFormatters,
       dropdownMenuEntries: items,
@@ -1326,7 +1382,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget dropdownButton = ReactiveDropdownButton2<String, String>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       focusNode: focusNode,
       inputDecoration: decoration,
       items: items,
@@ -1387,7 +1444,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget dropdownSearch = ReactiveDropdownSearch<String, String>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       dropdownDecoratorProps: DropDownDecoratorProps(
         decoration: decoration,
       ),
@@ -1395,7 +1453,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     );
     ReactiveDropdownSearchMultiSelection<String, String>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       dropdownDecoratorProps: DropDownDecoratorProps(
         decoration: decoration,
       ),
@@ -1416,7 +1475,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     Widget inputDecorator = ReactiveInputDecorator(
         formControlName: name,
         decoration: decoration,
-        validationMessages: platformDataField.validationMessages,
+        validationMessages:
+            _buildValidationMessages(platformDataField.validationMessages),
         child: child);
 
     return inputDecorator;
@@ -1427,7 +1487,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     Widget pinCodeTextField = ReactivePinCodeTextField(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       autofocus: platformDataField.autofocus,
       focusNode: focusNode,
       readOnly: platformDataField.readOnly,
@@ -1447,7 +1508,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     }
     Widget languagePicker = ReactiveLanguagePickerDialog<String>(
       formControlName: name,
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       valueAccessor: LanguageCodeValueAccessor(),
       focusNode: focusNode,
       title: Text(platformDataField.label),
@@ -1473,7 +1535,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     Widget wechatAssetsPicker = ReactiveWechatAssetsPicker<List<AssetEntity>>(
       formControlName: name,
       decoration: _buildInputDecoration(platformDataField),
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       imagePickerBuilder: (Future<void> Function() pick,
           List<AssetEntity> images, void Function(List<AssetEntity>) onChange) {
         return Column(
@@ -1503,7 +1566,8 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     Widget wechatCameraPicker = ReactiveWechatCameraPicker<AssetEntity>(
       formControlName: name,
       decoration: _buildInputDecoration(platformDataField),
-      validationMessages: platformDataField.validationMessages,
+      validationMessages:
+          _buildValidationMessages(platformDataField.validationMessages),
       locale: myself.locale,
       imagePickerBuilder: (pick, image, _) {
         return Column(
@@ -1540,7 +1604,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return ReactivePhoneFormField<String>(
         formControlName: name,
         decoration: decoration,
-        validationMessages: validationMessages,
+        validationMessages: _buildValidationMessages(validationMessages),
         keyboardType: textInputType,
         obscureText: inputType == InputType.password,
         inputFormatters: platformDataField.inputFormatters,
