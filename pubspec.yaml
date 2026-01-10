@@ -285,7 +285,7 @@ dependencies:
   audio_service: ^0.18.17
   stts: ^1.2.6
   flutter_tts: ^4.2.3
-  speech_to_text: ^7.3.0
+  speech_to_text: ^7.4.0-beta.8
   #  sherpa_onnx: ^1.12.17
   #  kokoro_tts_flutter: ^0.2.0+1
   flutter_image_compress: ^2.4.0
