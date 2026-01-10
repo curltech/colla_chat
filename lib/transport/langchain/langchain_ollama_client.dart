@@ -45,7 +45,7 @@ class LangChainOllamaClient {
     return result;
   }
 
-  close() {
+  void close() {
     _client.close();
   }
 }
@@ -69,7 +69,7 @@ class LangChainOllamaClientPool {
     return langChainClient;
   }
 
-  close(String url) {
+  void close(String url) {
     if (_clients.containsKey(url)) {
       var langChainClient = _clients[url];
       langChainClient!.close();

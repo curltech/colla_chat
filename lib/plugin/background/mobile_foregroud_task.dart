@@ -35,7 +35,7 @@ class MobileForegroundTaskHandler extends TaskHandler {
   String notificationText = AppLocalizations.t('Tap to return to the app');
 
   /// 初始化前台任务
-  _init() async {
+  Future<void> _init() async {
     await _requestPermissionForAndroid();
     FlutterForegroundTask.init(
       androidNotificationOptions: androidNotificationOptions,
@@ -126,17 +126,17 @@ class MobileForegroundTaskHandler extends TaskHandler {
   }
 
   ///最小化app
-  minimizeApp() {
+  void minimizeApp() {
     FlutterForegroundTask.minimizeApp();
   }
 
   ///如果app没有关闭，启动app
-  launchApp([String? route]) {
+  void launchApp([String? route]) {
     FlutterForegroundTask.launchApp(route);
   }
 
   ///屏幕关闭的时候打开屏幕
-  wakeUpScreen() {
+  void wakeUpScreen() {
     FlutterForegroundTask.wakeUpScreen();
   }
 
@@ -146,7 +146,7 @@ class MobileForegroundTaskHandler extends TaskHandler {
   }
 
   ///切换锁定屏幕的可见性
-  setOnLockScreenVisibility(bool isVisible) {
+  void setOnLockScreenVisibility(bool isVisible) {
     FlutterForegroundTask.setOnLockScreenVisibility(isVisible);
   }
 
@@ -156,7 +156,7 @@ class MobileForegroundTaskHandler extends TaskHandler {
   }
 
   /// 保存数据到SharedPreferences
-  saveData(String key, Object value) async {
+  Future<void> saveData(String key, Object value) async {
     await FlutterForegroundTask.saveData(key: key, value: value);
   }
 

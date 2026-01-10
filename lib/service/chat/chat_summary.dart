@@ -246,7 +246,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
     });
   }
 
-  removeChatSummary(String peerId) async {
+  Future<void> removeChatSummary(String peerId) async {
     delete(where: 'peerId=?', whereArgs: [peerId]);
     chatSummaries.remove(peerId);
   }

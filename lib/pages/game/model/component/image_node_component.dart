@@ -63,7 +63,7 @@ class ImageNodeComponent extends PositionComponent
     (parent as NodeFrameComponent).updateSize();
   }
 
-  loadImage() async {
+  Future<void> loadImage() async {
     if (modelNode.image == null) {
       ui.Image? image;
       if (modelNode.content != null) {

@@ -560,7 +560,7 @@ class LocalMediaStreamWidget extends StatelessWidget with TileDataMixin {
     return actionData;
   }
 
-  _showVideoSetting(BuildContext context) async {
+  Future<void> _showVideoSetting(BuildContext context) async {
     await DialogUtil.show(
         context: context,
         builder: (BuildContext context) {
@@ -584,7 +584,7 @@ class LocalMediaStreamWidget extends StatelessWidget with TileDataMixin {
         });
   }
 
-  _makeCall() async {
+  Future<void> _makeCall() async {
     mediaStream.value = await MediaStreamUtil.createVideoMediaStream(
       width: selectedVideoWidth.value,
       height: selectedVideoHeight.value,
@@ -596,7 +596,7 @@ class LocalMediaStreamWidget extends StatelessWidget with TileDataMixin {
     callStatus.value = true;
   }
 
-  _hangUp() async {
+  Future<void> _hangUp() async {
     mediaStream.value?.dispose();
     mediaStream.value = null;
     videoRenderer.srcObject = null;

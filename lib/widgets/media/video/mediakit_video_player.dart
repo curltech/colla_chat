@@ -54,7 +54,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
     _init();
   }
 
-  _init() {
+  void _init() {
     if (player == null) {
       player = Player();
       // List<PlatformMediaSource> mediaSources=playlistController.data;
@@ -254,7 +254,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
     await player?.stop();
   }
 
-  seek(Duration position, {int? index}) async {
+  Future<void> seek(Duration position, {int? index}) async {
     await player?.seek(position);
   }
 
@@ -262,7 +262,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
     return Future.value(speed);
   }
 
-  setSpeed(double speed) async {
+  Future<void> setSpeed(double speed) async {
     await player?.setRate(speed);
   }
 
@@ -270,7 +270,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
     return Future.value(volume);
   }
 
-  setVolume(double volume) async {
+  Future<void> setVolume(double volume) async {
     await player?.setVolume(volume);
   }
 }

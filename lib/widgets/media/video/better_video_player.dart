@@ -20,11 +20,11 @@ class BetterVideoPlayerController extends AbstractMediaPlayerController {
     return await betterPlayerController.isPictureInPictureSupported();
   }
 
-  enablePictureInPicture() async {
+  Future<void> enablePictureInPicture() async {
     await betterPlayerController.enablePictureInPicture(key);
   }
 
-  disablePictureInPicture() async {
+  Future<void> disablePictureInPicture() async {
     await betterPlayerController.disablePictureInPicture();
   }
 
@@ -55,7 +55,7 @@ class BetterVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  void close() async {
+  Future<void> close() async {
     await super.close();
     betterPlayerController.dispose();
   }

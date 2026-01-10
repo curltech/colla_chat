@@ -688,7 +688,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
     cameraController.setFocusPoint(offset);
   }
 
-  _disposeController() async {
+  Future<void> _disposeController() async {
     final CameraController? oldController = cameraController;
     if (oldController != null) {
       cameraController = null;
@@ -1118,7 +1118,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
     }
   }
 
-  _back() async {
+  Future<void> _back() async {
     XFile? current = mediaFileController.current;
     if (widget.onData != null) {
       if (current != null) {

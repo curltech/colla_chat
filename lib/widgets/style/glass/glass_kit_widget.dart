@@ -24,7 +24,6 @@ final defaultBorderGradient = LinearGradient(
   ],
 );
 
-
 extension GlassKitWidget<T extends Widget> on T {
   Widget asGlassKit(
       {Key? key,

@@ -62,7 +62,7 @@ class TextMessageInputWidget extends StatelessWidget {
   final RxBool voiceRecording = false.obs;
 
   ///停止录音，把录音数据作为消息发送
-  _onStop(String filename) async {
+  Future<void> _onStop(String filename) async {
     if (StringUtil.isNotEmpty(filename)) {
       List<int>? data = await FileUtil.readFileAsBytes(filename);
       if (data == null) {
@@ -155,7 +155,7 @@ class TextMessageInputWidget extends StatelessWidget {
     return transportTypeActions;
   }
 
-  _onTransportSend(BuildContext context, int index, String label,
+  Future<Null> _onTransportSend(BuildContext context, int index, String label,
       {String? value}) async {
     if (label == 'SMS receive') {
       _onActionReceiveSms();
@@ -172,12 +172,12 @@ class TextMessageInputWidget extends StatelessWidget {
 
   final BlueFireAudioPlayer audioPlayer = globalBlueFireAudioPlayer;
 
-  _play() {
+  void _play() {
     audioPlayer.setLoopMode(false);
     audioPlayer.play('assets/media/send.mp3');
   }
 
-  _stop() {
+  void _stop() {
     audioPlayer.stop();
   }
 
@@ -240,14 +240,14 @@ class TextMessageInputWidget extends StatelessWidget {
     }
   }
 
-  _send(BuildContext context) {
+  void _send(BuildContext context) {
     onSendPressed();
     textEditingController.clear();
     FocusScope.of(context).requestFocus(chatMessageViewController.focusNode);
   }
 
   ///接收到加密短信
-  _onActionReceiveSms() async {
+  Future<void> _onActionReceiveSms() async {
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     if (chatSummary == null) {
       return;
@@ -262,7 +262,7 @@ class TextMessageInputWidget extends StatelessWidget {
   }
 
   ///弹出不同发送方式的命令菜单
-  _buildTransportMenu(BuildContext context) {
+  Widget _buildTransportMenu(BuildContext context) {
     Widget sendButton = ListenableBuilder(
         listenable: textEditingController,
         builder: (BuildContext context, Widget? child) {

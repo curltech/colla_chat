@@ -74,7 +74,7 @@ class ProVideoEditorWidget extends StatelessWidget with TileDataMixin {
   String? _outputVideoFile;
 
   /// The duration it took to generate the exported video.
-  Duration _videoGenerationTime = Duration.zero;
+  final Duration _videoGenerationTime = Duration.zero;
   late VideoPlayerController _videoController;
 
   final _taskId = DateTime.now().microsecondsSinceEpoch.toString();
@@ -166,11 +166,11 @@ class ProVideoEditorWidget extends StatelessWidget with TileDataMixin {
   /// 关闭视频编辑
   void onCloseEditor(EditorMode editorMode) async {
     if (editorMode != EditorMode.main) {
-      await controller.move(0);
+      controller.move(0);
     }
     if (_outputVideoFile != null) {
     } else {
-      await controller.move(0);
+      controller.move(0);
     }
   }
 
@@ -210,7 +210,7 @@ class ProVideoEditorWidget extends StatelessWidget with TileDataMixin {
               IconButton(
                 tooltip: AppLocalizations.t('Pro video editor'),
                 onPressed: () async {
-                  await controller.move(1);
+                  controller.move(1);
                 },
                 icon: const Icon(Icons.task_alt_outlined),
               ),
@@ -227,7 +227,7 @@ class ProVideoEditorWidget extends StatelessWidget with TileDataMixin {
               IconButton(
                 tooltip: AppLocalizations.t('Playlist'),
                 onPressed: () async {
-                  await controller.move(0);
+                  controller.move(0);
                 },
                 icon: const Icon(Icons.featured_play_list_outlined),
               ),

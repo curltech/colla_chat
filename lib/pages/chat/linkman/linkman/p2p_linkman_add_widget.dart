@@ -45,7 +45,7 @@ class P2pLinkmanAddWidget extends StatelessWidget with TileDataMixin {
   late final Widget dataListView;
   StreamSubscription<ChainMessage>? chainMessageListen;
 
-  _init() {
+  void _init() {
     dataListView = Obx(() {
       return DataListView(
         itemCount: tileDataController.length,
@@ -60,7 +60,7 @@ class P2pLinkmanAddWidget extends StatelessWidget with TileDataMixin {
     });
   }
 
-  _buildSearchTextField(BuildContext context) {
+  Padding _buildSearchTextField(BuildContext context) {
     var searchTextField = TextFormField(
         controller: controller,
         keyboardType: TextInputType.text,

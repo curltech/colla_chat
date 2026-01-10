@@ -1,6 +1,5 @@
 import 'package:colla_chat/entity/stock/stat_score.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
@@ -41,7 +40,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
   final DataListController<StatScore> statScoreController =
       DataListController<StatScore>();
 
-  _init() {
+  void _init() {
     searchDataField = [
       PlatformDataField(
         name: 'keyword',
@@ -83,7 +82,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
     searchController = PlatformReactiveFormController(searchDataField);
   }
 
-  refresh(
+  Future<void> refresh(
     String tsCode, {
     List<dynamic>? terms,
   }) async {
@@ -140,7 +139,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
     return platformReactiveForm;
   }
 
-  _onSubmit(Map<String, dynamic> values) async {
+  Future<void> _onSubmit(Map<String, dynamic> values) async {
     String? tsCode = values['tsCode'];
     if (tsCode == null) {
       DialogUtil.error(content: 'tsCode must be value');

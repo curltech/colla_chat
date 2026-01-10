@@ -12,7 +12,7 @@ class KlineChartWidget extends StatelessWidget {
 
   Rx<List<CandleData>> candles = Rx<List<CandleData>>([]);
 
-  _computeTrendLines() {
+  void _computeTrendLines() {
     final ma7 = CandleData.computeMA(candles.value, 7);
     final ma30 = CandleData.computeMA(candles.value, 30);
     final ma90 = CandleData.computeMA(candles.value, 90);
@@ -22,14 +22,14 @@ class KlineChartWidget extends StatelessWidget {
     }
   }
 
-  _removeTrendLines() {
+  void _removeTrendLines() {
     for (final data in candles.value) {
       data.trends = [];
     }
   }
 
   /// 创建图形的数据
-  _buildCandles(List<dynamic> data) {
+  void _buildCandles(List<dynamic> data) {
     List<CandleData> candles = [];
     for (int i = data.length - 1; i >= 0; i--) {
       Map<String, dynamic> map = JsonUtil.toJson(data[i]);

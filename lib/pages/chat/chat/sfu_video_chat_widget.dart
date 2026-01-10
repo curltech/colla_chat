@@ -69,7 +69,7 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
     videoChatDragOverlay.dispose();
   }
 
-  _update() {
+  void _update() {
     conferenceChatMessageController.value =
         liveKitConferenceClientPool.conferenceChatMessageController;
   }

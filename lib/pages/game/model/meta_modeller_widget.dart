@@ -13,7 +13,6 @@ import 'package:colla_chat/pages/game/model/component/node_frame_component.dart'
 import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/pages/game/model/widget/model_node_edit_widget.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -55,7 +54,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Modeller';
 
-  _selectSubject() async {
+  Future<void> _selectSubject() async {
     Project? project = modelProjectController.project.value;
     if (project == null) {
       return;
@@ -203,7 +202,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     return btns;
   }
 
-  _modelNodeAction(ModelNode modelNode) {
+  void _modelNodeAction(ModelNode modelNode) {
     ModelNode? canAddModelNode = modelProjectController.canAddModelNode.value;
     if (canAddModelNode == null) {
       modelProjectController.canAddModelNode.value = modelNode;
@@ -338,7 +337,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     return btns;
   }
 
-  delete() async {
+  Future<void> delete() async {
     Project? project = modelProjectController.project.value;
     if (project == null) {
       return;
@@ -440,7 +439,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     });
   }
 
-  _newProject() async {
+  Future<void> _newProject() async {
     String? projectName = await DialogUtil.showTextFormField(
         title: 'New project',
         content: 'Please input new project name',
@@ -454,7 +453,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _openProject() async {
+  Future<void> _openProject() async {
     XFile? xfile = await FileUtil.selectFile(allowedExtensions: ['json']);
     if (xfile == null) {
       return;
@@ -477,7 +476,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _saveProject() async {
+  Future<void> _saveProject() async {
     String content =
         JsonUtil.toJsonString(modelProjectController.project.value);
     String? filename = await FileUtil.saveAsFile(
@@ -487,7 +486,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     modelProjectController.filename.value = filename;
   }
 
-  _viewProject() async {
+  Future<void> _viewProject() async {
     if (modelProjectController.project.value != null) {
       String content =
           JsonUtil.toJsonString(modelProjectController.project.value);
@@ -496,7 +495,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _closeProject() async {
+  Future<void> _closeProject() async {
     if (modelProjectController.currentProject.value != null) {
       modelProjectController.currentProject.value = null;
     }
@@ -505,7 +504,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _viewMetaProject() async {
+  Future<void> _viewMetaProject() async {
     Project? metaProject = modelProjectController
         .metaProjects[modelProjectController.currentMetaId.value];
     if (metaProject != null) {
@@ -558,7 +557,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     return btns;
   }
 
-  loadImage(ModelNode modelNode) async {
+  Future<void> loadImage(ModelNode modelNode) async {
     if ((modelNode.nodeType == NodeType.image.name ||
             modelNode.nodeType == NodeType.image.name) &&
         (modelNode.image == null && modelFlameGame != null)) {
@@ -572,7 +571,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _registerMetaProject() async {
+  Future<void> _registerMetaProject() async {
     XFile? xfile = await FileUtil.selectFile(allowedExtensions: ['json']);
     if (xfile == null) {
       return;
@@ -582,7 +581,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     await modelProjectController.registerMetaProject(content);
   }
 
-  _register() async {
+  Future<void> _register() async {
     Project? project = modelProjectController.project.value;
     if (project != null) {
       project.meta = true;
@@ -592,7 +591,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _selectMetaProject() async {
+  Future<void> _selectMetaProject() async {
     List<Option<String>> options = [];
     for (var metaProject in modelProjectController.metaProjects.value.values) {
       if (modelProjectController.currentMetaId.value == metaProject.id) {

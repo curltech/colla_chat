@@ -21,7 +21,6 @@ import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
@@ -86,7 +85,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     _updateView();
   }
 
-  _updateConferenceClient() {
+  void _updateConferenceClient() {
     ConferenceChatMessageController? conferenceChatMessageController =
         p2pConferenceClientPool.conferenceChatMessageController;
     if (conferenceChatMessageController != null) {
@@ -98,7 +97,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     _updateView();
   }
 
-  _updateVideoChatStatus() {
+  void _updateVideoChatStatus() {
     ConferenceChatMessageController? conferenceChatMessageController =
         p2pConferenceClientPool.conferenceChatMessageController;
     if (conferenceChatMessageController != null) {
@@ -156,13 +155,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     controlPanelVisible.value = true;
   }
 
-  _playAudio() {
+  void _playAudio() {
     var conferenceChatMessageController =
         p2pConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.playAudio('assets/imedia/call.mp3', true);
   }
 
-  _stopAudio() async {
+  Future<void> _stopAudio() async {
     var conferenceChatMessageController =
         p2pConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.stopAudio(
@@ -170,7 +169,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   ///在视频会议中增加本地视频到会议的所有连接
-  _publish(PeerMediaStream peerMediaStream) async {
+  Future<void> _publish(PeerMediaStream peerMediaStream) async {
     P2pConferenceClient? p2pConferenceClient =
         p2pConferenceClientPool.conferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =
@@ -240,7 +239,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   ///关闭并且移除本地所有的视频，这时候还能看远程的视频
-  _closeAll() async {
+  Future<void> _closeAll() async {
     var peerMediaStreamMap = localPeerMediaStreamController.peerMediaStreams;
     if (peerMediaStreamMap.isNotEmpty) {
       var peerMediaStreams = peerMediaStreamMap.values.first;
@@ -258,7 +257,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   ///呼叫挂断，关闭音频和本地视频，设置结束状态
-  _hangup() async {
+  Future<void> _hangup() async {
     _stopAudio();
     await localPeerMediaStreamController.closeAll();
     await p2pConferenceClientPool.terminate();
@@ -267,7 +266,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
   ///如果正在通话chatting，挂断视频通话，关闭所有的本地视频和远程视频，呼叫状态改为结束
   ///结束会议，这时候本地和远程的视频都应该被关闭
-  _disconnect() async {
+  Future<void> _disconnect() async {
     P2pConferenceClient? p2pConferenceClient =
         p2pConferenceClientPool.conferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =

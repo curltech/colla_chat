@@ -39,8 +39,7 @@ class PlatformFutureBuilder<T> extends StatelessWidget {
           }
           String? message = this.message;
           if (message != null) {
-            return Center(
-                child: AutoSizeText(AppLocalizations.t(message)));
+            return Center(child: AutoSizeText(AppLocalizations.t(message)));
           }
           return nilBox;
         }

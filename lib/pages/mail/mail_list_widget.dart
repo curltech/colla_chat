@@ -36,7 +36,7 @@ class MailListWidget extends StatelessWidget {
     return await _convertMimeMessage(currentMailMessages[index], index);
   }
 
-  _initMailActionData() {
+  void _initMailActionData() {
     mailPopActionData
         .add(ActionData(icon: const Icon(Icons.delete), label: 'Delete'));
     mailPopActionData.add(ActionData(
@@ -69,7 +69,7 @@ class MailListWidget extends StatelessWidget {
     ));
   }
 
-  _onMailPopAction(BuildContext context, int index, String label,
+  Future<void> _onMailPopAction(BuildContext context, int index, String label,
       {String? value}) async {
     switch (label) {
       case 'Delete':
@@ -98,7 +98,7 @@ class MailListWidget extends StatelessWidget {
     }
   }
 
-  _showMailPopAction({BuildContext? context}) async {
+  Future<void> _showMailPopAction({BuildContext? context}) async {
     await DialogUtil.show(
       context: context,
       builder: (BuildContext context) {
@@ -189,7 +189,7 @@ class MailListWidget extends StatelessWidget {
     return tile;
   }
 
-  _onTap(int index, String title, {String? subtitle, TileData? group}) async {
+  Future<Null> _onTap(int index, String title, {String? subtitle, TileData? group}) async {
     mailMimeMessageController.currentMailIndex.value = index;
     MailMessage? mailMessage = mailMimeMessageController.currentMailMessage;
     if (mailMessage == null) {

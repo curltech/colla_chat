@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/tool/entity_util.dart';
 
 import '../datastore/datastore.dart';
@@ -165,7 +167,7 @@ abstract class BaseService {
   }
 
   /// 批量保存，根据脏标志新增，修改或者删除
-  save(List<Object> entities, [dynamic ignore, dynamic parent]) {
+  FutureOr<Object?> save(List<Object> entities, [dynamic ignore, dynamic parent]) {
     List<Map<String, dynamic>> operators = [];
     for (var entity in entities) {
       operators.add({'table': tableName, 'entity': entity});

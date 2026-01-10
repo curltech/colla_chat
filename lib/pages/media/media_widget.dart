@@ -1,4 +1,3 @@
-import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_media_widget.dart';
 import 'package:colla_chat/widgets/media_editor/image_editor_widget.dart';
 import 'package:colla_chat/pages/media/platform_audio_player_widget.dart';

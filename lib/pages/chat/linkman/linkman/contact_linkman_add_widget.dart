@@ -59,7 +59,7 @@ class ContactLinkmanAddWidget extends StatelessWidget with TileDataMixin {
   var contactMap = {};
   StreamSubscription<ChainMessage>? chainMessageListen;
 
-  _buildSearchTextField(BuildContext context) {
+  TextFormField _buildSearchTextField(BuildContext context) {
     var searchTextField = TextFormField(
         controller: textEditingController,
         keyboardType: TextInputType.text,

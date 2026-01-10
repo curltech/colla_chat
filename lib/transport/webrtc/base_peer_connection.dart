@@ -333,7 +333,7 @@ class BasePeerConnection {
   BasePeerConnection();
 
   ///初始化加密密钥提供者，采用棘轮加密
-  _initKeyProvider() async {
+  Future<void> _initKeyProvider() async {
     var keyProviderOptions = KeyProviderOptions(
       sharedKey: true,
       ratchetSalt: Uint8List.fromList('CollaChat RatchetSalt'.codeUnits),
@@ -638,7 +638,7 @@ class BasePeerConnection {
   }
 
   ///连接状态事件
-  onConnectionState(RTCPeerConnectionState state) async {
+  Future<void> onConnectionState(RTCPeerConnectionState state) async {
     logger.w('RTCPeerConnectionState:$state');
     if (state == RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
       negotiating = false;
@@ -657,7 +657,7 @@ class BasePeerConnection {
   }
 
   ///ice连接状态事件
-  onIceConnectionState(RTCIceConnectionState state) async {
+  Future<void> onIceConnectionState(RTCIceConnectionState state) async {
     if (state == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
       logger.e('Ice connection disconnected:$state');
 
@@ -672,13 +672,13 @@ class BasePeerConnection {
     }
   }
 
-  onIceGatheringState(RTCIceGatheringState state) async {
+  Future<void> onIceGatheringState(RTCIceGatheringState state) async {
     logger.w('RTCIceGatheringState:$state');
     emit(WebrtcEventType.iceGatheringState, state);
   }
 
   /// signal状态事件
-  onSignalingState(RTCSignalingState state) async {
+  Future<void> onSignalingState(RTCSignalingState state) async {
     logger.w('RTCSignalingState was changed to:$state');
     if (state == RTCSignalingState.RTCSignalingStateClosed) {
       logger.w('RTCSignalingState is closed');
@@ -702,7 +702,7 @@ class BasePeerConnection {
   }
 
   //数据通道状态事件
-  onDataChannelState(RTCDataChannelState state) async {
+  Future<void> onDataChannelState(RTCDataChannelState state) async {
     logger.i('onDataChannelState event:$state');
     //数据通道打开
     if (state == RTCDataChannelState.RTCDataChannelOpen) {
@@ -724,7 +724,7 @@ class BasePeerConnection {
   }
 
   ///onIceCandidate事件表示本地candidate准备好，可以发送IceCandidate到远端
-  onIceCandidate(RTCIceCandidate candidate) async {
+  Future<void> onIceCandidate(RTCIceCandidate candidate) async {
     ///如果注册了iceCandidate事件，则直接执行事件
     var handler = events[WebrtcEventType.iceCandidate];
     if (handler != null) {
@@ -737,7 +737,7 @@ class BasePeerConnection {
   }
 
   ///向对方发送收集的IceCandidates
-  _postIceCandidates() async {
+  Future<void> _postIceCandidates() async {
     if (_peerConnection == null ||
         connectionState ==
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
@@ -766,7 +766,7 @@ class BasePeerConnection {
   }
 
   ///需要重新协商，一般是本节点有增减轨道的时候
-  onRenegotiationNeeded() {
+  void onRenegotiationNeeded() {
     logger.w('onRenegotiationNeeded event');
   }
 
@@ -785,7 +785,7 @@ class BasePeerConnection {
   ///实际开始执行协商过程
   ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
   ///一般情况下系统
-  negotiate({bool toggle = false}) async {
+  Future<void> negotiate({bool toggle = false}) async {
     if (_initiator == null) {
       logger.e('BasePeerConnection is not init');
       return;
@@ -818,7 +818,7 @@ class BasePeerConnection {
     });
   }
 
-  toggleInitiator() async {
+  Future<void> toggleInitiator() async {
     if (_initiator == null) {
       logger.e('BasePeerConnection is not init');
       return;
@@ -849,7 +849,7 @@ class BasePeerConnection {
   }
 
   ///发起重新连接的请求，将激活onRenegotiationNeeded，从而调用negotiate进行协商
-  restartIce() async {
+  Future<void> restartIce() async {
     if (_peerConnection == null ||
         connectionState ==
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
@@ -860,7 +860,7 @@ class BasePeerConnection {
   }
 
   ///作为主叫，发起协商过程createOffer
-  _negotiateOffer() async {
+  Future<void> _negotiateOffer() async {
     if (_peerConnection == null ||
         connectionState ==
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
@@ -874,7 +874,7 @@ class BasePeerConnection {
   }
 
   ///作为主叫，创建offer，设置到本地会话描述，并发送offer
-  _createOffer() async {
+  Future<void> _createOffer() async {
     if (_peerConnection == null ||
         connectionState ==
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
@@ -926,7 +926,7 @@ class BasePeerConnection {
   }
 
   ///作为主叫，调用外部方法发送offer
-  _sendOffer(RTCSessionDescription offer) async {
+  Future<void> _sendOffer(RTCSessionDescription offer) async {
     if (_peerConnection == null ||
         connectionState ==
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
@@ -961,7 +961,7 @@ class BasePeerConnection {
   }
 
   ///作为主叫，从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
-  _onOfferSignal(WebrtcSignal webrtcSignal) async {
+  Future<void> _onOfferSignal(WebrtcSignal webrtcSignal) async {
     if (_peerConnection == null ||
         connectionState ==
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
@@ -1037,7 +1037,7 @@ class BasePeerConnection {
   }
 
   ///作为被叫，协商时发送再协商信号给主叫，要求重新发起协商
-  _negotiateAnswer({bool toggle = false}) async {
+  Future<void> _negotiateAnswer({bool toggle = false}) async {
     logger.i('Negotiation start, requesting negotiation from answer');
     if (_peerConnection == null ||
         connectionState ==
@@ -1062,7 +1062,7 @@ class BasePeerConnection {
   }
 
   ///作为被叫，创建answer，发生在被叫方，将answer回到主叫方
-  _createAnswer() async {
+  Future<void> _createAnswer() async {
     if (_peerConnection == null ||
         connectionState ==
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
@@ -1119,7 +1119,7 @@ class BasePeerConnection {
   }
 
   //作为被叫，发送answer
-  _sendAnswer(RTCSessionDescription answer) async {
+  Future<void> _sendAnswer(RTCSessionDescription answer) async {
     if (_peerConnection == null ||
         connectionState ==
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
@@ -1134,7 +1134,7 @@ class BasePeerConnection {
   }
 
   ///作为被叫，从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
-  _onAnswerSignal(WebrtcSignal webrtcSignal) async {
+  Future<void> _onAnswerSignal(WebrtcSignal webrtcSignal) async {
     if (_peerConnection == null ||
         connectionState ==
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
@@ -1241,7 +1241,7 @@ class BasePeerConnection {
   }
 
   ///外部在收到信号的时候调用
-  onSignal(WebrtcSignal webrtcSignal) async {
+  Future<void> onSignal(WebrtcSignal webrtcSignal) async {
     if (_initiator == null) {
       logger.e('BasePeerConnection is not init');
       return;
@@ -1254,7 +1254,7 @@ class BasePeerConnection {
     }
   }
 
-  checkStats() async {
+  Future<void> checkStats() async {
     if (_peerConnection != null) {
       List<StatsReport>? statsReport = await _peerConnection?.getStats();
 
@@ -1270,7 +1270,7 @@ class BasePeerConnection {
   /// 作为主叫，为连接加上收发器
   /// @param {String} kind
   /// @param {Object} init
-  _addOfferTransceiver({
+  Future<void> _addOfferTransceiver({
     required MediaStreamTrack track,
     required RTCRtpMediaType kind,
     required RTCRtpTransceiverInit init,
@@ -1294,7 +1294,7 @@ class BasePeerConnection {
     }
   }
 
-  addTransceiver({
+  void addTransceiver({
     required MediaStreamTrack track,
     required RTCRtpMediaType kind,
     required RTCRtpTransceiverInit init,
@@ -1313,7 +1313,7 @@ class BasePeerConnection {
   /// 作为被叫，为连接加上收发器
   /// @param {String} kind
   /// @param {Object} init
-  _addAnswerTransceiver({
+  Future<void> _addAnswerTransceiver({
     required MediaStreamTrack track,
     required RTCRtpMediaType kind,
     required RTCRtpTransceiverInit init,
@@ -1411,7 +1411,7 @@ class BasePeerConnection {
   }
 
   /// 主动从连接中移除本地媒体流，然后会激活onRemoveStream
-  removeStream(MediaStream stream) async {
+  FutureOr<bool?> removeStream(MediaStream stream) async {
     logger.i('removeStream stream:${stream.id} ${stream.ownerTag}');
     if (_peerConnection == null ||
         connectionState ==
@@ -1425,10 +1425,11 @@ class BasePeerConnection {
     for (var track in tracks) {
       await removeTrack(stream, track);
     }
+    return null;
   }
 
   /// 主动从连接中移除一个本地轨道，然后会激活onRemoveTrack
-  removeTrack(MediaStream stream, MediaStreamTrack track) async {
+  FutureOr<bool?> removeTrack(MediaStream stream, MediaStreamTrack track) async {
     logger.i(
         'removeTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id}');
     if (_peerConnection == null ||
@@ -1463,6 +1464,7 @@ class BasePeerConnection {
         frameCyrptors.remove(participantId);
       }
     }
+    return null;
   }
 
   ///克隆远程流，可用于转发
@@ -1492,7 +1494,7 @@ class BasePeerConnection {
   }
 
   /// 主动在连接中用一个轨道取代另一个轨道
-  replaceTrack(MediaStream stream, MediaStreamTrack oldTrack,
+  Future<void> replaceTrack(MediaStream stream, MediaStreamTrack oldTrack,
       MediaStreamTrack newTrack) async {
     logger.i(
         'replaceTrack stream:${stream.id} ${stream.ownerTag}, oldTrack:${oldTrack.id}, newTrack:${newTrack.id}');
@@ -1526,7 +1528,7 @@ class BasePeerConnection {
 
   ///对远端的连接来说，当有stream到来时触发
   ///由onRemoteTrack事件处理
-  onAddRemoteStream(MediaStream stream) async {
+  Future<void> onAddRemoteStream(MediaStream stream) async {
     logger.i('onAddRemoteStream stream:${stream.id} ${stream.ownerTag}');
     List<MediaStreamTrack> tracks = stream.getTracks();
     for (MediaStreamTrack track in tracks) {
@@ -1536,7 +1538,7 @@ class BasePeerConnection {
   }
 
   ///连接的监听轨道到来的监听器，当远方由轨道来的时候执行
-  onRemoteTrack(MediaStream? stream, MediaStreamTrack track) async {
+  Future<Null> onRemoteTrack(MediaStream? stream, MediaStreamTrack track) async {
     logger.i('onRemoteTrack event:${track.id}, stream:${stream?.id}');
     if (_peerConnection == null ||
         connectionState ==
@@ -1560,7 +1562,7 @@ class BasePeerConnection {
     emit(WebrtcEventType.track, {'stream': stream, 'track': track});
   }
 
-  onRemoveRemoteStream(MediaStream stream) async {
+  Future<void> onRemoveRemoteStream(MediaStream stream) async {
     logger.i('onRemoveRemoteStream stream:${stream.id} ${stream.ownerTag}');
     List<MediaStreamTrack> tracks = stream.getTracks();
     for (MediaStreamTrack track in tracks) {
@@ -1569,7 +1571,7 @@ class BasePeerConnection {
     emit(WebrtcEventType.removeStream, stream);
   }
 
-  onRemoveRemoteTrack(MediaStream stream, MediaStreamTrack track) async {
+  Future<void> onRemoveRemoteTrack(MediaStream stream, MediaStreamTrack track) async {
     logger.i(
         'onRemoveRemoteTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id}');
 
@@ -1592,7 +1594,7 @@ class BasePeerConnection {
   /// 内部通过调用emit方法调用外部注册的方法
   /// 所有basePeerConnection的事件都缺省转发到peerConnectionPool相同的处理
   /// 所以调用此方法会覆盖peerConnectionPool的处理
-  on(WebrtcEventType name, Function? fn) {
+  void on(WebrtcEventType name, Function? fn) {
     if (fn != null) {
       events[name] = fn;
     } else {
@@ -1601,7 +1603,7 @@ class BasePeerConnection {
   }
 
   /// 调用外部事件注册方法
-  emit(WebrtcEventType name, dynamic webrtcEvent) async {
+  Future<void> emit(WebrtcEventType name, dynamic webrtcEvent) async {
     var event = events[name];
     if (event != null) {
       event(webrtcEvent);
@@ -1609,7 +1611,7 @@ class BasePeerConnection {
   }
 
   ///数据通道的缓冲区大小
-  get bufferSize {
+  int? get bufferSize {
     final dataChannel = this.dataChannel;
     if (dataChannel != null) {
       return dataChannel.bufferedAmount;
@@ -1618,7 +1620,7 @@ class BasePeerConnection {
   }
 
   ///为连接加上候选的服务器
-  addIceCandidate(List<RTCIceCandidate> iceCandidates) async {
+  Future<Null> addIceCandidate(List<RTCIceCandidate> iceCandidates) async {
     if (_peerConnection == null ||
         connectionState ==
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
@@ -1697,7 +1699,7 @@ class BasePeerConnection {
   /// 被叫方的数据传输事件
   /// webrtc的数据通道发来的消息可以是ChainMessage，
   /// 也可以是简单的非ChainMessage，比如最简单的文本或者复合文档，也就是ChatMessage
-  onMessage(RTCDataChannelMessage message) async {
+  Future<Null> onMessage(RTCDataChannelMessage message) async {
     if (_peerConnection == null ||
         connectionState ==
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
@@ -1724,7 +1726,7 @@ class BasePeerConnection {
   }
 
   ///关闭连接
-  close() async {
+  Future<void> close() async {
     final dataChannel = this.dataChannel;
     if (dataChannel != null) {
       try {

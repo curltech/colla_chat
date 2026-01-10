@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
@@ -40,7 +42,7 @@ class LocalSecurityStorage {
     return key;
   }
 
-  save(String key, String value, {bool userKey = true}) async {
+  Future<void> save(String key, String value, {bool userKey = true}) async {
     try {
       await _secureStorage.write(
         key: _getKey(key, userKey: userKey),
@@ -94,7 +96,7 @@ class LocalSecurityStorage {
     return null;
   }
 
-  remove(String key, {bool userKey = true}) async {
+  Future<void> remove(String key, {bool userKey = true}) async {
     try {
       return await _secureStorage.delete(
         key: _getKey(key, userKey: userKey),
@@ -109,7 +111,7 @@ class LocalSecurityStorage {
     }
   }
 
-  removeAll() async {
+  Future<void> removeAll() async {
     try {
       return await _secureStorage.deleteAll(
         iOptions: iOptions,
@@ -129,7 +131,7 @@ final LocalSecurityStorage localSecurityStorage = LocalSecurityStorage();
 class LocalSharedPreferences {
   late final SharedPreferences prefs;
 
-  init() async {
+  Future<void> init() async {
     prefs = await SharedPreferences.getInstance();
   }
 
@@ -187,7 +189,7 @@ class LocalSharedPreferences {
     return key;
   }
 
-  save(String key, String value,
+  FutureOr<bool?> save(String key, String value,
       {bool encrypt = false, bool userKey = true}) async {
     try {
       if (encrypt) {
@@ -202,6 +204,7 @@ class LocalSharedPreferences {
     } catch (e) {
       logger.e('LocalSharedPreferences save:$e');
     }
+    return null;
   }
 
   Future<String?> get(String key,
@@ -221,12 +224,13 @@ class LocalSharedPreferences {
     return null;
   }
 
-  remove(String key, {bool userKey = true}) async {
+  FutureOr<bool?> remove(String key, {bool userKey = true}) async {
     try {
       return await prefs.remove(_getKey(key, userKey: userKey));
     } catch (e) {
       logger.e('LocalSharedPreferences remove:$e');
     }
+    return null;
   }
 }
 

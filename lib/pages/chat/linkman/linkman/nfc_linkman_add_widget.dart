@@ -85,7 +85,7 @@ class _NfcLinkmanAddWidgetState extends State<NfcLinkmanAddWidget> {
     return result;
   }
 
-  write(String data) async {
+  Future<void> write(String data) async {
     try {
       _tag = await NfcUtil.poll();
       if (_tag == null) {

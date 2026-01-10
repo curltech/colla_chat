@@ -48,10 +48,10 @@ class MailAddressController extends DataListController<entity.MailAddress> {
     _initAllMailAddress();
   }
 
-  _initAllMailAddress() async {
+  Future<void> _initAllMailAddress() async {
     data.assignAll(await mailAddressService.findAllMailAddress());
     if (data.isNotEmpty) {
-      mailboxController.currentMailboxName = mailboxController.init();
+      mailboxController.init();
       for (var emailAddress in data) {
         String email = emailAddress.email;
         mailMimeMessageController.init(email);
@@ -64,7 +64,7 @@ class MailAddressController extends DataListController<entity.MailAddress> {
     }
   }
 
-  connectAllMailAddress() async {
+  Future<void> connectAllMailAddress() async {
     if (data.isNotEmpty) {
       for (var emailAddress in data) {
         EmailClient? emailClient = await connectMailAddress(emailAddress);
@@ -141,7 +141,7 @@ class MailboxController {
     }
   }
 
-  init() {
+  void init() {
     currentMailboxName = _mailBoxIcons.keys.firstOrNull;
   }
 
@@ -176,7 +176,7 @@ class MailboxController {
   }
 
   ///设置当前邮箱名称
-  setCurrentMailbox(String? name) {
+  void setCurrentMailbox(String? name) {
     if (mailAddressController.current == null) {
       return;
     }
@@ -208,7 +208,7 @@ class MailboxController {
   }
 
   ///设置邮件地址的邮箱
-  setMailboxes(String email, List<enough_mail.Mailbox?> mailboxes) {
+  void setMailboxes(String email, List<enough_mail.Mailbox?> mailboxes) {
     Map<String, List<MailMessage>>? addressMailMessages =
         mailMimeMessageController._addressMailMessages[email];
     if (addressMailMessages == null) {
@@ -253,7 +253,7 @@ class MailMimeMessageController {
   ///构造函数从数据库获取所有的邮件地址，初始化邮箱数据
   MailMimeMessageController();
 
-  init(String email) {
+  void init(String email) {
     var currentMailboxName = mailboxController.currentMailboxName;
     if (!_addressMailMessages.containsKey(email) &&
         currentMailboxName != null) {
@@ -307,7 +307,7 @@ class MailMimeMessageController {
     }
   }
 
-  findCurrent() async {
+  FutureOr<bool?> findCurrent() async {
     var current = mailAddressController.current;
     if (current == null) {
       return false;
@@ -324,6 +324,7 @@ class MailMimeMessageController {
         currentMailMessage = mailMessage;
       }
     }
+    return null;
   }
 
   /// 取本地存储中更新的邮件
@@ -457,7 +458,7 @@ class MailMimeMessageController {
     return page;
   }
 
-  _onMessage(MimeMessage mimeMessage) {
+  void _onMessage(MimeMessage mimeMessage) {
     logger.i('Received mimeMessage:${mimeMessage.decodeSubject() ?? ''}');
   }
 
@@ -748,7 +749,7 @@ class MailMimeMessageController {
     return decryptedData;
   }
 
-  deleteMessage(int index, {bool expunge = false}) async {
+  Future<Null> deleteMessage(int index, {bool expunge = false}) async {
     EmailClient? emailClient = await currentEmailClient;
     if (emailClient == null) {
       return null;
@@ -766,7 +767,7 @@ class MailMimeMessageController {
     }
   }
 
-  flagMessage(
+  Future<Null> flagMessage(
     int index, {
     bool? isSeen,
     bool? isFlagged,

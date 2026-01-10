@@ -68,7 +68,7 @@ class FlickVideoPlayerController extends OriginVideoPlayerController {
   }
 
   @override
-  void close() {
+  Future<void> close() async {
     super.close();
     if (flickManager != null) {
       flickManager!.dispose();

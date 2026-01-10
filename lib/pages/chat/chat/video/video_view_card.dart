@@ -25,7 +25,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
     widget.peerMediaStreamController.addListener(_update);
   }
 
-  _update() {
+  void _update() {
     if (mounted) {
       setState(() {});
     }

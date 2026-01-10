@@ -40,7 +40,7 @@ class ContactWidget extends StatelessWidget with TileDataMixin {
     return null;
   }
 
-  _refresh() async {
+  Future<void> _refresh() async {
     _tileData = [];
     List<Contact>? contacts = await loadContacts();
     if (contacts != null && contacts.isNotEmpty) {

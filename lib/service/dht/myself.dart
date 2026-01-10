@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 
 class MyselfService {
   ///创建新的myself，创建新的密钥对，设置到当前
-  createMyself(MyselfPeer myselfPeer, String password) async {
+  Future<void> createMyself(MyselfPeer myselfPeer, String password) async {
     ///peerId对应的密钥对
     SimpleKeyPair peerPrivateKey = await cryptoGraphy.generateKeyPair();
     SimplePublicKey peerPublicKey = await peerPrivateKey.extractPublicKey();
@@ -45,7 +45,7 @@ class MyselfService {
     myself.publicKey = publicKey;
   }
 
-  updateMyselfPassword(MyselfPeer myselfPeer, String password) async {
+  Future<void> updateMyselfPassword(MyselfPeer myselfPeer, String password) async {
     ///peerId对应的密钥对
     SimpleKeyPair? peerPrivateKey = myself.peerPrivateKey;
     myselfPeer.peerPrivateKey =

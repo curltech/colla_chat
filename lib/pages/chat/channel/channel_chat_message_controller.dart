@@ -104,7 +104,7 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
     return chatMessage;
   }
 
-  publish(String messageId) async {
+  Future<void> publish(String messageId) async {
     await chatMessageService.update(
         {
           'status': MessageStatus.published.name,

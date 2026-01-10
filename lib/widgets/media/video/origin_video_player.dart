@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:fl_video/fl_video.dart';
 import 'package:flutter/material.dart';
@@ -287,7 +286,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     videoPlayerController?.pause();
   }
 
-  seek(Duration position, {int? index}) async {
+  Future<void> seek(Duration position, {int? index}) async {
     videoPlayerController?.seekTo(position);
   }
 
@@ -299,7 +298,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     return Future.value(speed);
   }
 
-  setSpeed(double speed) async {
+  Future<void> setSpeed(double speed) async {
     videoPlayerController?.setPlaybackSpeed(speed);
   }
 
@@ -311,7 +310,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     return Future.value(volume);
   }
 
-  setVolume(double volume) async {
+  Future<void> setVolume(double volume) async {
     videoPlayerController?.setVolume(volume);
   }
 

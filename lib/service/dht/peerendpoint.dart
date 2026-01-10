@@ -23,7 +23,7 @@ class PeerEndpointService extends PeerEntityService<PeerEndpoint> {
     return peerEndpoints;
   }
 
-  store(PeerEndpoint peerEndpoint) async {
+  Future<void> store(PeerEndpoint peerEndpoint) async {
     PeerEndpoint? peerEndpoint_ = await findOneByPeerId(peerEndpoint.peerId);
     if (peerEndpoint_ != null) {
       peerEndpoint.id = peerEndpoint_.id;

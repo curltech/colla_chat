@@ -94,7 +94,7 @@ class _LlmChatMessageWidgetState extends State<LlmChatMessageWidget>
     return scrollNotification.depth == 0;
   }
 
-  _scrollMin() {
+  void _scrollMin() {
     // scroll to the bottom of the list when keyboard appears
     Timer(
         const Duration(milliseconds: 200),

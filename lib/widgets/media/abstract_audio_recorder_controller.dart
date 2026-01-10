@@ -85,7 +85,7 @@ abstract class AbstractAudioRecorderController with ChangeNotifier {
     return _durationText;
   }
 
-  _changeDurationText() {
+  void _changeDurationText() {
     var duration = Duration(seconds: _duration);
 
     _durationText = StringUtil.durationText(duration);

@@ -79,7 +79,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   }
 
   ///移除远程所有的视频
-  _closeAll() async {
+  Future<void> _closeAll() async {
     P2pConferenceClient? conferenceClient =
         p2pConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {

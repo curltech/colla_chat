@@ -55,7 +55,7 @@ abstract class GeneralRemoteService<T> {
     int? offset,
     dynamic condiBean,
   }) async {
-    var url = '/${this.name}/Get';
+    var url = '/$name/Get';
     if (orderBy != null && orderBy.isNotEmpty) {
       url = '$url?orderby=$orderBy';
     }
@@ -106,7 +106,7 @@ abstract class GeneralRemoteService<T> {
     if (condiBean != null) {
       params['condiBean'] = JsonUtil.toRemoteJson(condiBean);
     }
-    dynamic data = await send('/${this.name}/Find', data: params);
+    dynamic data = await send('/$name/Find', data: params);
     List<T> os = [];
     var ms = data['data'];
     if (ms.isNotEmpty) {
@@ -138,7 +138,7 @@ abstract class GeneralRemoteService<T> {
     if (condiBean != null) {
       params['condiBean'] = JsonUtil.toRemoteJson(condiBean);
     }
-    var data = await send('/${this.name}/Find', data: params);
+    var data = await send('/$name/Find', data: params);
     var ms = data['data'];
     List<T> os = [];
     if (ms.isNotEmpty) {
@@ -186,7 +186,7 @@ abstract class GeneralRemoteService<T> {
 
   Future<T?> sendInsert(dynamic entity) async {
     Map<String, dynamic> json = await JsonUtil.toRemoteJson(entity);
-    List<dynamic> ms = await send('/${this.name}/Insert', data: [json]);
+    List<dynamic> ms = await send('/$name/Insert', data: [json]);
     T? o;
     if (ms.isNotEmpty) {
       Object? id = EntityUtil.getId(entity);
@@ -207,7 +207,7 @@ abstract class GeneralRemoteService<T> {
   Future<T?> sendDelete(
       {dynamic entity, String? where, List<Object>? whereArgs}) async {
     Map<String, dynamic> json = await JsonUtil.toRemoteJson(entity);
-    List<dynamic> ms = await send('/${this.name}/Delete', data: [json]);
+    List<dynamic> ms = await send('/$name/Delete', data: [json]);
     T? o;
     if (ms.isNotEmpty) {
       o = post(ms.first);
@@ -226,7 +226,7 @@ abstract class GeneralRemoteService<T> {
       args.addAll(whereArgs);
     }
     Map<String, dynamic> json = await JsonUtil.toRemoteJson(entity);
-    List<dynamic> ms = await send('/${this.name}/Update', data: [json]);
+    List<dynamic> ms = await send('/$name/Update', data: [json]);
     T? o;
     if (ms.isNotEmpty) {
       o = post(ms.first);
@@ -235,13 +235,13 @@ abstract class GeneralRemoteService<T> {
   }
 
   /// 批量保存，根据脏标志新增，修改或者删除
-  sendSave(List<T> entities) async {
+  Future<dynamic> sendSave(List<T> entities) async {
     List<Map<String, dynamic>> operators = [];
     for (var entity in entities) {
       Map<String, dynamic> json = await JsonUtil.toRemoteJson(entity);
       operators.add(json);
     }
-    dynamic responseData = await send('/${this.name}/Save', data: operators);
+    dynamic responseData = await send('/$name/Save', data: operators);
 
     return responseData;
   }

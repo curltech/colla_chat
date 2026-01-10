@@ -105,7 +105,7 @@ class _IndexViewState extends State<IndexView>
     _initObserver();
   }
 
-  _initObserver() {
+  void _initObserver() {
     WidgetsBinding.instance.addObserver(this);
     windowManager.addListener(this);
     _appLifecycleState = SchedulerBinding.instance.lifecycleState;
@@ -281,7 +281,7 @@ class _IndexViewState extends State<IndexView>
   }
 
   ///初始化应用数据接受分享的监听器
-  _initShare() {
+  void _initShare() {
     if (!platformParams.mobile) {
       return;
     }
@@ -308,7 +308,7 @@ class _IndexViewState extends State<IndexView>
     });
   }
 
-  _updateConferenceJoined() {
+  void _updateConferenceJoined() {
     if (indexWidgetProvider.current == 'video_chat' ||
         indexWidgetProvider.current == 'sfu_video_chat') {
       videoChatDragOverlay.dispose();
@@ -326,17 +326,17 @@ class _IndexViewState extends State<IndexView>
     }
   }
 
-  _play() {
+  void _play() {
     conferenceChatMessageController.playAudio(
         'assets/media/invitation.mp3', true);
   }
 
-  _stop() {
+  void _stop() {
     conferenceChatMessageController.stopAudio();
   }
 
   ///有新消息到来的时候，一般消息直接显示
-  _updateGlobalChatMessage(
+  Future<void> _updateGlobalChatMessage(
       BuildContext context, ChatMessage chatMessage) async {
     String? subMessageType = chatMessage.subMessageType;
     String senderPeerId = chatMessage.senderPeerId!;

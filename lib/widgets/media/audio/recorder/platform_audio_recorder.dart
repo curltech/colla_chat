@@ -52,7 +52,7 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
     widget.audioRecorderController.addListener(_update);
   }
 
-  _update() {
+  void _update() {
     setState(() {});
   }
 

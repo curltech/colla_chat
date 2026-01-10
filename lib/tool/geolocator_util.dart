@@ -215,7 +215,7 @@ class GeolocatorUtil {
   }
 
   //设置语言国家，en_US，zh_CN
-  static setLocaleIdentifier(String localeIdentifier) async {
+  static Future<void> setLocaleIdentifier(String localeIdentifier) async {
     await geocoding.setLocaleIdentifier(localeIdentifier);
   }
 

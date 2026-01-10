@@ -34,7 +34,7 @@ class SystemStatusWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'System status';
 
-  _init() async {
+  Future<void> _init() async {
     if (platformParams.macos) {
       try {
         SystemStatusMacOS systemStatus = SystemStatusMacOS();

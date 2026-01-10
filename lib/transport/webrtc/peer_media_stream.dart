@@ -233,7 +233,7 @@ class PeerMediaStream {
   }
 
   ///关闭旧的媒体流，设置新的媒体流，
-  replaceStream({
+  Future<void> replaceStream({
     MediaStream? mediaStream,
     VideoTrack? videoTrack,
     AudioTrack? audioTrack,
@@ -288,7 +288,7 @@ class PeerMediaStream {
   }
 
   ///关闭媒体流，关闭后里面的流为空
-  close() async {
+  Future<void> close() async {
     if (mediaStream != null) {
       var mediaStream = this.mediaStream;
       try {
@@ -323,7 +323,7 @@ class PeerMediaStream {
   }
 
   /// 切换第一个视频轨道的摄像头，对sfu模式来说，必须指定position
-  switchCamera({CameraPosition? position}) async {
+  Future<void> switchCamera({CameraPosition? position}) async {
     if (participant != null) {
       final Track? track =
           participant!.videoTrackPublications.firstOrNull?.track;
@@ -346,7 +346,7 @@ class PeerMediaStream {
   }
 
   /// 切换设备的麦克风是否打开
-  switchSpeaker(bool enableSpeaker) async {
+  Future<void> switchSpeaker(bool enableSpeaker) async {
     if (participant != null) {
       await Hardware.instance.setPreferSpeakerOutput(false);
       await Hardware.instance.setSpeakerphoneOn(enableSpeaker);
@@ -376,7 +376,7 @@ class PeerMediaStream {
   }
 
   /// 设置音频流的麦克风是否静音，用于本地参与者或者本地流
-  setMicrophoneMute(bool enableMute) async {
+  Future<void> setMicrophoneMute(bool enableMute) async {
     if (participant != null) {
       for (TrackPublication<Track> audioTrackPublication
           in participant!.audioTrackPublications) {
@@ -410,7 +410,7 @@ class PeerMediaStream {
   }
 
   /// 设置参与者或者流的音量
-  setVolume(double volume) async {
+  Future<void> setVolume(double volume) async {
     if (participant != null) {
       participant?.audioLevel = 1 - volume;
     } else {
@@ -421,7 +421,7 @@ class PeerMediaStream {
   }
 
   /// 设置视频流流的放大缩小
-  setZoom(double zoomLevel) async {
+  Future<void> setZoom(double zoomLevel) async {
     if (participant != null) {
     } else {
       if (mediaStream != null) {
@@ -455,7 +455,7 @@ class PeerMediaStream {
   }
 
   /// 激活参与者的轨道，用于sfu模式
-  enable() async {
+  Future<void> enable() async {
     if (participant != null) {
       RemoteParticipant remoteParticipant = participant as RemoteParticipant;
       for (RemoteTrackPublication publication
@@ -466,7 +466,7 @@ class PeerMediaStream {
   }
 
   /// 关闭参与者的轨道，用于sfu模式
-  disable() async {
+  Future<void> disable() async {
     if (participant != null) {
       RemoteParticipant remoteParticipant = participant as RemoteParticipant;
       for (RemoteTrackPublication publication
@@ -477,7 +477,7 @@ class PeerMediaStream {
   }
 
   /// 设置参与者的轨道的fps，用于sfu模式
-  setVideoFPS(int fps) async {
+  Future<void> setVideoFPS(int fps) async {
     if (participant != null) {
       RemoteParticipant remoteParticipant = participant as RemoteParticipant;
       for (RemoteTrackPublication publication
@@ -488,7 +488,7 @@ class PeerMediaStream {
   }
 
   /// 设置参与者的轨道的视频质量，用于sfu模式
-  setVideoQuality(VideoQuality videoQuality) async {
+  Future<void> setVideoQuality(VideoQuality videoQuality) async {
     if (participant != null) {
       RemoteParticipant remoteParticipant = participant as RemoteParticipant;
       for (RemoteTrackPublication publication

@@ -22,7 +22,7 @@ class WasteAreaComponent extends RectangleComponent
     _init();
   }
 
-  _init() {
+  void _init() {
     if (areaDirection == AreaDirection.self) {
       position = Vector2(
           roomController.x(roomController.width *
@@ -87,7 +87,7 @@ class WasteAreaComponent extends RectangleComponent
     }
   }
 
-  loadWastePile() {
+  void loadWastePile() {
     if (wastePileComponent != null) {
       remove(wastePileComponent!);
       wastePileComponent = null;

@@ -115,7 +115,7 @@ class P2pRegisterWidget extends StatelessWidget {
       }
     }
     if (backupFile != null) {
-      return sqlite3.restore(path: backupFile);
+      await sqlite3.restore(path: backupFile);
     }
     return null;
   }
@@ -222,7 +222,7 @@ class P2pRegisterWidget extends StatelessWidget {
     );
   }
 
-  _onOk(Map<String, dynamic> values) async {
+  Future<void> _onOk(Map<String, dynamic> values) async {
     if (!values.containsKey('name')) {
       DialogUtil.error(content: 'name must be not empty');
       return;

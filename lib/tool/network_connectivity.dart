@@ -24,7 +24,7 @@ class NetworkConnectivity {
   }
 
   /// 注册连接状态监听器
-  register([Function(List<ConnectivityResult> result)? fn]) {
+  void register([Function(List<ConnectivityResult> result)? fn]) {
     if (fn == null) {
       _connectivitySubscription =
           _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);

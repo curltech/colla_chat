@@ -85,7 +85,7 @@ class ShareService extends GeneralBaseService<Share> {
     return shares[tsCode];
   }
 
-  store(Share share) async {
+  Future<void> store(Share share) async {
     Share? old = await findOne(where: 'tscode=?', whereArgs: [share.tsCode!]);
     if (old == null) {
       share.id = null;

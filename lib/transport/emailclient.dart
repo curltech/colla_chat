@@ -314,7 +314,7 @@ class EmailClient {
     if (mailClient == null) {
       success = await _mailClientConnect(password: password, config: config);
       if (!success) {
-        success = await imapConnect();
+        await imapConnect();
         logger.i('imapConnect $success');
         if (success) {
           PopStatus? status = await popConnect();
@@ -842,7 +842,7 @@ class EmailClient {
     return false;
   }
 
-  disconnect() async {
+  Future<void> disconnect() async {
     enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null) {
       await mailClient.disconnect();
@@ -850,7 +850,7 @@ class EmailClient {
   }
 
   ///采用imap配置和协议连接
-  imapConnect({
+  Future<void> imapConnect({
     EventBus? bus,
     bool isLogEnabled = false,
     String? logName,
@@ -1129,7 +1129,7 @@ class EmailClient {
     return false;
   }
 
-  close() async {
+  Future<void> close() async {
     await disconnect();
     await imapLogout();
     await popClose();
@@ -1186,7 +1186,7 @@ class EmailClientPool {
     }
   }
 
-  close({String? email}) async {
+  Future<void> close({String? email}) async {
     if (email != null) {
       if (emailClients.containsKey(email)) {
         var emailClient = emailClients[email];

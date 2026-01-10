@@ -65,7 +65,7 @@ class PasswordWidget extends StatelessWidget with TileDataMixin {
     );
   }
 
-  _onOk(BuildContext context, Map<String, dynamic> values) async {
+  Future<void> _onOk(BuildContext context, Map<String, dynamic> values) async {
     String oldPassword = values['oldPassword'];
     String plainPassword = values['plainPassword'];
     String confirmPassword = values['confirmPassword'];

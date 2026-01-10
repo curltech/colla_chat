@@ -223,7 +223,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   Future<void> playMediaSource(PlatformMediaSource mediaSource);
 
   /// 如果没有播放，则播放当前文件
-  play() {
+  void play() {
     if (playlistController.current != null) {
       playMediaSource(playlistController.current!);
     }
@@ -233,14 +233,14 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
 
   resume();
 
-  next() {
+  void next() {
     playlistController.next();
     if (playlistController.current != null) {
       playMediaSource(playlistController.current!);
     }
   }
 
-  previous() {
+  void previous() {
     playlistController.previous();
     if (playlistController.current != null) {
       playMediaSource(playlistController.current!);
@@ -251,7 +251,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   stop();
 
   /// 停止播放，关闭当前播放资源
-  close() async {
+  Future<void> close() async {
     await stop();
     filename.value = null;
   }
@@ -264,7 +264,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   }
 
   ///选择文件加入播放列表
-  _addMediaSource() async {
+  Future<void> _addMediaSource() async {
     try {
       await playlistController.sourceFilePicker();
       PlatformMediaSource? mediaSource = playlistController.current;

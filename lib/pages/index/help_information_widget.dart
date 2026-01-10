@@ -22,7 +22,7 @@ class HelpInformationController {
     _loadString();
   }
 
-  _loadString() async {
+  Future<void> _loadString() async {
     String languageCode = myself.locale.languageCode;
 
     try {

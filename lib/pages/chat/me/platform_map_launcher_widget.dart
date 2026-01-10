@@ -34,7 +34,7 @@ class PlatformMapLauncherWidget extends StatelessWidget with TileDataMixin {
 
   
 
-  _init() async {
+  Future<void> _init() async {
     try {
       maps.value = await GeolocatorUtil.installedMaps();
     } catch (e) {

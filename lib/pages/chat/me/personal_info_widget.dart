@@ -40,7 +40,7 @@ class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
 
   
 
-  _buildPersonalInfo(BuildContext context) {
+  void _buildPersonalInfo(BuildContext context) {
     personalInfoTileData.value = [
       TileData(
           title: 'Avatar',

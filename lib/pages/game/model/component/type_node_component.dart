@@ -112,7 +112,7 @@ class TypeNodeComponent extends RectangleComponent
     return methodHeight;
   }
 
-  updateSize() {
+  void updateSize() {
     height = headHeight + calAttributeHeight() + calMethodHeight();
     methodAreaComponent.position =
         Vector2(0, headHeight + calAttributeHeight());

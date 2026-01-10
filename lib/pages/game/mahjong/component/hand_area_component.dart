@@ -18,7 +18,7 @@ class HandAreaComponent extends RectangleComponent
     _init();
   }
 
-  _init() {
+  void _init() {
     if (areaDirection == AreaDirection.self) {
       position = Vector2(
           roomController
@@ -72,7 +72,7 @@ class HandAreaComponent extends RectangleComponent
     }
   }
 
-  loadHandPile() {
+  void loadHandPile() {
     if (handPileComponent != null) {
       remove(handPileComponent!);
     }

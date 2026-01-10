@@ -62,7 +62,7 @@ class FlutterWebView extends StatelessWidget {
     return filename;
   }
 
-  _initWebViewContent() {
+  void _initWebViewContent() {
     if (initialUrl != null) {
       controller!.loadRequest(Uri.parse(initialUrl!));
     }
@@ -81,15 +81,14 @@ class FlutterWebView extends StatelessWidget {
     }
   }
 
-  _buildWebViewWidget() {
+  void _buildWebViewWidget() {
     if (platformParams.desktop || platformParams.mobile || platformParams.web) {
       webView = WebViewWidget(
         controller: controller!,
       );
     } else {
       webView = Center(
-          child:
-              AutoSizeText(AppLocalizations.t('Not supported platform')));
+          child: AutoSizeText(AppLocalizations.t('Not supported platform')));
     }
   }
 

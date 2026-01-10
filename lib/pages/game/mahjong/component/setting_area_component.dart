@@ -10,7 +10,7 @@ class SettingAreaComponent extends RectangleComponent
     _init();
   }
 
-  _init() {
+  void _init() {
     position = Vector2(
         roomController
             .x(roomController.width * (1 - MahjongFlameGame.settingWidthRadio)),

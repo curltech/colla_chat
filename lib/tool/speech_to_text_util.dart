@@ -24,7 +24,7 @@ class SpeechToTextUtil {
     return null;
   }
 
-  static listen(
+  static Future<void> listen(
     SpeechToText speech, {
     void Function(SpeechRecognitionResult)? onResult,
     Duration? listenFor,
@@ -41,7 +41,7 @@ class SpeechToTextUtil {
     speech.listen(onResult: onResult);
   }
 
-  static stop(SpeechToText speech) {
+  static void stop(SpeechToText speech) {
     speech.stop();
   }
 }

@@ -22,7 +22,7 @@ class AnimateMultiIconController with ChangeNotifier {
   AnimateMultiIconController(this.icons,
       {this.duration = const Duration(milliseconds: 150)});
 
-  togglePlay() {
+  void togglePlay() {
     if (playState) {
       playState = false;
       return;
@@ -63,7 +63,7 @@ class _AnimateMultiIconStat extends State<AnimateMultiIcon> {
     widget.animateMultiIconController.addListener(_update);
   }
 
-  _update() {
+  void _update() {
     setState(() {});
   }
 

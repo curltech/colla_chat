@@ -134,7 +134,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
     _initDelete();
   }
 
-  _initStatusStreamController() async {
+  Future<void> _initStatusStreamController() async {
     WebSocketChannel? websocket = await websocketPool.connect();
     if (websocket != null) {
       if (_socketStatusStreamSubscription != null) {
@@ -151,13 +151,13 @@ class _ChatListWidgetState extends State<ChatListWidget>
     }
   }
 
-  _initDelete() {
+  void _initDelete() {
     chatMessageService.deleteTimeout();
     chatMessageService.deleteSystem();
   }
 
   ///网络连通的情况下，如果没有缺省的websocket，尝试创建新的缺省websocket，如果有，则重连缺省的websocket
-  _reconnect() async {
+  Future<void> _reconnect() async {
     if (ConnectivityUtil.getMainResult(
             connectivityController.connectivityResult.value) !=
         ConnectivityResult.none) {
@@ -169,7 +169,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
     }
   }
 
-  _updateConnectivity() {
+  void _updateConnectivity() {
     List<ConnectivityResult> result = connectivityController.connectivityResult;
     if (result.contains(ConnectivityResult.none)) {
     } else {
@@ -177,7 +177,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
     }
   }
 
-  _updateWebsocketStatus(String address, SocketStatus socketStatus) {
+  void _updateWebsocketStatus(String address, SocketStatus socketStatus) {
     var status = _socketStatus.value;
     _socketStatus.value = socketStatus;
     if (socketStatus != status) {
@@ -200,7 +200,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
   }
 
   ///所有的friend的webrtc重连
-  _reconnectWebrtc() async {
+  Future<void> _reconnectWebrtc() async {
     List<Linkman> linkmen = await linkmanService
         .find(where: 'linkmanStatus=?', whereArgs: [LinkmanStatus.F.name]);
     if (linkmen.isNotEmpty) {
@@ -391,7 +391,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
           }
           chatSummaryController.setCurrentIndex = index;
           await chatSummaryService.removeChatSummary(peerId);
-          await chatMessageService.removeByLinkman(peerId);
+          chatMessageService.removeByLinkman(peerId);
           chatSummaryController.delete();
         });
     slideActions.add(deleteSlideAction);

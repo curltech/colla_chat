@@ -416,7 +416,7 @@ class NodeRelationshipComponent extends PositionComponent
     }
   }
 
-  _drawCardinality(Canvas canvas, String text, Offset offset) {
+  void _drawCardinality(Canvas canvas, String text, Offset offset) {
     ui.ParagraphStyle style =
         ui.ParagraphStyle(textAlign: TextAlign.start, fontSize: 10.0);
     ui.ParagraphBuilder paragraphBuilder = ui.ParagraphBuilder(style);

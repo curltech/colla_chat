@@ -93,7 +93,7 @@ class Postgres extends DataStore {
     return true;
   }
 
-  reset() {
+  void reset() {
     File file = File(appDataProvider.sqlite3Path);
     if (file.existsSync()) {
       file.deleteSync();
@@ -101,7 +101,7 @@ class Postgres extends DataStore {
   }
 
   /// 关闭数据库
-  close() async {
+  Future<void> close() async {
     if (db != null) {
       await db!.close();
       db == null;
@@ -116,7 +116,7 @@ class Postgres extends DataStore {
     return null;
   }
 
-  restore() async {
+  Future<void> restore() async {
     File file = File(appDataProvider.sqlite3Path);
     if (file.existsSync()) {
       close();
@@ -132,7 +132,7 @@ class Postgres extends DataStore {
 
   /// 删除数据库
   /// @param {*} options
-  remove() {}
+  void remove() {}
 
   /// 批量执行sql，参数是二维数组
   /// @param {*} sqls

@@ -38,7 +38,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class LinkmanController extends DataListController<Linkman> {
-  changeLinkmanStatus(Linkman linkman, LinkmanStatus status) async {
+  Future<void> changeLinkmanStatus(Linkman linkman, LinkmanStatus status) async {
     int id = linkman.id!;
     await linkmanService.update({'id': id, 'linkmanStatus': status.name});
     linkmanService.linkmen.remove(linkman.peerId);
@@ -46,7 +46,7 @@ class LinkmanController extends DataListController<Linkman> {
     data.assignAll(data);
   }
 
-  changeSubscriptStatus(Linkman linkman, LinkmanStatus status) async {
+  Future<void> changeSubscriptStatus(Linkman linkman, LinkmanStatus status) async {
     int id = linkman.id!;
     await linkmanService.update({'id': id, 'subscriptStatus': status.name});
     linkmanService.linkmen.remove(linkman.peerId);
@@ -115,22 +115,22 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     _searchLinkman(_linkmanTextController.text);
   }
 
-  _searchLinkman(String key) async {
+  Future<void> _searchLinkman(String key) async {
     List<Linkman> linkmen = await linkmanService.search(key);
     linkmanController.replaceAll(linkmen);
   }
 
-  _searchGroup(String key) async {
+  Future<void> _searchGroup(String key) async {
     List<Group> groups = await groupService.search(key);
     groupController.replaceAll(groups);
   }
 
-  _searchConference(String key) async {
+  Future<void> _searchConference(String key) async {
     List<Conference> conferences = await conferenceService.search(key);
     conferenceController.replaceAll(conferences);
   }
 
-  _buildLinkmanSearchTextField(BuildContext context) {
+  Container _buildLinkmanSearchTextField(BuildContext context) {
     var searchTextField = Container(
         padding: const EdgeInsets.all(10.0),
         child: TextFormField(
@@ -152,7 +152,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     return searchTextField;
   }
 
-  _buildGroupSearchTextField(BuildContext context) {
+  Container _buildGroupSearchTextField(BuildContext context) {
     var searchTextField = Container(
         padding: const EdgeInsets.all(10.0),
         child: TextFormField(
@@ -174,7 +174,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     return searchTextField;
   }
 
-  _buildConferenceSearchTextField(BuildContext context) {
+  Container _buildConferenceSearchTextField(BuildContext context) {
     var searchTextField = Container(
         padding: const EdgeInsets.all(10.0),
         child: TextFormField(
@@ -284,9 +284,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 return;
               }
               linkmanController.setCurrentIndex = index;
-              await linkmanService.removeByPeerId(linkman.peerId);
+              linkmanService.removeByPeerId(linkman.peerId);
               await chatSummaryService.removeChatSummary(linkman.peerId);
-              await chatMessageService.removeByLinkman(linkman.peerId);
+              chatMessageService.removeByLinkman(linkman.peerId);
               linkmanController.delete();
               if (mounted) {
                 DialogUtil.info(
@@ -501,11 +501,11 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 return;
               }
               await groupService.removeGroupMember(group, [myself.peerId!]);
-              await groupService.removeByGroupId(peerId);
+              groupService.removeByGroupId(peerId);
               groupMemberService
                   .delete(where: 'groupId=?', whereArgs: [peerId]);
               await chatSummaryService.removeChatSummary(peerId);
-              await chatMessageService.removeByGroup(peerId);
+              chatMessageService.removeByGroup(peerId);
               groupController.delete(index: index);
               if (mounted) {
                 DialogUtil.info(
@@ -531,7 +531,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 groupMemberService
                     .delete(where: 'groupId=?', whereArgs: [peerId]);
                 await chatSummaryService.removeChatSummary(peerId);
-                await chatMessageService.removeByGroup(peerId);
+                chatMessageService.removeByGroup(peerId);
                 groupController.delete(index: index);
                 if (mounted) {
                   DialogUtil.info(
@@ -612,7 +612,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               groupMemberService
                   .delete(where: 'groupId=?', whereArgs: [conferenceId]);
               await chatSummaryService.removeChatSummary(conferenceId);
-              await chatMessageService.removeByGroup(conferenceId);
+              chatMessageService.removeByGroup(conferenceId);
               conferenceController.delete(index: index);
               if (mounted) {
                 DialogUtil.info(
@@ -644,15 +644,15 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     return tiles;
   }
 
-  _onTapLinkman(int index, String title, {String? subtitle, TileData? group}) {
+  void _onTapLinkman(int index, String title, {String? subtitle, TileData? group}) {
     linkmanController.setCurrentIndex = index;
   }
 
-  _onTapGroup(int index, String title, {String? subtitle, TileData? group}) {
+  void _onTapGroup(int index, String title, {String? subtitle, TileData? group}) {
     groupController.setCurrentIndex = index;
   }
 
-  _onTapConference(int index, String title,
+  void _onTapConference(int index, String title,
       {String? subtitle, TileData? group}) {
     conferenceController.setCurrentIndex = index;
   }

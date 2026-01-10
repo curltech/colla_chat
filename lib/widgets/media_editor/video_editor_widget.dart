@@ -55,7 +55,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
   final ScrollController scrollController = ScrollController();
   final RxInt displayPosition = 0.obs;
 
-  _onScroll() {
+  void _onScroll() {
     double offset = scrollController.offset;
     logger.i('scrolled to $offset');
 
@@ -70,12 +70,12 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _update() {
+  void _update() {
     _splitImageFiles();
   }
 
   /// 将视频文件按帧分离成图像
-  _splitImageFiles() async {
+  Future<void> _splitImageFiles() async {
     String? videoFilename = playlistController.current?.filename;
     if (videoFilename == null) {
       return;
@@ -110,7 +110,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _delete() {
+  void _delete() {
     List<String> filenames = imageFileController.data;
     for (var filename in filenames) {
       File(filename).delete();
@@ -216,8 +216,8 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
         controller: controller,
         onPageChanged: (int index,
             {PlatformSwiperDirection? direction,
-              int? oldIndex,
-              CarouselPageChangedReason? reason}) {
+            int? oldIndex,
+            CarouselPageChangedReason? reason}) {
           this.index.value = index;
         },
         itemBuilder: (BuildContext context, int index, {int? realIndex}) {
@@ -271,7 +271,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
               IconButton(
                 tooltip: AppLocalizations.t('Video editor'),
                 onPressed: () async {
-                  await controller.move(1);
+                  controller.move(1);
                 },
                 icon: const Icon(Icons.task_alt_outlined),
               ),
@@ -288,7 +288,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
               IconButton(
                 tooltip: AppLocalizations.t('Playlist'),
                 onPressed: () async {
-                  await controller.move(0);
+                  controller.move(0);
                 },
                 icon: const Icon(Icons.featured_play_list_outlined),
               ),

@@ -20,7 +20,6 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -149,7 +148,7 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
   }
 
   //当当前会议改变后，更新数据，局部刷新
-  _buildConferenceData(BuildContext context) async {
+  Future<void> _buildConferenceData(BuildContext context) async {
     Conference? current = conferenceNotifier.value;
     if (current == null) {
       return;
@@ -174,7 +173,7 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
   }
 
   //更新ConferenceOwnerOptions，从会议成员中选择
-  _buildConferenceOwnerOptions() async {
+  Future<void> _buildConferenceOwnerOptions() async {
     Conference? current = conferenceNotifier.value;
     if (current == null) {
       return;
@@ -252,7 +251,7 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
     return selector;
   }
 
-  _resend(BuildContext context) async {
+  Future<Null> _resend(BuildContext context) async {
     Conference? current = conferenceNotifier.value;
     if (current == null) {
       return null;
@@ -290,7 +289,7 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _qrcode(BuildContext context) async {
+  Future<Null> _qrcode(BuildContext context) async {
     Conference? current = conferenceNotifier.value;
     if (current == null) {
       return null;

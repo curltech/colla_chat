@@ -203,7 +203,7 @@ class SmartDialogUtil {
   }
 
   /// loading框
-  static loadingShow({String tip = 'Loading, please waiting...'}) {
+  static void loadingShow({String tip = 'Loading, please waiting...'}) {
     SmartDialog.showLoading(
       msg: tip,
       maskColor: myself.primary,
@@ -214,7 +214,7 @@ class SmartDialogUtil {
   }
 
   /// 关闭loading框
-  static loadingHide() {
+  static void loadingHide() {
     SmartDialog.dismiss();
   }
 
@@ -277,7 +277,7 @@ class SmartDialogUtil {
   }
 
   /// 底部延时提示错误
-  static error({String content = 'Error'}) {
+  static void error({String content = 'Error'}) {
     showToast(
       content,
       maskColor: Colors.red,
@@ -285,7 +285,7 @@ class SmartDialogUtil {
   }
 
   /// 底部延时警告
-  static warn({String content = 'Warning'}) {
+  static void warn({String content = 'Warning'}) {
     showToast(
       content,
       maskColor: Colors.amber,
@@ -293,7 +293,7 @@ class SmartDialogUtil {
   }
 
   /// 底部延时提示
-  static info({String content = 'Information'}) {
+  static void info({String content = 'Information'}) {
     showToast(
       content,
       maskColor: Colors.green,
@@ -320,7 +320,7 @@ class SmartDialogUtil {
     );
   }
 
-  static showToast(
+  static void showToast(
     String msg, {
     SmartDialogController? controller,
     Duration? displayTime,

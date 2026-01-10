@@ -159,7 +159,7 @@ class ChatMessageView extends StatelessWidget
     //logger.i('[WindowManager] chat message view onWindowEvent: $eventName');
   }
 
-  _updateChatSummary() async {
+  Future<void> _updateChatSummary() async {
     await _createPeerConnection();
     await _buildReadStatus();
   }
@@ -167,7 +167,7 @@ class ChatMessageView extends StatelessWidget
   ///初始化，webrtc如果没有连接，尝试连接
   ///在初始化，窗口恢复，背景恢复都会调用，因此需要能够重复调用
   ///如果ChatGPT，则设置
-  _createPeerConnection() async {
+  Future<void> _createPeerConnection() async {
     await websocketPool.connect();
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     if (chatSummary == null) {
@@ -219,7 +219,7 @@ class ChatMessageView extends StatelessWidget
     }
   }
 
-  _createDataChannel() async {
+  Future<void> _createDataChannel() async {
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
@@ -235,7 +235,7 @@ class ChatMessageView extends StatelessWidget
     }
   }
 
-  _disconnectPeerConnection() async {
+  Future<void> _disconnectPeerConnection() async {
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
@@ -249,7 +249,7 @@ class ChatMessageView extends StatelessWidget
   }
 
   ///创建linkman的PeerConnection，可以重复调用只会创建一次
-  _createLinkmanPeerConnection(String peerId) async {
+  Future<void> _createLinkmanPeerConnection(String peerId) async {
     ///未来应该可以自己连接另一个自己
     if (peerId == myself.peerId) {
       _peerConnectionState.value = null;
@@ -307,7 +307,7 @@ class ChatMessageView extends StatelessWidget
     }
   }
 
-  _disconnectLinkmanPeerConnection(String peerId) async {
+  Future<void> _disconnectLinkmanPeerConnection(String peerId) async {
     if (peerId == myself.peerId) {
       return;
     }
@@ -329,7 +329,7 @@ class ChatMessageView extends StatelessWidget
   }
 
   ///群或者会议的成员全部尝试连接
-  _createGroupPeerConnection(String peerId) async {
+  Future<void> _createGroupPeerConnection(String peerId) async {
     List<GroupMember> groupMembers =
         await groupMemberService.findByGroupId(peerId);
     for (var groupMember in groupMembers) {

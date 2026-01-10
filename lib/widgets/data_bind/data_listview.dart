@@ -90,7 +90,7 @@ class _DataListViewState extends State<DataListView> {
     }
   }
 
-  _onTap(int index, String title, {String? subtitle}) {
+  void _onTap(int index, String title, {String? subtitle}) {
     var onTap = widget.onTap;
     if (onTap != null) {
       onTap(index, title, subtitle: subtitle, group: widget.group);

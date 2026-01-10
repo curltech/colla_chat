@@ -18,7 +18,7 @@ class DirectoryController extends DataListController<FolderNode> {
     init();
   }
 
-  init() async {
+  Future<void> init() async {
     clear();
     if (platformParams.mobile) {
       initMobile();
@@ -32,17 +32,17 @@ class DirectoryController extends DataListController<FolderNode> {
     treeViewController = TreeViewController(data.value);
   }
 
-  initMac() {
+  void initMac() {
     io.Directory root = io.Directory('/');
     addDirectory('/', root);
   }
 
-  initWindows() {
+  void initWindows() {
     io.Directory root = io.Directory('c:/');
     addDirectory('c:/', root);
   }
 
-  initMobile() async {
+  Future<void> initMobile() async {
     io.Directory? applicationDirectory =
         await PathUtil.getApplicationDirectory();
     if (applicationDirectory != null) {
@@ -92,12 +92,12 @@ class DirectoryController extends DataListController<FolderNode> {
     return folderNode;
   }
 
-  deleteDirectory({FolderNode? node}) {
+  void deleteDirectory({FolderNode? node}) {
     node ??= current;
     remove(node!);
   }
 
-  findDirectory(FolderNode folderNode) {
+  void findDirectory(FolderNode folderNode) {
     io.Directory directory = (folderNode.value as Folder).directory;
     List<io.FileSystemEntity> fileSystemEntities = directory.listSync();
 

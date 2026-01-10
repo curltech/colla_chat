@@ -167,7 +167,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   late final PlatformReactiveFormController searchController;
   final ExpansibleController expansibleController = ExpansibleController();
 
-  _init() {
+  void _init() {
     searchDataField = [
       PlatformDataField(
         name: 'securityCode',
@@ -205,7 +205,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
     searchController = PlatformReactiveFormController(searchDataField);
   }
 
-  refresh(String securityCode, String startDate) async {
+  Future<void> refresh(String securityCode, String startDate) async {
     Map<String, dynamic> responseData = await remotePerformanceService
         .sendFindByQDate(securityCode: securityCode, startDate: startDate);
     var count = responseData['count'];
@@ -259,7 +259,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
     return platformReactiveForm;
   }
 
-  _onSubmit(Map<String, dynamic> values) async {
+  Future<void> _onSubmit(Map<String, dynamic> values) async {
     String? securityCode = values['security_code'];
     String? startDate = values['start_date'];
     if (securityCode == null || startDate == null) {

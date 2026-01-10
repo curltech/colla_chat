@@ -61,7 +61,7 @@ class ModelProjectController {
     registerAssetMetaProject();
   }
 
-  initMetaProject() {
+  void initMetaProject() {
     Project metaProject =
         Project(Project.baseMetaId, Project.baseMetaId, id: Project.baseMetaId);
     Subject subject =
@@ -167,7 +167,7 @@ class ModelProjectController {
     return null;
   }
 
-  removeModelNode(ModelNode modelNode) {
+  void removeModelNode(ModelNode modelNode) {
     if (project.value != null) {
       for (Subject subject in project.value!.subjects.values) {
         if (subject.modelNodes.containsKey(modelNode.id)) {
@@ -179,7 +179,7 @@ class ModelProjectController {
     }
   }
 
-  removeRelationship(NodeRelationship relationship) {
+  void removeRelationship(NodeRelationship relationship) {
     if (project.value != null) {
       for (Subject subject in project.value!.subjects.values) {
         if (subject.containsKey(relationship)) {
@@ -233,9 +233,6 @@ class ModelProjectController {
       for (NodeRelationship nodeRelationship in subject.relationships.values) {
         Set<String>? allowRelationshipTypes =
             nodeRelationship.allowRelationshipTypes;
-        if (allowRelationshipTypes == null) {
-          continue;
-        }
         if (nodeRelationship.srcId == srcId &&
             nodeRelationship.dstId == dstId) {
           for (String allowRelationshipType
@@ -253,13 +250,13 @@ class ModelProjectController {
     return relationshipTypes;
   }
 
-  registerAssetMetaProject() {
+  void registerAssetMetaProject() {
     _registerAssetMetaProject('product_model');
     _registerAssetMetaProject('class_model');
     _registerAssetMetaProject('process_model');
   }
 
-  _registerAssetMetaProject(String filename) async {
+  Future<void> _registerAssetMetaProject(String filename) async {
     String content = await rootBundle.loadString('assets/model/$filename.json');
     Map<String, dynamic> json = JsonUtil.toJson(content);
     Project metaProject = Project.fromJson(json);
@@ -271,7 +268,7 @@ class ModelProjectController {
   }
 
   /// 注册元模型，覆盖原来加载的
-  registerMetaProject(String content) async {
+  Future<void> registerMetaProject(String content) async {
     Map<String, dynamic> json = JsonUtil.toJson(content);
     Project metaProject = Project.fromJson(json);
     String filename = p.join(platformParams.path, '${metaProject.id}.json');
@@ -352,7 +349,7 @@ class ModelProjectController {
     return project;
   }
 
-  reset() {
+  void reset() {
     currentSubjectName.value = null;
     selectedSrcModelNode.value = null;
     selectedDstModelNode.value = null;

@@ -25,7 +25,7 @@ class FirebaseMessagingService {
   FirebaseMessagingService();
 
   /// 在main的runApp之前调用，用于初始化
-  init() async {
+  Future<void> init() async {
     if (platformParams.mobile || platformParams.macos) {
       await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform);
@@ -34,7 +34,7 @@ class FirebaseMessagingService {
     }
   }
 
-  register() async {
+  Future<void> register() async {
     ///foreground message
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       logger.i('foreground message data: ${message.data}');
@@ -105,11 +105,11 @@ class FirebaseMessagingService {
     return await FirebaseMessaging.instance.getInitialMessage();
   }
 
-  subscribe(String topic) async {
+  Future<void> subscribe(String topic) async {
     await FirebaseMessaging.instance.subscribeToTopic(topic);
   }
 
-  unsubscribe(String topic) async {
+  Future<void> unsubscribe(String topic) async {
     await FirebaseMessaging.instance.unsubscribeFromTopic(topic);
   }
 

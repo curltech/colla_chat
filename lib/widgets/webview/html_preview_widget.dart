@@ -70,8 +70,6 @@ class HtmlPreviewWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => '';
 
-  
-
   @override
   State<StatefulWidget> createState() => _HtmlPreviewWidgetState();
 }
@@ -83,7 +81,7 @@ class _HtmlPreviewWidgetState extends State<HtmlPreviewWidget> {
     super.initState();
   }
 
-  _update() {
+  void _update() {
     setState(() {});
   }
 

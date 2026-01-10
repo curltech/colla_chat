@@ -25,7 +25,7 @@ import 'package:flutter/material.dart';
 class VideoChatDragOverlay {
   DragOverlay? overlayEntry;
 
-  dispose() {
+  void dispose() {
     if (overlayEntry != null) {
       overlayEntry!.close();
       overlayEntry = null;
@@ -33,7 +33,7 @@ class VideoChatDragOverlay {
   }
 
   ///关闭最小化界面，把本界面显示
-  hide() {
+  void hide() {
     if (overlayEntry != null) {
       String? target;
       ConferenceChatMessageController? conferenceChatMessageController =
@@ -62,7 +62,7 @@ class VideoChatDragOverlay {
   }
 
   ///最小化界面，将overlay按钮压入，本界面被弹出
-  show(BuildContext context) {
+  void show(BuildContext context) {
     bool? joined = liveKitConferenceClientPool.conferenceClient?.joined;
     if (joined == null || !joined) {
       joined = p2pConferenceClientPool.conferenceClient?.joined;
@@ -137,7 +137,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     videoChatDragOverlay.dispose();
   }
 
-  _update() {
+  void _update() {
     setState(() {});
   }
 

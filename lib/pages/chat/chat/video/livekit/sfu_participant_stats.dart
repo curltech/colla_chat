@@ -91,7 +91,7 @@ class _SfuParticipantStatsWidgetState extends State<SfuParticipantStatsWidget> {
     }
   }
 
-  _onParticipantChanged() {
+  void _onParticipantChanged() {
     for (var element in listeners) {
       element.dispose();
     }

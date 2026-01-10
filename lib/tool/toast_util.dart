@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 
 class ToastUtil {
-  static show({
+  static void show({
     required BuildContext context,
     AlignmentGeometry? alignment = Alignment.topRight,
     Duration? autoCloseDuration = const Duration(seconds: 5),

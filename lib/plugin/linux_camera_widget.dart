@@ -124,7 +124,7 @@ class _LinuxCameraWidgetState extends State<LinuxCameraWidget> {
     return iconButton;
   }
 
-  _back() async {
+  Future<void> _back() async {
     XFile? current = mediaFileController.current;
     if (widget.onData != null) {
       if (current != null) {

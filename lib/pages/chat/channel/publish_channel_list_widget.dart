@@ -102,7 +102,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
     }
   }
 
-  _scrollMin() {
+  void _scrollMin() {
     // scroll to the bottom of the list when keyboard appears
     Timer(
         const Duration(milliseconds: 200),
@@ -113,7 +113,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
   }
 
   ///将编辑的内容正式发布，统一采用html格式保存和发送，原先保存的草案要转换格式，更新状态
-  _publish(ChatMessage chatMessage) async {
+  Future<void> _publish(ChatMessage chatMessage) async {
     String? mimeType = chatMessage.mimeType;
     if (mimeType == ChatMessageMimeType.json.name) {
       var bytes = await messageAttachmentService.findContent(

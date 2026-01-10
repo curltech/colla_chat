@@ -116,7 +116,7 @@ class PeerClientService extends PeerEntityService<PeerClient> {
 
   ///保存新peerClient信息，mobile和email是否覆盖旧的
   ///同时保存新的linkman联系人
-  store(PeerClient peerClient, {bool mobile = true, bool email = true}) async {
+  Future<void> store(PeerClient peerClient, {bool mobile = true, bool email = true}) async {
     PeerClient? peerClient_ = await findOneByClientId(peerClient.peerId,
         clientId: peerClient.clientId);
     if (peerClient_ != null) {
@@ -155,7 +155,7 @@ class PeerClientService extends PeerEntityService<PeerClient> {
     await refresh(peerId, clientId: clientId);
   }
 
-  refresh(String peerId, {String? clientId}) async {
+  Future<void> refresh(String peerId, {String? clientId}) async {
     peerClients.remove(peerId);
   }
 

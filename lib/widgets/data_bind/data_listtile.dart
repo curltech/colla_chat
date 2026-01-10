@@ -207,13 +207,9 @@ class DataListTile extends StatelessWidget {
           tileData.onTap != null ||
           tileData.routeName != null) {
         var fn = onTap;
-        if (fn != null) {
-          await fn(index, tileData.title, subtitle: tileData.subtitle);
-        }
+        await fn?.call(index, tileData.title, subtitle: tileData.subtitle);
         fn = tileData.onTap;
-        if (fn != null) {
-          await fn(index, tileData.title, subtitle: tileData.subtitle);
-        }
+        await fn?.call(index, tileData.title, subtitle: tileData.subtitle);
 
         ///如果路由名称存在，点击会调用路由
         if (tileData.routeName != null) {
@@ -225,13 +221,9 @@ class DataListTile extends StatelessWidget {
     _onLongPress() async {
       if (onLongPress != null || tileData.onLongPress != null) {
         var fn = onLongPress;
-        if (fn != null) {
-          await fn(index, tileData.title, subtitle: tileData.subtitle);
-        }
+        await fn?.call(index, tileData.title, subtitle: tileData.subtitle);
         fn = tileData.onLongPress;
-        if (fn != null) {
-          await fn(index, tileData.title, subtitle: tileData.subtitle);
-        }
+        await fn?.call(index, tileData.title, subtitle: tileData.subtitle);
       }
     }
 

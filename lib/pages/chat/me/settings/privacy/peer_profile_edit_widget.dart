@@ -169,7 +169,7 @@ class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
     return formInputWidget;
   }
 
-  _onOk(BuildContext context, Map<String, dynamic> values) async {
+  Future<void> _onOk(BuildContext context, Map<String, dynamic> values) async {
     PeerProfile peerProfile = PeerProfile.fromJson(values);
     PeerProfile? myselfPeerProfile = myself.myselfPeer.peerProfile;
     if (myselfPeerProfile == null) {

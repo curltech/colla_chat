@@ -303,7 +303,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   ///接收更新联系人信息的请求
-  receiveFindLinkman(ChatMessage chatMessage) async {
+  Future<void> receiveFindLinkman(ChatMessage chatMessage) async {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     List<String> peerIds = [];
     List<dynamic> list = JsonUtil.toJson(json);
@@ -339,7 +339,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   ///接收到联系人信息，会同时修改消息和联系人
-  receiveModifyLinkman(ChatMessage chatMessage) async {
+  Future<void> receiveModifyLinkman(ChatMessage chatMessage) async {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     List<dynamic> list = JsonUtil.toJson(json);
     for (dynamic map in list) {
@@ -349,7 +349,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
     }
   }
 
-  removeByPeerId(String peerId) {
+  void removeByPeerId(String peerId) {
     delete(where: 'peerId=?', whereArgs: [peerId]);
     linkmen.remove(peerId);
   }

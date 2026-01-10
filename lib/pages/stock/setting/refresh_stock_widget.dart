@@ -30,7 +30,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
       TextEditingController();
   final RxList<TileData> tileData = <TileData>[].obs;
 
-  _initTileData(BuildContext context) {
+  void _initTileData(BuildContext context) {
     tileData.clear();
     tileData.addAll([
       TileData(

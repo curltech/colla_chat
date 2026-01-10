@@ -332,7 +332,7 @@ class DialogUtil {
   }
 
   /// 关闭loading框
-  static loadingHide({BuildContext? context}) {
+  static void loadingHide({BuildContext? context}) {
     context ??= appDataProvider.context!;
     try {
       Navigator.of(context).pop(true);
@@ -515,7 +515,7 @@ class DialogUtil {
   }
 
   /// 底部延时提示错误
-  static error({BuildContext? context, String content = 'Error'}) {
+  static void error({BuildContext? context, String content = 'Error'}) {
     context ??= appDataProvider.context!;
     ScaffoldMessenger.of(context).showSnackBar(_buildSnackBar(
       icon: Icon(
@@ -532,7 +532,7 @@ class DialogUtil {
   }
 
   /// 底部延时警告
-  static warn({BuildContext? context, String content = 'Warning'}) {
+  static void warn({BuildContext? context, String content = 'Warning'}) {
     context ??= appDataProvider.context!;
     ScaffoldMessenger.of(context).showSnackBar(_buildSnackBar(
       icon: Icon(
@@ -549,7 +549,7 @@ class DialogUtil {
   }
 
   /// 底部延时提示
-  static info({BuildContext? context, String content = 'Information'}) {
+  static void info({BuildContext? context, String content = 'Information'}) {
     context ??= appDataProvider.context!;
     ScaffoldMessenger.of(context).showSnackBar(_buildSnackBar(
         icon: Icon(

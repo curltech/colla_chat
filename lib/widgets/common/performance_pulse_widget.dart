@@ -20,7 +20,7 @@ class PerformancePulseWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Performance pulse';
 
-  _init() async {
+  Future<void> _init() async {
     await PerformanceMonitor.instance.initialize(
       config: MonitorConfig(
         showMemory: true,
@@ -54,6 +54,8 @@ class PerformancePulseWidget extends StatelessWidget with TileDataMixin {
         title: title,
         helpPath: routeName,
         withLeading: withLeading,
-        child: PerformanceDashboard(theme:DashboardTheme.light(),));
+        child: PerformanceDashboard(
+          theme: DashboardTheme.light(),
+        ));
   }
 }

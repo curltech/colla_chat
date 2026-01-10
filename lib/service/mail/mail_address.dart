@@ -36,7 +36,7 @@ class EmailAddressService extends GeneralBaseService<MailAddress> {
     return mailAddress;
   }
 
-  store(MailAddress mailAddress) async {
+  Future<void> store(MailAddress mailAddress) async {
     MailAddress? old = await findByMailAddress(mailAddress.email);
     if (old != null) {
       mailAddress.id = old.id;

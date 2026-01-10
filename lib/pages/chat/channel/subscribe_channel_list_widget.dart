@@ -79,7 +79,7 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
     channelChatMessageController.latest();
   }
 
-  _update() {
+  void _update() {
     setState(() {
       channelChatMessageController.latest();
     });
@@ -115,7 +115,7 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
     }
   }
 
-  _scrollMin() {
+  void _scrollMin() {
     // scroll to the bottom of the list when keyboard appears
     Timer(
         const Duration(milliseconds: 200),

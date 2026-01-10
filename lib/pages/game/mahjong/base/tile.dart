@@ -22,7 +22,7 @@ class Tile {
     check();
   }
 
-  check() {
+  void check() {
     if (suit == Suit.none ||
         (suit == Suit.wind && windSuit != null) ||
         (suit != Suit.wind && rank != null)) {
@@ -57,7 +57,7 @@ class Tile {
     };
   }
 
-  loadSprite() async {
+  Future<void> loadSprite() async {
     if (suit == Suit.wind && windSuit != null) {
       String path = '$mahjongCardPath${windSuit!.name}.png';
       try {

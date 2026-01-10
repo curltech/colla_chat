@@ -184,7 +184,7 @@ class AppleMapWidgetState extends State<AppleMapWidget> {
     return mapPopActionData;
   }
 
-  _onMaoPopAction(BuildContext context, int index, String label,
+  Future<void> _onMaoPopAction(BuildContext context, int index, String label,
       {String? value}) async {
     switch (label) {
       case 'Remove':
@@ -249,7 +249,7 @@ class AppleMapWidgetState extends State<AppleMapWidget> {
     );
   }
 
-  _onLongPress(LatLng latLng) async {
+  Future<void> _onLongPress(LatLng latLng) async {
     await DialogUtil.show(
       context: context,
       builder: (BuildContext context) {

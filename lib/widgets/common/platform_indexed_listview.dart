@@ -43,43 +43,43 @@ class PlatformIndexedListView extends StatelessWidget {
       this.itemExtent,
       this.cacheExtent});
 
-  jumpToIndex(int index) {
+  void jumpToIndex(int index) {
     controller.jumpToIndex(index);
   }
 
-  jumpToIndexAndOffset(int index, double offset) {
+  void jumpToIndexAndOffset(int index, double offset) {
     controller.jumpToIndexAndOffset(index: index, offset: offset);
   }
 
-  animateToIndex(int index) async {
+  Future<void> animateToIndex(int index) async {
     await controller.animateToIndex(index);
   }
 
-  animateToIndexAndOffset(int index, double offset) async {
+  Future<void> animateToIndexAndOffset(int index, double offset) async {
     await controller.animateToIndexAndOffset(index: index, offset: offset);
   }
 
-  jumpTo(double offset) {
+  void jumpTo(double offset) {
     controller.jumpTo(offset);
   }
 
-  animateTo(double offset) async {
+  Future<void> animateTo(double offset) async {
     await controller.animateTo(offset);
   }
 
-  jumpToWithSameOriginIndex(double offset) {
+  void jumpToWithSameOriginIndex(double offset) {
     controller.jumpToWithSameOriginIndex(offset);
   }
 
-  animateToWithSameOriginIndex(double offset) async {
+  Future<void> animateToWithSameOriginIndex(double offset) async {
     await controller.animateToWithSameOriginIndex(offset);
   }
 
-  jumpToRelative(double offset) {
+  void jumpToRelative(double offset) {
     controller.jumpToRelative(offset);
   }
 
-  animateToRelative(double offset) async {
+  Future<void> animateToRelative(double offset) async {
     await controller.animateToRelative(offset);
   }
 

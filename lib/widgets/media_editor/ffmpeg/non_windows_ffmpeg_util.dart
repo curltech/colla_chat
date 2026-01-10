@@ -124,7 +124,7 @@ class NonWindowsFFMpegUtil {
     return completer.future;
   }
 
-  static cancel([int? sessionId]) {
+  static void cancel([int? sessionId]) {
     FFmpegKit.cancel(sessionId);
   }
 

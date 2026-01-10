@@ -2,10 +2,9 @@ import 'dart:ui';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:material_neumorphic/material_neumorphic.dart';
 
-buildThemeData() {
+void buildThemeData() {
   ThemeData themeData = myself.themeData.copyWith(
     extensions: <ThemeExtension<dynamic>>[
       const NeumorphicTheme().fitWithColorSchema(myself.colorScheme),

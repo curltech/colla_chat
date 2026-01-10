@@ -23,7 +23,7 @@ class PhotoUtil {
     }
   }
 
-  buildPhotoView({
+  PhotoView buildPhotoView({
     Key? key,
     required ImageProvider<Object>? imageProvider,
     Widget Function(BuildContext, ImageChunkEvent?)? loadingBuilder,
@@ -59,7 +59,7 @@ class PhotoUtil {
     );
   }
 
-  buildPhotoViewGallery(List<String> assetNames) {
+  PhotoViewGallery buildPhotoViewGallery(List<String> assetNames) {
     return PhotoViewGallery.builder(
       itemCount: null,
       builder: (BuildContext context, int index) {

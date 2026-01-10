@@ -53,12 +53,12 @@ class LlmTextMessageInputWidget extends StatelessWidget {
     }
   }
 
-  _play() {
+  void _play() {
     audioPlayer.setLoopMode(false);
     audioPlayer.play('assets/imedia/send.mp3');
   }
 
-  _stop() {
+  void _stop() {
     audioPlayer.stop();
   }
 
@@ -326,7 +326,7 @@ class LlmTextMessageInputWidget extends StatelessWidget {
   }
 
   ///停止录音，把录音数据作为消息发送
-  _onStop(String filename) async {
+  Future<void> _onStop(String filename) async {
     if (StringUtil.isNotEmpty(filename)) {
       List<int>? data = await FileUtil.readFileAsBytes(filename);
       if (data == null) {
@@ -366,7 +366,7 @@ class LlmTextMessageInputWidget extends StatelessWidget {
 
   ///各种不同的ChatGPT的prompt的消息发送命令
   ///比如文本聊天，翻译，提取摘要，文本生成图片
-  _onSend(BuildContext context) async {
+  Future<void> _onSend(BuildContext context) async {
     onSendPressed();
     textEditingController.clear();
   }

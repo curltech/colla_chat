@@ -57,20 +57,20 @@ class ContactUtil {
   }
 
   ///联系人修改监听器
-  static addListener(void Function() fn) {
+  static void addListener(void Function() fn) {
     // Listen to contact database changes
     FlutterContacts.addListener(fn);
   }
 
-  static insert(Contact contact) async {
+  static Future<void> insert(Contact contact) async {
     await contact.insert();
   }
 
-  static update(Contact contact) async {
+  static Future<void> update(Contact contact) async {
     await contact.update();
   }
 
-  static delete(Contact contact) async {
+  static Future<void> delete(Contact contact) async {
     await contact.delete();
   }
 }

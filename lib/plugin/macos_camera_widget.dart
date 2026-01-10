@@ -99,7 +99,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
   }
 
   ///当视频设备识别后，显示预览界面
-  _buildPreviewWidget() {
+  ValueListenableBuilder<List<CameraMacOSDevice>> _buildPreviewWidget() {
     return ValueListenableBuilder(
         valueListenable: videoDevices,
         builder: (BuildContext context, List<CameraMacOSDevice> videoDevices,
@@ -353,7 +353,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
     }
   }
 
-  _takePicture() async {
+  Future<void> _takePicture() async {
     CameraMacOSController? cameraController = this.cameraController.value;
     if (cameraController != null) {
       CameraMacOSFile? imageData = await cameraController.takePicture();
@@ -395,7 +395,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
     return iconButton;
   }
 
-  _back() async {
+  Future<void> _back() async {
     XFile? current = mediaFileController.current;
     if (widget.onData != null) {
       if (current != null) {

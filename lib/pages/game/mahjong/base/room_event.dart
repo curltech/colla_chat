@@ -179,7 +179,7 @@ class RoomEventActions {
     return null;
   }
 
-  init() async {
+  Future<void> init() async {
     for (var outstandingAction in RoomEventAction.values) {
       Sprite? sprite = await loadSprite(outstandingAction);
       if (sprite != null) {

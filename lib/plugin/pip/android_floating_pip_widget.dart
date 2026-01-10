@@ -61,7 +61,7 @@ class AndroidFloatingPipWidget extends StatelessWidget {
 
   AndroidFloatingPipWidget({super.key, required this.disabled});
 
-  enable(
+  void enable(
       {Widget? enabled,
       Rational aspectRatio = const Rational.landscape(),
       Rectangle<int>? sourceRectHint,

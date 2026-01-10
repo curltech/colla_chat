@@ -79,7 +79,7 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
   }
 
   /// 移除远程所有的视频
-  _closeAll() async {
+  Future<void> _closeAll() async {
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {

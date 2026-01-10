@@ -80,7 +80,7 @@ class TreeViewController {
     _init();
   }
 
-  _init() {
+  void _init() {
     _initializeNodes(roots, null);
     _setInitialExpansion(roots, 0);
     _updateAllNodesSelectionState();

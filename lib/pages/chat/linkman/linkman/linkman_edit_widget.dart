@@ -124,7 +124,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     linkmanNotifier.addListener(_update);
   }
 
-  _update() {
+  void _update() {
     setState(() {});
   }
 
@@ -194,7 +194,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     await peerClientService.updateAvatar(peerId, avatar);
   }
 
-  _onOk(Map<String, dynamic> values) async {
+  Future<void> _onOk(Map<String, dynamic> values) async {
     Linkman? linkman = linkmanNotifier.value;
     if (linkman == null) {
       linkman = Linkman('', '');
@@ -216,7 +216,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     }
   }
 
-  _onShare(Map<String, dynamic> values) async {
+  Future<void> _onShare(Map<String, dynamic> values) async {
     final box = context.findRenderObject() as RenderBox?;
     String peerId = values['peerId'];
     PeerClient? peerClient =
@@ -231,7 +231,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     );
   }
 
-  _onCopy(Map<String, dynamic> values) async {
+  Future<void> _onCopy(Map<String, dynamic> values) async {
     String peerId = values['peerId'];
     PeerClient? peerClient =
         await peerClientService.findCachedOneByPeerId(peerId);

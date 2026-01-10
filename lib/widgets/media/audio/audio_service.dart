@@ -52,7 +52,7 @@ class PlatformAudioService {
   static PlatformAudioHandler? _audioHandler;
 
   ///注册音频后台服务的处理器，所有的操作都转发到自定义实现的处理器
-  static init() async {
+  static Future<void> init() async {
     _audioHandler = await AudioService.init<PlatformAudioHandler>(
       builder: () => PlatformAudioHandler(),
       config: const AudioServiceConfig(

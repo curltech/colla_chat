@@ -125,14 +125,14 @@ class NewMailWidget extends StatelessWidget with TileDataMixin {
   }
 
   ///删除附件信息
-  _removeAttachment(PlatformAttachmentInfo info) {
+  void _removeAttachment(PlatformAttachmentInfo info) {
     List<PlatformAttachmentInfo> infos = [];
     attachmentInfos.value.remove(info);
     infos.addAll(attachmentInfos.value);
     attachmentInfos.value = infos;
   }
 
-  _buildMailSubjectWidget(BuildContext context) {
+  Container _buildMailSubjectWidget(BuildContext context) {
     return Container(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: Column(children: [
@@ -331,7 +331,7 @@ class NewMailWidget extends StatelessWidget with TileDataMixin {
     return email;
   }
 
-  _draft(BuildContext context) async {
+  Future<void> _draft(BuildContext context) async {
     DialogUtil.loadingShow();
 
     ///邮件消息的构造器
@@ -367,7 +367,7 @@ class NewMailWidget extends StatelessWidget with TileDataMixin {
   }
 
   ///发送邮件，首先将邮件的编辑部分转换成html格式，对邮件的各个组成部分加密，目标为多人时采用群加密方式，然后发送
-  _send(BuildContext context) async {
+  Future<void> _send(BuildContext context) async {
     DialogUtil.loadingShow();
 
     ///邮件消息的构造器

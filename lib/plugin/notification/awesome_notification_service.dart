@@ -40,7 +40,7 @@ class AwesomeNotificationService {
   AwesomeNotificationService();
 
   /// 在main的runApp之前调用，用于初始化
-  init() async {
+  Future<void> init() async {
     if (platformParams.mobile || platformParams.macos) {
       awesomeNotifications.initialize(
           // set the icon to null if you want to use the default app icon
@@ -64,7 +64,7 @@ class AwesomeNotificationService {
     }
   }
 
-  register() async {
+  Future<void> register() async {
     awesomeNotifications.setListeners(
         onActionReceivedMethod: NotificationController.onActionReceivedMethod,
         onNotificationCreatedMethod:

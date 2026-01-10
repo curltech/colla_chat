@@ -47,8 +47,8 @@ class ImageEditorWidget extends StatelessWidget with TileDataMixin {
       controller: controller,
       onPageChanged: (int index,
           {PlatformSwiperDirection? direction,
-            int? oldIndex,
-            CarouselPageChangedReason? reason}) {
+          int? oldIndex,
+          CarouselPageChangedReason? reason}) {
         this.index.value = index;
       },
       itemBuilder: (BuildContext context, int index, {int? realIndex}) {
@@ -100,7 +100,7 @@ class ImageEditorWidget extends StatelessWidget with TileDataMixin {
               IconButton(
                 tooltip: AppLocalizations.t('Image editor'),
                 onPressed: () async {
-                  await controller.move(1);
+                  controller.move(1);
                 },
                 icon: const Icon(Icons.task_alt_outlined),
               ),
@@ -117,7 +117,7 @@ class ImageEditorWidget extends StatelessWidget with TileDataMixin {
               IconButton(
                 tooltip: AppLocalizations.t('Playlist'),
                 onPressed: () async {
-                  await controller.move(0);
+                  controller.move(0);
                 },
                 icon: const Icon(Icons.featured_play_list_outlined),
               ),

@@ -86,13 +86,13 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
     return false;
   }
 
-  _getConfig() async {
+  Future<void> _getConfig() async {
     String? config = await localSecurityStorage.get('openvpn');
     this.config.value = config;
     _initConfig();
   }
 
-  _initConfig() {
+  void _initConfig() {
     if (config.value != null) {
       List<String> cs = config.value!.split('\n');
       if (cs.isNotEmpty) {

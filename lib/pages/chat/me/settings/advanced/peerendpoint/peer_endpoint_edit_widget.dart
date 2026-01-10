@@ -124,7 +124,7 @@ class PeerEndpointEditWidget extends StatelessWidget with TileDataMixin {
     });
   }
 
-  _onOk(Map<String, dynamic> values) {
+  void _onOk(Map<String, dynamic> values) {
     PeerEndpoint currentPeerEndpoint = PeerEndpoint.fromJson(values);
     peerEndpointService.upsert(currentPeerEndpoint).then((count) {
       peerEndpointController.update(currentPeerEndpoint);

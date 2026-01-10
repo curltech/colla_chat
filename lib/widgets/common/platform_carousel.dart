@@ -44,7 +44,7 @@ class PlatformCarouselController {
     }
   }
 
-  move(int index) {
+  void move(int index) {
     if (swiperController != null) {
       swiperController!.move(index);
     } else if (carouselSliderController != null) {
@@ -58,7 +58,7 @@ class PlatformCarouselController {
     }
   }
 
-  previous() {
+  void previous() {
     if (swiperController != null) {
       swiperController!.previous();
     } else if (carouselSliderController != null) {
@@ -72,7 +72,7 @@ class PlatformCarouselController {
     }
   }
 
-  next() {
+  void next() {
     if (swiperController != null) {
       swiperController!.next();
     } else if (carouselSliderController != null) {

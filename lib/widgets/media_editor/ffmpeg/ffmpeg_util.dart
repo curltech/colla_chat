@@ -80,7 +80,7 @@ class FFMpegUtil {
     return mediaInformation;
   }
 
-  static cancel({FFMpegHelperSession? session}) {
+  static void cancel({FFMpegHelperSession? session}) {
     session?.cancelSession();
   }
 

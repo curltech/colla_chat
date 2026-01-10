@@ -59,7 +59,7 @@ class PlatformAudioPlayer extends StatelessWidget {
     );
   }
 
-  _onSelected(int index, String filename) {
+  void _onSelected(int index, String filename) {
     // swiperController.move(1);
   }
 

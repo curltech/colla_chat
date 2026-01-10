@@ -42,11 +42,11 @@ class _JsonLinkmanAddWidgetState extends State<JsonLinkmanAddWidget> {
     super.initState();
   }
 
-  _update() {
+  void _update() {
     setState(() {});
   }
 
-  _buildJsonTextField(BuildContext context) {
+  Padding _buildJsonTextField(BuildContext context) {
     var jsonTextField = TextFormField(
         controller: jsonController,
         keyboardType: TextInputType.text,

@@ -25,7 +25,7 @@ class AppLocalizations {
 
   AppLocalizations(this.locale, this._localisedValues);
 
-  static init() async {
+  static Future<void> init() async {
     for (var supportedLocale in supportedLocales) {
       await load(supportedLocale);
     }

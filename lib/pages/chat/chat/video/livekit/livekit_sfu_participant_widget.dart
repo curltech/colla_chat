@@ -30,7 +30,7 @@ class LiveKitSfuParticipantWidget extends StatelessWidget with TileDataMixin {
 
   final RxList<TileData> tileData = <TileData>[].obs;
 
-  _init() async {
+  Future<void> _init() async {
     if (roomName.value == null) {
       return;
     }

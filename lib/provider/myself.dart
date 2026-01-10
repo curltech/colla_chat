@@ -76,7 +76,7 @@ class Myself with ChangeNotifier {
     }
   }
 
-  _buildThemeData() {
+  void _buildThemeData() {
     TextTheme textTheme = const TextTheme();
     colorScheme = SeedColorScheme.fromSeeds(
       brightness: Brightness.light,
@@ -92,7 +92,7 @@ class Myself with ChangeNotifier {
         colorScheme: colorScheme, textTheme: textTheme, useMaterial3: true);
   }
 
-  _buildDarkThemeData() {
+  void _buildDarkThemeData() {
     TextTheme textTheme = const TextTheme();
     darkColorScheme = SeedColorScheme.fromSeeds(
       brightness: Brightness.dark,
@@ -174,7 +174,7 @@ class Myself with ChangeNotifier {
     }
   }
 
-  setThemeData({ThemeData? themeData, ThemeData? darkThemeData}) {
+  void setThemeData({ThemeData? themeData, ThemeData? darkThemeData}) {
     bool updated = false;
     if (themeData != null && themeData != _themeData) {
       _themeData = themeData;

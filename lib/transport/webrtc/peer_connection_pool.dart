@@ -188,7 +188,7 @@ class PeerConnectionPool {
     return null;
   }
 
-  put(
+  void put(
     String peerId,
     AdvancedPeerConnection advancedPeerConnection, {
     String clientId = unknownClientId,
@@ -236,7 +236,7 @@ class PeerConnectionPool {
         return null;
       }
 
-      await put(peerId, peerConnection, clientId: clientId);
+      put(peerId, peerConnection, clientId: clientId);
 
       return peerConnection;
     });
@@ -357,7 +357,7 @@ class PeerConnectionPool {
   }
 
   /// 清除过一段时间仍没有连接上的连接
-  clear() async {
+  Future<void> clear() async {
     for (AdvancedPeerConnection peerConnection in all) {
       bool removeNeeded = (peerConnection.dataChannelState == null ||
               peerConnection.dataChannelState ==
@@ -458,7 +458,7 @@ class PeerConnectionPool {
   /// 接收到信号服务器发来的signal的处理,没有完成，要仔细考虑多终端的情况
   /// 如果发来的是answer,寻找主叫的peerId,必须找到，否则报错，找到后检查clientId
   /// 如果发来的是offer,检查peerId，没找到创建一个新的被叫，如果找到，检查clientId
-  onWebrtcSignal(String peerId, WebrtcSignal signal,
+  Future<Null> onWebrtcSignal(String peerId, WebrtcSignal signal,
       {required String clientId}) async {
     var signalType = signal.signalType;
     String name = unknownName;
@@ -610,7 +610,7 @@ class PeerConnectionPool {
     return false;
   }
 
-  removeTrack(String peerId, MediaStream stream, MediaStreamTrack track,
+  Future<void> removeTrack(String peerId, MediaStream stream, MediaStreamTrack track,
       {required String clientId}) async {
     AdvancedPeerConnection? advancedPeerConnection =
         await peerConnectionPool.getOne(peerId, clientId: clientId);
@@ -619,7 +619,7 @@ class PeerConnectionPool {
     }
   }
 
-  replaceTrack(String peerId, MediaStream stream, MediaStreamTrack oldTrack,
+  Future<void> replaceTrack(String peerId, MediaStream stream, MediaStreamTrack oldTrack,
       MediaStreamTrack newTrack,
       {required String clientId}) async {
     AdvancedPeerConnection? advancedPeerConnection =

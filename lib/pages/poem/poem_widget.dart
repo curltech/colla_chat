@@ -115,7 +115,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
     return expansionTile;
   }
 
-  _onSubmit(BuildContext context, Map<String, dynamic> values,
+  Future<void> _onSubmit(BuildContext context, Map<String, dynamic> values,
       {int from = 0, int limit = 10}) async {
     String? title = values['title'];
     String? author = values['author'];

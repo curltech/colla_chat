@@ -104,7 +104,7 @@ class ExtendedTextMessageInputWidget extends StatelessWidget {
         composing: TextRange.empty);
   }
 
-  _onSelected(List<String> selected) {
+  void _onSelected(List<String> selected) {
     if (selected.isNotEmpty) {
       linkmanService
           .findCachedOneByPeerId(selected[0])
@@ -118,7 +118,7 @@ class ExtendedTextMessageInputWidget extends StatelessWidget {
     Navigator.pop(appDataProvider.context!, selected);
   }
 
-  _selectGroupLinkman() async {
+  Future<void> _selectGroupLinkman() async {
     var chatSummary = chatMessageController.chatSummary;
     if (chatSummary != null) {
       if (chatSummary.partyType == PartyType.group.name) {

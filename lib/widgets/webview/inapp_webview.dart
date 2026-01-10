@@ -26,7 +26,7 @@ class FlutterInAppWebView extends StatelessWidget {
     _buildInAppWebView();
   }
 
-  _getSetting() {
+  InAppWebViewSettings _getSetting() {
     InAppWebViewSettings settings = InAppWebViewSettings(
         useShouldOverrideUrlLoading: true,
         mediaPlaybackRequiresUserGesture: false,
@@ -37,7 +37,7 @@ class FlutterInAppWebView extends StatelessWidget {
     return settings;
   }
 
-  _onWebViewCreated(InAppWebViewController controller) {
+  void _onWebViewCreated(InAppWebViewController controller) {
     this.controller = controller;
     if (onWebViewCreated != null) {
       onWebViewCreated!(controller);
@@ -84,8 +84,7 @@ class FlutterInAppWebView extends StatelessWidget {
       }
     } else {
       inAppWebView = Center(
-          child:
-              AutoSizeText(AppLocalizations.t('Not supported platform')));
+          child: AutoSizeText(AppLocalizations.t('Not supported platform')));
     }
 
     return inAppWebView;

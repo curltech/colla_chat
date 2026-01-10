@@ -1,4 +1,3 @@
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/overlay/flutter_floating_widget.dart';
 import 'package:colla_chat/plugin/overlay/mobile_system_alert_window.dart';

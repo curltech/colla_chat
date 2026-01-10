@@ -310,7 +310,7 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
     );
   }
 
-  _onSubmit(Map<String, dynamic> values) async {
+  Future<void> _onSubmit(Map<String, dynamic> values) async {
     int? startTimeMs = values['startTimeMs'];
     int? endTimeMs = values['endTimeMs'];
     double? blur = values['blur'];
@@ -445,7 +445,7 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
               IconButton(
                 tooltip: AppLocalizations.t('Video render'),
                 onPressed: () async {
-                  await controller.move(1);
+                  controller.move(1);
                 },
                 icon: const Icon(Icons.task_alt_outlined),
               ),
@@ -462,7 +462,7 @@ class VideoRendererWidget extends StatelessWidget with TileDataMixin {
               IconButton(
                 tooltip: AppLocalizations.t('Playlist'),
                 onPressed: () async {
-                  await controller.move(0);
+                  controller.move(0);
                 },
                 icon: const Icon(Icons.featured_play_list_outlined),
               ),

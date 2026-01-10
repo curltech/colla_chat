@@ -70,7 +70,7 @@ class FFMpegHelperSession {
     }
   }
 
-  cancelSession({String? name}) async {
+  Future<void> cancelSession({String? name}) async {
     if (ffmpegSessions != null) {
       for (var ffmpegSession in ffmpegSessions!) {
         if (name != null) {

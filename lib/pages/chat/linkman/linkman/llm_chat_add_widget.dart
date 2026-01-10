@@ -85,7 +85,7 @@ class LlmChatAddWidget extends StatelessWidget with TileDataMixin {
     });
   }
 
-  _onOk(BuildContext context, Map<String, dynamic> values) async {
+  Future<void> _onOk(BuildContext context, Map<String, dynamic> values) async {
     if (values['name'] == null) {
       DialogUtil.error(content: AppLocalizations.t('Must have name'));
       return;

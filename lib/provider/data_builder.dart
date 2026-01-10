@@ -16,7 +16,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:cryptography/cryptography.dart';
 
 class DataBuilder {
-  static build() async {
+  static Future<void> build() async {
     List<Linkman> linkmen = [];
     var deviceData = platformParams.deviceData;
     var clientDevice = JsonUtil.toJsonString(deviceData);

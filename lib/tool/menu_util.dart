@@ -11,7 +11,7 @@ import 'package:popup_menu/popup_menu.dart';
 
 class MenuUtil {
   /// 自定义的data action弹出菜单
-  static showPopActionMenu(BuildContext context,
+  static Future<void> showPopActionMenu(BuildContext context,
       {double? width,
       double? height,
       double iconSize = 32,
@@ -40,7 +40,7 @@ class MenuUtil {
   }
 
   /// 使用popmenu组件弹出菜单,widgetKey:弹出菜单位置的组件的GlobalKey，比如按钮菜单
-  static showPopMenu(BuildContext context,
+  static Future<void> showPopMenu(BuildContext context,
       {GlobalKey<State<StatefulWidget>>? widgetKey,
       double? width,
       double? height,

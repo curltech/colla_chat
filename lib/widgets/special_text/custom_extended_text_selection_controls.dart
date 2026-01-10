@@ -56,7 +56,10 @@ class CustomTextSelectionControls extends TextSelectionControls
     final Widget handle = SizedBox(
       width: _kHandleSize,
       height: _kHandleSize,
-      child: Icon(Icons.arrow_drop_up_outlined,color: myself.primary,),
+      child: Icon(
+        Icons.arrow_drop_up_outlined,
+        color: myself.primary,
+      ),
     );
 
     // [handle] is a circle, with a rectangle in the top left quadrant of that

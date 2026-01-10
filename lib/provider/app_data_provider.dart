@@ -53,7 +53,7 @@ class AppDataProvider with ChangeNotifier {
   }
 
   /// 根据totalSize重新计算bodyWidth
-  calBodyWidth() {
+  void calBodyWidth() {
     double totalBodyWidth = portraitSize.width;
     double secondaryBodyWidth = portraitSize.width;
     double bodyWidth;
@@ -263,7 +263,7 @@ class AppDataProvider with ChangeNotifier {
   }
 
   ///当外部改变屏幕大小的时候引起index页面的重建，从而调用这个方法改变size
-  changeWindowSize() {
+  void changeWindowSize() {
     if (this.context == null) {
       logger.e('context has not set!');
       return;

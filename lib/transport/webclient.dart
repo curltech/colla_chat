@@ -34,7 +34,7 @@ class WebClient extends IWebClient {
     }
   }
 
-  setDefault(String address) async {
+  Future<void> setDefault(String address) async {
     if (address.startsWith('wss') || address.startsWith('ws')) {
       _wsDefault = await websocketPool.get(address, isDefault: true);
     } else if (address.startsWith('https') || address.startsWith('http')) {
@@ -60,7 +60,7 @@ class WebClient extends IWebClient {
   }
 
   @override
-  get status => throw UnimplementedError();
+  Never get status => throw UnimplementedError();
 }
 
 final WebClient webClient = WebClient();

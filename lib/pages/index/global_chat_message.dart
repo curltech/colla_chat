@@ -57,12 +57,12 @@ class GlobalChatMessage {
   }
 
   /// 从AdvancedPeerConnection收到消息事件，先解密数据，然后转换成chatMessage
-  onMessage(WebrtcEvent event) async {
+  Future<void> onMessage(WebrtcEvent event) async {
     List<int> data = event.data;
     await onData(data, TransportType.webrtc);
   }
 
-  onData(List<int> data, TransportType transportType) async {
+  Future<void> onData(List<int> data, TransportType transportType) async {
     ChatMessage? chatMessage = await chatMessageService.decrypt(data);
     if (chatMessage != null) {
       chatMessage.transportType = transportType.name;
@@ -121,7 +121,7 @@ class GlobalChatMessage {
   }
 
   ///接收到加密的短信
-  onSmsMessage(SmsMessage smsMessage) async {
+  Future<void> onSmsMessage(SmsMessage smsMessage) async {
     var mobile = smsMessage.address;
     String? body = smsMessage.body;
     if (body == null) {
@@ -136,7 +136,7 @@ class GlobalChatMessage {
     onLinkmanSmsMessage(linkman, body);
   }
 
-  onLinkmanSmsMessage(Linkman linkman, String text) async {
+  Future<void> onLinkmanSmsMessage(Linkman linkman, String text) async {
     var peerId = linkman.peerId;
     var clientId = linkman.clientId;
     Uint8List data = CryptoUtil.decodeBase64(text);
@@ -273,7 +273,7 @@ class GlobalChatMessage {
     }
   }
 
-  _receiveChatReceipt(ChatMessage chatMessage) async {
+  Future<void> _receiveChatReceipt(ChatMessage chatMessage) async {
     String? subMessageType = chatMessage.subMessageType;
     if (subMessageType != ChatMessageSubType.chatReceipt.name) {
       logger.e('chatMessage is not chatReceipt');
@@ -351,7 +351,7 @@ class GlobalChatMessage {
   }
 
   ///收到signal加密初始化消息
-  _receivePreKeyBundle(ChatMessage chatMessage) async {
+  Future<void> _receivePreKeyBundle(ChatMessage chatMessage) async {
     String content = chatMessageService.recoverContent(chatMessage.content!);
     String peerId = chatMessage.senderPeerId!;
     String? clientId = chatMessage.senderClientId;
@@ -384,7 +384,7 @@ class GlobalChatMessage {
   }
 
   /// 收到webrtc signal消息
-  _receiveSignal(ChatMessage chatMessage) async {
+  Future<void> _receiveSignal(ChatMessage chatMessage) async {
     var json = chatMessageService.recoverContent(chatMessage.content!);
     String peerId = chatMessage.senderPeerId!;
     String clientId = chatMessage.senderClientId!;
@@ -396,12 +396,12 @@ class GlobalChatMessage {
   }
 
   ///发送新的联系人信息
-  sendModifyLinkman(String peerId, {String? clientId}) async {
+  Future<void> sendModifyLinkman(String peerId, {String? clientId}) async {
     await linkmanService.modifyLinkman(peerId, clientId: clientId);
   }
 
   ///发送PreKeyBundle
-  sendPreKeyBundle(String peerId, {required String clientId}) async {
+  Future<void> sendPreKeyBundle(String peerId, {required String clientId}) async {
     return;
     PreKeyBundle preKeyBundle =
         signalSessionPool.signalKeyPair.getPreKeyBundle();

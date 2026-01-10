@@ -43,31 +43,31 @@ class CustomLogger {
     return _myLogger;
   }
 
-  clearMyLogger() {
+  void clearMyLogger() {
     _myLogger = null;
   }
 
-  t(dynamic msg) {
+  void t(dynamic msg) {
     logger.v(msg);
   }
 
-  d(dynamic msg) {
+  void d(dynamic msg) {
     logger.d(msg);
   }
 
-  i(dynamic msg) {
+  void i(dynamic msg) {
     logger.i(msg);
   }
 
-  w(dynamic msg) {
+  void w(dynamic msg) {
     logger.w(msg);
   }
 
-  e(dynamic msg) {
+  void e(dynamic msg) {
     logger.e(msg);
   }
 
-  f(dynamic msg) {
+  void f(dynamic msg) {
     logger.wtf(msg);
   }
 }
@@ -114,7 +114,7 @@ class LoggerController with ChangeNotifier {
   int total = 100;
   final List<String> _logs = [];
 
-  append(List<String> logs) async {
+  Future<void> append(List<String> logs) async {
     if (_logs.length >= 100) {
       await synchronized(() async {
         try {
@@ -150,7 +150,7 @@ class _LoggerConsoleWidgetState extends State<LoggerConsoleWidget> {
     loggerController.addListener(_update);
   }
 
-  _update() {
+  void _update() {
     if (mounted) {
       setState(() {});
     }

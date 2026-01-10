@@ -267,7 +267,7 @@ class MessageWidget {
     return body;
   }
 
-  _onMessagePopAction(BuildContext context, int index, String label,
+  Future<void> _onMessagePopAction(BuildContext context, int index, String label,
       {String? value}) async {
     switch (label) {
       case 'Resend':
@@ -452,7 +452,7 @@ class MessageWidget {
     }
   }
 
-  _notify() async {
+  Future<void> _notify() async {
     String? title = chatMessage.title;
     String? content = chatMessage.content;
     if (content != null) {

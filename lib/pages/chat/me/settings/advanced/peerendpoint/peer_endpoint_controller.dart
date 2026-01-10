@@ -31,7 +31,7 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
     }
   }
 
-  init() async {
+  Future<void> init() async {
     data.clear();
     for (var peerEndpoint in nodeAddressOptions.values) {
       peerEndpointService.store(peerEndpoint);

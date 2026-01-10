@@ -24,7 +24,7 @@ class InAppPipPlayerWidget extends StatelessWidget {
     ),
   );
 
-  enable({Widget? enabled}) {
+  void enable({Widget? enabled}) {
     if (enabled != null) {
       this.enabled.value = enabled;
     }

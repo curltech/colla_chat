@@ -82,7 +82,7 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
   //当前群的头像
   final Rx<String?> groupAvatar = Rx<String?>(null);
 
-  _initGroup() {
+  void _initGroup() {
     Group? current = groupNotifier.value;
     if (current == null) {
       current = Group('', '');
@@ -90,7 +90,7 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _buildGroupData(BuildContext context) async {
+  Future<void> _buildGroupData(BuildContext context) async {
     Group? current = groupNotifier.value;
     if (current == null) {
       return;
@@ -111,7 +111,7 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
   }
 
   //更新groupOwnerChoices
-  _buildGroupOwnerOptions() async {
+  Future<void> _buildGroupOwnerOptions() async {
     Group? current = groupNotifier.value;
     if (current == null) {
       return;

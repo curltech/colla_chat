@@ -56,7 +56,7 @@ class NearbyGroupAddWidget extends StatelessWidget with TileDataMixin {
   TextEditingController textEditingController = TextEditingController();
   StreamSubscription<ChainMessage>? chainMessageListen;
 
-  _buildSearchTextField(BuildContext context) {
+  TextFormField _buildSearchTextField(BuildContext context) {
     var searchTextField = TextFormField(
         controller: textEditingController,
         keyboardType: TextInputType.text,

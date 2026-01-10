@@ -10,7 +10,7 @@ class EntityUtil {
     }
   }
 
-  static setId(dynamic entity, Object val) {
+  static void setId(dynamic entity, Object val) {
     if (entity is Map) {
       entity['id'] = val;
     } else {
@@ -26,7 +26,7 @@ class EntityUtil {
     }
   }
 
-  static setSelected(dynamic entity, bool? val) {
+  static void setSelected(dynamic entity, bool? val) {
     if (entity is Map) {
       entity['selected'] = val;
     } else {
@@ -34,7 +34,7 @@ class EntityUtil {
     }
   }
 
-  static createTimestamp(dynamic entity) {
+  static void createTimestamp(dynamic entity) {
     var currentDate = DateUtil.currentDate();
     var ownerPeerId = myself.peerId;
     if (entity is Map) {
@@ -74,14 +74,14 @@ class EntityUtil {
     }
   }
 
-  static removeNullId(Map map) {
+  static void removeNullId(Map map) {
     var id = getId(map);
     if (id == null) {
       map.remove('id');
     }
   }
 
-  static removeNull(Map map) {
+  static void removeNull(Map map) {
     List<String> keys = [];
     for (var entry in map.entries) {
       dynamic key = entry.key;

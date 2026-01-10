@@ -43,7 +43,7 @@ class _PeerMediaRenderViewState extends State<PeerMediaRenderView> {
   }
 
   //绑定视频流到渲染器
-  bindRTCVideoRender() async {
+  Future<void> bindRTCVideoRender() async {
     MediaStream? mediaStream = widget.peerMediaStream.mediaStream;
     if (mediaStream != null) {
       renderer = RTCVideoRenderer();
@@ -53,7 +53,7 @@ class _PeerMediaRenderViewState extends State<PeerMediaRenderView> {
     readyRenderer.value = true;
   }
 
-  close() {
+  void close() {
     var renderer = this.renderer;
     renderer?.srcObject = null;
     try {

@@ -83,7 +83,7 @@ class ChannelChatMessageService {
   }
 
   ///接收到更新频道消息的请求,发送发布的频道消息
-  receiveUpdateSubscript(ChatMessage chatMessage) async {
+  Future<void> receiveUpdateSubscript(ChatMessage chatMessage) async {
     var subMessageType = chatMessage.subMessageType;
     if (ChatMessageSubType.updateSubscript.name != subMessageType) {
       return;

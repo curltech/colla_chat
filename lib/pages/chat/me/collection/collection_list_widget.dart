@@ -133,7 +133,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
     return tile;
   }
 
-  _onTapCollection(int index, String title,
+  void _onTapCollection(int index, String title,
       {String? subtitle, TileData? group}) {
     collectionChatMessageController.setCurrentIndex = index;
   }

@@ -36,7 +36,7 @@ class InoutEventController extends DataListController<DayLine> {
   }
 
   /// 设置当前事件代码
-  setEventCode(String? eventCode, {String? eventName}) {
+  void setEventCode(String? eventCode, {String? eventName}) {
     _eventCode(eventCode);
     _eventName(eventName);
     data.clear();
@@ -67,7 +67,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
   late final PlatformReactiveFormController searchController;
   final ExpansibleController expansibleController = ExpansibleController();
 
-  _init() {
+  void _init() {
     final List<PlatformDataField> searchDataField = [
       PlatformDataField(
         name: 'eventCode',
@@ -176,7 +176,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
   }
 
   /// 构建搜索条件
-  _buildSearchView(BuildContext context) {
+  Widget _buildSearchView(BuildContext context) {
     searchController.values = {'eventCode': inoutEventController.eventCode};
     int tradeDate = DateUtil.formatDateInt(DateUtil.currentDateTime());
     searchController.values = {'tradeDate': tradeDate};
@@ -200,7 +200,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
     return platformReactiveForm;
   }
 
-  _onSubmit(BuildContext context, Map<String, dynamic> values) async {
+  Future<void> _onSubmit(BuildContext context, Map<String, dynamic> values) async {
     String? eventCode = values['eventCode'];
     String? tsCode = values['tsCode'];
     int? tradeDate = values['tradeDate'];
@@ -224,7 +224,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
     );
   }
 
-  refresh({String? eventCode, String? tsCode, int? tradeDate}) async {
+  Future<void> refresh({String? eventCode, String? tsCode, int? tradeDate}) async {
     eventCode ??= inoutEventController.eventCode;
     if (eventCode == null) {
       return;

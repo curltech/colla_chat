@@ -46,7 +46,7 @@ class AdvancedPeerConnection {
   }
 
   /// 监听信号流，注册各种webrtc event
-  _registerStreamController() {
+  void _registerStreamController() {
     for (WebrtcEventType webrtcEventType in WebrtcEventType.values) {
       webrtcEventStreamControllers[webrtcEventType] =
           StreamController<WebrtcEvent>.broadcast();
@@ -192,7 +192,7 @@ class AdvancedPeerConnection {
   }
 
   /// 在peerConnectionPool的webrtcEventType的流控制器中加入事件
-  _addWebrtcEventType(WebrtcEventType webrtcEventType, dynamic data) async {
+  Future<void> _addWebrtcEventType(WebrtcEventType webrtcEventType, dynamic data) async {
     StreamController<WebrtcEvent>? webrtcEventStreamController =
         webrtcEventStreamControllers[webrtcEventType];
     if (webrtcEventStreamController != null) {
@@ -206,11 +206,11 @@ class AdvancedPeerConnection {
     }
   }
 
-  renegotiate({bool toggle = false}) async {
+  Future<void> renegotiate({bool toggle = false}) async {
     await basePeerConnection.negotiate(toggle: toggle);
   }
 
-  restartIce() async {
+  Future<void> restartIce() async {
     await basePeerConnection.restartIce();
   }
 
@@ -247,7 +247,7 @@ class AdvancedPeerConnection {
   }
 
   /// 主动从连接中移除本地媒体流，然后会激活onRemoveStream
-  removeLocalStreams(List<PeerMediaStream> peerMediaStreams) async {
+  Future<void> removeLocalStreams(List<PeerMediaStream> peerMediaStreams) async {
     if (connectionState ==
         RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
       logger.e('PeerConnection closed');
@@ -268,7 +268,7 @@ class AdvancedPeerConnection {
   }
 
   /// 主动从连接中移除一个本地轨道，然后会激活onRemoveTrack
-  removeTrack(MediaStream stream, MediaStreamTrack track) async {
+  Future<void> removeTrack(MediaStream stream, MediaStreamTrack track) async {
     await basePeerConnection.removeTrack(stream, track);
   }
 
@@ -289,7 +289,7 @@ class AdvancedPeerConnection {
     return null;
   }
 
-  replaceTrack(MediaStream stream, MediaStreamTrack oldTrack,
+  Future<void> replaceTrack(MediaStream stream, MediaStreamTrack oldTrack,
       MediaStreamTrack newTrack) async {
     await basePeerConnection.replaceTrack(stream, oldTrack, newTrack);
   }
@@ -342,23 +342,23 @@ class AdvancedPeerConnection {
   ///连接成功
   ///webrtc连接完成后首先交换最新的联系人信息，然后请求新的订阅渠道消息
   ///然后交换棘轮加密的密钥
-  onConnected(WebrtcEvent event) async {
+  Future<void> onConnected(WebrtcEvent event) async {
     p2pConferenceClientPool.onConnected(this);
   }
 
   ///从池中移除连接
-  onClosed(WebrtcEvent event) async {
+  Future<void> onClosed(WebrtcEvent event) async {
     peerConnectionPool.remove(event.peerId, clientId: event.clientId);
     signalSessionPool.close(peerId: event.peerId, clientId: event.clientId);
   }
 
   ///连接状态发生改变
-  onConnectionState(WebrtcEvent event) async {}
+  Future<void> onConnectionState(WebrtcEvent event) async {}
 
-  onSignalingState(WebrtcEvent event) async {}
+  Future<void> onSignalingState(WebrtcEvent event) async {}
 
   /// 对被叫方，数据通道的打开时间比连接的建立时间要晚很多
-  onDataChannelState(WebrtcEvent event) async {
+  Future<void> onDataChannelState(WebrtcEvent event) async {
     logger.i('data channel event:${event.peerId}');
     if (event.eventType == WebrtcEventType.dataChannelState) {
       RTCDataChannelState state = event.data as RTCDataChannelState;
@@ -372,32 +372,32 @@ class AdvancedPeerConnection {
     }
   }
 
-  onError(WebrtcEvent event) async {}
+  Future<void> onError(WebrtcEvent event) async {}
 
-  onInitiator(WebrtcEvent event) async {}
+  Future<void> onInitiator(WebrtcEvent event) async {}
 
-  onStream(WebrtcEvent event) async {
+  Future<void> onStream(WebrtcEvent event) async {
     String peerId = event.peerId;
     String clientId = event.clientId;
     String name = event.name;
     MediaStream stream = event.data;
   }
 
-  onAddStream(WebrtcEvent event) async {
+  Future<void> onAddStream(WebrtcEvent event) async {
     String peerId = event.peerId;
     String clientId = event.clientId;
     String name = event.name;
     MediaStream stream = event.data;
   }
 
-  onRemoveStream(WebrtcEvent event) async {
+  Future<void> onRemoveStream(WebrtcEvent event) async {
     String peerId = event.peerId;
     String clientId = event.clientId;
     String name = event.name;
     MediaStream stream = event.data;
   }
 
-  onTrack(WebrtcEvent event) async {
+  Future<void> onTrack(WebrtcEvent event) async {
     String peerId = event.peerId;
     String clientId = event.clientId;
     String name = event.name;
@@ -406,7 +406,7 @@ class AdvancedPeerConnection {
     MediaStreamTrack track = data['track'];
   }
 
-  onAddTrack(WebrtcEvent event) async {
+  Future<void> onAddTrack(WebrtcEvent event) async {
     String peerId = event.peerId;
     String clientId = event.clientId;
     String name = event.name;
@@ -415,7 +415,7 @@ class AdvancedPeerConnection {
     MediaStreamTrack track = data['track'];
   }
 
-  onRemoveTrack(WebrtcEvent event) async {
+  Future<void> onRemoveTrack(WebrtcEvent event) async {
     String peerId = event.peerId;
     String clientId = event.clientId;
     String name = event.name;
@@ -424,7 +424,7 @@ class AdvancedPeerConnection {
     MediaStreamTrack track = data['track'];
   }
 
-  close() async {
+  Future<void> close() async {
     await basePeerConnection.close();
   }
 }

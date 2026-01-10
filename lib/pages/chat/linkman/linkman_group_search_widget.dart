@@ -51,7 +51,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
   }
 
   ///构造已选择的联系人和群的数据
-  _initOption() async {
+  Future<void> _initOption() async {
     List<Option<String>> options = [];
     if (widget.selected.isNotEmpty) {
       for (String select in widget.selected) {

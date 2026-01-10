@@ -29,7 +29,7 @@ class IndexWidgetProvider with ChangeNotifier {
   IndexWidgetProvider();
 
   ///初始化主菜单视图
-  initMainView(PlatformCarouselController controller, List<TileDataMixin> views) {
+  void initMainView(PlatformCarouselController controller, List<TileDataMixin> views) {
     this.controller = controller;
     for (TileDataMixin view in views) {
       define(view);
@@ -38,14 +38,14 @@ class IndexWidgetProvider with ChangeNotifier {
     }
   }
 
-  addMainView(String routeName) {
+  void addMainView(String routeName) {
     if (!mainViews.contains(routeName) && allViews.containsKey(routeName)) {
       mainViews.add(routeName);
       notifyListeners();
     }
   }
 
-  removeMainView(String routeName) {
+  void removeMainView(String routeName) {
     if (mainViews.contains(routeName)) {
       mainViews.remove(routeName);
       notifyListeners();
@@ -54,7 +54,7 @@ class IndexWidgetProvider with ChangeNotifier {
 
   ///增加新的视图，不能在initState和build构建方法中调用listen=true，
   ///因为本方法会引起整个pageview视图的重新构建
-  define(TileDataMixin view, {bool listen = false}) {
+  void define(TileDataMixin view, {bool listen = false}) {
     allViews[view.routeName] = view;
     if (listen) {
       notifyListeners();
@@ -111,7 +111,7 @@ class IndexWidgetProvider with ChangeNotifier {
   }
 
   ///把名字压入堆栈，然后跳转
-  push(String name, {bool push = true, BuildContext? context}) {
+  void push(String name, {bool push = true, BuildContext? context}) {
     //判断要进入的页面是否存在
     TileDataMixin? view = allViews[name];
     if (view == null) {
@@ -150,7 +150,7 @@ class IndexWidgetProvider with ChangeNotifier {
   }
 
   ///弹出最新的，跳转到第二新的
-  pop({BuildContext? context}) {
+  void pop({BuildContext? context}) {
     // if (popAction) {
     //   popAction = false;
     //   return;

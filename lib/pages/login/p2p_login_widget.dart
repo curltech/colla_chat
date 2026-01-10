@@ -191,7 +191,7 @@ class P2pLoginWidget extends StatelessWidget {
   }
 
   //验证
-  _auth(Map<String, dynamic> values) async {
+  Future<void> _auth(Map<String, dynamic> values) async {
     String? credential = values[credentialName];
     String? password = values[passwordName];
     if (credential == null) {
@@ -222,7 +222,7 @@ class P2pLoginWidget extends StatelessWidget {
   }
 
   ///登录
-  _login(BuildContext context, Map<String, dynamic> values) async {
+  Future<void> _login(BuildContext context, Map<String, dynamic> values) async {
     String? credential = values[credentialName];
     String? password = values[passwordName];
     if (credential == null) {

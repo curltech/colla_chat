@@ -18,7 +18,7 @@ class WsAddressPicker extends StatelessWidget {
   final TextEditingController _wsConnectAddressController =
       TextEditingController();
 
-  _init() {
+  void _init() {
     var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
     if (defaultPeerEndpoint != null) {
       var wsConnectAddress = defaultPeerEndpoint.wsConnectAddress;

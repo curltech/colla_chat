@@ -124,7 +124,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///当前chatSummary是必须存在的，不存在就查找到
   ///当前chatMessage在选择了视频邀请消息后，也是存在的
   ///如果chatMessage不存在，表明是准备新的会议
-  setChatMessage(ChatMessage chatMessage, {ChatSummary? chatSummary}) async {
+  Future<void> setChatMessage(ChatMessage chatMessage, {ChatSummary? chatSummary}) async {
     await _lock.synchronized(() async {
       _close();
       //消息未变，直接返回
@@ -166,7 +166,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   }
 
   ///校验_chatMessage和_chatSummary，不一致则重新设置_chatSummary
-  _initChatSummary() async {
+  Future<void> _initChatSummary() async {
     if (_chatSummary == null && _chatMessage != null) {
       ChatSummary? chatSummary = await _findChatSummary();
       _chatSummary = chatSummary;
@@ -199,7 +199,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   }
 
   ///根据_chatMessage设置会议属性
-  _initChatMessage() async {
+  Future<void> _initChatMessage() async {
     if (_chatMessage!.subMessageType == ChatMessageSubType.videoChat.name) {
       String json = chatMessageService.recoverContent(_chatMessage!.content!);
       Map map = JsonUtil.toJson(json);
@@ -232,7 +232,7 @@ class ConferenceChatMessageController with ChangeNotifier {
     chatReceipts[chatReceipt.senderPeerId!] = chatReceipt;
   }
 
-  _initChatReceipt() async {
+  Future<void> _initChatReceipt() async {
     _chatReceipts.clear();
     var messageId = _chatMessage!.messageId!;
     List<ChatMessage> chatMessages =
@@ -248,7 +248,7 @@ class ConferenceChatMessageController with ChangeNotifier {
     return _chatReceipts[subMessageType]?[peerId];
   }
 
-  playAudio(String filename, bool loopMode) {
+  void playAudio(String filename, bool loopMode) {
     try {
       _audioPlayer.setLoopMode(loopMode);
       _audioPlayer.play(filename);
@@ -257,7 +257,7 @@ class ConferenceChatMessageController with ChangeNotifier {
     }
   }
 
-  stopAudio({String? filename, bool loopMode = false}) async {
+  Future<void> stopAudio({String? filename, bool loopMode = false}) async {
     try {
       await _audioPlayer.stop();
       await _audioPlayer.release();
@@ -272,7 +272,7 @@ class ConferenceChatMessageController with ChangeNotifier {
     }
   }
 
-  setAudioContext({
+  Future<void> setAudioContext({
     AudioContextConfigRoute? route,
     AudioContextConfigFocus? focus,
     bool? respectSilence,
@@ -297,7 +297,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///3.发送会议邀请回执，用于被邀请方
   ///接收到视频通话邀请，做出接受或者拒绝视频通话邀请的决定
   ///如果是接受决定，本控制器将被加入到池中
-  sendChatReceipt(MessageReceiptType receiptType) async {
+  Future<void> sendChatReceipt(MessageReceiptType receiptType) async {
     ChatSummary? chatSummary = _chatSummary;
     if (chatSummary == null) {
       logger.e('conference chat message controller chatSummary is null');
@@ -345,7 +345,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   }
 
   ///仅仅发送回执消息
-  _sendChatReceipt(MessageReceiptType receiptType) async {
+  Future<void> _sendChatReceipt(MessageReceiptType receiptType) async {
     ChatMessage? chatMessage = _chatMessage;
     if (chatMessage == null) {
       return;
@@ -362,7 +362,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   }
 
   ///发送linkman视频邀请消息的回执
-  _sendLinkmanChatReceipt(MessageReceiptType receiptType) async {
+  Future<void> _sendLinkmanChatReceipt(MessageReceiptType receiptType) async {
     ChatMessage? chatMessage = _chatMessage;
     if (chatMessage == null) {
       return;
@@ -385,7 +385,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   }
 
   ///发送group视频邀请消息的回执
-  _sendGroupChatReceipt(MessageReceiptType receiptType) async {
+  Future<void> _sendGroupChatReceipt(MessageReceiptType receiptType) async {
     ChatMessage? chatMessage = _chatMessage;
     if (chatMessage == null) {
       return;
@@ -404,7 +404,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   }
 
   ///发送conference视频邀请消息的回执
-  _sendConferenceChatReceipt(MessageReceiptType receiptType) async {
+  Future<void> _sendConferenceChatReceipt(MessageReceiptType receiptType) async {
     ChatMessage? chatMessage = _chatMessage;
     if (chatMessage == null) {
       return;
@@ -430,7 +430,7 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   ///在会议创建后，打开本地视频，如果存在则直接返回，
   ///否则在linkman模式下自动创建，会议和群模式根据auto参数决定是否自动创建
-  openLocalMainPeerMediaStream() async {
+  Future<void> openLocalMainPeerMediaStream() async {
     PeerMediaStream? mainPeerMediaStream =
         localPeerMediaStreamController.mainPeerMediaStream;
     if (mainPeerMediaStream != null) {
@@ -458,7 +458,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///4.接受到视频通话回执，一般由globalChatMessageController分发到此
   ///在多个接收人的场景下，首先检查自己是否已经发过回执，存在是accepted则继续处理
   ///如果不存在，则发送自己的决定，如果存在是rejected或者terminated，则不处理
-  onReceivedChatReceipt(ChatMessage chatReceipt) async {
+  Future<void> onReceivedChatReceipt(ChatMessage chatReceipt) async {
     await stopAudio();
     //当前的视频通话邀请消息不为空
     if (_chatMessage == null) {
@@ -481,7 +481,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///收到视频通话的回执的处理，
   ///在群通话的情况下，可以收到多次，包括多个接收人的回执
   ///根据消息回执是接受拒绝还是终止进行处理
-  _onReceivedChatReceipt(ChatMessage chatReceipt) async {
+  Future<void> _onReceivedChatReceipt(ChatMessage chatReceipt) async {
     String? receiptType = chatReceipt.receiptType;
     if (receiptType == null) {
       return;
@@ -566,7 +566,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   }
 
   ///对方终止，把对方移除会议
-  _onTerminated(
+  Future<void> _onTerminated(
       PlatformParticipant platformParticipant, String messageId) async {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
@@ -665,13 +665,13 @@ class ConferenceChatMessageController with ChangeNotifier {
   }
 
   ///通知所有人自己加入会议，发送join回执，并且加入
-  join() async {
+  Future<void> join() async {
     await joinConference();
     await _sendChatReceipt(MessageReceiptType.join);
   }
 
   ///自己主动加入
-  joinConference() async {
+  Future<void> joinConference() async {
     if (_conference!.sfu) {
       LiveKitConferenceClient? liveKitConferenceClient =
           liveKitConferenceClientPool
@@ -699,19 +699,19 @@ class ConferenceChatMessageController with ChangeNotifier {
   }
 
   ///自己主动退出会议，发送exit回执
-  exit() async {
+  Future<void> exit() async {
     await _sendChatReceipt(MessageReceiptType.exit);
     status = VideoChatStatus.end;
   }
 
   ///自己主动终止，发送terminate回执，关闭会议
   ///如果会议发起人发出终止信号，收到的参与者都将退出，而且会议将不可再加入
-  terminate() async {
+  Future<void> terminate() async {
     await _sendChatReceipt(MessageReceiptType.terminated);
     close();
   }
 
-  close() async {
+  Future<void> close() async {
     await _lock.synchronized(() {
       _close();
     });

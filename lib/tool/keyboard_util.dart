@@ -24,7 +24,7 @@ class KeyboardVisibilityUtil {
   }
 
   /// 点击键盘消失的组件
-  static keyboardDismissOnTap({
+  static KeyboardDismissOnTap keyboardDismissOnTap({
     Key? key,
     required Widget child,
     bool dismissOnCapturedTaps = false,

@@ -432,7 +432,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
     });
   }
 
-  removeByConferenceId(String conferenceId) async {
+  Future<void> removeByConferenceId(String conferenceId) async {
     delete(where: 'conferenceId=?', whereArgs: [conferenceId]);
     conferences.remove(conferenceId);
   }

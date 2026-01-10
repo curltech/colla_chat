@@ -97,7 +97,7 @@ class NodeFrameComponent extends RectangleComponent
   }
 
   /// 子组件的大小发生变化，调用此方法更新框架组件的大小
-  updateSize() {
+  void updateSize() {
     if (child != null) {
       height = child!.height;
       width = child!.width;

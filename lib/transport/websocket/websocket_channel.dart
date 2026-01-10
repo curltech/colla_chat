@@ -27,7 +27,7 @@ class ConnectivityController {
         ConnectivityUtil.onConnectivityChanged(_onConnectivityChanged);
   }
 
-  _onConnectivityChanged(List<ConnectivityResult> result) {
+  void _onConnectivityChanged(List<ConnectivityResult> result) {
     connectivityResult(result);
     if (ConnectivityUtil.getMainResult(
             connectivityController.connectivityResult) !=
@@ -141,7 +141,7 @@ class WebSocketChannel extends IWebSocket {
     return false;
   }
 
-  onData(dynamic data) async {
+  Future<void> onData(dynamic data) async {
     if (lastHeartBeatTime == null && channel != null) {
       statusStreamController.add(_status);
     }
@@ -167,7 +167,7 @@ class WebSocketChannel extends IWebSocket {
   }
 
   ///连接被关闭或出错的时候重连
-  onDone() async {
+  Future<void> onDone() async {
     int? closeCode;
     String? closeReason;
     if (channel != null) {
@@ -182,7 +182,7 @@ class WebSocketChannel extends IWebSocket {
     reconnect();
   }
 
-  onError(err) async {
+  Future<void> onError(err) async {
     logger.e("wss address:$address websocket onError, $err");
     if (status != SocketStatus.disconnecting) {
       status = SocketStatus.disconnecting;
@@ -454,13 +454,13 @@ class WebsocketPool {
     return websocket;
   }
 
-  close(String address) async {
+  Future<void> close(String address) async {
     await lock.synchronized(() async {
       _close(address);
     });
   }
 
-  _close(String address) {
+  void _close(String address) {
     if (websockets.containsKey(address)) {
       var websocket = websockets[address];
       if (websocket != null) {

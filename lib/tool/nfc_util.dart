@@ -28,14 +28,14 @@ class NfcUtil {
     return await FlutterNfcKit.readNDEFRecords(cached: false);
   }
 
-  static write(String data) async {
+  static Future<void> write(String data) async {
     List<ndef.NDEFRecord> records = [];
     ndef.NDEFRecord record = ndef.TextRecord(text: data);
     records.add(record);
     await FlutterNfcKit.writeNDEFRecords(records);
   }
 
-  static finish() async {
+  static Future<void> finish() async {
     await FlutterNfcKit.finish();
   }
 }

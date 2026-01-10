@@ -29,14 +29,14 @@ class OptionController with ChangeNotifier {
     }
   }
 
-  setSelected(Option<String> option, bool selected) {
+  void setSelected(Option<String> option, bool selected) {
     if (option.selected != selected) {
       option.selected = selected;
       notifyListeners();
     }
   }
 
-  setSingleSelected(Option<String> option, bool selected) {
+  void setSingleSelected(Option<String> option, bool selected) {
     for (var opt in _options) {
       if (opt != option) {
         opt.selected = false;
@@ -168,11 +168,11 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
     _search();
   }
 
-  _update() {
+  void _update() {
     options.value = [...widget.optionController.options];
   }
 
-  _search() async {
+  Future<void> _search() async {
     if (widget.onSearch != null) {
       await widget.onSearch!(textController.text);
     } else {
@@ -335,7 +335,7 @@ class _CustomSingleSelectFieldState extends State<CustomSingleSelectField> {
     _update();
   }
 
-  _update() {
+  void _update() {
     for (var option in widget.optionController.options) {
       if (option.selected) {
         textEditingController.text = option.label;
@@ -447,11 +447,11 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
     _search();
   }
 
-  _update() {
+  void _update() {
     options.value = widget.optionController.copy();
   }
 
-  _search() async {
+  Future<void> _search() async {
     if (widget.onSearch != null) {
       await widget.onSearch!(textController.text);
     } else {
@@ -699,7 +699,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
     widget.optionController.addListener(_update);
   }
 
-  _update() {
+  void _update() {
     optionsChanged.value = !optionsChanged.value;
   }
 

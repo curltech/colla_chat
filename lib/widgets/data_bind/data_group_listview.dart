@@ -16,24 +16,24 @@ class GroupDataListController {
     return allData[tile];
   }
 
-  _addAll({required Map<TileData, List<TileData>> tileData}) {
+  void _addAll({required Map<TileData, List<TileData>> tileData}) {
     allData.addEntries(tileData.entries);
   }
 
-  addAll({required Map<TileData, List<TileData>> tileData}) {
+  void addAll({required Map<TileData, List<TileData>> tileData}) {
     if (tileData.isNotEmpty) {
       _addAll(tileData: tileData);
     }
   }
 
-  add(TileData tile, List<TileData> tileData) {
+  void add(TileData tile, List<TileData> tileData) {
     List<TileData>? data = allData[tile];
     data ??= [];
     data.addAll([...tileData]);
     allData[tile] = data;
   }
 
-  remove(TileData tile) {
+  void remove(TileData tile) {
     if (allData.containsKey(tile)) {
       allData.remove(tile);
     }
@@ -57,7 +57,7 @@ class GroupDataListView extends StatelessWidget {
     }
   }
 
-  _onTap(int index, String title, {String? subtitle, TileData? group}) {
+  void _onTap(int index, String title, {String? subtitle, TileData? group}) {
     var onTap = this.onTap;
     if (onTap != null) {
       onTap(index, title, subtitle: subtitle, group: group);

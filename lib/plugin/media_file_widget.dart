@@ -26,7 +26,7 @@ class MediaFileWidgetState extends State<MediaFileWidget> {
     super.initState();
   }
 
-  _update() {
+  void _update() {
     if (mounted) {
       setState(() {});
     }

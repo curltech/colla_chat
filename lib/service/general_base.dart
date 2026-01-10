@@ -327,7 +327,7 @@ abstract class GeneralBaseService<T> {
   }
 
   /// 批量保存，根据脏标志新增，修改或者删除
-  save(List<T> entities, [dynamic ignore, dynamic parent]) async {
+  Future<Object?>? save(List<T> entities, [dynamic ignore, dynamic parent]) async {
     List<Map<String, dynamic>> operators = [];
     for (var entity in entities) {
       Map<String, dynamic> json = await _encryptFields(entity);

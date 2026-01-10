@@ -29,7 +29,7 @@ class ChatMessageInputWidget extends StatelessWidget {
 
   ChatMessageInputWidget({super.key, this.onAction});
 
-  _onEmojiTap(String text) {
+  void _onEmojiTap(String text) {
     textMessageInputWidget.insertText(text);
   }
 

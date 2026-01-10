@@ -16,7 +16,7 @@ class FileTalkerObserver extends TalkerObserver {
     init();
   }
 
-  init() async {
+  Future<void> init() async {
     var current = DateTime.now();
     var filename =
         'colla_chat-${current.year}-${current.month}-${current.day}.log';
@@ -97,37 +97,37 @@ class TalkerLogger {
     }
   }
 
-  t(String msg) {
+  void t(String msg) {
     _talkerLogger.verbose(msg);
     _logger.t(msg);
   }
 
-  d(String msg) {
+  void d(String msg) {
     _talkerLogger.debug(msg);
     _logger.d(msg);
   }
 
-  i(String msg) {
+  void i(String msg) {
     _talkerLogger.info(msg);
     _logger.i(msg);
   }
 
-  w(String msg) {
+  void w(String msg) {
     _talkerLogger.warning(msg);
     _logger.w(msg);
   }
 
-  e(String msg) {
+  void e(String msg) {
     _talkerLogger.error(msg);
     _logger.e(msg);
   }
 
-  f(String msg) {
+  void f(String msg) {
     _talkerLogger.critical(msg);
     _logger.f(msg);
   }
 
-  clearMyLogger() {
+  void clearMyLogger() {
     _myLogger = null;
   }
 }

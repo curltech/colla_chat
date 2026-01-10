@@ -235,7 +235,7 @@ class ImageUtil {
   }
 
   ///以下时extendedImage的功能
-  buildGestureConfig({
+  GestureConfig buildGestureConfig({
     double minScale = 0.8,
     double maxScale = 5.0,
     double speed = 1.0,
@@ -263,7 +263,7 @@ class ImageUtil {
     );
   }
 
-  buildEditorConfig({
+  EditorConfig buildEditorConfig({
     double maxScale = 5.0,
     EdgeInsets cropRectPadding = const EdgeInsets.all(20.0),
     Size cornerSize = const Size(30.0, 5.0),
@@ -321,7 +321,7 @@ class ImageUtil {
   }
 
   ///压缩图片，适用于多个平台
-  static compress({
+  static Future<String?>? compress({
     required String filename,
     required String path,
     CompressMode mode = CompressMode.LARGE2SMALL,

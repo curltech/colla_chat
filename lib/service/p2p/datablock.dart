@@ -124,7 +124,7 @@ class DataBlockService extends BaseService {
     return dataBlocks;
   }
 
-  static sign(DataBlock dataBlock) async {
+  static Future<void> sign(DataBlock dataBlock) async {
     var privateKey = myself.privateKey;
     if (privateKey == null) {
       throw 'NullPrivateKey';
@@ -146,7 +146,7 @@ class DataBlockService extends BaseService {
     dataBlock.signature = String.fromCharCodes(signature);
   }
 
-  static verify(DataBlock dataBlock) async {
+  static Future<void> verify(DataBlock dataBlock) async {
     // 消息的数据部分，验证签名
     var peerId = dataBlock.peerId;
     var transportPayload = dataBlock.transportPayload;
@@ -250,7 +250,7 @@ class DataBlockService extends BaseService {
   /// 客户端加密处理基本的DataBlock数据，加密每个交易的负载
   ///
   /// 假设基本数据已经存在，但是没有经过加密处理，分片处理，hash处理和签名处理
-  encrypt(DataBlock dataBlock) async {
+  Future<void> encrypt(DataBlock dataBlock) async {
     // 设置客户端的基本属性
     dataBlock.peerId = myself.peerId;
     // 设置数据的时间戳
@@ -316,7 +316,7 @@ class DataBlockService extends BaseService {
   }
 
   /// 接受者解密（如果加密的化），在分片合并，校验DataBlock数据后执行解密
-  decrypt(DataBlock dataBlock, bool verify) async {
+  Future<void> decrypt(DataBlock dataBlock, bool verify) async {
     var transactionKeys = dataBlock.transactionKeys;
 
     if (transactionKeys == null && dataBlock.transportKey != null) {
@@ -419,8 +419,8 @@ class DataBlockService extends BaseService {
     }
   }
 
-  blockMerge(Map dbMap) async {
-    var blocks = [];
+  Future<List<DataBlock>> blockMerge(Map dbMap) async {
+    var blocks = <DataBlock>[];
     for (var key in dbMap.keys) {
       var dataBlocks = dbMap[key];
       if (dataBlocks && TypeUtil.isArray(dataBlocks) && dataBlocks.length > 0) {
@@ -432,7 +432,7 @@ class DataBlockService extends BaseService {
     return blocks;
   }
 
-  blockMapMerge(Map targetMap, Map dbMap) async {
+  Future<void> blockMapMerge(Map targetMap, Map dbMap) async {
     var blocks = [];
     // 每个不同的块号循环
     for (var key in dbMap.keys) {
@@ -455,7 +455,7 @@ class DataBlockService extends BaseService {
   /// @param {*} connectPeerId
   /// @param {*} conditionBean
   /// @param {*} options
-  _find(String connectPeerId,
+  Future<Map<dynamic, dynamic>> _find(String connectPeerId,
       {required Map conditionBean, required Map options}) async {
     Map blockMap = {};
     conditionBean['receiverPeerId'] = myself.peerId;
@@ -473,7 +473,7 @@ class DataBlockService extends BaseService {
     return blockMap;
   }
 
-  loadUrl(url, uriVariables) async {
+  Future<dynamic> loadUrl(url, uriVariables) async {
     var html;
 
     return html;
@@ -482,7 +482,7 @@ class DataBlockService extends BaseService {
   /// 获取块中的负载
   ///
   /// @param {*} dataBlocks
-  getPayload(List<DataBlock> dataBlocks) {
+  List<dynamic>? getPayload(List<DataBlock> dataBlocks) {
     if (dataBlocks.isNotEmpty) {
       var data = [];
       // 循环不同的块号
@@ -511,13 +511,13 @@ class DataBlockService extends BaseService {
   ///
   /// @param {*} connectPeerId
   /// @param {*} blockId
-  findTx(connectPeerId, blockId) async {
+  Future<dynamic> findTx(connectPeerId, blockId) async {
     /**
      * 首先获取所有交易的第1个分片
      */
     var blockMap = await _find(connectPeerId,
         options: {'blockId': blockId, 'sliceNumber': 1}, conditionBean: {});
-    if (blockMap) {
+
       var block = blockMap[blockId];
       if (block) {
         var sliceSize = block[0].sliceSize;
@@ -544,7 +544,6 @@ class DataBlockService extends BaseService {
           }
         }
       }
-    }
 
     return blockMap;
   }
@@ -555,7 +554,7 @@ class DataBlockService extends BaseService {
   ///
   /// @param {*} connectPeerId
   /// @param {*} blockId
-  findTxPayload(String connectPeerId, String blockId) async {
+  Future<dynamic> findTxPayload(String connectPeerId, String blockId) async {
     var blockMap = await findTx(connectPeerId, blockId);
     var dataBlocks = await blockMerge(blockMap);
     var data = getPayload(dataBlocks);

@@ -75,14 +75,14 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
     }
   }
 
-  previous() async {
+  Future<void> previous() async {
     if (currentIndex.value == null || currentIndex.value == 0) {
       return;
     }
     setCurrentIndex = currentIndex.value! - 1;
   }
 
-  next() async {
+  Future<void> next() async {
     if (currentIndex.value == null || currentIndex.value! >= data.length - 1) {
       return;
     }
@@ -214,7 +214,7 @@ class PlaylistWidget extends StatelessWidget {
   PlaylistWidget(
       {super.key, this.onSelected, required this.playlistController}) {
     playlistController.currentIndex.addListener(() async {
-      await _buildTileData();
+      _buildTileData();
     });
   }
 
@@ -222,7 +222,7 @@ class PlaylistWidget extends StatelessWidget {
   final RxList<TileData> tileData = RxList<TileData>([]);
 
   ///从收藏的文件中加入播放列表
-  _collect() async {
+  Future<void> _collect() async {
     String fileType = playlistController.fileType.name;
     ChatMessageContentType? contentType =
         StringUtil.enumFromString(ChatMessageContentType.values, fileType);
@@ -250,7 +250,7 @@ class PlaylistWidget extends StatelessWidget {
     playlistController.addMediaFiles(filenames: filenames);
   }
 
-  _buildTileData() {
+  void _buildTileData() {
     List<PlatformMediaSource> mediaSources = playlistController.data;
     List<TileData> tileData = [];
     for (var mediaSource in mediaSources) {
@@ -373,7 +373,8 @@ class PlaylistWidget extends StatelessWidget {
   }
 
   ///选择文件加入播放列表
-  _addMediaSource(BuildContext context, {bool directory = false}) async {
+  Future<void> _addMediaSource(BuildContext context,
+      {bool directory = false}) async {
     try {
       await playlistController.sourceFilePicker(directory: directory);
     } catch (e) {
@@ -381,7 +382,7 @@ class PlaylistWidget extends StatelessWidget {
     }
   }
 
-  _removeFromCollect(int index) async {
+  Future<void> _removeFromCollect(int index) async {
     PlatformMediaSource? mediaSource = playlistController.delete(index: index);
     var messageId = mediaSource?.messageId;
     if (messageId != null) {
@@ -390,7 +391,7 @@ class PlaylistWidget extends StatelessWidget {
   }
 
   ///将播放列表的文件加入收藏
-  _collectMediaSource(int index) async {
+  Future<void> _collectMediaSource(int index) async {
     PlatformMediaSource? mediaSource = playlistController.get(index);
     if (mediaSource == null) {
       return;
@@ -470,7 +471,7 @@ class PlaylistWidget extends StatelessWidget {
           color: myself.primary,
         ),
         onTap: (int index, String label, {String? value}) async {
-          await playlistController.clear();
+          playlistController.clear();
         },
         tooltip: AppLocalizations.t('Remove all video file'),
       ),

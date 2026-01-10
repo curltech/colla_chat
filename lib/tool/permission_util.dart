@@ -22,7 +22,7 @@ class PermissionUtil {
     return PermissionStatus.denied;
   }
 
-  static openAppSettings(Permission permission) async {
+  static Future<void> openAppSettings(Permission permission) async {
     if (await permission.isPermanentlyDenied) {
       openAppSettings(permission);
     }

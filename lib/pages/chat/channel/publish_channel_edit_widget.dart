@@ -68,7 +68,7 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     return '';
   }
 
-  _onPreview() async {
+  Future<void> _onPreview() async {
     indexWidgetProvider.push('html_preview');
     htmlPreviewController.title = textEditingController.text;
     htmlPreviewController.html = await platformEditorController.html;

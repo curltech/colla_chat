@@ -40,7 +40,7 @@ class MobileFlPipEnabledWidget extends StatelessWidget {
 
   MobileFlPipEnabledWidget({super.key});
 
-  enable(
+  void enable(
       {Widget? enabled,
       FlPiPAndroidConfig android = const FlPiPAndroidConfig(),
       FlPiPiOSConfig ios = const FlPiPiOSConfig()}) {

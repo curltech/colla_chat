@@ -8,7 +8,7 @@ class EasyVideoEditor {
 
   EasyVideoEditor(this.videoInputPath);
 
-  edit(String outputVideoPath,
+  Future<String?>? edit(String outputVideoPath,
       {int? startTimeMs,
       int? endTimeMs,
       List<String>? mergeVideoPaths,
@@ -66,7 +66,7 @@ class EasyVideoEditor {
     return audioPath;
   }
 
-  generateThumbnail({
+  Future<String?>? generateThumbnail({
     required int positionMs,
     required int quality,
     int? height,

@@ -66,7 +66,7 @@ class FlutterPipWindow extends StatelessWidget {
     return AndroidFloatingPipWidget(disabled: Center(child: disabled));
   }
 
-  enable({Widget? enabled}) {
+  void enable({Widget? enabled}) {
     if (platformParams.mobile) {
       mobileFlPipEnabledWidget.enable(enabled: enabled);
     } else if (platformParams.android) {

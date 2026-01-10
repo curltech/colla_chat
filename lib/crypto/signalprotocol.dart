@@ -27,7 +27,7 @@ class SignalKeyPair {
 
   /// 在初始化的时候，客户端需要产生注册编号，身份密钥对，预先生成的密钥对数组，签名后的预先密钥对
   /// 并序列化存储起来，方便后续使用
-  init() async {
+  Future<void> init() async {
     //注册编号
     registrationId = generateRegistrationId(false);
     //身份密钥对
@@ -192,7 +192,7 @@ class SignalSession {
     }
   }
 
-  init() async {
+  Future<void> init() async {
     //产生会话builder
     var sessionBuilder = SessionBuilder(
         signalSessionPool.signalKeyPair.sessionStore,
@@ -223,7 +223,7 @@ class SignalSession {
   }
 
   ///没搞懂怎么用
-  groupProcess(Uint8List data) async {
+  Future<void> groupProcess(Uint8List data) async {
     final receivedDistributionMessage =
         SenderKeyDistributionMessageWrapper.fromSerialized(data);
     await groupSessionBuilder!
@@ -314,7 +314,7 @@ class SignalSession {
     return plaintext;
   }
 
-  close() async {}
+  Future<void> close() async {}
 }
 
 class SignalSessionPool {
@@ -340,7 +340,7 @@ class SignalSessionPool {
         SignalProtocolAddress('$peerId:$clientId', deviceId);
   }
 
-  init() async {
+  Future<void> init() async {
     signalKeyPair = SignalKeyPair();
     await signalKeyPair.init();
   }
@@ -380,7 +380,7 @@ class SignalSessionPool {
     return signalSessions[signalProtocolAddress];
   }
 
-  close({
+  void close({
     required String peerId,
     required String clientId,
     int deviceId = 1,
@@ -391,7 +391,7 @@ class SignalSessionPool {
     logger.i('peerId: $peerId clientId:$clientId removed');
   }
 
-  clear() {
+  void clear() {
     signalSessions.clear();
   }
 }

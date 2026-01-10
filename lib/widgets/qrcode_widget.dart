@@ -38,7 +38,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
     _init();
   }
 
-  _init() {
+  void _init() {
     actionData.clear();
     actionData.add(ActionData(
       label: 'Save to file',
@@ -62,7 +62,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
     ));
   }
 
-  _onPopAction(BuildContext context, int index, String label,
+  Future<void> _onPopAction(BuildContext context, int index, String label,
       {String? value}) async {
     switch (label) {
       case 'Save to file':

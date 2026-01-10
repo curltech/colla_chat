@@ -11,7 +11,7 @@ class PlatformEmailServiceProvider {
 
   PlatformEmailServiceProvider();
 
-  init() {
+  void init() {
     ///著名的邮件服务提供商
     _init(GmailProvider());
     _init(OutlookProvider());
@@ -23,7 +23,7 @@ class PlatformEmailServiceProvider {
     _init(Mail163Provider());
   }
 
-  _init(EmailServiceProvider emailServiceProvider) {
+  void _init(EmailServiceProvider emailServiceProvider) {
     emailServiceProviders.add(emailServiceProvider);
     var domains = emailServiceProvider.domains;
     if (domains != null && domains.isNotEmpty) {

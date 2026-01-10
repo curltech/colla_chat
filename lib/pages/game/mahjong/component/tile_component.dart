@@ -138,7 +138,7 @@ class TileComponent extends PositionComponent
     _render(canvas);
   }
 
-  discard() {
+  void discard() {
     RoundParticipant? roundParticipant = roomController
         .getRoundParticipant(roomController.selfParticipantDirection.value);
     Map<RoomEventAction, Set<int>>? outstandingActions =

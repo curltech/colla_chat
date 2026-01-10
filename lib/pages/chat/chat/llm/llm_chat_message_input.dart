@@ -19,7 +19,7 @@ class LlmChatMessageInputWidget extends StatelessWidget {
 
   LlmChatMessageInputWidget({super.key});
 
-  _onEmojiTap(String text) {
+  void _onEmojiTap(String text) {
     llmTextMessageInputWidget.insertText(text);
   }
 

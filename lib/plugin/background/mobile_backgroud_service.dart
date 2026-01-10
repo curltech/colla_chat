@@ -43,12 +43,12 @@ class MobileBackgroundService {
   }
 
   ///设置服务线程为前台模式，使用service.invoke将方法字符串setAsForeground数据发送给服务线程
-  setAsForeground() {
+  void setAsForeground() {
     service.invoke("setAsForeground");
   }
 
   ///设置服务线程为后台模式
-  setAsBackground() {
+  void setAsBackground() {
     service.invoke("setAsBackground");
   }
 
@@ -63,7 +63,7 @@ class MobileBackgroundService {
   }
 
   ///停止服务线程
-  stop() async {
+  Future<void> stop() async {
     if (await isRunning()) {
       service.invoke("stopService");
     }

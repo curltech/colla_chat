@@ -62,7 +62,7 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
     return peer;
   }
 
-  modify(PeerSignal peerSignal) async {
+  Future<void> modify(PeerSignal peerSignal) async {
     PeerSignal? old = await findOneByPeerId(peerSignal.peerId,
         clientId: peerSignal.clientId, signalType: peerSignal.signalType);
     if (old == null) {

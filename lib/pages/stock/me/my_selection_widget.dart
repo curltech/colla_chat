@@ -151,7 +151,7 @@ class MyShareController {
   }
 
   /// 删除分组，自选股分组不能删除
-  removeGroup(String groupName) async {
+  Future<void> removeGroup(String groupName) async {
     String defaultGroupName =
         AppLocalizations.t(ShareGroupService.defaultGroupName);
     if (defaultGroupName != groupName) {
@@ -334,7 +334,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
   }
 
   /// 如果此时有记录被选择，则选择的记录将被移入组中
-  _addMember(String groupName) async {
+  Future<void> _addMember(String groupName) async {
     List<DayLine> dayLines = dayLineController.selected;
     if (dayLines.isEmpty) {
       return;
@@ -353,7 +353,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
     await myShareController.addMember(groupName, tsCodes);
   }
 
-  _removeMember() async {
+  Future<void> _removeMember() async {
     String groupName = myShareController.groupName.value;
     String defaultGroupName =
         AppLocalizations.t(ShareGroupService.defaultGroupName);
@@ -382,7 +382,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
     }
   }
 
-  _removeShare() async {
+  Future<void> _removeShare() async {
     List<DayLine> dayLines = dayLineController.selected;
     if (dayLines.isEmpty) {
       return;
@@ -398,7 +398,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
     }
   }
 
-  _refresh({String? groupName}) async {
+  Future<void> _refresh({String? groupName}) async {
     groupName ??= myShareController.groupName.value;
     String? subscription = await myShareController.findSubscription(groupName);
     if (subscription != null) {

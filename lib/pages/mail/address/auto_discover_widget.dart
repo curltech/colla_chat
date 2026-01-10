@@ -47,7 +47,7 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
   final RxList<Option<String>> emailServiceProviderOptions =
       RxList<Option<String>>([]);
 
-  _updateEmailServiceProviderOptions() {
+  void _updateEmailServiceProviderOptions() {
     List<Option<String>> items = [];
     for (var emailServiceProvider
         in platformEmailServiceProvider.emailServiceProviders) {
@@ -185,7 +185,7 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
     DialogUtil.loadingHide();
   }
 
-  _connect(Map<String, dynamic> values) async {
+  Future<void> _connect(Map<String, dynamic> values) async {
     String? name = values['name'];
     String? email = values['email'];
     String? password = values['password'];

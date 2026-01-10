@@ -21,7 +21,7 @@ class RoomController {
     init();
   }
 
-  init() {
+  void init() {
     width = appDataProvider.secondaryBodyWidth + appDataProvider.bodyWidth;
     height = appDataProvider.totalSize.height - appDataProvider.toolbarHeight;
     if (width < height) {

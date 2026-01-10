@@ -40,7 +40,7 @@ class BackgroundPicker extends StatelessWidget {
   }
 
   // 从相册选取图片
-  _openGallery({
+  Future<void> _openGallery({
     ImageSource source = ImageSource.gallery,
   }) async {
     final ImagePicker picker = ImagePicker();

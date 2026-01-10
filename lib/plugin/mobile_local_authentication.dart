@@ -6,7 +6,7 @@ import 'package:local_auth_darwin/local_auth_darwin.dart';
 class MobileLocalAuthenticationPlugin {
   final LocalAuthentication auth = LocalAuthentication();
 
-  init() async {
+  Future<void> init() async {
     final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
     final bool canAuthenticate =
         canAuthenticateWithBiometrics || await auth.isDeviceSupported();

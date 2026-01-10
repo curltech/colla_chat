@@ -11,7 +11,7 @@ class BaseVideoEditor {
 
   BaseVideoEditor(this.videoInputPath);
 
-  _init(
+  void _init(
       {Duration maxDuration = Duration.zero,
       Duration minDuration = Duration.zero,
       base.CoverSelectionStyle coverStyle = const base.CoverSelectionStyle(),
@@ -29,11 +29,11 @@ class BaseVideoEditor {
     editor!.initialize(aspectRatio: aspectRatio);
   }
 
-  dispose() {
+  void dispose() {
     editor?.dispose();
   }
 
-  edit(String outputVideoPath,
+  Future<void> edit(String outputVideoPath,
       {double? minTrimPos,
       double? maxTrimPos,
       Offset? cropTopLeft,

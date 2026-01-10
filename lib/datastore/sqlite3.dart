@@ -84,7 +84,7 @@ class Sqlite3 extends DataStore {
     return true;
   }
 
-  reset() {
+  void reset() {
     File file = File(dbPath);
     if (file.existsSync()) {
       file.deleteSync();
@@ -92,7 +92,7 @@ class Sqlite3 extends DataStore {
   }
 
   /// 关闭数据库
-  close() {
+  void close() {
     if (db != null) {
       db!.dispose();
       db == null;
@@ -107,7 +107,7 @@ class Sqlite3 extends DataStore {
     return null;
   }
 
-  restore({String? path}) async {
+  Future<void> restore({String? path}) async {
     File file = File(dbPath);
     if (file.existsSync()) {
       close();
@@ -124,7 +124,7 @@ class Sqlite3 extends DataStore {
 
   /// 删除数据库
   /// @param {*} options
-  remove() {}
+  void remove() {}
 
   /// 批量执行sql，参数是二维数组
   /// @param {*} sqls
@@ -193,7 +193,7 @@ class Sqlite3 extends DataStore {
     }
   }
 
-  vacuum() {
+  void vacuum() {
     try {
       db!.execute('VACUUM');
     } catch (e) {

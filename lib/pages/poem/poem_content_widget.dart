@@ -21,7 +21,7 @@ class PoemContentWidget extends StatelessWidget {
 
   PoemContentWidget({super.key, required this.poemController});
 
-  speak(Poem poem) async {
+  Future<void> speak(Poem poem) async {
     var platformTextToSpeech = this.platformTextToSpeech.value;
     if (platformTextToSpeech) {
       var ttsState = platformTextToSpeechWidget.ttsState.value;
@@ -32,7 +32,7 @@ class PoemContentWidget extends StatelessWidget {
     }
   }
 
-  pause() {
+  void pause() {
     var platformTextToSpeech = this.platformTextToSpeech.value;
     if (platformTextToSpeech) {
       var ttsState = platformTextToSpeechWidget.ttsState.value;
@@ -42,7 +42,7 @@ class PoemContentWidget extends StatelessWidget {
     }
   }
 
-  stop() {
+  void stop() {
     var platformTextToSpeech = this.platformTextToSpeech.value;
     if (platformTextToSpeech) {
       platformTextToSpeechWidget.stop();

@@ -133,7 +133,7 @@ class MoreMessageInput extends StatelessWidget {
     return actionData;
   }
 
-  _onAction(int index, String name, {String? value}) async {
+  Future<void> _onAction(int index, String name, {String? value}) async {
     if (onAction != null) {
       onAction!(index, name, value: value);
       return;
@@ -172,7 +172,7 @@ class MoreMessageInput extends StatelessWidget {
   }
 
   ///阅后删除时间
-  _onActionDeleteTime() async {
+  Future<void> _onActionDeleteTime() async {
     int? deleteTime = await DialogUtil.showSelectDialog<int>(
         title: AutoSizeText(AppLocalizations.t('Select delete time')),
         items: [
@@ -193,7 +193,7 @@ class MoreMessageInput extends StatelessWidget {
   }
 
   ///视频通话
-  _onActionVideoChat() async {
+  Future<void> _onActionVideoChat() async {
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     String? partyType = chatSummary?.partyType;
     if (partyType == PartyType.linkman.name) {
@@ -218,7 +218,7 @@ class MoreMessageInput extends StatelessWidget {
     }
   }
 
-  _onActionSfuVideoChat() async {
+  Future<void> _onActionSfuVideoChat() async {
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     String? partyType = chatSummary?.partyType;
     if (partyType == PartyType.linkman.name) {
@@ -249,7 +249,7 @@ class MoreMessageInput extends StatelessWidget {
   }
 
   ///相册
-  _onActionAlbum() async {
+  Future<void> _onActionAlbum() async {
     if (platformParams.mobile) {
       final List<AssetEntity>? assets = await AssetUtil.pickAssets();
       if (assets != null && assets.isNotEmpty) {
@@ -292,7 +292,7 @@ class MoreMessageInput extends StatelessWidget {
   }
 
   ///拍照
-  _onActionPicture() async {
+  Future<void> _onActionPicture() async {
     Uint8List? data;
     String? filename;
     String? mimeType = ChatMessageMimeType.jpg.name;

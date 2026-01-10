@@ -93,7 +93,7 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
         });
   }
 
-  _onTap(BuildContext context, int index, String title,
+  void _onTap(BuildContext context, int index, String title,
       {TileData? group, String? subtitle}) {
     switch (title) {
       case 'Vacuum':
@@ -128,7 +128,7 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _vacuum(BuildContext context) async {
+  Future<void> _vacuum(BuildContext context) async {
     sqlite3.vacuum();
     File file = File(appDataProvider.sqlite3Path);
     if (file.existsSync()) {
@@ -141,7 +141,7 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
   }
 
   ///备份整个colla.db文件
-  _backup(BuildContext context) {
+  void _backup(BuildContext context) {
     File? file = sqlite3.backup();
     if (file != null) {
       DialogUtil.info(

@@ -67,7 +67,7 @@ class AdaptiveContainer extends StatelessWidget {
     }
   }
 
-  closeSlider() {
+  void closeSlider() {
     sliderDrawerKey?.currentState?.closeSlider();
     controller?.move(1);
     if (zoomDrawerController != null) {
@@ -76,7 +76,7 @@ class AdaptiveContainer extends StatelessWidget {
     resizableController?.setSizes([ResizableSize.pixels(0)]);
   }
 
-  openSlider() {
+  void openSlider() {
     sliderDrawerKey?.currentState?.openSlider();
     controller?.move(0);
     if (zoomDrawerController != null) {
@@ -85,7 +85,7 @@ class AdaptiveContainer extends StatelessWidget {
     resizableController?.setSizes([ResizableSize.pixels(pixels)]);
   }
 
-  toggle() {
+  void toggle() {
     sliderDrawerKey?.currentState?.toggle();
     if (index.value == 0) {
       controller?.move(1);

@@ -41,7 +41,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
   final DataListController<QStat> qstatController = DataListController<QStat>();
   final ExpansibleController expansibleController = ExpansibleController();
 
-  _init() {
+  void _init() {
     searchDataField = [
       PlatformDataField(
         name: 'startDate',
@@ -118,7 +118,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
     searchController = PlatformReactiveFormController(searchDataField);
   }
 
-  refresh(String tsCode, {List<dynamic>? terms, List<dynamic>? source}) async {
+  Future<void> refresh(String tsCode, {List<dynamic>? terms, List<dynamic>? source}) async {
     Map<String, dynamic> responseData = await remoteQStatService
         .sendFindQStatBy(tsCode: tsCode, terms: terms, source: source);
     var count = responseData['count'];
@@ -172,7 +172,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
     return platformReactiveForm;
   }
 
-  _onSubmit(BuildContext context, Map<String, dynamic> values) async {
+  Future<void> _onSubmit(BuildContext context, Map<String, dynamic> values) async {
     String? tsCode = values['tsCode'];
     if (tsCode == null) {
       DialogUtil.error(content: 'tsCode must be value');

@@ -90,7 +90,7 @@ class Subject {
     return rect;
   }
 
-  add(NodeRelationship nodeRelationship) {
+  void add(NodeRelationship nodeRelationship) {
     relationships['${nodeRelationship.srcId}-${nodeRelationship.dstId}'] =
         nodeRelationship;
   }

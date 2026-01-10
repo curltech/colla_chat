@@ -36,7 +36,7 @@ class ChatMessageItem extends StatelessWidget {
   final RxInt leftDeleteTime = 0.obs;
   Timer? timer;
 
-  _buildDeleteTimer() async {
+  Future<void> _buildDeleteTimer() async {
     var deleteTime = chatMessage.deleteTime;
     if (deleteTime == 0) {
       return;

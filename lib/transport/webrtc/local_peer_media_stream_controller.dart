@@ -75,7 +75,7 @@ class PeerMediaStreamController with ChangeNotifier {
     return streams;
   }
 
-  _add(PeerMediaStream peerMediaStream) async {
+  Future<bool> _add(PeerMediaStream peerMediaStream) async {
     var peerId = peerMediaStream.platformParticipant?.peerId;
     if (peerId != null) {
       if (!_peerMediaStreams.containsKey(peerId)) {
@@ -95,7 +95,7 @@ class PeerMediaStreamController with ChangeNotifier {
   }
 
   /// 如果不存在，增加peerMediaStream，激活add事件
-  add(PeerMediaStream peerMediaStream, {bool notify = true}) async {
+  Future<void> add(PeerMediaStream peerMediaStream, {bool notify = true}) async {
     bool success = await _streamLock.synchronized(() async {
       return await _add(peerMediaStream);
     });
@@ -105,7 +105,7 @@ class PeerMediaStreamController with ChangeNotifier {
     }
   }
 
-  addRemoteTrack(RemoteTrack track, RemoteParticipant remoteParticipant,
+  Future<void> addRemoteTrack(RemoteTrack track, RemoteParticipant remoteParticipant,
       {bool notify = true}) async {
     bool changed = false;
     var peerId = remoteParticipant.identity;
@@ -169,7 +169,7 @@ class PeerMediaStreamController with ChangeNotifier {
     });
   }
 
-  removeRemoteTrack(RemoteTrack track, RemoteParticipant remoteParticipant,
+  Future<void> removeRemoteTrack(RemoteTrack track, RemoteParticipant remoteParticipant,
       {bool notify = true}) async {
     bool changed = false;
     var peerId = remoteParticipant.identity;
@@ -252,7 +252,7 @@ class PeerMediaStreamController with ChangeNotifier {
   }
 
   ///移除并且关闭控制器所有的媒体流，激活exit事件
-  closeAll() async {
+  Future<void> closeAll() async {
     await _streamLock.synchronized(() async {
       _currentPeerId = null;
       for (var peerMediaStreams in _peerMediaStreams.values) {

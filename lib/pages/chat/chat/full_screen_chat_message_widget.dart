@@ -75,7 +75,7 @@ class FullScreenChatMessageWidget extends StatelessWidget with TileDataMixin {
     );
   }
 
-  _shareChatMessage() {}
+  void _shareChatMessage() {}
 
   @override
   Widget build(BuildContext context) {

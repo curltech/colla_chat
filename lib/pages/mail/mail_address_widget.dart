@@ -8,12 +8,10 @@ import 'package:colla_chat/pages/mail/mail_content_widget.dart';
 import 'package:colla_chat/pages/mail/mail_list_widget.dart';
 import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/pages/mail/new_mail_widget.dart';
-import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/transport/emailclient.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -57,7 +55,7 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
   final RxInt index = 0.obs;
   final PlatformCarouselController controller = PlatformCarouselController();
 
-  _onTap(int index, String title, {String? subtitle, TileData? group}) {
+  void _onTap(int index, String title, {String? subtitle, TileData? group}) {
     int i = 0;
     for (MailAddress emailAddress in mailAddressController.data) {
       if (emailAddress.email == group!.title) {

@@ -42,7 +42,7 @@ class MultiKlineController extends DataListController<String> {
   }
 
   /// 加入新的股票代码和控制器，包含所有的线型，并设置为当前
-  put(String tsCode) async {
+  Future<void> put(String tsCode) async {
     if (tsCode.isEmpty) {
       return;
     }
@@ -94,7 +94,7 @@ class MultiKlineController extends DataListController<String> {
   }
 
   /// 当前股票转为上一只股票
-  previous() async {
+  Future<void> previous() async {
     if (data.isEmpty) {
       setCurrentIndex = null;
     }
@@ -114,7 +114,7 @@ class MultiKlineController extends DataListController<String> {
   }
 
   /// 当前股票转为下一只股票
-  next() async {
+  Future<void> next() async {
     if (data.isEmpty) {
       setCurrentIndex = null;
     }
@@ -134,7 +134,7 @@ class MultiKlineController extends DataListController<String> {
   }
 
   /// 装载日线
-  loadDayLines({List<String>? tsCodes}) async {
+  Future<void> loadDayLines({List<String>? tsCodes}) async {
     tsCodes ??= data;
     for (String tsCode in tsCodes) {
       if (tsCode.isEmpty) {

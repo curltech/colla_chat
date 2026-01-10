@@ -28,7 +28,7 @@ class DartOllamaClient {
     this.baseUrl = _client.baseUrl!;
   }
 
-  close() {
+  void close() {
     _client.endSession();
   }
 
@@ -299,7 +299,7 @@ class DartOllamaClientPool {
     return ollamaDartClient;
   }
 
-  close(String url) {
+  void close(String url) {
     if (_clients.containsKey(url)) {
       var ollamaDartClient = _clients[url];
       ollamaDartClient!.close();

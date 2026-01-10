@@ -167,7 +167,7 @@ class ChainMessageHandler {
         //   Future.delayed(const Duration(seconds: 1));
         // }
         if (websocket != null &&
-            websocket.status?.name == SocketStatus.connected.name) {
+            websocket.status.name == SocketStatus.connected.name) {
           var data = MessageSerializer.marshal(chainMessage);
           success = await websocket.sendMsg(data);
         }
@@ -311,7 +311,7 @@ class ChainMessageHandler {
     return chainMessage;
   }
 
-  validate(ChainMessage chainMessage) {
+  void validate(ChainMessage chainMessage) {
     if (chainMessage.connectPeerId == null) {
       throw 'NullConnectPeerId';
     }

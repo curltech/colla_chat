@@ -185,7 +185,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   }
 
   ///删除消息的附件
-  remove(String messageId, String? title) async {
+  Future<void> remove(String messageId, String? title) async {
     delete(where: 'messageId=?', whereArgs: [messageId]);
     final filename = await getEncryptFilename(messageId, title);
     File file = File(filename!);

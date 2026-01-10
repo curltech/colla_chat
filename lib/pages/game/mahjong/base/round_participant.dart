@@ -56,7 +56,7 @@ class RoundParticipant {
     return NumberUtil.toEnum(ParticipantDirection.values, index)!;
   }
 
-  clear() {
+  void clear() {
     outstandingActions.clear();
     earnedActions.clear();
     packer = null;
@@ -74,7 +74,7 @@ class RoundParticipant {
     return handCount == 14;
   }
 
-  addOutstandingAction(RoomEventAction outstandingAction, List<int> vs) {
+  void addOutstandingAction(RoomEventAction outstandingAction, List<int> vs) {
     Set<int>? values = outstandingActions[outstandingAction];
     if (values == null) {
       values = {};
@@ -83,7 +83,7 @@ class RoundParticipant {
     values.addAll(vs);
   }
 
-  addEarnedAction(RoomEventAction earnedAction, List<RoomEvent> roomEvents) {
+  void addEarnedAction(RoomEventAction earnedAction, List<RoomEvent> roomEvents) {
     Set<RoomEvent>? values = earnedActions[earnedAction];
     if (values == null) {
       values = {};
@@ -233,7 +233,7 @@ class RoundParticipant {
   }
 
   /// 当机器参与者有未决的行为时，自动采取行为
-  robotCheck(int owner, Tile tile, {DealTileType? dealTileType}) async {
+  Future<void> robotCheck(int owner, Tile tile, {DealTileType? dealTileType}) async {
     Room room = round.room;
     RoomEvent robotCheckEvent = RoomEvent(
       round.room.name,
@@ -338,7 +338,7 @@ class RoundParticipant {
   }
 
   /// 过牌，owner宣布不做任何操作
-  pass(int owner) {
+  void pass(int owner) {
     if (index != owner) {
       return;
     }
@@ -823,7 +823,7 @@ class RoundParticipant {
   }
 
   /// 发牌或者碰牌的时候调用决定要打什么牌
-  robotDiscard(int owner, Tile tile, {DealTileType? dealTileType}) {
+  void robotDiscard(int owner, Tile tile, {DealTileType? dealTileType}) {
     /// 海底捞的时候不打牌,只发牌
     if (dealTileType == DealTileType.sea) {
       Future.delayed(Duration(seconds: 1), () async {

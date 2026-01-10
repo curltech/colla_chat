@@ -14,7 +14,7 @@ class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
     _init();
   }
 
-  _init() {
+  void _init() {
     if (playerController == null) {
       playerController = PlayerController();
       playerController!.onCurrentDurationChanged.listen((event) {});
@@ -107,7 +107,7 @@ class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
   setSpeed(double speed) async {}
 
   @override
-  close() {}
+  Future<void> close() async {}
 
   @override
   Widget buildMediaPlayer({

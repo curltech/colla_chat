@@ -144,7 +144,7 @@ class LangChainClient {
     return result;
   }
 
-  close() {
+  void close() {
     if (chatModel != null) {
       if (chatModel is ChatOllama) {
         (chatModel! as ChatOllama).close();
@@ -172,7 +172,7 @@ class LangChainClientPool {
     return langChainClient;
   }
 
-  close(String url) {
+  void close(String url) {
     if (langChainClients.containsKey(url)) {
       var langChainClient = langChainClients[url];
       langChainClient!.close();

@@ -4,8 +4,8 @@ import 'package:telephony/telephony.dart';
 class TelephonyUtil {
   static Telephony telephony = Telephony.backgroundInstance;
 
-  static send(String data, String recipient) async {
-    var result = telephony.sendSms(
+  static Future<void> send(String data, String recipient) async {
+    var result = await telephony.sendSms(
         to: recipient,
         message: data,
         isMultipart: true,
@@ -41,7 +41,7 @@ class TelephonyUtil {
     return messages;
   }
 
-  static register(dynamic Function(SmsMessage)? fn) {
+  static void register(dynamic Function(SmsMessage)? fn) {
     telephony.listenIncomingSms(
       onNewMessage: (SmsMessage message) {
         if (fn != null) {

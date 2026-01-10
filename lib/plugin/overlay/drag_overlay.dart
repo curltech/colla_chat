@@ -95,7 +95,7 @@ class DragOverlay {
     Overlay.of(context).insert(overlayEntry!);
   }
 
-  close() {
+  void close() {
     if (overlayEntry != null) {
       overlayEntry!.remove();
       overlayEntry!.dispose();
@@ -104,7 +104,7 @@ class DragOverlay {
   }
 
   /// 增加并显示一个新的浮动框，用于外部调用
-  show(BuildContext context) {
+  void show(BuildContext context) {
     close();
     overlayEntry = _buildDraggableWidget();
     Overlay.of(context).insert(overlayEntry!);

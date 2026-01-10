@@ -76,7 +76,7 @@ class P2pConferenceClient {
   }
 
   /// 自己加入会议，在所有的连接中加上本地流
-  join() async {
+  Future<void> join() async {
     Conference? conference = conferenceChatMessageController.conference;
     if (conference == null) {
       return;
@@ -96,7 +96,7 @@ class P2pConferenceClient {
     await globalAudioSession.initSpeech();
   }
 
-  renegotiate(
+  Future<void> renegotiate(
       {AdvancedPeerConnection? peerConnection, bool toggle = false}) async {
     if (peerConnection != null) {
       await peerConnection.renegotiate(toggle: toggle);
@@ -108,7 +108,7 @@ class P2pConferenceClient {
     }
   }
 
-  addLocalStreams(AdvancedPeerConnection peerConnection,
+  Future<void> addLocalStreams(AdvancedPeerConnection peerConnection,
       List<PeerMediaStream> peerMediaStreams) async {
     String peerId = peerConnection.peerId;
     String clientId = peerConnection.clientId;
@@ -119,7 +119,7 @@ class P2pConferenceClient {
     }
   }
 
-  removeLocalStreams(AdvancedPeerConnection peerConnection,
+  Future<void> removeLocalStreams(AdvancedPeerConnection peerConnection,
       List<PeerMediaStream> peerMediaStreams) async {
     String peerId = peerConnection.peerId;
     String clientId = peerConnection.clientId;
@@ -132,7 +132,7 @@ class P2pConferenceClient {
 
   /// 发布本地视频或者音频，如果参数的流为null，则创建本地主视频并发布
   /// 把本地新的peerMediaStream加入到会议的所有连接中，并且都重新协商
-  publish({List<PeerMediaStream>? peerMediaStreams}) async {
+  Future<void> publish({List<PeerMediaStream>? peerMediaStreams}) async {
     if (!joined) {
       return;
     }
@@ -154,7 +154,7 @@ class P2pConferenceClient {
   }
 
   /// 从会议的所有连接中退出发布并且关闭本地的多个视频流，并且都重新协商
-  closeLocal(List<PeerMediaStream> peerMediaStreams) async {
+  Future<void> closeLocal(List<PeerMediaStream> peerMediaStreams) async {
     List<AdvancedPeerConnection> pcs = await peerConnections;
     for (AdvancedPeerConnection peerConnection in pcs) {
       await removeLocalStreams(peerConnection, peerMediaStreams);
@@ -167,7 +167,7 @@ class P2pConferenceClient {
   }
 
   /// 退出发布并且关闭本地的所有的轨道或者流
-  closeAllLocal({bool notify = true}) async {
+  Future<void> closeAllLocal({bool notify = true}) async {
     for (var peerMediaStreams
         in localPeerMediaStreamController.peerMediaStreams.values) {
       closeLocal(peerMediaStreams);
@@ -176,7 +176,7 @@ class P2pConferenceClient {
 
   /// 远程参与者加入会议事件，此时连接未必已经建立
   /// 如果连接建立，则加入连接
-  onParticipantConnectedEvent(PlatformParticipant platformParticipant) async {
+  Future<void> onParticipantConnectedEvent(PlatformParticipant platformParticipant) async {
     var peerId = platformParticipant.peerId;
     var clientId = platformParticipant.clientId!;
     var key = _getKey(peerId, clientId);
@@ -197,7 +197,7 @@ class P2pConferenceClient {
 
   /// 远程参与者的连接加入会议操作，此连接将与自己展开视频通话
   /// 如果自己已经加入，将在各远程连接中加入本地流
-  _onParticipantConnected(AdvancedPeerConnection peerConnection) async {
+  Future<void> _onParticipantConnected(AdvancedPeerConnection peerConnection) async {
     String peerId = peerConnection.peerId;
     String clientId = peerConnection.clientId;
     var key = _getKey(peerId, clientId);
@@ -237,7 +237,7 @@ class P2pConferenceClient {
   }
 
   /// 生成并且加入连接的远程视频stream，确保之前连接已经加入
-  _onStreamPublished(AdvancedPeerConnection peerConnection) async {
+  Future<void> _onStreamPublished(AdvancedPeerConnection peerConnection) async {
     var peerId = peerConnection.peerId;
     var clientId = peerConnection.clientId;
     var name = peerConnection.name;
@@ -260,7 +260,7 @@ class P2pConferenceClient {
   }
 
   /// 远程参与者退出会议
-  onParticipantDisconnectedEvent(
+  Future<void> onParticipantDisconnectedEvent(
       PlatformParticipant platformParticipant) async {
     String peerId = platformParticipant.peerId;
     String clientId = platformParticipant.clientId!;
@@ -277,7 +277,7 @@ class P2pConferenceClient {
 
   /// 远程参与者退出会议操作，移除指定连接
   /// 把指定连接中的本地媒体全部移除并且重新协商
-  _onParticipantDisconnected(AdvancedPeerConnection peerConnection) async {
+  Future<void> _onParticipantDisconnected(AdvancedPeerConnection peerConnection) async {
     var key = _getKey(peerConnection.peerId, peerConnection.clientId);
     List<StreamSubscription<WebrtcEvent>>? streamSubscriptions =
         _streamSubscriptions[key];
@@ -299,7 +299,7 @@ class P2pConferenceClient {
   }
 
   /// 从远程视频流的控制器中移除连接的远程视频操作
-  _onParticipantUnpublish(AdvancedPeerConnection peerConnection) async {
+  Future<void> _onParticipantUnpublish(AdvancedPeerConnection peerConnection) async {
     var peerId = peerConnection.peerId;
     List<PeerMediaStream> peerMediaStreams =
         remotePeerMediaStreamController.getPeerMediaStreams(peerId).toList();
@@ -372,7 +372,7 @@ class P2pConferenceClient {
   }
 
   /// 自己退出会议，从所有的连接中移除本地流和远程流
-  _disconnect() async {
+  Future<void> _disconnect() async {
     _joined = false;
     await conferenceChatMessageController.exit();
     for (var key in localPeerMediaStreamController.peerMediaStreams.keys) {
@@ -390,7 +390,7 @@ class P2pConferenceClient {
 
   ///终止会议，移除所有的webrtc连接
   ///激活exit事件
-  terminate() async {
+  Future<void> terminate() async {
     remotePeerMediaStreamController.currentPeerId = null;
     if (conferenceChatMessageController.conferenceId != null) {
       conferenceService.update({'status': EntityStatus.expired.name},
@@ -475,7 +475,7 @@ class P2pConferenceClientPool with ChangeNotifier {
     }
   }
 
-  join(String conferenceId) {
+  void join(String conferenceId) {
     if (_conferenceId == conferenceId) {
       notifyListeners();
     }
@@ -514,7 +514,7 @@ class P2pConferenceClientPool with ChangeNotifier {
   }
 
   /// 新的连接建立事件，如果各会议的连接中存在已经加入但是连接为建立的情况则更新连接
-  onConnected(AdvancedPeerConnection peerConnection) async {
+  Future<void> onConnected(AdvancedPeerConnection peerConnection) async {
     for (P2pConferenceClient p2pConferenceClient in _conferenceClients.values) {
       // await p2pConferenceClient._onParticipantConnected(peerConnection);
       await p2pConferenceClient.conferenceChatMessageController.join();
@@ -522,7 +522,7 @@ class P2pConferenceClientPool with ChangeNotifier {
   }
 
   ///把本地新的peerMediaStream加入到会议的所有连接中，并且都重新协商
-  publish(String conferenceId, List<PeerMediaStream> peerMediaStreams) async {
+  Future<void> publish(String conferenceId, List<PeerMediaStream> peerMediaStreams) async {
     P2pConferenceClient? p2pConferenceClient = _conferenceClients[conferenceId];
     if (p2pConferenceClient != null) {
       await p2pConferenceClient.publish(peerMediaStreams: peerMediaStreams);
@@ -530,7 +530,7 @@ class P2pConferenceClientPool with ChangeNotifier {
   }
 
   ///会议的指定连接或者所有连接中移除本地或者远程的peerMediaStream，并且都重新协商
-  close(String conferenceId, List<PeerMediaStream> peerMediaStreams) async {
+  Future<void> close(String conferenceId, List<PeerMediaStream> peerMediaStreams) async {
     P2pConferenceClient? p2pConferenceClient = _conferenceClients[conferenceId];
     if (p2pConferenceClient != null) {
       await p2pConferenceClient.closeLocal(peerMediaStreams);
@@ -539,7 +539,7 @@ class P2pConferenceClientPool with ChangeNotifier {
 
   ///根据会议编号退出会议
   ///调用对应会议的退出方法
-  closeAll(String conferenceId) async {
+  Future<void> closeAll(String conferenceId) async {
     await _clientLock.synchronized(() async {
       P2pConferenceClient? conferenceClient = _conferenceClients[conferenceId];
       if (conferenceClient != null) {
@@ -551,7 +551,7 @@ class P2pConferenceClientPool with ChangeNotifier {
 
   /// 根据会议编号退出会议
   /// 调用对应会议的退出方法
-  disconnect({String? conferenceId}) async {
+  Future<void> disconnect({String? conferenceId}) async {
     await _clientLock.synchronized(() async {
       conferenceId ??= _conferenceId;
       P2pConferenceClient? p2pConferenceClient =
@@ -569,7 +569,7 @@ class P2pConferenceClientPool with ChangeNotifier {
 
   ///根据会议编号终止会议
   ///调用对应会议的终止方法，然后从会议池中删除，设置当前会议编号为null
-  terminate({String? conferenceId}) async {
+  Future<void> terminate({String? conferenceId}) async {
     await _clientLock.synchronized(() async {
       conferenceId ??= _conferenceId;
       P2pConferenceClient? p2pConferenceClient =

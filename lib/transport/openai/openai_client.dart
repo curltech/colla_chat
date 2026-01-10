@@ -116,7 +116,7 @@ class OpenAIClient {
   }
 
   ///流的方式发起通用的completion，回答在onChoices回调函数中处理
-  completionStream({
+  void completionStream({
     required String model,
     dynamic prompt,
     required Function(List<OpenAIStreamCompletionModelChoice> choices)
@@ -206,7 +206,7 @@ class OpenAIClient {
   }
 
   ///流模式发起chat completion
-  chatCompletionStream({
+  void chatCompletionStream({
     required List<OpenAIChatCompletionChoiceMessageModel> messages,
     double? temperature,
     double? topP,
@@ -525,7 +525,7 @@ class OpenAIClient {
   }
 
   ///流模式列出fine tune任务的事件
-  listEventStream(
+  void listEventStream(
     String fineTuneId,
     Function(OpenAIFineTuneEventStreamModel) onEvent, {
     http.Client? client,

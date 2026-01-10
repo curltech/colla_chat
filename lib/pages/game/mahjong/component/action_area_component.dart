@@ -15,7 +15,7 @@ class ActionAreaComponent extends RectangleComponent
     _init();
   }
 
-  _init() {
+  void _init() {
     priority = 10;
     position = Vector2(
         roomController.x(roomController.width *
@@ -39,7 +39,7 @@ class ActionAreaComponent extends RectangleComponent
       ..style = PaintingStyle.fill;
   }
 
-  loadSpriteButton() {
+  void loadSpriteButton() {
     RoundParticipant? roundParticipant = roomController
         .getRoundParticipant(roomController.selfParticipantDirection.value);
     Map<RoomEventAction, Set<int>>? outstandingActions =
@@ -76,7 +76,7 @@ class ActionAreaComponent extends RectangleComponent
     }
   }
 
-  _call(RoomEventAction outstandingAction, List<int> pos) async {
+  Future<void> _call(RoomEventAction outstandingAction, List<int> pos) async {
     Room? room = roomController.room.value;
     if (room == null) {
       return;

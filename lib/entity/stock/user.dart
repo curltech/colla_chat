@@ -33,7 +33,7 @@ class StockUser {
   String tab = 'selfselection';
   String error = 'error';
 
-  constructor() {}
+  void constructor() {}
 
   Map<String, dynamic>? getShare() {
     return _share;
@@ -86,7 +86,7 @@ class StockUser {
     account?.subscription = val;
   }
 
-  addSubscription(String tsCode) {
+  void addSubscription(String tsCode) {
     final account = this.account;
     if (account != null) {
       var subscription = account.subscription;
@@ -103,7 +103,7 @@ class StockUser {
     }
   }
 
-  removeSubscription(String tsCode) {
+  void removeSubscription(String tsCode) {
     final account = this.account;
     if (account != null) {
       var subscription = account.subscription;

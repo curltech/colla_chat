@@ -55,12 +55,12 @@ final AndroidBackgroundService androidBackgroundService =
 ///保持app的运行，哪怕是在后台模式下也不会被杀死
 class AndroidForegroundService {
   ///启动前台运行模式
-  start() {
+  void start() {
     ForegroundService().start();
   }
 
   ///关闭前台运行模式
-  stop() {
+  void stop() {
     ForegroundService().stop();
   }
 }

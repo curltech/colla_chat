@@ -10,7 +10,8 @@ class CameraPreviewAssetWidget extends StatefulWidget {
   final AssetEntity asset;
 
   @override
-  State<CameraPreviewAssetWidget> createState() => _CameraPreviewAssetWidgetState();
+  State<CameraPreviewAssetWidget> createState() =>
+      _CameraPreviewAssetWidgetState();
 }
 
 class _CameraPreviewAssetWidgetState extends State<CameraPreviewAssetWidget> {

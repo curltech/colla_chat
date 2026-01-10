@@ -23,7 +23,7 @@ class PlatformWebViewController with ChangeNotifier {
     this.inAppWebViewController,
   });
 
-  from(dynamic controller) {
+  void from(dynamic controller) {
     if (controller is webview.WebViewController) {
       webViewController = controller;
       inAppWebViewController = null;
@@ -36,7 +36,7 @@ class PlatformWebViewController with ChangeNotifier {
     }
   }
 
-  loadHtml(String html) async {
+  Future<void> loadHtml(String html) async {
     if (webViewController != null) {
       if (platformParams.windows) {
         //windows平台不能直接加载html，会乱码
@@ -55,7 +55,7 @@ class PlatformWebViewController with ChangeNotifier {
     }
   }
 
-  load(String? filename) async {
+  Future<void> load(String? filename) async {
     if (StringUtil.isEmpty(filename)) {
       String html = """<html><body></body></html>""";
       if (webViewController != null) {
@@ -87,7 +87,7 @@ class PlatformWebViewController with ChangeNotifier {
     }
   }
 
-  reload() async {
+  Future<void> reload() async {
     if (webViewController != null) {
       await webViewController!.reload();
     } else if (inAppWebViewController != null) {
@@ -95,7 +95,7 @@ class PlatformWebViewController with ChangeNotifier {
     }
   }
 
-  goBack() async {
+  Future<void> goBack() async {
     if (webViewController != null) {
       await webViewController!.goBack();
     } else if (inAppWebViewController != null) {
@@ -103,7 +103,7 @@ class PlatformWebViewController with ChangeNotifier {
     }
   }
 
-  goForward() async {
+  Future<void> goForward() async {
     if (webViewController != null) {
       await webViewController!.goForward();
     } else if (inAppWebViewController != null) {

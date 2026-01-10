@@ -30,7 +30,7 @@ class EventFilterController extends DataListController<EventFilter> {
     return _eventName.value;
   }
 
-  setEventCode(String? eventCode, {String? eventName}) async {
+  Future<void> setEventCode(String? eventCode, {String? eventName}) async {
     _eventCode(eventCode);
     _eventName(eventName);
     if (eventCode != null) {
@@ -149,7 +149,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
         ),
         IconButton(
           onPressed: () async {
-            await inoutEventController.setEventCode(eventFilter.eventCode,
+            inoutEventController.setEventCode(eventFilter.eventCode,
                 eventName: eventFilter.eventName);
             indexWidgetProvider.push('in_out_event');
           },
@@ -165,7 +165,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
     return actionWidget;
   }
 
-  _onDoubleTap(int index) {
+  void _onDoubleTap(int index) {
     eventFilterController.setCurrentIndex = index;
     controller.move(1);
   }
@@ -207,7 +207,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
     );
   }
 
-  _buildEventFilterEditView(BuildContext context) {
+  Container _buildEventFilterEditView(BuildContext context) {
     EventFilter? eventFilter = eventFilterController.current;
     if (eventFilter != null) {
       platformReactiveFormController.values = eventFilter.toJson();
@@ -235,7 +235,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
     return platformReactiveForm;
   }
 
-  _onSubmit(BuildContext context, Map<String, dynamic> values) async {
+  Future<void> _onSubmit(BuildContext context, Map<String, dynamic> values) async {
     EventFilter currentFilterCond = EventFilter.fromJson(values);
     if (currentFilterCond.id == null) {
       await eventFilterService.insert(currentFilterCond);
@@ -249,7 +249,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
         content: AppLocalizations.t('EventFilter has save completely'));
   }
 
-  _onCopy(Map<String, dynamic> values) async {
+  Future<void> _onCopy(Map<String, dynamic> values) async {
     platformReactiveFormController.setValue('id', null);
     eventFilterController.setCurrentIndex = -1;
   }

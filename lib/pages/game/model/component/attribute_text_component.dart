@@ -88,7 +88,7 @@ class AttributeAreaComponent extends RectangleComponent
     });
   }
 
-  updateSize() {
+  void updateSize() {
     if (attributes.isEmpty) {
       height = AttributeTextComponent.contentHeight;
     } else {

@@ -21,7 +21,6 @@ import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -73,7 +72,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     _updateView();
   }
 
-  _updateConferenceClient() {
+  void _updateConferenceClient() {
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
@@ -87,7 +86,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     _updateView();
   }
 
-  _updateVideoChatStatus() {
+  void _updateVideoChatStatus() {
     ConferenceChatMessageController? conferenceChatMessageController =
         liveKitConferenceClientPool.conferenceChatMessageController;
     if (conferenceChatMessageController != null) {
@@ -144,13 +143,13 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     this.actionData.value = actionData;
   }
 
-  _playAudio() {
+  void _playAudio() {
     var conferenceChatMessageController =
         liveKitConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.playAudio('assets/imedia/call.mp3', true);
   }
 
-  _stopAudio() async {
+  Future<void> _stopAudio() async {
     var conferenceChatMessageController =
         liveKitConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.stopAudio(
@@ -158,7 +157,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   }
 
   /// 发布视频流
-  _publish(PeerMediaStream peerMediaStream) async {
+  Future<void> _publish(PeerMediaStream peerMediaStream) async {
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
@@ -208,7 +207,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   }
 
   /// 关闭单个本地视频窗口的流
-  _close(PeerMediaStream peerMediaStream) async {
+  Future<void> _close(PeerMediaStream peerMediaStream) async {
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
@@ -221,7 +220,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   }
 
   ///关闭并且移除本地所有的视频，这时候还能看远程的视频
-  _closeAll() async {
+  Future<void> _closeAll() async {
     await localPeerMediaStreamController.closeAll();
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
@@ -233,7 +232,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
   ///如果正在通话chatting，挂断视频通话，关闭所有的本地视频和远程视频，呼叫状态改为结束
   ///结束会议，这时候本地和远程的视频都应该被关闭
-  _disconnect() async {
+  Future<void> _disconnect() async {
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {

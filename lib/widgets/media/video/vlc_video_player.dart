@@ -133,7 +133,7 @@ class MobileVlcPlayerController extends AbstractMediaPlayerController {
     vlcPlayerController?.stop();
   }
 
-  seek(Duration position, {int? index}) async {
+  Future<void> seek(Duration position, {int? index}) async {
     vlcPlayerController?.seekTo(position);
   }
 
@@ -145,7 +145,7 @@ class MobileVlcPlayerController extends AbstractMediaPlayerController {
     return Future.value(speed);
   }
 
-  setSpeed(double speed) async {
+  Future<void> setSpeed(double speed) async {
     vlcPlayerController?.setPlaybackSpeed(speed);
   }
 
@@ -157,7 +157,7 @@ class MobileVlcPlayerController extends AbstractMediaPlayerController {
     return Future.value(volume);
   }
 
-  setVolume(double volume) async {
+  Future<void> setVolume(double volume) async {
     vlcPlayerController?.setVolume(volume.toInt());
   }
 

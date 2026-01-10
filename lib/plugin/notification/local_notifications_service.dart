@@ -47,7 +47,7 @@ class LocalNotificationsService {
   ];
 
   /// 初始化local notification，runApp前调用
-  init() async {
+  Future<void> init() async {
     // ios,macos的初始化设置
     final DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings(

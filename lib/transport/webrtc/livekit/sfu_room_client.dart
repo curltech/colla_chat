@@ -142,12 +142,12 @@ class LiveKitRoomClient {
   }
 
   /// 本地参与者的监听器
-  onLocalParticipantEvent(void Function() listener) {
+  void onLocalParticipantEvent(void Function() listener) {
     room.localParticipant?.addListener(listener);
   }
 
   /// 订阅远程参与者的轨道
-  subscribe(List<String> participants) async {
+  Future<void> subscribe(List<String> participants) async {
     for (String participantId in participants) {
       Map<String, RemoteParticipant> remoteParticipants =
           room.remoteParticipants;
@@ -162,7 +162,7 @@ class LiveKitRoomClient {
   }
 
   /// 解除订阅远程参与者的轨道
-  unsubscribe(List<String> participants) async {
+  Future<void> unsubscribe(List<String> participants) async {
     for (String participantId in participants) {
       Map<String, RemoteParticipant> remoteParticipants =
           room.remoteParticipants;
@@ -177,7 +177,7 @@ class LiveKitRoomClient {
   }
 
   /// 激活参与者的轨道
-  enable(List<String> participants) async {
+  Future<void> enable(List<String> participants) async {
     for (String participantId in participants) {
       Map<String, RemoteParticipant> remoteParticipants =
           room.remoteParticipants;
@@ -192,7 +192,7 @@ class LiveKitRoomClient {
   }
 
   /// 关闭参与者的轨道
-  disable(List<String> participants) async {
+  Future<void> disable(List<String> participants) async {
     for (String participantId in participants) {
       Map<String, RemoteParticipant> remoteParticipants =
           room.remoteParticipants;
@@ -207,7 +207,7 @@ class LiveKitRoomClient {
   }
 
   /// 设置参与者的轨道的fps
-  setVideoFPS(List<String> participants, int fps) async {
+  Future<void> setVideoFPS(List<String> participants, int fps) async {
     for (String participantId in participants) {
       Map<String, RemoteParticipant> remoteParticipants =
           room.remoteParticipants;
@@ -222,7 +222,7 @@ class LiveKitRoomClient {
   }
 
   /// 设置参与者的轨道的质量
-  setVideoQuality(List<String> participants, VideoQuality videoQuality) async {
+  Future<void> setVideoQuality(List<String> participants, VideoQuality videoQuality) async {
     for (String participantId in participants) {
       Map<String, RemoteParticipant> remoteParticipants =
           room.remoteParticipants;
@@ -344,7 +344,7 @@ class LiveKitRoomClient {
   }
 
   ///设置可否订阅本地轨道的参与人
-  setTrackSubscriptionPermissions(
+  void setTrackSubscriptionPermissions(
       {required bool allParticipantsAllowed,
       List<String> participants = const []}) {
     List<ParticipantTrackPermission> trackPermissions = [];
@@ -358,18 +358,18 @@ class LiveKitRoomClient {
   }
 
   /// 关闭本地的某个轨道或者流
-  removePublishedTrack(String trackSid, {bool notify = true}) async {
+  Future<void> removePublishedTrack(String trackSid, {bool notify = true}) async {
     await room.localParticipant?.removePublishedTrack(trackSid, notify: notify);
   }
 
   /// 关闭本地的所有的轨道或者流
-  unpublishAll({bool notify = true, bool? stopOnUnpublish}) async {
+  Future<void> unpublishAll({bool notify = true, bool? stopOnUnpublish}) async {
     await room.localParticipant
         ?.unpublishAllTracks(notify: notify, stopOnUnpublish: stopOnUnpublish);
   }
 
   /// 断开连接，退出会议
-  disconnect() async {
+  Future<void> disconnect() async {
     await room.disconnect();
   }
 
@@ -412,7 +412,7 @@ class LiveKitConferenceClient {
   // TrackPublished	A new track is published to room after the local participant has joined	x	x
   // TrackUnpublished	A RemoteParticipant has unpublished a track	x	x
   /// 初始化会议，先连接，然后注册事件
-  join() async {
+  Future<void> join() async {
     Conference? conference = conferenceChatMessageController.conference;
     if (conference == null) {
       return;
@@ -516,7 +516,7 @@ class LiveKitConferenceClient {
   }
 
   /// 退出发布并且关闭本地的某个轨道或者流
-  closeLocal(List<PeerMediaStream> peerMediaStreams,
+  Future<void> closeLocal(List<PeerMediaStream> peerMediaStreams,
       {bool notify = true}) async {
     if (joined) {
       for (PeerMediaStream peerMediaStream in peerMediaStreams) {
@@ -537,7 +537,7 @@ class LiveKitConferenceClient {
   }
 
   /// 退出发布并且关闭本地的所有的轨道或者流
-  closeAllLocal({bool notify = true}) async {
+  Future<void> closeAllLocal({bool notify = true}) async {
     if (joined) {
       await roomClient.unpublishAll(notify: notify, stopOnUnpublish: true);
     }
@@ -697,7 +697,7 @@ class LiveKitConferenceClient {
   }
 
   /// 断开连接，退出会议
-  _disconnect() async {
+  Future<void> _disconnect() async {
     if (joined) {
       await roomClient.disconnect();
     }
@@ -718,7 +718,7 @@ class LiveKitConferenceClient {
     // roomClient.room.startAudio();
   }
 
-  publishData(
+  Future<void> publishData(
     List<int> data, {
     bool? reliable,
     List<String>? destinationIdentities,
@@ -816,7 +816,7 @@ class LiveKitConferenceClientPool with ChangeNotifier {
     }
   }
 
-  join(String conferenceId) {
+  void join(String conferenceId) {
     if (_conferenceId == conferenceId) {
       notifyListeners();
     }
@@ -855,7 +855,7 @@ class LiveKitConferenceClientPool with ChangeNotifier {
   }
 
   ///把本地新的peerMediaStream加入到会议的所有连接中，并且都重新协商
-  publish(String conferenceId, List<PeerMediaStream> peerMediaStreams,
+  Future<void> publish(String conferenceId, List<PeerMediaStream> peerMediaStreams,
       {AdvancedPeerConnection? peerConnection}) async {
     LiveKitConferenceClient? conferenceClient =
         _conferenceClients[conferenceId];
@@ -865,7 +865,7 @@ class LiveKitConferenceClientPool with ChangeNotifier {
   }
 
   ///会议的指定连接或者所有连接中移除本地或者远程的peerMediaStream，并且都重新协商
-  close(String conferenceId, List<PeerMediaStream> peerMediaStreams) async {
+  Future<void> close(String conferenceId, List<PeerMediaStream> peerMediaStreams) async {
     LiveKitConferenceClient? conferenceClient =
         _conferenceClients[conferenceId];
     if (conferenceClient != null) {
@@ -875,7 +875,7 @@ class LiveKitConferenceClientPool with ChangeNotifier {
 
   ///根据会议编号退出会议
   ///调用对应会议的退出方法
-  closeAll(String conferenceId) async {
+  Future<void> closeAll(String conferenceId) async {
     await _clientLock.synchronized(() async {
       LiveKitConferenceClient? conferenceClient =
           _conferenceClients[conferenceId];
@@ -888,7 +888,7 @@ class LiveKitConferenceClientPool with ChangeNotifier {
 
   ///根据会议编号终止会议
   ///调用对应会议的终止方法，然后从会议池中删除，设置当前会议编号为null
-  disconnect({String? conferenceId}) async {
+  Future<void> disconnect({String? conferenceId}) async {
     await _clientLock.synchronized(() async {
       conferenceId ??= _conferenceId;
       LiveKitConferenceClient? liveKitConferenceClient =

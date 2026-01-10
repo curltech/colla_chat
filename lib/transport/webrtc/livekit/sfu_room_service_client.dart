@@ -87,7 +87,7 @@ class LiveKitRoomServiceClient {
     return null;
   }
 
-  deleteRoom(String roomName) async {
+  Future<void> deleteRoom(String roomName) async {
     await roomServiceClient.deleteRoom(roomName);
   }
 
@@ -104,7 +104,7 @@ class LiveKitRoomServiceClient {
     return await roomServiceClient.listParticipants(roomName);
   }
 
-  removeParticipant(String roomName, String participant) async {
+  Future<void> removeParticipant(String roomName, String participant) async {
     await roomServiceClient.removeParticipant(roomName, participant);
   }
 
@@ -124,7 +124,7 @@ class LiveKitRoomServiceClient {
     return await roomServiceClient.updateRoomMetadata(roomName, metadata);
   }
 
-  updateSubscriptions(String roomName, String identity, List<String> trackSids,
+  Future<void> updateSubscriptions(String roomName, String identity, List<String> trackSids,
       bool subscribe) async {
     await roomServiceClient.updateSubscriptions(
         roomName, identity, trackSids, subscribe);

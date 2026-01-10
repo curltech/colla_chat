@@ -14,7 +14,7 @@ class StockAreaComponent extends RectangleComponent
     _init();
   }
 
-  _init() {
+  void _init() {
     position = Vector2(
         roomController.x(roomController.width *
             (MahjongFlameGame.previousWidthRadio +
@@ -30,7 +30,7 @@ class StockAreaComponent extends RectangleComponent
       ..style = PaintingStyle.stroke;
   }
 
-  loadStockPile() {
+  void loadStockPile() {
     if (stockPileComponent != null) {
       remove(stockPileComponent!);
       stockPileComponent = null;

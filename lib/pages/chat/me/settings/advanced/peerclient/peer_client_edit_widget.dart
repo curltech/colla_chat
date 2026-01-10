@@ -138,7 +138,7 @@ class PeerClientEditWidget extends StatelessWidget with TileDataMixin {
     return formInputWidget;
   }
 
-  _onOk(Map<String, dynamic> values) {
+  void _onOk(Map<String, dynamic> values) {
     PeerClient currentPeerClient = PeerClient.fromJson(values);
     peerClientService.upsert(currentPeerClient).then((count) {
       peerClientController.update(currentPeerClient);

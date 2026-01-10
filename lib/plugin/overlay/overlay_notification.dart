@@ -188,7 +188,7 @@ class PlatformOverlays {
   }
 
   /// 增加并显示一个新的浮动框，用于外部调用
-  show(
+  void show(
     BuildContext context, {
     required Widget child,
     StackedOptions? stackedOptions,
@@ -551,7 +551,7 @@ class OverlayNotificationState extends State<OverlayNotification>
     _initializeAnimation();
   }
 
-  _initTimer() {
+  void _initTimer() {
     widget._closeTimer = Timer(widget.toastDuration, () {
       widget._slideController.reverse();
       widget._slideController.addListener(() {

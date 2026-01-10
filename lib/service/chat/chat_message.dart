@@ -510,7 +510,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   ///收到消息后填写接收者字段，状态字段，接收时间
-  _writeReceiveChatMessage(ChatMessage chatMessage) {
+  void _writeReceiveChatMessage(ChatMessage chatMessage) {
     chatMessage.receiverPeerId = myself.peerId;
     chatMessage.receiverClientId = myself.clientId;
     chatMessage.receiverType = PartyType.linkman.name;
@@ -872,7 +872,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   ///对发送失败的消息重新发送
-  sendUnsent({String? receiverPeerId}) async {
+  Future<void> sendUnsent({String? receiverPeerId}) async {
     logger.i('resent unsent chat message:$receiverPeerId');
     List<ChatMessage> chatMessages = await findByStatusAndReceiverPeer(
         MessageStatus.unsent.name,
@@ -1179,7 +1179,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return collectChatMessage;
   }
 
-  resend() async {
+  Future<void> resend() async {
     List<ChatMessage> chatMessages =
         await findByPeerId(status: MessageStatus.unsent.name);
     for (var chatMessage in chatMessages) {
@@ -1197,7 +1197,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
   /// 删除所有已读且有销毁时间的记录
   /// 删除一天前的系统记录
-  deleteTimeout() async {
+  Future<void> deleteTimeout() async {
     String where = 'deleteTime>0 and readTime is not null';
     List<Object> whereArgs = [];
     var chatMessages = await find(
@@ -1226,7 +1226,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   /// 删除linkman的消息
-  removeByLinkman(String peerId) {
+  void removeByLinkman(String peerId) {
     var myselfPeerId = myself.peerId!;
     delete(
         where:
@@ -1235,12 +1235,12 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   /// 删除group的消息
-  removeByGroup(String peerId) {
+  void removeByGroup(String peerId) {
     delete(where: 'groupId=?', whereArgs: [peerId]);
   }
 
   /// 删除过期的系统消息
-  deleteSystem() {
+  void deleteSystem() {
     String yesterday =
         DateTime.now().toUtc().add(const Duration(days: -1)).toIso8601String();
     delete(

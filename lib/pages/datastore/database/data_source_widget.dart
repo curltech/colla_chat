@@ -244,7 +244,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _updateDataColumns() async {
+  Future<void> _updateDataColumns() async {
     List<DataColumnNode>? dataColumnNodes =
         dataSourceController.getDataColumnNodes();
     if (dataColumnNodes == null) {
@@ -257,7 +257,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     dataTableColumnController.replaceAll(dataColumns);
   }
 
-  _updateDataIndexes() async {
+  Future<void> _updateDataIndexes() async {
     List<DataIndexNode>? dataIndexNodes =
         dataSourceController.getDataIndexNodes();
     if (dataIndexNodes == null) {
@@ -296,7 +296,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _onPopAction(
+  Future<void> _onPopAction(
       BuildContext context, ExplorableNode node, int index, String label,
       {String? value}) async {
     switch (label) {

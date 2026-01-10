@@ -18,7 +18,7 @@ class PrimaryNavigation {
   // 主菜单项对应的动画控制器
   final List<AnimationController> _slideControllers = [];
 
-  initController(TickerProvider vsync) {
+  void initController(TickerProvider vsync) {
     int index = 0;
     for (String mainView in indexWidgetProvider.mainViews) {
       TileDataMixin? view = indexWidgetProvider.allViews[mainView];
@@ -32,7 +32,7 @@ class PrimaryNavigation {
     }
   }
 
-  forward() {
+  void forward() {
     for (var slideController in _slideControllers) {
       slideController.forward();
     }
@@ -270,7 +270,7 @@ class PrimaryNavigation {
     );
   }
 
-  dispose() {
+  void dispose() {
     for (var slideController in _slideControllers) {
       slideController.dispose();
     }

@@ -13,7 +13,7 @@ class GlobalAudioSession {
   }
 
   ///初始化平台定制的全局音频会话
-  init() async {
+  Future<void> init() async {
     _session ??= await AudioSession.instance;
     await _session?.configure(const AudioSessionConfiguration(
       avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
@@ -34,12 +34,12 @@ class GlobalAudioSession {
   }
 
   ///初始化成播放音乐的配置
-  initMusic() async {
+  Future<void> initMusic() async {
     await _session?.configure(const AudioSessionConfiguration.music());
   }
 
   ///初始化成说话的配置
-  initSpeech() async {
+  Future<void> initSpeech() async {
     await _session?.configure(const AudioSessionConfiguration.speech());
   }
 

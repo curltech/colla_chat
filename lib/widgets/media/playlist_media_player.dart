@@ -21,7 +21,7 @@ class PlaylistMediaPlayer extends StatelessWidget {
   PlaylistMediaPlayer(
       {super.key, required this.player, required this.playlistController});
 
-  _onSelected(int index, String filename) {
+  void _onSelected(int index, String filename) {
     // swiperController.move(1);
   }
 
@@ -32,8 +32,8 @@ class PlaylistMediaPlayer extends StatelessWidget {
       controller: controller,
       onPageChanged: (int index,
           {PlatformSwiperDirection? direction,
-            int? oldIndex,
-            CarouselPageChangedReason? reason}) {
+          int? oldIndex,
+          CarouselPageChangedReason? reason}) {
         this.index.value = index;
         if (index == 1) {
           (player as PlatformMediaPlayer).mediaPlayerController.play();

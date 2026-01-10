@@ -79,7 +79,7 @@ class _PlatformEditorWidgetState extends State<PlatformEditorWidget> {
     super.initState();
   }
 
-  _onCreateController(dynamic controller) {
+  void _onCreateController(dynamic controller) {
     widget.platformEditorController.originalController = controller;
   }
 

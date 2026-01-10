@@ -237,7 +237,7 @@ class GroupService extends PeerPartyService<Group> {
 
   ///向联系人发送加群的消息，群成员在group的participants中
   ///发送的目标在peerIds参数中，如果peerIds为空，则在group的participants中
-  addGroup(Group group, {List<String>? peerIds}) async {
+  Future<void> addGroup(Group group, {List<String>? peerIds}) async {
     Group g = group.copyWithMembers();
     g.myAlias = null;
     ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
@@ -255,7 +255,7 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   ///接收加群的消息，自动完成加群，发送回执
-  receiveAddGroup(ChatMessage chatMessage) async {
+  Future<void> receiveAddGroup(ChatMessage chatMessage) async {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     Group group = Group.fromJsonWithMembers(map);
@@ -293,7 +293,7 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   ///向群成员发送群属性变化的消息
-  modifyGroup(Group group, {List<String>? peerIds}) async {
+  Future<void> modifyGroup(Group group, {List<String>? peerIds}) async {
     if (!canModifyGroup(group)) {
       return;
     }
@@ -314,7 +314,7 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   ///接收变群的消息，完成变群，发送回执
-  receiveModifyGroup(ChatMessage chatMessage) async {
+  Future<void> receiveModifyGroup(ChatMessage chatMessage) async {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     Group group = Group.fromJson(map);
@@ -363,7 +363,7 @@ class GroupService extends PeerPartyService<Group> {
     return true;
   }
 
-  receiveDismissGroup(ChatMessage chatMessage) async {
+  Future<void> receiveDismissGroup(ChatMessage chatMessage) async {
     String peerId = chatMessage.title!;
     Group? group = await groupService.findCachedOneByPeerId(peerId);
     if (group == null) {
@@ -383,7 +383,7 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   ///向群成员发送加群成员的消息，想新增的成员发送加群消息
-  addGroupMember(Group group, List<GroupMember> groupMembers,
+  Future<void> addGroupMember(Group group, List<GroupMember> groupMembers,
       {List<String>? peerIds}) async {
     peerIds ??= [];
     if (group.participants != null) {
@@ -413,7 +413,7 @@ class GroupService extends PeerPartyService<Group> {
     );
   }
 
-  receiveAddGroupMember(ChatMessage chatMessage) async {
+  Future<void> receiveAddGroupMember(ChatMessage chatMessage) async {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     List<dynamic> maps = JsonUtil.toJson(json);
     List<String> peerIds = [];
@@ -460,7 +460,7 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   ///向群成员发送删群成员的消息
-  removeGroupMember(Group group, List<String> groupMemberIds,
+  Future<void> removeGroupMember(Group group, List<String> groupMemberIds,
       {List<String>? peerIds}) async {
     if (!canRemoveGroupMember(group, groupMemberIds)) {
       return;
@@ -493,7 +493,7 @@ class GroupService extends PeerPartyService<Group> {
     );
   }
 
-  receiveRemoveGroupMember(ChatMessage chatMessage) async {
+  Future<void> receiveRemoveGroupMember(ChatMessage chatMessage) async {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     List<dynamic> maps = JsonUtil.toJson(json);
     for (var map in maps) {
@@ -529,7 +529,7 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   ///向群成员发送群文件的消息
-  groupFile(String groupId, List<int> data) async {
+  Future<void> groupFile(String groupId, List<int> data) async {
     ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
       groupId,
       PartyType.group,
@@ -545,7 +545,7 @@ class GroupService extends PeerPartyService<Group> {
         cryptoOption: CryptoOption.group, peerIds: peerIds);
   }
 
-  receiveGroupFile(ChatMessage chatMessage) async {
+  Future<void> receiveGroupFile(ChatMessage chatMessage) async {
     Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
 
     ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
@@ -557,7 +557,7 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   ///删除群
-  removeByGroupId(String peerId) {
+  void removeByGroupId(String peerId) {
     delete(where: 'peerId=?', whereArgs: [peerId]);
     groups.remove(peerId);
   }

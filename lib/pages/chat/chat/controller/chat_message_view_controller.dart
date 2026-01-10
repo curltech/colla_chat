@@ -1,6 +1,5 @@
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
-import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -41,7 +40,7 @@ class ChatMessageViewController {
   }
 
   ///输入框的高度可能发生变化，延时进行计算消息输入部分的高度
-  changeExtendedTextHeight(Size size) {
+  void changeExtendedTextHeight(Size size) {
     double chatMessageInputHeight = size.height;
     if (_chatMessageInputHeight.value != chatMessageInputHeight) {
       _chatMessageInputHeight.value = chatMessageInputHeight;

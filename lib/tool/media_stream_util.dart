@@ -160,7 +160,7 @@ class MediaStreamUtil {
   static Future<List<MediaDeviceInfo>> get audioInputs =>
       Helper.enumerateDevices('audioinput');
 
-  static onDeviceChange(Function(List<MediaDeviceInfo>) onMediaDevices) {
+  static void onDeviceChange(Function(List<MediaDeviceInfo>) onMediaDevices) {
     navigator.mediaDevices.ondevicechange = (event) async {
       var mediaDevices = await navigator.mediaDevices.enumerateDevices();
       onMediaDevices(mediaDevices);

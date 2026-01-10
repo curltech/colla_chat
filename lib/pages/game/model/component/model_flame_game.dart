@@ -120,7 +120,7 @@ class ModelFlameGame extends FlameGame
   }
 
   /// camera移到当前主题的位置
-  moveTo() {
+  void moveTo() {
     String? current = modelProjectController.currentSubjectName.value;
     if (current == null) {
       return;
@@ -225,7 +225,7 @@ class ModelFlameGame extends FlameGame
     }
   }
 
-  addRelationship(RelationshipType relationshipType) {
+  void addRelationship(RelationshipType relationshipType) {
     ModelNode? srcModelNode = modelProjectController.selectedSrcModelNode.value;
     ModelNode? dstModelNode = modelProjectController.selectedDstModelNode.value;
     if (srcModelNode != null && dstModelNode != null) {

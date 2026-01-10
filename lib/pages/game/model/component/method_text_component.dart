@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
-import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/component/type_node_component.dart';
@@ -87,7 +86,7 @@ class MethodAreaComponent extends RectangleComponent
     });
   }
 
-  updateSize() {
+  void updateSize() {
     if (methods.isEmpty) {
       height = MethodTextComponent.contentHeight;
     } else {

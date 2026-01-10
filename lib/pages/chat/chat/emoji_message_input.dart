@@ -14,7 +14,7 @@ class EmojiMessageInputWidget extends StatelessWidget {
   final textEditingController = TextEditingController();
   final scrollController = ScrollController();
 
-  _onBackspacePressed() {
+  void _onBackspacePressed() {
     textEditingController
       ..text = textEditingController.text.characters.toString()
       ..selection = TextSelection.fromPosition(

@@ -31,7 +31,7 @@ class LiveKitSfuRoomWidget extends StatelessWidget with TileDataMixin {
 
   final Rx<List<TileData>> tileData = Rx<List<TileData>>([]);
 
-  _init() async {
+  Future<void> _init() async {
     LiveKitManageRoom liveKitManageRoom = await conferenceService.listSfuRoom();
     List<LiveKitRoom>? rooms = liveKitManageRoom.rooms;
     List<TileData> tiles = [];
@@ -71,7 +71,7 @@ class LiveKitSfuRoomWidget extends StatelessWidget with TileDataMixin {
     tileData.value = tiles;
   }
 
-  _showRoom(LiveKitManageRoom liveKitManageRoom, LiveKitRoom room) {
+  void _showRoom(LiveKitManageRoom liveKitManageRoom, LiveKitRoom room) {
     DialogUtil.show(builder: (BuildContext context) {
       return Dialog(
           child: Container(

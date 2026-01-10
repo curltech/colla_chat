@@ -43,7 +43,7 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
   final RxBool showLoading = false.obs;
   final ExpansibleController expansibleController = ExpansibleController();
 
-  _init() {
+  void _init() {
     final List<PlatformDataField> searchDataField = [
       PlatformDataField(
           name: 'tradeDate',
@@ -224,7 +224,7 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
             )));
   }
 
-  _onActionChip(String name) {
+  void _onActionChip(String name) {
     String? condContent = searchController.values['condContent']?.toString();
     if (condContent == null) {
       condContent = '$name=?';
@@ -346,7 +346,7 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
   }
 
   /// 构建搜索条件
-  _buildSearchView(BuildContext context) {
+  Widget _buildSearchView(BuildContext context) {
     int tradeDate = DateUtil.formatDateInt(DateUtil.currentDateTime());
     searchController.values = {'tradeDate': tradeDate};
     Widget platformReactiveForm = Container(
@@ -369,7 +369,7 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
     return platformReactiveForm;
   }
 
-  onSubmit(BuildContext context, Map<String, dynamic> values) async {
+  Future<void> onSubmit(BuildContext context, Map<String, dynamic> values) async {
     int? tradeDate = values['tradeDate'];
     String? condContent = values['condContent'];
     query(tradeDate: tradeDate!, condContent: condContent!);
@@ -378,7 +378,7 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
         content: AppLocalizations.t('stock dayline query completely'));
   }
 
-  query({int? tradeDate, String? condContent}) async {
+  Future<void> query({int? tradeDate, String? condContent}) async {
     DateTime start = DateTime.now();
     List<DayLine> dayLines = await remoteDayLineService.sendFindByCondContent(
         condContent: condContent, tradeDate: tradeDate);

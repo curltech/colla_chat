@@ -55,7 +55,7 @@ class FileWidget extends StatelessWidget {
         ));
   }
 
-  _searchFile(String keyword) async {
+  Future<void> _searchFile(String keyword) async {
     Folder? folder = directoryController.currentNode.value?.value as Folder?;
     io.Directory? directory = folder?.directory;
     if (directory == null) {
@@ -110,7 +110,8 @@ class FileWidget extends StatelessWidget {
     );
   }
 
-  _onPopAction(BuildContext context, File file, int index, String label,
+  Future<void> _onPopAction(
+      BuildContext context, File file, int index, String label,
       {String? value}) async {
     switch (label) {
       case 'New':
@@ -191,7 +192,7 @@ class FileWidget extends StatelessWidget {
     }
   }
 
-  _buildFiles() {
+  void _buildFiles() {
     Folder? folder = directoryController.currentNode.value?.value as Folder?;
     io.Directory? directory = folder?.directory;
     if (directory == null) {
@@ -331,7 +332,7 @@ class FileWidget extends StatelessWidget {
       )
     ];
     return Column(
-      crossAxisAlignment : CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
             padding: EdgeInsets.all(

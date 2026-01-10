@@ -76,10 +76,10 @@ class DataListController<T> {
   }
 
   T? get current {
-    if (this.currentIndex.value != -1 &&
-        this.currentIndex.value != null &&
+    if (currentIndex.value != -1 &&
+        currentIndex.value != null &&
         data.isNotEmpty) {
-      return data[this.currentIndex.value!];
+      return data[currentIndex.value!];
     }
     return null;
   }
@@ -95,24 +95,24 @@ class DataListController<T> {
   ///设置当前数据索引
   set setCurrentIndex(int? index) {
     if (index == null || index > data.length - 1) {
-      this.currentIndex.value = null;
+      currentIndex.value = null;
       return;
     }
-    if (this.currentIndex.value != index) {
-      this.currentIndex.value = index;
+    if (currentIndex.value != index) {
+      currentIndex.value = index;
     }
   }
 
-  addAll(List<T> ds) {
+  void addAll(List<T> ds) {
     if (ds.isNotEmpty) {
       data.addAll(ds);
-      this.currentIndex.value = data.length - 1;
+      currentIndex.value = data.length - 1;
     }
   }
 
-  add(T d) {
+  void add(T d) {
     data.add(d);
-    this.currentIndex.value = data.length - 1;
+    currentIndex.value = data.length - 1;
   }
 
   T? get(int index) {
@@ -123,30 +123,30 @@ class DataListController<T> {
     return null;
   }
 
-  insert(int index, T d) {
+  void insert(int index, T d) {
     if (index >= 0 && index <= data.length) {
       data.insert(index, d);
-      this.currentIndex.value = index;
+      currentIndex.value = index;
     }
   }
 
-  insertAll(int index, List<T> ds) {
+  void insertAll(int index, List<T> ds) {
     if (index >= 0 && index <= data.length) {
       data.insertAll(index, ds);
-      this.currentIndex.value = index;
+      currentIndex.value = index;
     }
   }
 
   T? delete({int? index}) {
-    index = index ?? this.currentIndex.value;
+    index = index ?? currentIndex.value;
     if (index != null && index < data.length) {
       T t = data.removeAt(index);
       if (data.isEmpty) {
-        this.currentIndex(null);
+        currentIndex(null);
       } else if (index == 0) {
-        this.currentIndex.value = 0;
+        currentIndex.value = 0;
       } else {
-        this.currentIndex.value = (index - 1);
+        currentIndex.value = (index - 1);
       }
       return t;
     }
@@ -163,35 +163,35 @@ class DataListController<T> {
     return delete(index: index);
   }
 
-  update(T d, {int? index}) {
-    index = index ?? this.currentIndex.value;
+  void update(T d, {int? index}) {
+    index = index ?? currentIndex.value;
     if (index != null && index < data.length) {
       data[index] = d;
     }
   }
 
-  clear() {
+  void clear() {
     if (data.isNotEmpty) {
       data.clear();
-      this.currentIndex.value = null;
+      currentIndex.value = null;
     }
   }
 
   ///替换了当前的对象
-  replace(T d) {
-    if (this.currentIndex.value != null && data.isNotEmpty) {
-      data[this.currentIndex.value!] = d;
+  void replace(T d) {
+    if (currentIndex.value != null && data.isNotEmpty) {
+      data[currentIndex.value!] = d;
     }
   }
 
-  replaceAll(List<T> ds) {
+  void replaceAll(List<T> ds) {
     data.assignAll(ds);
     if (ds.isNotEmpty) {
-      this.currentIndex.value = data.length - 1;
+      currentIndex.value = data.length - 1;
     }
   }
 
-  move(int initialIndex, int finalIndex) {
+  void move(int initialIndex, int finalIndex) {
     var mediaSource = data[initialIndex];
     data[initialIndex] = data[finalIndex];
     data[finalIndex] = mediaSource;
@@ -213,7 +213,7 @@ class DataListController<T> {
   }
 
   /// 已有数据的排序
-  sort<S>(Comparable<S>? Function(T t) getFieldValue, int columnIndex,
+  void sort<S>(Comparable<S>? Function(T t) getFieldValue, int columnIndex,
       String columnName, bool ascending) {
     data.sort((T a, T b) {
       Comparable<S>? av = getFieldValue(a);
@@ -237,8 +237,8 @@ class DataListController<T> {
       }
     });
 
-    this.currentIndex.value = 0;
-    this.findCondition.value.sortColumns = [
+    currentIndex.value = 0;
+    findCondition.value.sortColumns = [
       SortColumn(columnIndex, columnName, ascending)
     ];
   }
@@ -255,13 +255,13 @@ class DataListController<T> {
     return selectedData;
   }
 
-  selectAll(l) {
+  void selectAll(l) {
     for (var t in data) {
       EntityUtil.setSelected(t, true);
     }
   }
 
-  unselectAll() {
+  void unselectAll() {
     for (var t in data) {
       EntityUtil.setSelected(t, false);
     }
@@ -273,7 +273,7 @@ class DataListController<T> {
 abstract class DataPageController<T> extends DataListController<T> {
   DataPageController();
 
-  previous() async {
+  Future<void> previous() async {
     int offset = findCondition.value.offset;
     int limit = findCondition.value.limit;
     if (offset >= limit) {
@@ -282,7 +282,7 @@ abstract class DataPageController<T> extends DataListController<T> {
     }
   }
 
-  next() async {
+  Future<void> next() async {
     int offset = findCondition.value.offset;
     int limit = findCondition.value.limit;
     int count = findCondition.value.count;
@@ -292,7 +292,7 @@ abstract class DataPageController<T> extends DataListController<T> {
     }
   }
 
-  first() async {
+  Future<void> first() async {
     int offset = findCondition.value.offset;
     if (offset != 0) {
       findCondition.value = findCondition.value.copy(offset: 0);
@@ -300,7 +300,7 @@ abstract class DataPageController<T> extends DataListController<T> {
     }
   }
 
-  last() async {
+  Future<void> last() async {
     int limit = findCondition.value.limit;
     int count = findCondition.value.count;
     int pageCount = PaginationUtil.getPageCount(count, limit);
@@ -311,7 +311,7 @@ abstract class DataPageController<T> extends DataListController<T> {
     }
   }
 
-  movePage(int index) async {
+  Future<void> movePage(int index) async {
     int offset = findCondition.value.offset;
     int limit = findCondition.value.limit;
     int currentPage = PaginationUtil.getCurrentPage(offset, limit);

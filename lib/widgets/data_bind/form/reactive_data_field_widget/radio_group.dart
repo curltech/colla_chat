@@ -28,50 +28,50 @@ class ReactiveRadioGroup<T> extends ReactiveFormField<T, T> {
     FocusNode? focusNode,
     bool autofocus = false,
   }) : super(
-    builder: (field) {
-      List<Widget> radioChildren = [];
-      if (options.isNotEmpty) {
-        T? groupValue = field.value;
-        for (var i = 0; i < options.length; ++i) {
-          var option = options[i];
-          var radio = Radio<T>(
-            onChanged: (T? value) {
-              field.control.markAsTouched(updateParent: false);
-              field.didChange(value);
-              onChanged?.call(field.control);
-            },
-            value: option.value,
-            groupValue: groupValue,
-            mouseCursor: mouseCursor,
-            toggleable: toggleable,
-            activeColor: activeColor,
-            fillColor: fillColor,
-            focusColor: focusColor,
-            hoverColor: hoverColor,
-            overlayColor: overlayColor,
-            splashRadius: splashRadius,
-            materialTapTargetSize: materialTapTargetSize,
-            visualDensity: visualDensity,
-            focusNode: focusNode,
-            autofocus: autofocus,
-          );
-          var row = SizedBox(
-              width: width,
-              child: Row(
-                children: [
-                  radio,
-                  Expanded(
-                      child: AutoSizeText(
-                          AppLocalizations.t(option.label)))
-                ],
-              ));
-          radioChildren.add(row);
-        }
-      }
+          builder: (field) {
+            List<Widget> radioChildren = [];
+            if (options.isNotEmpty) {
+              T? groupValue = field.value;
+              for (var i = 0; i < options.length; ++i) {
+                var option = options[i];
+                var radio = Radio<T>(
+                  onChanged: (T? value) {
+                    field.control.markAsTouched(updateParent: false);
+                    field.didChange(value);
+                    onChanged?.call(field.control);
+                  },
+                  value: option.value,
+                  groupValue: groupValue,
+                  mouseCursor: mouseCursor,
+                  toggleable: toggleable,
+                  activeColor: activeColor,
+                  fillColor: fillColor,
+                  focusColor: focusColor,
+                  hoverColor: hoverColor,
+                  overlayColor: overlayColor,
+                  splashRadius: splashRadius,
+                  materialTapTargetSize: materialTapTargetSize,
+                  visualDensity: visualDensity,
+                  focusNode: focusNode,
+                  autofocus: autofocus,
+                );
+                var row = SizedBox(
+                    width: width,
+                    child: Row(
+                      children: [
+                        radio,
+                        Expanded(
+                            child:
+                                AutoSizeText(AppLocalizations.t(option.label)))
+                      ],
+                    ));
+                radioChildren.add(row);
+              }
+            }
 
-      return Wrap(
-        children: radioChildren,
-      );
-    },
-  );
+            return Wrap(
+              children: radioChildren,
+            );
+          },
+        );
 }

@@ -18,7 +18,7 @@ class ParticipantAreaComponent extends RectangleComponent
     _init();
   }
 
-  _init() {
+  void _init() {
     if (areaDirection == AreaDirection.self) {
       position = Vector2(
           roomController.x(0),
@@ -63,7 +63,7 @@ class ParticipantAreaComponent extends RectangleComponent
     }
   }
 
-  loadRoundParticipant() {
+  void loadRoundParticipant() {
     if (roundParticipantComponent != null) {
       remove(roundParticipantComponent!);
     }

@@ -46,7 +46,7 @@ class CollectionChatMessageController extends DataMoreController<ChatMessage> {
   }
 
   ///收藏变成消息
-  collection() {
+  void collection() {
     chatMessageService.buildChatMessage();
   }
 }

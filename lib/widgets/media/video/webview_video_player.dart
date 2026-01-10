@@ -52,9 +52,6 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  close() {}
-
-  @override
   pause() {}
 
   @override

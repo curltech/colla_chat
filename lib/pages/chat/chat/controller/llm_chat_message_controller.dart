@@ -82,7 +82,7 @@ class LlmChatMessageController extends ChatMessageController {
     }
   }
 
-  onChatCompletion(String? chatResponse) async {
+  Future<void> onChatCompletion(String? chatResponse) async {
     ChatMessage chatMessage = buildLlmChatMessage(chatResponse,
         senderPeerId: chatSummary!.peerId, senderName: chatSummary!.name);
     await chatMessageService.store(chatMessage);
@@ -134,7 +134,7 @@ class LlmChatMessageController extends ChatMessageController {
     return chatMessage;
   }
 
-  onImageCompletion(String url) async {
+  Future<void> onImageCompletion(String url) async {
     Uint8List content = await ImageUtil.loadUrlImage(url);
     ChatMessage chatMessage = buildLlmChatMessage(content,
         senderPeerId: chatSummary!.peerId,

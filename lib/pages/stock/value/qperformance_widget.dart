@@ -44,7 +44,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
       DataListController<QPerformance>();
   final RxBool showLoading = false.obs;
 
-  _init() {
+  void _init() {
     searchDataField = [
       PlatformDataField(
           name: 'tradeDate',
@@ -152,7 +152,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
             )));
   }
 
-  _onActionChip(String name) {
+  void _onActionChip(String name) {
     String? condContent = searchController.values['condContent']?.toString();
     if (condContent == null) {
       condContent = '$name=?';
@@ -210,7 +210,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
     return platformReactiveForm;
   }
 
-  _onSubmit(BuildContext context, Map<String, dynamic> values) async {
+  Future<void> _onSubmit(BuildContext context, Map<String, dynamic> values) async {
     String? tsCode = values['tsCode'];
     int? tradeDate = values['tradeDate'];
     String? qDate = values['qDate'];
@@ -225,7 +225,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         content: AppLocalizations.t('stock qperformance query completely'));
   }
 
-  query({
+  Future<void> query({
     String? tsCode,
     String? qDate,
     int? tradeDate,

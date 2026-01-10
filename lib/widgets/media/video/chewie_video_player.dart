@@ -16,31 +16,32 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
       return;
     }
     chewieController = ChewieController(
-        videoPlayerController: controller,
-        autoPlay: autoPlay,
-        looping: true,
-        progressIndicatorDelay: const Duration(milliseconds: 200),
-        additionalOptions: (context) {
-          return <OptionItem>[
-            OptionItem(
-              onTap: (BuildContext context) {},
-              iconData: Icons.live_tv_sharp,
-              title: 'Toggle Video Src',
-            ),
-          ];
-        },
-        hideControlsTimer: const Duration(seconds: 3),
-        showControls: true,
-        materialProgressColors: ChewieProgressColors(
-          playedColor: myself.primary,
-          handleColor: myself.primary,
-          backgroundColor: Colors.white,
-          bufferedColor: Colors.green,
-        ),
-        placeholder: Container(
-          color: Colors.black,
-        ),
-        autoInitialize: true,);
+      videoPlayerController: controller,
+      autoPlay: autoPlay,
+      looping: true,
+      progressIndicatorDelay: const Duration(milliseconds: 200),
+      additionalOptions: (context) {
+        return <OptionItem>[
+          OptionItem(
+            onTap: (BuildContext context) {},
+            iconData: Icons.live_tv_sharp,
+            title: 'Toggle Video Src',
+          ),
+        ];
+      },
+      hideControlsTimer: const Duration(seconds: 3),
+      showControls: true,
+      materialProgressColors: ChewieProgressColors(
+        playedColor: myself.primary,
+        handleColor: myself.primary,
+        backgroundColor: Colors.white,
+        bufferedColor: Colors.green,
+      ),
+      placeholder: Container(
+        color: Colors.black,
+      ),
+      autoInitialize: true,
+    );
   }
 
   @override
@@ -73,7 +74,7 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
   }
 
   @override
-  void close() {
+  Future<void> close() async {
     super.close();
     if (chewieController != null) {
       chewieController!.dispose();

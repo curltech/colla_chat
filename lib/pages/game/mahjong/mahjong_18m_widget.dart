@@ -90,7 +90,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   }
 
   /// 弹出对话框，输入名称，选择参加的人
-  _createRoomWidget(BuildContext context) async {
+  Future<void> _createRoomWidget(BuildContext context) async {
     ButtonStyle style = StyleUtil.buildButtonStyle();
     ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
@@ -147,7 +147,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
     });
   }
 
-  _check() {
+  void _check() {
     Room? room = roomController.room.value;
     Round? currentRound = room?.currentRound;
     if (currentRound == null) {
@@ -171,7 +171,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
     mahjongFlameGame.reloadSelf();
   }
 
-  _score() {
+  void _score() {
     Room? room = roomController.room.value;
     Round? currentRound = room?.currentRound;
     if (currentRound == null) {
@@ -189,7 +189,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _showEvent(BuildContext context) {
+  void _showEvent(BuildContext context) {
     Room? room = roomController.room.value;
     Round? currentRound = room?.currentRound;
     if (currentRound == null) {

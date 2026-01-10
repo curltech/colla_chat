@@ -11,7 +11,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:telephony/telephony.dart';
 
-onBackgroundMessage(SmsMessage message) async {
+Future<void> onBackgroundMessage(SmsMessage message) async {
   smsClient.onMessage(message);
 }
 
@@ -34,7 +34,7 @@ class SmsClient extends IWebClient {
   }
 
   ///接收到加密的短信
-  onMessage(SmsMessage smsMessage) async {
+  Future<void> onMessage(SmsMessage smsMessage) async {
     smsMessageStreamController.add(smsMessage);
   }
 

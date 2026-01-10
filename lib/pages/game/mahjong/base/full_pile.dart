@@ -1,6 +1,5 @@
 import 'package:colla_chat/pages/game/mahjong/base/suit.dart';
 import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
-import 'package:flame/flame.dart';
 
 /// 完整的一副麻将
 class FullPile {
@@ -10,7 +9,7 @@ class FullPile {
     init();
   }
 
-  init() async {
+  Future<void> init() async {
     for (var windSuit in WindSuit.values) {
       for (int i = 0; i < 4; ++i) {
         Tile tile = Tile(i, Suit.wind, windSuit: windSuit);

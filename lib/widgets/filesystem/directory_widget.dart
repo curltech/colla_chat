@@ -140,7 +140,7 @@ class DirectoryWidget extends StatelessWidget {
     );
   }
 
-  _onToggleNodeExpansion(FolderNode node) {
+  void _onToggleNodeExpansion(FolderNode node) {
     if (node.children.isEmpty) {
       try {
         directoryController.findDirectory(node);

@@ -34,7 +34,7 @@ class Pile {
     };
   }
 
-  static sortTile(List<Tile> tiles) {
+  static void sortTile(List<Tile> tiles) {
     tiles.sort((Tile a, Tile b) {
       if (a.suit != Suit.wind && b.suit != Suit.wind) {
         return a.toString().compareTo(b.toString());
@@ -49,12 +49,12 @@ class Pile {
   }
 
   /// 排序
-  sort() {
+  void sort() {
     sortTile(tiles);
   }
 
   /// 洗牌
-  shuffle([Random? random]) {
+  void shuffle([Random? random]) {
     tiles.shuffle(random);
   }
 

@@ -25,7 +25,7 @@ class CardBackgroundSprite {
     init();
   }
 
-  init() async {
+  Future<void> init() async {
     for (var cardBackgroundType in TileBackgroundType.values) {
       Image image = await Flame.images
           .load('$mahjongPath${cardBackgroundType.name}.webp');

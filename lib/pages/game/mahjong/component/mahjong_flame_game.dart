@@ -93,7 +93,7 @@ class MahjongFlameGame extends FlameGame
   // @override
   // bool debugMode = true;
 
-  _init() {
+  void _init() {
     camera = CameraComponent.withFixedResolution(
         width: roomController.width, height: roomController.height);
     allOutstandingActions.roomEventActions.length;
@@ -167,7 +167,7 @@ class MahjongFlameGame extends FlameGame
     world.add(stockAreaComponent);
   }
 
-  reloadSelf() {
+  void reloadSelf() {
     selfParticipantAreaComponent.loadRoundParticipant();
     selfWasteAreaComponent.loadWastePile();
     selfHandAreaComponent.loadHandPile();
@@ -175,29 +175,29 @@ class MahjongFlameGame extends FlameGame
     loadActionArea();
   }
 
-  reloadOpponent() {
+  void reloadOpponent() {
     opponentParticipantAreaComponent.loadRoundParticipant();
     opponentWasteAreaComponent.loadWastePile();
     opponentHandAreaComponent.loadHandPile();
   }
 
-  reloadNext() {
+  void reloadNext() {
     nextParticipantAreaComponent.loadRoundParticipant();
     nextHandAreaComponent.loadHandPile();
     nextWasteAreaComponent.loadWastePile();
   }
 
-  reloadPrevious() {
+  void reloadPrevious() {
     previousHandAreaComponent.loadHandPile();
     previousWasteAreaComponent.loadWastePile();
     previousParticipantAreaComponent.loadRoundParticipant();
   }
 
-  reloadStock() {
+  void reloadStock() {
     stockAreaComponent.loadStockPile();
   }
 
-  reload() {
+  void reload() {
     reloadSelf();
     reloadOpponent();
     reloadNext();
@@ -205,7 +205,7 @@ class MahjongFlameGame extends FlameGame
     reloadStock();
   }
 
-  loadActionArea() {
+  void loadActionArea() {
     if (actionAreaComponent != null) {
       world.remove(actionAreaComponent!);
       actionAreaComponent = null;

@@ -39,7 +39,7 @@ class JustAudioPlayer {
   }
 
   ///定制音频会话的处理
-  _initAudioSession() async {
+  Future<void> _initAudioSession() async {
     await globalAudioSession.initMusic();
     await globalAudioSession.handleInterruptions(() {
       player.pause();
@@ -89,7 +89,7 @@ class JustAudioPlayer {
     return audioSource;
   }
 
-  play(String filename) async {
+  Future<void> play(String filename) async {
     try {
       AudioSource audioSource = _audioSource(filename: filename);
       await player.setAudioSource(audioSource);
@@ -99,28 +99,28 @@ class JustAudioPlayer {
     }
   }
 
-  pause() async {
+  Future<void> pause() async {
     await player.pause();
   }
 
-  resume() async {
+  Future<void> resume() async {
     await player.play();
   }
 
-  stop() async {
+  Future<void> stop() async {
     await player.stop();
   }
 
-  release() async {
+  Future<void> release() async {
     await player.dispose();
   }
 
-  setLoopMode(bool mode) async {
+  Future<void> setLoopMode(bool mode) async {
     await player.setLoopMode(mode ? LoopMode.all : LoopMode.off);
   }
 
   @override
-  close() async {
+  Future<void> close() async {
     await stop();
   }
 }
@@ -209,7 +209,7 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
         androidOffloadSchedulingEnabled: androidOffloadSchedulingEnabled);
   }
 
-  _init({
+  void _init({
     String? userAgent,
     bool handleInterruptions = true,
     bool androidApplyAudioAttributes = true,
@@ -281,7 +281,7 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
 
   @override
   resume() async {
-    await play();
+    play();
   }
 
   @override
@@ -305,7 +305,7 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
     }
   }
 
-  setLoopMode(LoopMode mode) async {
+  Future<void> setLoopMode(LoopMode mode) async {
     await player!.player.setLoopMode(mode);
   }
 

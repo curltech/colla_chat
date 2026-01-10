@@ -28,7 +28,7 @@ abstract class AbstractAudioPlayerController
     return Future.value(mediaPlayerState.playbackSpeed);
   }
 
-  setSpeed(double speed) {
+  void setSpeed(double speed) {
     mediaPlayerState.playbackSpeed = speed;
   }
 
@@ -36,7 +36,7 @@ abstract class AbstractAudioPlayerController
     return Future.value(mediaPlayerState.volume);
   }
 
-  setVolume(double volume) {
+  void setVolume(double volume) {
     mediaPlayerState.volume = volume;
   }
 
@@ -53,7 +53,7 @@ abstract class AbstractAudioPlayerController
     if (mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.playing) {
       await pause();
     } else {
-      await play();
+      play();
     }
   }
 
@@ -113,7 +113,7 @@ abstract class AbstractAudioPlayerController
             //color: Colors.white,
           ),
           onPressed: () async {
-            await play();
+            play();
           },
         ),
       );

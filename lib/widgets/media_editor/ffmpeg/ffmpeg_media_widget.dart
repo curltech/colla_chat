@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
@@ -62,7 +61,8 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
     return ffmpegPresent.value;
   }
 
-  _showTransferFileMenu(BuildContext context, String filename) async {
+  Future<void> _showTransferFileMenu(
+      BuildContext context, String filename) async {
     List<ActionData> filePopActionData = [];
     String? mimeType = FileUtil.mimeType(filename);
     if (mimeType != null) {
@@ -296,7 +296,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
     return children;
   }
 
-  show(BuildContext context, String title) {
+  void show(BuildContext context, String title) {
     DialogUtil.show(
         context: context,
         builder: (BuildContext context) {
@@ -321,8 +321,8 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
       controller: controller,
       onPageChanged: (int index,
           {PlatformSwiperDirection? direction,
-            int? oldIndex,
-            CarouselPageChangedReason? reason}) {
+          int? oldIndex,
+          CarouselPageChangedReason? reason}) {
         this.index.value = index;
       },
       itemBuilder: (BuildContext context, int index, {int? realIndex}) {
@@ -373,7 +373,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
               IconButton(
                 tooltip: AppLocalizations.t('Ffmpeg task'),
                 onPressed: () async {
-                  await controller.move(1);
+                  controller.move(1);
                 },
                 icon: const Icon(Icons.task_alt_outlined),
               ),
@@ -401,7 +401,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
               IconButton(
                 tooltip: AppLocalizations.t('Playlist'),
                 onPressed: () async {
-                  await controller.move(0);
+                  controller.move(0);
                 },
                 icon: const Icon(Icons.featured_play_list_outlined),
               ),

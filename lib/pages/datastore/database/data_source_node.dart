@@ -300,7 +300,7 @@ class DataTableNode extends ExplorableNode {
     return dataColumnNodes;
   }
 
-  deleteDataColumnNode({DataColumnNode? dataColumnNode}) {
+  void deleteDataColumnNode({DataColumnNode? dataColumnNode}) {
     FolderNode? folderNode = getColumnFolderNode();
     if (folderNode == null) {
       return;
@@ -329,7 +329,7 @@ class DataTableNode extends ExplorableNode {
     return dataIndexNodes;
   }
 
-  deleteDataIndexNode({DataIndexNode? dataIndexNode}) {
+  bool deleteDataIndexNode({DataIndexNode? dataIndexNode}) {
     FolderNode? folderNode = getIndexFolderNode();
     if (folderNode == null) {
       return false;
@@ -340,6 +340,8 @@ class DataTableNode extends ExplorableNode {
       folderNode.children
           .removeWhere((item) => item.value.name == dataIndexNode.value.name);
     }
+
+    return true;
   }
 }
 

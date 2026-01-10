@@ -82,7 +82,7 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
     return tiles;
   }
 
-  _searchShare(String keyword) async {
+  Future<void> _searchShare(String keyword) async {
     if (keyword.isNotEmpty) {
       try {
         if (myShareController.online.value) {

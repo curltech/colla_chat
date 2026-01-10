@@ -62,7 +62,7 @@ class SubjectComponent extends RectangleComponent with ModelNodeComponent {
     size = rect.size.toVector2();
   }
 
-  updateSubjectName() {
+  void updateSubjectName() {
     textComponent.text = subject.name;
   }
 

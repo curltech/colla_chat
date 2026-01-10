@@ -6,7 +6,7 @@ import 'package:liquid_glass_effect/liquid_glass_theme.dart';
 import 'package:liquid_glass_effect/liquid_glass_widgets.dart';
 import 'package:liquid_glass_effect/models/liquid_glass_config.dart';
 
-buildThemeData() {
+void buildThemeData() {
   LiquidGlassConfig glassConfig = LiquidGlassConfig(
     blurAmount: 15.0,
     highlightIntensity: 0.3,

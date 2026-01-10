@@ -83,11 +83,11 @@ class PlatformVideoPlayer extends StatelessWidget {
     // ));
   }
 
-  _onSelected(int index, String filename) {
+  void _onSelected(int index, String filename) {
     // swiperController.move(1);
   }
 
-  toggleCrossAxisCount() {
+  void toggleCrossAxisCount() {
     if (crossAxisCount.value == 4) {
       crossAxisCount.value = 1;
     } else {
@@ -95,7 +95,7 @@ class PlatformVideoPlayer extends StatelessWidget {
     }
   }
 
-  close() {
+  void close() {
     for (var mediaPlayerController in mediaPlayerControllers) {
       mediaPlayerController.close();
     }
@@ -108,8 +108,8 @@ class PlatformVideoPlayer extends StatelessWidget {
       controller: controller,
       onPageChanged: (int index,
           {PlatformSwiperDirection? direction,
-            int? oldIndex,
-            CarouselPageChangedReason? reason}) {
+          int? oldIndex,
+          CarouselPageChangedReason? reason}) {
         this.index.value = index;
       },
       itemBuilder: (BuildContext context, int index, {int? realIndex}) {
@@ -146,7 +146,7 @@ class PlatformVideoPlayer extends StatelessWidget {
     );
   }
 
-  play() {
+  void play() {
     int? currentIndex = playlistController.currentIndex.value;
     currentIndex ??= 0;
     int length = playlistController.data.length;

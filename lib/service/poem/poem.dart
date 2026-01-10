@@ -68,7 +68,7 @@ class PoemService extends GeneralBaseService<Poem> {
     return poem;
   }
 
-  parseJson(String collection, String filename) async {
+  Future<void> parseJson(String collection, String filename) async {
     File file = File(filename);
     String jsonStr = file.readAsStringSync();
     List<dynamic> list = [];

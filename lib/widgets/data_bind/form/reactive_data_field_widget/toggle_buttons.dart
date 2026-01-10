@@ -34,53 +34,53 @@ class ReactiveToggleButtons<T> extends ReactiveFormField<T, T> {
     Axis direction = Axis.horizontal,
     VerticalDirection verticalDirection = VerticalDirection.down,
   }) : super(
-    builder: (field) {
-      T? value = field.value;
-      List<bool> isSelected = [];
-      List<Widget> children = [];
-      for (var i = 0; i < options.length; ++i) {
-        var option = options[i];
-        if (value == option.value) {
-          isSelected.add(true);
-        } else {
-          isSelected.add(false);
-        }
-        if (option.icon != null) {
-          children.add(Icon(option.icon!));
-        } else {
-          children.add(Text(option.label));
-        }
-      }
-      return ToggleButtons(
-        isSelected: isSelected,
-        onPressed: (int index) {
-          var option = options[index];
-          field.didChange.call(option.value);
-          onToggle?.call(field.control);
-        },
-        mouseCursor: mouseCursor,
-        tapTargetSize: tapTargetSize,
-        textStyle: textStyle,
-        constraints: constraints,
-        color: color,
-        selectedColor: selectedColor,
-        disabledColor: disabledColor,
-        fillColor: fillColor,
-        focusColor: focusColor,
-        highlightColor: highlightColor,
-        hoverColor: hoverColor,
-        splashColor: splashColor,
-        focusNodes: focusNodes,
-        renderBorder: renderBorder,
-        borderColor: borderColor,
-        selectedBorderColor: selectedBorderColor,
-        disabledBorderColor: disabledBorderColor,
-        borderRadius: borderRadius,
-        borderWidth: borderWidth,
-        direction: direction,
-        verticalDirection: verticalDirection,
-        children: children,
-      );
-    },
-  );
+          builder: (field) {
+            T? value = field.value;
+            List<bool> isSelected = [];
+            List<Widget> children = [];
+            for (var i = 0; i < options.length; ++i) {
+              var option = options[i];
+              if (value == option.value) {
+                isSelected.add(true);
+              } else {
+                isSelected.add(false);
+              }
+              if (option.icon != null) {
+                children.add(Icon(option.icon!));
+              } else {
+                children.add(Text(option.label));
+              }
+            }
+            return ToggleButtons(
+              isSelected: isSelected,
+              onPressed: (int index) {
+                var option = options[index];
+                field.didChange.call(option.value);
+                onToggle?.call(field.control);
+              },
+              mouseCursor: mouseCursor,
+              tapTargetSize: tapTargetSize,
+              textStyle: textStyle,
+              constraints: constraints,
+              color: color,
+              selectedColor: selectedColor,
+              disabledColor: disabledColor,
+              fillColor: fillColor,
+              focusColor: focusColor,
+              highlightColor: highlightColor,
+              hoverColor: hoverColor,
+              splashColor: splashColor,
+              focusNodes: focusNodes,
+              renderBorder: renderBorder,
+              borderColor: borderColor,
+              selectedBorderColor: selectedBorderColor,
+              disabledBorderColor: disabledBorderColor,
+              borderRadius: borderRadius,
+              borderWidth: borderWidth,
+              direction: direction,
+              verticalDirection: verticalDirection,
+              children: children,
+            );
+          },
+        );
 }

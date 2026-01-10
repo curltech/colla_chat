@@ -33,7 +33,7 @@ class VideoChatMessage extends StatelessWidget {
     _buildConference();
   }
 
-  _buildConference() {
+  void _buildConference() {
     String? content = chatMessage.content;
     if (content != null) {
       content = chatMessageService.recoverContent(content);
@@ -49,7 +49,7 @@ class VideoChatMessage extends StatelessWidget {
     conferenceNotifier.value = conference;
   }
 
-  _join(BuildContext context) async {
+  Future<void> _join(BuildContext context) async {
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     if (chatSummary != null) {
       String? content = chatMessage.content;

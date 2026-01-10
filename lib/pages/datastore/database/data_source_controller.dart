@@ -31,13 +31,13 @@ class DataSourceController extends DataListController<DataSourceNode> {
     super.current = element;
   }
 
-  save() async {
+  Future<void> save() async {
     String value =
         JsonUtil.toJsonString(data.value.map((node) => node.value).toList());
     await localSecurityStorage.save('DataSources', value);
   }
 
-  init() async {
+  Future<void> init() async {
     clear();
     String? value = await localSecurityStorage.get('DataSources');
     List<dynamic>? dataSources;
@@ -108,7 +108,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
     return dataSourceNode;
   }
 
-  deleteDataSource({DataSourceNode? dataSourceNode}) {
+  void deleteDataSource({DataSourceNode? dataSourceNode}) {
     data_source.DataSource? dataSource;
     if (dataSourceNode != null) {
       dataSource = dataSourceNode.value as data_source.DataSource?;
@@ -147,7 +147,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
     return dataSourceNode.getDataTableNodes();
   }
 
-  setCurrentDataTableNode(
+  void setCurrentDataTableNode(
       {DataTableNode? current, DataSourceNode? dataSourceNode}) {
     List<DataTableNode>? dataTableNodes = getDataTableNodes();
     if (dataTableNodes != null && dataTableNodes.isNotEmpty) {
@@ -256,7 +256,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
     return sql;
   }
 
-  removeDataTableNode({
+  void removeDataTableNode({
     DataSourceNode? dataSourceNode,
     DataTableNode? dataTableNode,
   }) {
@@ -290,7 +290,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
   }
 
   /// 对数据源加表
-  updateDataTables(
+  Future<Null> updateDataTables(
     List<data_source.DataTable> dataTables, {
     DataSourceNode? dataSourceNode,
   }) async {
@@ -310,7 +310,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
   }
 
   /// 在数据库中加列，要求数据源，表和列控制器存在
-  addDataColumn(data_source.DataColumn dataColumn,
+  Null addDataColumn(data_source.DataColumn dataColumn,
       {DataSourceNode? dataSourceNode, DataTableNode? dataTableNode}) {
     DataSourceNode? dataSourceNode = current;
     if (dataSourceNode == null) {
@@ -346,7 +346,9 @@ class DataSourceController extends DataListController<DataSourceNode> {
     }
     dataSource.dataStore?.run(Sql(
         'alter table ${dataTableNode.value.name} drop column ${dataColumnNode.value.name};'));
-    return dataTableNode.deleteDataColumnNode(dataColumnNode: dataColumnNode);
+    dataTableNode.deleteDataColumnNode(dataColumnNode: dataColumnNode);
+
+    return true;
   }
 
   DataColumnNode? getDataColumnNode(
@@ -374,7 +376,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
     return null;
   }
 
-  setCurrentDataColumnNode(
+  Null setCurrentDataColumnNode(
     DataColumnNode current, {
     DataSourceNode? dataSourceNode,
     DataTableNode? dataTableNode,
@@ -401,7 +403,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
     currentNode.value = current;
   }
 
-  addDataIndex(DataIndex dataIndex,
+  bool? addDataIndex(DataIndex dataIndex,
       {DataSourceNode? dataSourceNode,
       DataTableNode? dataTableNode,
       bool mock = true}) {
@@ -415,6 +417,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
       return null;
     }
     dataTableNode.addDataIndexes([dataIndex]);
+    return null;
   }
 
   String? createDataIndex(
@@ -498,7 +501,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
     return null;
   }
 
-  setCurrentDataIndexNode(
+  Null setCurrentDataIndexNode(
     DataIndexNode? current, {
     DataSourceNode? dataSourceNode,
     DataTableNode? dataTableNode,
@@ -552,7 +555,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
   }
 
   /// 把数据源的表加入节点
-  updateTableNodes({
+  Future<Null> updateTableNodes({
     DataSourceNode? dataSourceNode,
   }) async {
     data_source.DataSource? dataSource =

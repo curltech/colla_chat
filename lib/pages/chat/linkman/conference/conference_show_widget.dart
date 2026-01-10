@@ -152,7 +152,7 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
         });
   }
 
-  _resend(BuildContext context) async {
+  Future<Null> _resend(BuildContext context) async {
     Conference? current = conferenceNotifier.value;
     if (current == null) {
       return null;

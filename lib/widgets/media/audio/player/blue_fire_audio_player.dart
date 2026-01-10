@@ -17,7 +17,7 @@ class BlueFireAudioPlayer {
   BlueFireAudioPlayer();
 
   ///所有的音频播放器的配置
-  setGlobalAudioContext({
+  Future<void> setGlobalAudioContext({
     AudioContextConfigRoute? route,
     AudioContextConfigFocus? focus,
     bool? respectSilence,
@@ -31,7 +31,7 @@ class BlueFireAudioPlayer {
         stayAwake: stayAwake));
   }
 
-  setAudioContext({
+  Future<void> setAudioContext({
     AudioContextConfigRoute? route,
     AudioContextConfigFocus? focus,
     bool? respectSilence,
@@ -63,7 +63,7 @@ class BlueFireAudioPlayer {
     return config.build();
   }
 
-  play(
+  Future<void> play(
     String filename, {
     double? volume,
     double? balance,
@@ -86,23 +86,23 @@ class BlueFireAudioPlayer {
     }
   }
 
-  pause() async {
+  Future<void> pause() async {
     await player.pause();
   }
 
-  resume() async {
+  Future<void> resume() async {
     await player.resume();
   }
 
-  stop() async {
+  Future<void> stop() async {
     await player.stop();
   }
 
-  release() async {
+  Future<void> release() async {
     await player.release();
   }
 
-  setLoopMode(bool mode) async {
+  Future<void> setLoopMode(bool mode) async {
     await player.setReleaseMode(mode ? ReleaseMode.loop : ReleaseMode.stop);
   }
 }
@@ -252,40 +252,40 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   @override
   setVolume(double volume) async {
     await player!.player.setVolume(volume);
-    await super.setVolume(volume);
+    super.setVolume(volume);
   }
 
   @override
   setSpeed(double speed) async {
     await player!.player.setPlaybackRate(speed);
-    await super.setSpeed(speed);
+    super.setSpeed(speed);
   }
 
-  setPlayerMode(PlayerMode playerMode) async {
+  Future<void> setPlayerMode(PlayerMode playerMode) async {
     await player!.player.setPlayerMode(playerMode); // half speed
   }
 
-  setReleaseMode(ReleaseMode releaseMode) async {
+  Future<void> setReleaseMode(ReleaseMode releaseMode) async {
     await player!.player.setReleaseMode(releaseMode); // half speed
   }
 
-  setAudioContext(AudioContext ctx) async {
+  Future<void> setAudioContext(AudioContext ctx) async {
     player!.player.setAudioContext(ctx);
   }
 
-  onPositionChanged(Function(Duration duration) fn) {
+  void onPositionChanged(Function(Duration duration) fn) {
     player!.player.onPositionChanged.listen((Duration duration) {
       fn(duration);
     });
   }
 
-  onPlayerComplete(Function(dynamic event) fn) {
+  void onPlayerComplete(Function(dynamic event) fn) {
     player!.player.onPlayerComplete.listen((dynamic event) {
       fn(event);
     });
   }
 
-  onDurationChanged(Function(Duration duration) fn) {
+  void onDurationChanged(Function(Duration duration) fn) {
     player!.player.onDurationChanged.listen((Duration duration) {
       fn(duration);
     });

@@ -152,7 +152,7 @@ class ManualAddWidget extends StatelessWidget with TileDataMixin {
     return platformReactiveForm;
   }
 
-  _connect(Map<String, dynamic> values) async {
+  Future<void> _connect(Map<String, dynamic> values) async {
     String? name = values['name'];
     String? email = values['email'];
     String? password = values['password'];

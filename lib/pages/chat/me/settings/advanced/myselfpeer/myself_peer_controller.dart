@@ -6,7 +6,7 @@ import 'package:colla_chat/service/dht/myselfpeer.dart';
 class MyselfPeerController extends DataListController<MyselfPeer> {
   MyselfPeerController();
 
-  init() async {
+  Future<void> init() async {
     List<MyselfPeer> myselfPeers = await myselfPeerService.findAll();
     clear();
     if (myselfPeers.isNotEmpty) {

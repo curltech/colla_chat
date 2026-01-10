@@ -132,7 +132,7 @@ class Round {
     };
   }
 
-  init() {
+  void init() {
     List<Tile> stockTiles = [
       ...fullPile.tiles.values,
     ];
@@ -179,7 +179,7 @@ class Round {
   }
 
   /// 增加等待决策的参与者
-  addOutstandingParticipants(int src, List<int> participants) {
+  void addOutstandingParticipants(int src, List<int> participants) {
     Set<int>? ps = outstandingParticipants[src];
     if (ps == null) {
       ps = {};
@@ -371,7 +371,7 @@ class Round {
   }
 
   /// 收到owner pass的消息
-  _pass(int owner, Tile tile, int src, int receiver, {int? pos}) async {
+  Future<void> _pass(int owner, Tile tile, int src, int receiver, {int? pos}) async {
     logger.w(
         'receiver:$receiver chat message: owner:$owner, tile:$tile, src:$src, pos:$pos, isSeaTake:$isSeaTake pass');
     final RoundParticipant roundParticipant = roundParticipants[owner];
@@ -576,7 +576,7 @@ class Round {
   }
 
   /// owner抢src的明杠牌card
-  _rob(int owner, int src, Tile tile, {int? receiver}) {}
+  void _rob(int owner, int src, Tile tile, {int? receiver}) {}
 
   /// 某个参与者暗杠，pos表示杠牌的位置
   Future<void> darkBar(int owner, int pos) async {
@@ -774,7 +774,7 @@ class Round {
 
   /// 作为creator，分发事件消息给其他参与者，不包括事件的原始发送者
   /// 否则，发送消息给creator
-  _sendChatMessage(RoomEvent roomEvent, int sender, List<int> receivers) async {
+  Future<void> _sendChatMessage(RoomEvent roomEvent, int sender, List<int> receivers) async {
     for (int receiver in receivers) {
       RoundParticipant roundParticipant = roundParticipants[receiver];
       roomEvent.sender = sender;
@@ -870,13 +870,13 @@ class Round {
       case RoomEventAction.chow:
         returnValue = await _chow(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.rob:
-        returnValue = _rob(roomEvent.owner, roomEvent.src!, roomEvent.tile!,
+        _rob(roomEvent.owner, roomEvent.src!, roomEvent.tile!,
             receiver: roomEvent.receiver);
       case RoomEventAction.score:
         returnValue =
             _score(roomEvent.owner, roomEvent.pos!, roomEvent.receiver!);
       case RoomEventAction.pass:
-        returnValue = await _pass(roomEvent.owner, roomEvent.tile!,
+        await _pass(roomEvent.owner, roomEvent.tile!,
             roomEvent.src!, roomEvent.receiver!,
             pos: roomEvent.pos);
       case RoomEventAction.win:
