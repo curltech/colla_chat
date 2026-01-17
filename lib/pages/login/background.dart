@@ -86,11 +86,9 @@ class BackgroundWidget extends StatelessWidget {
     platformCarouselType: PlatformCarouselType.card,
   );
 
-  BackgroundWidget({super.key}) {
-    init();
-  }
+  BackgroundWidget({super.key});
 
-  void init() {
+  void _init() {
     int count = BackgroundImages.lightBackgroundImages.length;
 
     ///在initState中调用context出错
@@ -124,6 +122,7 @@ class BackgroundWidget extends StatelessWidget {
         return PlatformCarouselWidget(
           height: appDataProvider.totalSize.height,
           controller: controller,
+          autoPlay: autoPlay,
           onPageChanged: (index,
               {PlatformSwiperDirection? direction,
               int? oldIndex,

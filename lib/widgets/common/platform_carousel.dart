@@ -143,8 +143,8 @@ class PlatformCarouselWidget extends StatelessWidget {
     this.animateToClosest = true,
     this.reverse = false,
     this.autoPlay = false,
-    this.autoPlayInterval = const Duration(seconds: 4),
-    this.autoPlayAnimationDuration = const Duration(milliseconds: 800),
+    this.autoPlayInterval = const Duration(seconds: 30),
+    this.autoPlayAnimationDuration = const Duration(milliseconds: 300),
     this.autoPlayCurve = Curves.fastOutSlowIn,
     this.enlargeCenterPage = false,
     this.onPageChanged,
@@ -287,7 +287,7 @@ class PlatformCarouselWidget extends StatelessWidget {
     return page.TransformerPageView(
         key: key,
         index: initialPage,
-        duration: autoPlayAnimationDuration,
+        duration: autoPlayInterval,
         loop: autoPlay,
         curve: autoPlayCurve,
         viewportFraction: viewportFraction,
@@ -332,7 +332,7 @@ class PlatformCarouselWidget extends StatelessWidget {
       cardsCount: itemCount,
       controller: controller.cardSwiperController,
       initialIndex: initialPage,
-      duration: autoPlayAnimationDuration,
+      duration: autoPlayInterval,
       isDisabled: physics is NeverScrollableScrollPhysics,
       onSwipe: onCardSwipe,
       allowedSwipeDirection: const AllowedSwipeDirection.all(),
@@ -345,6 +345,9 @@ class PlatformCarouselWidget extends StatelessWidget {
     return Swiper(
       key: key,
       autoplay: autoPlay,
+      loop: true,
+      autoplayDelay: autoPlayInterval.inMilliseconds,// 自动换页间隔
+      duration: autoPlayAnimationDuration.inMilliseconds,// 自动播放动画的时间
       controller: controller.swiperController,
       onIndexChanged: (int index) {
         onPageChanged?.call(index);
