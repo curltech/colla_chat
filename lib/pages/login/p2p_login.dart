@@ -117,6 +117,8 @@ class P2pLogin extends StatelessWidget with WindowListener {
     if (appDataProvider.bodyWidth == -1) {
       appDataProvider.calBodyWidth();
     }
+    AnimatedBuilder;
+    AnimatedContainer;
     var workspace = ListenableBuilder(
       listenable: appDataProvider,
       builder: (BuildContext context, Widget? child) {

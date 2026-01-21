@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:liquid_glass_effect/liquid_glass_buttons.dart';
 import 'package:liquid_glass_effect/liquid_glass_card.dart';
 import 'package:liquid_glass_effect/liquid_glass_theme.dart';
+import 'package:liquid_glass_effect/liquid_glass_widgets.dart';
 import 'package:liquid_glass_effect/models/liquid_glass_config.dart';
 
 void buildThemeData() {
@@ -49,6 +50,12 @@ extension LiquidGlassEffectWidget<T extends Widget> on T {
     double scaleFactor = 1.03,
     bool enableHoverEffect = true,
   }) {
+    if (this is PreferredSizeWidget) {
+      PreferredSizeWidget appBar = this as PreferredSizeWidget;
+      return LiquidGlassAppBar(
+        appBar: appBar,
+      );
+    }
     if (this is ElevatedButton) {
       return LiquidGlassElevatedButton(
         key: key,
@@ -74,7 +81,7 @@ extension LiquidGlassEffectWidget<T extends Widget> on T {
       return SizedBox(
           height: height,
           width: width,
-          child: LiquidGlassEffectContainer(
+          child: LiquidGlassBackground(
             key: key,
             blurAmount: blurAmount,
             noiseOpacity: noiseOpacity,
@@ -206,5 +213,57 @@ class LiquidGlassEffectCard extends StatelessWidget {
         scaleFactor: scaleFactor,
         enableHoverEffect: enableHoverEffect,
         child: child);
+  }
+}
+
+class LiquidGlassAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final PreferredSizeWidget appBar;
+
+  final double borderRadius;
+  final Color? baseColor;
+  final double? blurAmount;
+  final EdgeInsets? padding;
+  final Color? borderColor;
+  final double borderWidth;
+  final double elevation;
+  final Color? shadowColor;
+  final Duration animationDuration;
+  final double scaleFactor;
+  final bool enableHoverEffect;
+
+  const LiquidGlassAppBar({
+    super.key,
+    required this.appBar,
+    this.borderRadius = 0.0,
+    this.baseColor,
+    this.blurAmount,
+    this.padding = EdgeInsets.zero,
+    this.borderColor,
+    this.borderWidth = 0.0,
+    this.elevation = 0,
+    this.shadowColor,
+    this.animationDuration = const Duration(milliseconds: 300),
+    this.scaleFactor = 1.03,
+    this.enableHoverEffect = true,
+  });
+
+  @override
+  Size get preferredSize => appBar.preferredSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return LiquidGlassCard(
+        borderRadius: borderRadius,
+        baseColor: baseColor ?? myself.primaryColor,
+        blurAmount: blurAmount,
+        padding: padding,
+        borderColor: borderColor ?? myself.primaryColor,
+        borderWidth: borderWidth,
+        elevation: elevation,
+        shadowColor: shadowColor ?? Colors.blueGrey,
+        animationDuration: animationDuration,
+        scaleFactor: scaleFactor,
+        enableHoverEffect: enableHoverEffect,
+        child: appBar);
   }
 }

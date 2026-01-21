@@ -48,7 +48,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     return isAppBar ? _buildAppBar(context) : _buildTitleBar(context);
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
+  AppBar _buildAppBar(BuildContext context) {
     var btns = <Widget>[];
     if (rightWidgets != null && rightWidgets!.isNotEmpty) {
       btns.addAll(rightWidgets!);

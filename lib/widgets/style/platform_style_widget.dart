@@ -1,6 +1,7 @@
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/style/glass/glass_kit_widget.dart';
 import 'package:colla_chat/widgets/style/glass/glass_widget.dart';
+import 'package:colla_chat/widgets/style/glass/liquid_glass_design_widget.dart';
 import 'package:colla_chat/widgets/style/glass/liquid_glass_effect_widget.dart';
 import 'package:colla_chat/widgets/style/glass/liquid_glass_lens_widget.dart';
 import 'package:colla_chat/widgets/style/neumorphic/neumorphic_widget.dart';
@@ -13,6 +14,7 @@ enum PlatformStyle {
   glass,
   glassKit,
   liquidGlass,
+  liquidGlassDesign,
   ocLiquidGlass,
   liquidGlassLens,
   neumorphic,
@@ -93,6 +95,12 @@ extension PlatformStyleWidget<T extends Widget> on T {
       case PlatformStyle.liquidGlass:
         child =
             asLiquidGlassEffect(height: height, width: width, blurAmount: blur);
+      case PlatformStyle.liquidGlassDesign:
+        child = asLiquidGlassDesign(
+            height: height,
+            width: width,
+            blurStrength: blur,
+            surfaceOpacity: defaultOpacity);
       case PlatformStyle.ocLiquidGlass:
         child = OCLiquidGlassContainer(
           height: height,
