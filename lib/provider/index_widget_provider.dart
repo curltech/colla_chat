@@ -131,9 +131,6 @@ class IndexWidgetProvider with ChangeNotifier {
     }
     //判断要进入的页面是否已在工作区
     int index = views.indexOf(view);
-    if (index == currentIndex) {
-      return;
-    }
     if (index == -1) {
       //不是主页面，增加到工作区
       views.add(view);

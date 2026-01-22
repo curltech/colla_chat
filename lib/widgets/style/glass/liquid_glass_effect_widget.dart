@@ -50,12 +50,6 @@ extension LiquidGlassEffectWidget<T extends Widget> on T {
     double scaleFactor = 1.03,
     bool enableHoverEffect = true,
   }) {
-    if (this is PreferredSizeWidget) {
-      PreferredSizeWidget appBar = this as PreferredSizeWidget;
-      return LiquidGlassAppBar(
-        appBar: appBar,
-      );
-    }
     if (this is ElevatedButton) {
       return LiquidGlassElevatedButton(
         key: key,
@@ -76,29 +70,11 @@ extension LiquidGlassEffectWidget<T extends Widget> on T {
         clipBehavior: clipBehavior,
       );
     }
-
-    if (backgroundImageProvider != null) {
+    if (this is Card) {
       return SizedBox(
           height: height,
           width: width,
-          child: LiquidGlassBackground(
-            key: key,
-            blurAmount: blurAmount,
-            noiseOpacity: noiseOpacity,
-            highlightIntensity: highlightIntensity,
-            highlightColor: highlightColor,
-            noiseColor: noiseColor,
-            backgroundImageProvider: backgroundImageProvider,
-            backgroundGradient: backgroundGradient,
-            backgroundFit: backgroundFit,
-            backgroundAlignment: backgroundAlignment,
-            child: this,
-          ));
-    } else {
-      return SizedBox(
-          height: height,
-          width: width,
-          child: LiquidGlassEffectCard(
+          child: LiquidGlassCard(
               key: key,
               borderRadius: borderRadius,
               baseColor: baseColor,
@@ -114,105 +90,23 @@ extension LiquidGlassEffectWidget<T extends Widget> on T {
               enableHoverEffect: enableHoverEffect,
               child: this));
     }
-  }
-}
 
-class LiquidGlassEffectContainer extends StatelessWidget {
-  final double? height;
-  final double? width;
-  final Widget child;
-  final double? blurAmount;
-  final double? noiseOpacity;
-  final double? highlightIntensity;
-  final Color? highlightColor;
-  final Color? noiseColor;
-  final ImageProvider? backgroundImageProvider;
-  final Gradient? backgroundGradient;
-  final BoxFit backgroundFit;
-  final Alignment backgroundAlignment;
-
-  const LiquidGlassEffectContainer({
-    super.key,
-    required this.child,
-    this.blurAmount = 15,
-    this.noiseOpacity = 0.0,
-    this.highlightIntensity = 0.3,
-    this.highlightColor,
-    this.noiseColor,
-    this.backgroundImageProvider,
-    this.backgroundGradient,
-    this.backgroundFit = BoxFit.cover,
-    this.backgroundAlignment = Alignment.center,
-    this.height,
-    this.width,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return child.asLiquidGlassEffect(
-      height: height,
-      width: width,
-      blurAmount: blurAmount,
-      noiseOpacity: noiseOpacity,
-      highlightIntensity: highlightIntensity,
-      highlightColor: highlightColor,
-      noiseColor: noiseColor,
-      backgroundImageProvider: backgroundImageProvider,
-      backgroundGradient: backgroundGradient,
-      backgroundFit: backgroundFit,
-      backgroundAlignment: backgroundAlignment,
-    );
-  }
-}
-
-class LiquidGlassEffectCard extends StatelessWidget {
-  final Widget child;
-  final double borderRadius;
-  final Color? baseColor;
-  final double? blurAmount;
-  final EdgeInsets? padding;
-  final VoidCallback? onTap;
-  final Color? borderColor;
-  final double borderWidth;
-  final double elevation;
-  final Color? shadowColor;
-  final Duration animationDuration;
-  final double scaleFactor;
-  final bool enableHoverEffect;
-
-  const LiquidGlassEffectCard({
-    super.key,
-    required this.child,
-    this.borderRadius = 14.0,
-    this.baseColor,
-    this.blurAmount,
-    this.padding,
-    this.onTap,
-    this.borderColor,
-    this.borderWidth = 1.0,
-    this.elevation = 0,
-    this.shadowColor,
-    this.animationDuration = const Duration(milliseconds: 300),
-    this.scaleFactor = 1.03,
-    this.enableHoverEffect = true,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return LiquidGlassCard(
-        borderRadius: borderRadius,
-        baseColor: baseColor,
-        blurAmount: blurAmount,
-        padding: padding,
-        onTap: onTap,
-        borderColor: borderColor,
-        borderWidth: borderWidth,
-        elevation: elevation,
-        shadowColor: shadowColor,
-        animationDuration: animationDuration,
-        scaleFactor: scaleFactor,
-        enableHoverEffect: enableHoverEffect,
-        child: child);
+    return SizedBox(
+        height: height,
+        width: width,
+        child: LiquidGlassBackground(
+          key: key,
+          blurAmount: blurAmount,
+          noiseOpacity: noiseOpacity,
+          highlightIntensity: highlightIntensity,
+          highlightColor: highlightColor,
+          noiseColor: noiseColor,
+          backgroundImageProvider: backgroundImageProvider,
+          backgroundGradient: backgroundGradient,
+          backgroundFit: backgroundFit,
+          backgroundAlignment: backgroundAlignment,
+          child: this,
+        ));
   }
 }
 

@@ -20,17 +20,6 @@ extension LiquidGlassDesignWidget<T extends Widget> on T {
       double surfaceOpacity = 0.08,
       double reflectionIntensity = 0.4,
       bool animate = true}) {
-    if (this is PreferredSizeWidget) {
-      PreferredSizeWidget appBar = this as PreferredSizeWidget;
-      return LiquidGlassAppBar(
-        appBar: appBar,
-        color: baseColor,
-        borderRadius: borderRadius,
-        padding: padding,
-        margin: margin,
-        animate: animate,
-      );
-    }
     Widget content = LiquidGlassEffect(
         key: key,
         blurStrength: blurStrength,

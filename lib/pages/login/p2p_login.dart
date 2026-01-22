@@ -117,8 +117,6 @@ class P2pLogin extends StatelessWidget with WindowListener {
     if (appDataProvider.bodyWidth == -1) {
       appDataProvider.calBodyWidth();
     }
-    AnimatedBuilder;
-    AnimatedContainer;
     var workspace = ListenableBuilder(
       listenable: appDataProvider,
       builder: (BuildContext context, Widget? child) {
@@ -139,7 +137,7 @@ class P2pLogin extends StatelessWidget with WindowListener {
           );
         });
         return Center(
-            child: pageView.asStyle(
+            child: Card(child: pageView).asStyle(
           height: appDataProvider.portraitSize.height,
           width: appDataProvider.portraitSize.width,
         ));
