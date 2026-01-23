@@ -26,20 +26,20 @@ class P2pLogin extends StatelessWidget with WindowListener {
     controller: controller,
   );
   late final P2pSettingWidget p2pSettingWidget = const P2pSettingWidget();
-  late final List<Widget> _children;
+  late final List<Widget> _children = [
+    p2pLoginWidget,
+    p2pRegisterWidget,
+    p2pSettingWidget,
+  ];
 
   P2pLogin({super.key}) {
-    _children = [
-      p2pLoginWidget,
-      p2pRegisterWidget,
-      p2pSettingWidget,
-    ];
     init();
   }
 
   final RxInt index = 0.obs;
 
   void init() async {
+    windowManager.addListener(this);
     await myselfPeerController.init();
     List<MyselfPeer> myselfPeers = myselfPeerController.data;
     if (myselfPeers.isEmpty) {
@@ -136,10 +136,11 @@ class P2pLogin extends StatelessWidget with WindowListener {
             initialPage: index.value,
           );
         });
+        Size size = appDataProvider.portraitSize;
         return Center(
-            child: Card(child: pageView).asStyle(
-          height: appDataProvider.portraitSize.height,
-          width: appDataProvider.portraitSize.width,
+            child: pageView.asStyle(
+          height: size.height,
+          width: size.width,
         ));
       },
     );

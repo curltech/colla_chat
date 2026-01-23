@@ -8,7 +8,7 @@ extension LiquidGlassDesignWidget<T extends Widget> on T {
       BuildContext? context,
       double? height,
       double? width,
-      double blurStrength = 30.0,
+      double blurStrength = 15.0,
       Color? baseColor,
       Color? borderColor,
       double borderRadius = 20.0,

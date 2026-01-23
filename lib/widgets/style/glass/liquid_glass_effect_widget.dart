@@ -6,21 +6,6 @@ import 'package:liquid_glass_effect/liquid_glass_theme.dart';
 import 'package:liquid_glass_effect/liquid_glass_widgets.dart';
 import 'package:liquid_glass_effect/models/liquid_glass_config.dart';
 
-void buildThemeData() {
-  LiquidGlassConfig glassConfig = LiquidGlassConfig(
-    blurAmount: 15.0,
-    highlightIntensity: 0.3,
-    noiseOpacity: 0.05,
-    highlightColor: myself.primary,
-    noiseColor: myself.secondary,
-  );
-  ThemeData themeData = createLiquidGlassTheme(
-      config: glassConfig, colorScheme: myself.colorScheme);
-  ThemeData darkThemeData = createLiquidGlassTheme(
-      config: glassConfig, colorScheme: myself.darkColorScheme);
-  myself.setThemeData(themeData: themeData, darkThemeData: darkThemeData);
-}
-
 extension LiquidGlassEffectWidget<T extends Widget> on T {
   Widget asLiquidGlassEffect({
     Key? key,
@@ -70,43 +55,43 @@ extension LiquidGlassEffectWidget<T extends Widget> on T {
         clipBehavior: clipBehavior,
       );
     }
-    if (this is Card) {
+
+    if (this is Container) {
       return SizedBox(
           height: height,
           width: width,
-          child: LiquidGlassCard(
-              key: key,
-              borderRadius: borderRadius,
-              baseColor: baseColor,
-              blurAmount: blurAmount,
-              padding: padding,
-              onTap: onPressed,
-              borderColor: borderColor,
-              borderWidth: borderWidth,
-              elevation: elevation,
-              shadowColor: shadowColor,
-              animationDuration: animationDuration,
-              scaleFactor: scaleFactor,
-              enableHoverEffect: enableHoverEffect,
-              child: this));
+          child: LiquidGlassBackground(
+            key: key,
+            blurAmount: blurAmount,
+            noiseOpacity: noiseOpacity,
+            highlightIntensity: highlightIntensity,
+            highlightColor: highlightColor ?? myself.primary,
+            noiseColor: noiseColor ?? myself.secondary,
+            backgroundImageProvider: backgroundImageProvider,
+            backgroundGradient: backgroundGradient,
+            backgroundFit: backgroundFit,
+            backgroundAlignment: backgroundAlignment,
+            child: this,
+          ));
     }
-
     return SizedBox(
         height: height,
         width: width,
-        child: LiquidGlassBackground(
-          key: key,
-          blurAmount: blurAmount,
-          noiseOpacity: noiseOpacity,
-          highlightIntensity: highlightIntensity,
-          highlightColor: highlightColor,
-          noiseColor: noiseColor,
-          backgroundImageProvider: backgroundImageProvider,
-          backgroundGradient: backgroundGradient,
-          backgroundFit: backgroundFit,
-          backgroundAlignment: backgroundAlignment,
-          child: this,
-        ));
+        child: LiquidGlassCard(
+            key: key,
+            borderRadius: borderRadius,
+            baseColor: baseColor ?? myself.primary.withAlpha(32),
+            blurAmount: blurAmount,
+            padding: padding ?? EdgeInsets.all(0.0),
+            onTap: onPressed,
+            borderColor: borderColor ?? myself.primary.withAlpha(32),
+            borderWidth: borderWidth,
+            elevation: elevation,
+            shadowColor: shadowColor ?? myself.secondary,
+            animationDuration: animationDuration,
+            scaleFactor: scaleFactor,
+            enableHoverEffect: enableHoverEffect,
+            child: this));
   }
 }
 

@@ -25,7 +25,6 @@ const double defaultBlur = 15;
 const double defaultOpacity = 0.12;
 const double defaultFrostedOpacity = 0.12;
 const BorderRadius defaultBorderRadius = BorderRadius.zero;
-const Color defaultShadowColor = Colors.black;
 
 extension PlatformStyleWidget<T extends Widget> on T {
   Widget asStyle({
@@ -33,7 +32,7 @@ extension PlatformStyleWidget<T extends Widget> on T {
     double? height,
     double? width,
     double blur = defaultBlur,
-    Color color = Colors.white,
+    Color? color,
     BorderRadius borderRadius = defaultBorderRadius,
     bool frosted = false,
     Clip clipBehaviour = Clip.antiAlias,
@@ -49,12 +48,15 @@ extension PlatformStyleWidget<T extends Widget> on T {
     Gradient? borderGradient,
     Color? borderColor,
     double? elevation,
-    Color? shadowColor = defaultShadowColor,
+    Color? shadowColor,
     BoxShape shape = BoxShape.rectangle,
     double? frostedOpacity = defaultFrostedOpacity,
     Widget? backgroundWidget,
   }) {
     Widget child;
+    color = color ?? myself.primary;
+    borderColor = borderColor ?? myself.primary;
+    shadowColor = shadowColor ?? myself.secondary;
     switch (myself.platformStyle) {
       case PlatformStyle.material:
         child = SizedBox(

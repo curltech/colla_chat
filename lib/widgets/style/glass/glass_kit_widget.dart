@@ -1,4 +1,5 @@
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:glass_kit/glass_kit.dart' as glass;
@@ -62,7 +63,7 @@ extension GlassKitWidget<T extends Widget> on T {
       gradient: gradient ?? defaultLinearGradient,
       borderRadius: borderRadius,
       borderGradient: borderGradient ?? defaultBorderGradient,
-      shadowColor: shadowColor ?? defaultShadowColor,
+      shadowColor: shadowColor,
       shape: shape,
       child: this,
     );
@@ -112,7 +113,7 @@ class GlassKitContainer extends glass.GlassContainer {
         gradient: gradient ?? defaultLinearGradient,
         borderRadius: borderRadius,
         borderGradient: borderGradient ?? defaultBorderGradient,
-        shadowColor: defaultShadowColor,
+        shadowColor: myself.secondary,
         shape: shape);
   }
 }
