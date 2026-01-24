@@ -13,6 +13,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/tree_view.dart';
@@ -381,9 +382,12 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      _buildDataSourceButtonWidget(context),
-      Expanded(child: _buildTreeView(context)),
-    ]);
+    return AppBarView(
+        title: title,
+        withLeading: true,
+        child: Column(children: [
+          _buildDataSourceButtonWidget(context),
+          Expanded(child: _buildTreeView(context)),
+        ]));
   }
 }

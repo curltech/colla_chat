@@ -1,3 +1,4 @@
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_media_widget.dart';
 import 'package:colla_chat/widgets/media_editor/image_editor_widget.dart';
 import 'package:colla_chat/pages/media/platform_audio_player_widget.dart';
@@ -62,12 +63,16 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    Widget media = DataListView(
-      itemCount: mediaTileData.length,
-      itemBuilder: (BuildContext context, int index) {
-        return mediaTileData[index];
-      },
-    );
-    return media;
+    Widget mediaWidget = AppBarView(
+        title: title,
+        withLeading: true,
+        child: DataListView(
+          itemCount: mediaTileData.length,
+          itemBuilder: (BuildContext context, int index) {
+            return mediaTileData[index];
+          },
+        ));
+
+    return mediaWidget;
   }
 }

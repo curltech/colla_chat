@@ -1,4 +1,3 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/openvpn_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_map_launcher_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
@@ -39,28 +38,18 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   final DataSourceWidget dataSourceWidget = DataSourceWidget();
   final FileSystemWidget fileSystemWidget = FileSystemWidget();
 
-  late final Map<String, TileDataMixin> widgets = {
-    poemWidget.routeName: poemWidget,
-    stockMainWidget.routeName: stockMainWidget,
-    gameMainWidget.routeName: gameMainWidget,
-    mailAddressWidget.routeName: mailAddressWidget,
-    mediaWidget.routeName: mediaWidget,
-    webViewWidget.routeName: webViewWidget,
-    openVpnWidget.routeName: openVpnWidget,
-    flutterOverlayWindowWidget.routeName: flutterOverlayWindowWidget,
-    flutterPipWindowWidget.routeName: flutterPipWindowWidget,
-    platformMapLauncherWidget.routeName: platformMapLauncherWidget,
-    dataSourceWidget.routeName: dataSourceWidget,
-    fileSystemWidget.routeName: fileSystemWidget,
-  };
-
   OtherAppWidget({super.key}) {
-    indexWidgetProvider.define(poemWidget);
+    indexWidgetProvider.define(mediaWidget);
     indexWidgetProvider.define(webViewWidget);
+    indexWidgetProvider.define(mailAddressWidget);
+    indexWidgetProvider.define(stockMainWidget);
+    indexWidgetProvider.define(gameMainWidget);
+    indexWidgetProvider.define(poemWidget);
     indexWidgetProvider.define(openVpnWidget);
     indexWidgetProvider.define(flutterOverlayWindowWidget);
     indexWidgetProvider.define(flutterPipWindowWidget);
     indexWidgetProvider.define(platformMapLauncherWidget);
+    indexWidgetProvider.define(dataSourceWidget);
     indexWidgetProvider.define(fileSystemWidget);
   }
 
@@ -80,144 +69,57 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   late final RxString name = routeName.obs;
 
   /// 修改name的值，从body的页面转向新的body页面
-  Widget _buildOtherAppTileData(BuildContext context) {
-    List<TileData> otherAppTileData = [];
-    otherAppTileData.add(TileData(
-        title: AppLocalizations.t(poemWidget.title),
-        prefix: poemWidget.iconData,
-        helpPath: poemWidget.routeName,
-        onTap: (int index, String title, {String? subtitle}) {
-          indexWidgetProvider.push(poemWidget.routeName);
-        }));
+  List<TileData> _buildOtherAppTileData(BuildContext context) {
+    List<TileDataMixin> mixins = [
+      poemWidget,
+    ];
     final bool emailSwitch = myself.peerProfile.emailSwitch;
     if (emailSwitch) {
-      otherAppTileData.add(TileData(
-          title: AppLocalizations.t(mailAddressWidget.title),
-          prefix: mailAddressWidget.iconData,
-          helpPath: mailAddressWidget.routeName,
-          onTap: (int index, String title, {String? subtitle}) {
-            name.value = mailAddressWidget.routeName;
-          }));
+      mixins.add(mailAddressWidget);
     }
     final bool stockSwitch = myself.peerProfile.stockSwitch;
     if (stockSwitch) {
-      otherAppTileData.add(TileData(
-          title: AppLocalizations.t(stockMainWidget.title),
-          prefix: stockMainWidget.iconData,
-          helpPath: stockMainWidget.routeName,
-          onTap: (int index, String title, {String? subtitle}) {
-            name.value = stockMainWidget.routeName;
-          }));
+      mixins.add(stockMainWidget);
     }
     final bool gameSwitch = myself.peerProfile.gameSwitch;
     if (gameSwitch) {
-      otherAppTileData.add(TileData(
-          title: AppLocalizations.t(gameMainWidget.title),
-          prefix: gameMainWidget.iconData,
-          helpPath: gameMainWidget.routeName,
-          onTap: (int index, String title, {String? subtitle}) {
-            name.value = gameMainWidget.routeName;
-          }));
+      mixins.add(gameMainWidget);
     }
-    otherAppTileData.add(TileData(
-        title: AppLocalizations.t(mediaWidget.title),
-        prefix: mediaWidget.iconData,
-        helpPath: mediaWidget.routeName,
-        onTap: (int index, String title, {String? subtitle}) {
-          name.value = mediaWidget.routeName;
-        }));
-    otherAppTileData.add(TileData(
-        title: AppLocalizations.t(webViewWidget.title),
-        prefix: webViewWidget.iconData,
-        helpPath: webViewWidget.routeName,
-        onTap: (int index, String title, {String? subtitle}) {
-          indexWidgetProvider.push(webViewWidget.routeName);
-        }));
-    otherAppTileData.add(TileData(
-        title: AppLocalizations.t(platformMapLauncherWidget.title),
-        prefix: platformMapLauncherWidget.iconData,
-        helpPath: platformMapLauncherWidget.routeName,
-        onTap: (int index, String title, {String? subtitle}) {
-          indexWidgetProvider.push(platformMapLauncherWidget.routeName);
-        }));
-    otherAppTileData.add(TileData(
-        title: AppLocalizations.t(flutterPipWindowWidget.title),
-        prefix: flutterPipWindowWidget.iconData,
-        helpPath: flutterPipWindowWidget.routeName,
-        onTap: (int index, String title, {String? subtitle}) {
-          indexWidgetProvider.push(flutterPipWindowWidget.routeName);
-        }));
+    mixins.add(mediaWidget);
+    mixins.add(webViewWidget);
+    mixins.add(platformMapLauncherWidget);
+    mixins.add(flutterPipWindowWidget);
     if (platformParams.mobile) {
       if (myself.peerProfile.vpnSwitch) {
-        otherAppTileData.add(TileData(
-            title: AppLocalizations.t(openVpnWidget.title),
-            prefix: openVpnWidget.iconData,
-            helpPath: openVpnWidget.routeName,
-            onTap: (int index, String title, {String? subtitle}) {
-              indexWidgetProvider.push(openVpnWidget.routeName);
-            }));
+        mixins.add(openVpnWidget);
       }
     }
     if (myself.peerProfile.developerSwitch) {
-      otherAppTileData.add(TileData(
-          title: AppLocalizations.t(flutterOverlayWindowWidget.title),
-          prefix: flutterOverlayWindowWidget.iconData,
-          helpPath: flutterOverlayWindowWidget.routeName,
-          onTap: (int index, String title, {String? subtitle}) {
-            indexWidgetProvider.push(flutterOverlayWindowWidget.routeName);
-          }));
+      mixins.add(flutterOverlayWindowWidget);
     }
-    otherAppTileData.add(TileData(
-        title: AppLocalizations.t(dataSourceWidget.title),
-        prefix: dataSourceWidget.iconData,
-        helpPath: dataSourceWidget.routeName,
-        onTap: (int index, String title, {String? subtitle}) {
-          name.value = dataSourceWidget.routeName;
-        }));
-    otherAppTileData.add(TileData(
-        title: AppLocalizations.t(fileSystemWidget.title),
-        prefix: fileSystemWidget.iconData,
-        helpPath: fileSystemWidget.routeName,
-        onTap: (int index, String title, {String? subtitle}) {
-          indexWidgetProvider.push(fileSystemWidget.routeName);
-        }));
-    Widget otherAppWidget = DataListView(
+    mixins.add(dataSourceWidget);
+    mixins.add(fileSystemWidget);
+    List<TileData> otherAppTileData = TileData.from(mixins);
+    for (var tile in otherAppTileData) {
+      tile.dense = false;
+      tile.selected = false;
+    }
+
+    return otherAppTileData;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<TileData> otherAppTileData = _buildOtherAppTileData(context);
+    Widget child = DataListView(
       itemCount: otherAppTileData.length,
       itemBuilder: (BuildContext context, int index) {
         return otherAppTileData[index];
       },
     );
 
-    return otherAppWidget;
-  }
+    var otherApp = AppBarView(title: title, helpPath: routeName, child: child);
 
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() {
-      Widget? backWidget;
-      String title = this.title;
-      Widget otherAppWidget = _buildOtherAppTileData(context);
-      Widget child;
-      TileDataMixin? current = widgets[name.value];
-      if (current == null) {
-        backWidget = null;
-        child = otherAppWidget;
-      } else {
-        title = current.title;
-        child = current as Widget;
-        backWidget = IconButton(
-            onPressed: () {
-              name.value = routeName;
-            },
-            icon: const Icon(Icons.arrow_back_ios_new));
-      }
-      var otherApp = AppBarView(
-          title: title,
-          helpPath: current?.routeName,
-          leadingWidget: backWidget,
-          child: child);
-
-      return otherApp;
-    });
+    return otherApp;
   }
 }

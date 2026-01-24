@@ -13,6 +13,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
@@ -183,8 +184,8 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
         controller: controller,
         onPageChanged: (int index,
             {PlatformSwiperDirection? direction,
-              int? oldIndex,
-              CarouselPageChangedReason? reason}) {
+            int? oldIndex,
+            CarouselPageChangedReason? reason}) {
           this.index.value = index;
         },
         itemBuilder: (BuildContext context, int index, {int? realIndex}) {
@@ -194,17 +195,20 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
           return mailListWidget;
         });
 
-    return Column(
-      children: [
-        Card(
-            elevation: 0,
-            margin: EdgeInsets.zero,
-            shape: RoundedRectangleBorder(),
-            child: Row(
-              children: toolBars,
-            )),
-        Expanded(child: appBarView)
-      ],
-    );
+    return AppBarView(
+        title: title,
+        withLeading: true,
+        child: Column(
+          children: [
+            Card(
+                elevation: 0,
+                margin: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(),
+                child: Row(
+                  children: toolBars,
+                )),
+            Expanded(child: appBarView)
+          ],
+        ));
   }
 }

@@ -237,26 +237,25 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    var provider = Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(
-        builder:
+    var provider = AppBarView(
+        title: title,
+        withLeading: true,
+        child: Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(builder:
             (context, appDataProvider, indexWidgetProvider, myself, child) {
-      ContainerType containerType = ContainerType.swiper;
-      if (appDataProvider.landscape) {
-        if (appDataProvider.bodyWidth == 0) {
-          containerType = ContainerType.resizeable;
-        }
-      }
-      var poemWidget = AppBarView(
-          title: title,
-          withLeading: true,
-          child: AdaptiveContainer(
+          ContainerType containerType = ContainerType.swiper;
+          if (appDataProvider.landscape) {
+            if (appDataProvider.bodyWidth == 0) {
+              containerType = ContainerType.resizeable;
+            }
+          }
+          var poemWidget = AdaptiveContainer(
               pixels: 380,
               containerType: containerType,
               main: _buildPoemListWidget(context),
-              body: poemContentWidget));
+              body: poemContentWidget);
 
-      return poemWidget;
-    });
+          return poemWidget;
+        }));
     return provider;
   }
 }

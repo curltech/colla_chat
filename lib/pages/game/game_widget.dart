@@ -1,6 +1,7 @@
 import 'package:colla_chat/pages/game/mahjong/mahjong_18m_widget.dart';
 import 'package:colla_chat/pages/game/model/meta_modeller_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -39,12 +40,15 @@ class GameMainWidget extends StatelessWidget with TileDataMixin {
       tile.selected = false;
     }
 
-    Widget gameMain = DataListView(
+    Widget gameMain = AppBarView(
+        title: title,
+        withLeading: true,
+        child: DataListView(
       itemBuilder: (BuildContext context, int index) {
         return gameTileData[index];
       },
       itemCount: gameTileData.length,
-    );
+    ));
 
     return gameMain;
   }
