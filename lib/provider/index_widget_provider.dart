@@ -70,6 +70,11 @@ class IndexWidgetProvider with ChangeNotifier {
   }
 
   ///当前视图的序号
+  TileDataMixin get currentMainView {
+    return views[_currentMainIndex];
+  }
+
+  ///当前视图的序号
   TileDataMixin? get currentView {
     if (views.length > mainViews.length) {
       TileDataMixin view = views.last;

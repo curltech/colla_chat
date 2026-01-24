@@ -73,8 +73,15 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
 
   ///SecondaryBody视图
   Widget _buildSecondaryBodyView(BuildContext context) {
-    Widget? pageView = indexWidgetProvider.currentView;
-    pageView = pageView ?? Container();
+    Widget? view = indexWidgetProvider.currentView;
+    Widget mainView = indexWidgetProvider.currentMainView;
+    if (appDataProvider.smallBreakpoint.isActive(context)) {
+      if (view == null) {
+        return mainView;
+      }
+      return view;
+    }
+    view = view ?? Container();
 
     return Row(children: [
       VerticalDivider(
@@ -89,7 +96,7 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
           )..forward(),
           curve: Curves.easeInOut,
         )),
-        child: pageView,
+        child: view,
       ))
     ]);
   }
