@@ -31,7 +31,7 @@ class AdaptiveLayoutIndex extends StatefulWidget {
       MeWidget(),
       OtherAppWidget(),
     ];
-    indexWidgetProvider.initMainView(PlatformCarouselController(), views);
+    indexWidgetProvider.initMainView(views);
   }
 
   @override
@@ -73,35 +73,25 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
 
   ///SecondaryBody视图
   Widget _buildSecondaryBodyView(BuildContext context) {
-    ScrollPhysics? physics = const NeverScrollableScrollPhysics();
-    var pageView = PlatformCarouselWidget(
-        physics: physics,
-        controller: indexWidgetProvider.controller,
-        onPageChanged: (int index,
-            {PlatformSwiperDirection? direction,
-            int? oldIndex,
-            CarouselPageChangedReason? reason}) {},
-        itemCount: indexWidgetProvider.views.length,
-        itemBuilder: (BuildContext context, int index, {int? realIndex}) {
-          if (appDataProvider.smallBreakpoint.isActive(context)) {
-            return indexWidgetProvider.views[index];
-          }
-          Widget view;
-          if (index >= indexWidgetProvider.mainViews.length) {
-            view = indexWidgetProvider.views[index];
-          } else {
-            view = Container();
-          }
+    Widget? pageView = indexWidgetProvider.currentView;
+    pageView = pageView ?? Container();
 
-          return Row(children: [
-            VerticalDivider(
-              width: 1.0,
-            ),
-            Expanded(child: view),
-          ]);
-        });
-
-    return pageView;
+    return Row(children: [
+      VerticalDivider(
+        width: 1.0,
+      ),
+      Expanded(
+          child: ScaleTransition(
+        scale: Tween<double>(begin: 0.50, end: 1.0).animate(CurvedAnimation(
+          parent: AnimationController(
+            duration: const Duration(milliseconds: 900),
+            vsync: Navigator.of(context),
+          )..forward(),
+          curve: Curves.easeInOut,
+        )),
+        child: pageView,
+      ))
+    ]);
   }
 
   /// 放置SecondaryBody
