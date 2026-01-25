@@ -18,6 +18,7 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
   late final DirectoryWidget main = DirectoryWidget(
     directoryController: directoryController,
   );
+  AdaptiveContainerController? controller;
 
   late final FileWidget body = FileWidget(
     directoryController: directoryController,
@@ -42,7 +43,7 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
     var provider = Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(
         builder:
             (context, appDataProvider, indexWidgetProvider, myself, child) {
-      ContainerType containerType = ContainerType.swiper;
+      ContainerType containerType = ContainerType.carousel;
       if (appDataProvider.landscape) {
         if (appDataProvider.bodyWidth == 0) {
           containerType = ContainerType.resizeable;
@@ -59,12 +60,23 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
           } else {
             path = title;
           }
+          controller = AdaptiveContainerController(
+            containerType: containerType,
+            pixels: 380,
+          );
           return AppBarView(
               title: path,
               helpPath: routeName,
               withLeading: true,
+              rightWidgets: [
+                IconButton(
+                    onPressed: () {
+                      controller?.toggle();
+                    },
+                    icon: Icon(Icons.vertical_split_outlined))
+              ],
               child: AdaptiveContainer(
-                containerType: containerType,
+                controller: controller!,
                 main: main,
                 body: body,
               ));

@@ -31,6 +31,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
   late final PoemContentWidget poemContentWidget = PoemContentWidget(
     poemController: poemController,
   );
+  AdaptiveContainerController? controller;
 
   PoemWidget({super.key});
 
@@ -240,17 +241,27 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
     var provider = AppBarView(
         title: title,
         withLeading: true,
+        rightWidgets: [
+          IconButton(
+              onPressed: () {
+                controller?.toggle();
+              },
+              icon: Icon(Icons.vertical_split_outlined))
+        ],
         child: Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(builder:
             (context, appDataProvider, indexWidgetProvider, myself, child) {
-          ContainerType containerType = ContainerType.swiper;
+          ContainerType containerType = ContainerType.carousel;
           if (appDataProvider.landscape) {
             if (appDataProvider.bodyWidth == 0) {
               containerType = ContainerType.resizeable;
             }
           }
+          controller = AdaptiveContainerController(
+            containerType: containerType,
+            pixels: 380,
+          );
           var poemWidget = AdaptiveContainer(
-              pixels: 380,
-              containerType: containerType,
+              controller: controller!,
               main: _buildPoemListWidget(context),
               body: poemContentWidget);
 

@@ -1,97 +1,90 @@
 import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_resizable_container/flutter_resizable_container.dart';
 import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
 
-enum ContainerType { resizeable, slider, card, swiper, zoom }
+enum ContainerType { resizeable, carousel, slider, zoom }
 
-/// 自适应的容器，在竖屏的时候显示单个组件，滑动屏幕切换
-/// 横屏的时候横向排列，可拖拽调整尺寸
-class AdaptiveContainer extends StatelessWidget {
-  late final PlatformCarouselController? controller;
+class AdaptiveContainerController {
+  late final PlatformCarouselController? platformCarouselController;
   late final ResizableController? resizableController;
   late final GlobalKey<SliderDrawerState>? sliderDrawerKey;
   late final ZoomDrawerController? zoomDrawerController;
-  late final CardSwiperController? cardSwiperController;
 
-  final Widget main;
-  final Widget body;
-  final RxInt index = 0.obs;
   final ContainerType containerType;
-  final double dividerThickness;
-  final Color? dividerColor;
   final double pixels;
+  final RxInt index = 0.obs;
 
-  AdaptiveContainer(
-      {super.key,
-      required this.main,
-      required this.body,
-      this.containerType = ContainerType.resizeable,
-      this.dividerThickness = 2.0,
-      this.dividerColor,
-      this.pixels = 320}) {
+  AdaptiveContainerController(
+      {this.containerType = ContainerType.resizeable, this.pixels = 320}) {
     if (containerType == ContainerType.resizeable) {
       resizableController = ResizableController();
-      controller = null;
+      platformCarouselController = null;
       sliderDrawerKey = null;
       zoomDrawerController = null;
-      cardSwiperController = null;
-    } else if (containerType == ContainerType.swiper) {
-      controller = PlatformCarouselController();
+    } else if (containerType == ContainerType.carousel) {
+      platformCarouselController = PlatformCarouselController();
       resizableController = null;
       sliderDrawerKey = null;
       zoomDrawerController = null;
-      cardSwiperController = null;
     } else if (containerType == ContainerType.slider) {
       sliderDrawerKey = GlobalKey<SliderDrawerState>();
-      controller = null;
+      platformCarouselController = null;
       resizableController = null;
       zoomDrawerController = null;
-      cardSwiperController = null;
     } else if (containerType == ContainerType.zoom) {
       zoomDrawerController = ZoomDrawerController();
-      controller = null;
+      platformCarouselController = null;
       sliderDrawerKey = null;
       resizableController = null;
-      cardSwiperController = null;
-    } else {
-      cardSwiperController = CardSwiperController();
-      controller = null;
-      sliderDrawerKey = null;
-      resizableController = null;
-      zoomDrawerController = null;
     }
   }
 
   void closeSlider() {
+    index.value = 1;
     sliderDrawerKey?.currentState?.closeSlider();
-    controller?.move(1);
+    platformCarouselController?.move(index.value);
     if (zoomDrawerController != null) {
       zoomDrawerController!.close!();
     }
-    resizableController?.setSizes([ResizableSize.pixels(0)]);
+    resizableController?.setSizes([
+      ResizableSize.pixels(0),
+      ResizableSize.expand(),
+    ]);
   }
 
   void openSlider() {
+    index.value = 0;
     sliderDrawerKey?.currentState?.openSlider();
-    controller?.move(0);
+    platformCarouselController?.move(index.value);
     if (zoomDrawerController != null) {
       zoomDrawerController!.open!();
     }
-    resizableController?.setSizes([ResizableSize.pixels(pixels)]);
+    resizableController?.setSizes([
+      ResizableSize.pixels(pixels),
+      ResizableSize.expand(),
+    ]);
   }
 
   void toggle() {
-    sliderDrawerKey?.currentState?.toggle();
     if (index.value == 0) {
-      controller?.move(1);
+      index.value = 1;
+      resizableController?.setSizes([
+        ResizableSize.pixels(0),
+        ResizableSize.expand(),
+      ]);
     } else if (index.value == 1) {
-      controller?.move(0);
+      index.value = 0;
+      resizableController?.setSizes([
+        ResizableSize.pixels(pixels),
+        ResizableSize.expand(),
+      ]);
     }
+    sliderDrawerKey?.currentState?.toggle();
+    platformCarouselController?.move(index.value);
     if (zoomDrawerController != null) {
       zoomDrawerController!.toggle!();
     }
@@ -101,62 +94,82 @@ class AdaptiveContainer extends StatelessWidget {
     if (sliderDrawerKey != null) {
       return sliderDrawerKey?.currentState?.isDrawerOpen;
     }
-    if (controller != null) index.value == 0;
+    if (platformCarouselController != null) index.value == 0;
     if (zoomDrawerController != null) {
       return zoomDrawerController!.isOpen!();
     }
     return null;
   }
+}
+
+/// 自适应的容器，在竖屏的时候显示单个组件，滑动屏幕切换
+/// 横屏的时候横向排列，可拖拽调整尺寸
+class AdaptiveContainer extends StatelessWidget {
+  final AdaptiveContainerController controller;
+  final Widget main;
+  final Widget body;
+
+  final double dividerThickness;
+  final Color? dividerColor;
+
+  AdaptiveContainer({
+    super.key,
+    required this.main,
+    required this.body,
+    required this.controller,
+    this.dividerThickness = 2.0,
+    this.dividerColor,
+  }) {}
 
   @override
   Widget build(BuildContext context) {
-    if (containerType == ContainerType.resizeable) {
+    if (controller.containerType == ContainerType.resizeable) {
       return ResizableContainer(
-        controller: resizableController,
+        controller: controller.resizableController,
         children: [
           ResizableChild(
               divider: ResizableDivider(
                 thickness: dividerThickness,
                 color: dividerColor,
               ),
-              size: ResizableSize.pixels(pixels),
+              size: ResizableSize.pixels(controller.pixels),
               child: main),
           ResizableChild(child: body)
         ],
         direction: Axis.horizontal,
       );
     }
-    if (containerType == ContainerType.slider) {
+    if (controller.containerType == ContainerType.slider) {
       return SliderDrawer(
-        key: sliderDrawerKey,
-        sliderOpenSize: pixels,
+        key: controller.sliderDrawerKey,
+        sliderOpenSize: controller.pixels,
         backgroundColor: Colors.white.withAlpha(1),
-        slider: isDrawerOpen() == true ? Container() : main,
+        slider: controller.isDrawerOpen() == true ? Container() : main,
         child: body,
       );
     }
-    if (containerType == ContainerType.zoom) {
+    if (controller.containerType == ContainerType.zoom) {
       return ZoomDrawer(
-        controller: zoomDrawerController,
+        controller: controller.zoomDrawerController,
         style: DrawerStyle.defaultStyle,
         menuScreen: main,
         mainScreen: body,
         showShadow: true,
         // drawerShadowsBackgroundColor: Colors.grey,
-        slideWidth: pixels,
+        slideWidth: controller.pixels,
         openCurve: Curves.fastOutSlowIn,
         closeCurve: Curves.bounceIn,
       );
     }
-    if (containerType == ContainerType.swiper) {
+    if (controller.containerType == ContainerType.carousel) {
       return PlatformCarouselWidget(
-        controller: controller,
-        initialPage: index.value,
+        controller: controller.platformCarouselController,
+        initialPage: controller.index.value,
         onPageChanged: (int index,
             {PlatformSwiperDirection? direction,
             int? oldIndex,
             CarouselPageChangedReason? reason}) {
-          this.index.value = index;
+          controller.index.value = index;
         },
         itemCount: 2,
         itemBuilder: (BuildContext context, int index, {int? realIndex}) {
@@ -169,23 +182,6 @@ class AdaptiveContainer extends StatelessWidget {
       );
     }
 
-    return CardSwiper(
-      controller: cardSwiperController,
-      initialIndex: index.value,
-      onSwipe: (int oldIndex, int? newIndex, CardSwiperDirection direction) {
-        index.value = newIndex ?? oldIndex;
-
-        return newIndex == null ? false : true;
-      },
-      cardsCount: 2,
-      cardBuilder: (BuildContext context, int index,
-          int horizontalOffsetPercentage, int verticalOffsetPercentage) {
-        if (index == 0) {
-          return main;
-        } else {
-          return body;
-        }
-      },
-    );
+    return Container();
   }
 }

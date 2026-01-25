@@ -95,7 +95,7 @@ class PrimaryNavigation {
         },
         tooltip: AppLocalizations.t('split'),
         icon: Icon(Icons.vertical_split),
-        selectedIcon: Icon(Icons.swipe),
+        selectedIcon: Icon(Icons.vertical_split_outlined),
       ),
     ]);
   }
