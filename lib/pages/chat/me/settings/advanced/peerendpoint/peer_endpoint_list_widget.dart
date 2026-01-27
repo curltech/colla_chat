@@ -203,8 +203,9 @@ class PeerEndpointListWidget extends StatelessWidget with TileDataMixin {
     return tiles;
   }
 
-  void _onTap(int index, String title, {String? subtitle, TileData? group}) {
+  Future<bool?> _onTap(int index, String title, {String? subtitle, TileData? group}) async {
     peerEndpointController.setCurrentIndex = index;
+    return null;
   }
 
   @override

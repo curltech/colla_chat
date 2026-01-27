@@ -63,7 +63,9 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
             subtitle: conferenceId,
             selected: liveKitConferenceClientPool.conferenceId == conferenceId,
             isThreeLine: false,
-            onTap: (int index, String title, {String? subtitle}) {},
+            onTap: (int index, String title, {String? subtitle}) async {
+              return null;
+            },
             routeName: 'sfu_video_conference_participant');
         List<TileData> slideActions = [];
         if (liveKitConferenceClientPool.conferenceId != conferenceId) {

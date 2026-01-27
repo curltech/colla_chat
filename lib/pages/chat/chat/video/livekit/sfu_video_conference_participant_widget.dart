@@ -63,8 +63,9 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
       titleTail: joinedAt.toIso8601String(),
       subtitle: identity,
       isThreeLine: false,
-      onTap: (int index, String title, {String? subtitle}) {
+      onTap: (int index, String title, {String? subtitle}) async {
         participantNotifier.value = participant;
+        return null;
       },
     );
     List<TileData> slideActions = [];

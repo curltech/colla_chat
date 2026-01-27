@@ -69,7 +69,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
       nearbyGroupAddWidget,
       faceGroupAddWidget,
     ]);
-    groupTileData.first.onTap = (int index, String title, {String? subtitle}) {
+    groupTileData.first.onTap = (int index, String title, {String? subtitle}) async {
       groupNotifier.value = null;
     };
     for (var tile in groupTileData) {

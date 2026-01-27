@@ -63,7 +63,9 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
             titleTail: platformParams.desktop ? label : null,
             subtitle: trackId,
             isThreeLine: false,
-            onTap: (int index, String title, {String? subtitle}) {},
+            onTap: (int index, String title, {String? subtitle}) async {
+              return null;
+            },
             routeName: 'peer_connection_show');
 
         tiles.add(tile);
@@ -117,7 +119,9 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
             titleTail: platformParams.desktop ? ownerTag : null,
             subtitle: trackId,
             isThreeLine: false,
-            onTap: (int index, String title, {String? subtitle}) {},
+            onTap: (int index, String title, {String? subtitle}) async {
+              return null;
+            },
             routeName: 'peer_connection_show');
 
         tiles.add(tile);

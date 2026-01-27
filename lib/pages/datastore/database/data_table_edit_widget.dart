@@ -388,8 +388,9 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
             subtitle: dataIndex.columnNames ?? '',
             selected:
                 dataTableIndexController.currentIndex.value == i ? true : false,
-            onTap: (int index, String label, {String? subtitle}) {
+            onTap: (int index, String label, {String? subtitle}) async {
               dataTableIndexController.currentIndex.value = index;
+              return null;
             }));
       }
 

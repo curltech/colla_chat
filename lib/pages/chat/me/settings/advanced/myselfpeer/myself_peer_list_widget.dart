@@ -53,8 +53,9 @@ class MyselfPeerListWidget extends StatelessWidget with TileDataMixin {
       itemBuilder: (BuildContext context, int index) {
         return tiles[index];
       },
-      onTap: (int index, String title, {TileData? group, String? subtitle}) {
+      onTap: (int index, String title, {TileData? group, String? subtitle}) async {
         myselfPeerController.setCurrentIndex = index;
+        return null;
       },
     );
     var appBarView =

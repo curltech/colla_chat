@@ -46,8 +46,9 @@ class LiveKitSfuRoomWidget extends StatelessWidget with TileDataMixin {
             subtitle: creationTime.toString(),
             titleTail: emptyTimeout.toString(),
             selected: false,
-            onTap: (int index, String title, {String? subtitle}) {
+            onTap: (int index, String title, {String? subtitle}) async {
               _showRoom(liveKitManageRoom, current);
+              return null;
             });
         tile.endSlideActions = [
           TileData(
@@ -58,9 +59,10 @@ class LiveKitSfuRoomWidget extends StatelessWidget with TileDataMixin {
               }),
           TileData(
               title: 'Participant',
-              onTap: (int index, String title, {String? subtitle}) {
+              onTap: (int index, String title, {String? subtitle}) async {
                 roomName.value = name;
                 indexWidgetProvider.push('sfu_participant');
+                return null;
               })
         ];
 

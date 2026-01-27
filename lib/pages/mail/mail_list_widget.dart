@@ -181,8 +181,9 @@ class MailListWidget extends StatelessWidget {
       titleTail: titleTail,
       subtitle: subtitle.toString(),
       selected: mailMimeMessageController.currentMailIndex.value == index,
-      onLongPress: (int index, String title, {String? subtitle}) {
+      onLongPress: (int index, String title, {String? subtitle}) async {
         _showMailPopAction();
+        return null;
       },
     );
 

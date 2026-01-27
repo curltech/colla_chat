@@ -255,9 +255,10 @@ class ChannelChatMessageItem extends StatelessWidget {
         dense: true,
         selected: false,
         isThreeLine: true,
-        onTap: (int index, String title, {String? subtitle}) {
+        onTap: (int index, String title, {String? subtitle}) async {
           channelChatMessageController.current = chatMessage;
           indexWidgetProvider.push('subscribe_channel_message_preview');
+          return null;
         });
     List<TileData> slideActions = [];
     TileData deleteSlideAction = TileData(

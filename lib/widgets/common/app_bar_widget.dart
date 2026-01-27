@@ -77,7 +77,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       leading: leading,
       actions: btns,
       automaticallyImplyLeading: false,
-      toolbarHeight: toolbarHeight,
+      toolbarHeight: toolbarHeight ?? appDataProvider.toolbarHeight,
       elevation: elevation,
       backgroundColor: backgroundColor ?? myself.primary,
       foregroundColor: foregroundColor ?? Colors.white,
@@ -130,7 +130,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       children.add(Align(alignment: Alignment.center, child: title!));
     }
     return Container(
-      height: toolbarHeight,
+      height: toolbarHeight ?? appDataProvider.toolbarHeight,
       padding: const EdgeInsets.all(10),
       color: backgroundColor ?? myself.primary,
       child: Stack(

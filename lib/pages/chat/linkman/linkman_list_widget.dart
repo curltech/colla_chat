@@ -38,7 +38,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class LinkmanController extends DataListController<Linkman> {
-  Future<void> changeLinkmanStatus(Linkman linkman, LinkmanStatus status) async {
+  Future<void> changeLinkmanStatus(
+      Linkman linkman, LinkmanStatus status) async {
     int id = linkman.id!;
     await linkmanService.update({'id': id, 'linkmanStatus': status.name});
     linkmanService.linkmen.remove(linkman.peerId);
@@ -46,7 +47,8 @@ class LinkmanController extends DataListController<Linkman> {
     data.assignAll(data);
   }
 
-  Future<void> changeSubscriptStatus(Linkman linkman, LinkmanStatus status) async {
+  Future<void> changeSubscriptStatus(
+      Linkman linkman, LinkmanStatus status) async {
     int id = linkman.id!;
     await linkmanService.update({'id': id, 'subscriptStatus': status.name});
     linkmanService.linkmen.remove(linkman.peerId);
@@ -269,8 +271,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             subtitle: linkmanStatus,
             selected: false,
             routeName: routeName,
-            onTap: (int index, String title, {String? subtitle}) {
+            onTap: (int index, String title, {String? subtitle}) async {
               linkmanNotifier.value = linkman;
+              return null;
             });
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
@@ -484,8 +487,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: groupName,
             subtitle: groupOwnerName,
             selected: false,
-            onTap: (int index, String title, {String? subtitle}) {
+            onTap: (int index, String title, {String? subtitle}) async {
               groupNotifier.value = group;
+              return null;
             },
             routeName: 'group_edit');
         List<TileData> slideActions = [];
@@ -592,8 +596,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             subtitle: topic,
             selected: false,
             isThreeLine: false,
-            onTap: (int index, String title, {String? subtitle}) {
+            onTap: (int index, String title, {String? subtitle}) async {
               conferenceNotifier.value = conference;
+              return null;
             },
             routeName: routeName);
         List<TileData> slideActions = [];
@@ -644,17 +649,22 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     return tiles;
   }
 
-  void _onTapLinkman(int index, String title, {String? subtitle, TileData? group}) {
+  Future<bool?> _onTapLinkman(int index, String title,
+      {String? subtitle, TileData? group}) async {
     linkmanController.setCurrentIndex = index;
+    return null;
   }
 
-  void _onTapGroup(int index, String title, {String? subtitle, TileData? group}) {
+  Future<bool?> _onTapGroup(int index, String title,
+      {String? subtitle, TileData? group}) async {
     groupController.setCurrentIndex = index;
+    return null;
   }
 
-  void _onTapConference(int index, String title,
-      {String? subtitle, TileData? group}) {
+  Future<bool?> _onTapConference(int index, String title,
+      {String? subtitle, TileData? group}) async {
     conferenceController.setCurrentIndex = index;
+    return null;
   }
 
   Widget _buildLinkmanListView(BuildContext context) {

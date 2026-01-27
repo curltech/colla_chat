@@ -274,8 +274,10 @@ class PlaylistWidget extends StatelessWidget {
         title: FileUtil.filename(filename),
         subtitle: '$length',
         selected: selected,
-        onTap: (int index, String title, {String? subtitle}) {
+        onTap: (int index, String title, {String? subtitle}) async {
           playlistController.setCurrentIndex = index;
+
+          return null;
         },
       );
       tileData.add(tile);
@@ -357,11 +359,12 @@ class PlaylistWidget extends StatelessWidget {
       } else {
         return DataListView(
           onTap: (int index, String title,
-              {TileData? group, String? subtitle}) {
+              {TileData? group, String? subtitle}) async {
             playlistController.setCurrentIndex = index;
             if (onSelected != null) {
               onSelected!(index, title);
             }
+            return null;
           },
           itemCount: tileData.length,
           itemBuilder: (BuildContext context, int index) {

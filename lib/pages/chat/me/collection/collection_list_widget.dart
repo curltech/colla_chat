@@ -133,9 +133,10 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
     return tile;
   }
 
-  void _onTapCollection(int index, String title,
-      {String? subtitle, TileData? group}) {
+  Future<bool?> _onTapCollection(int index, String title,
+      {String? subtitle, TileData? group}) async {
     collectionChatMessageController.setCurrentIndex = index;
+    return null;
   }
 
   ///创建每一条收藏消息

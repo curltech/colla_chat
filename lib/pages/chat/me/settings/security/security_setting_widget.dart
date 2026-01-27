@@ -88,8 +88,9 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
         itemBuilder: (BuildContext context, int index) {
           return tiles[index];
         },
-        onTap: (int index, String title, {TileData? group, String? subtitle}) {
+        onTap: (int index, String title, {TileData? group, String? subtitle}) async {
           _onTap(context, index, title, group: group, subtitle: subtitle);
+          return null;
         });
   }
 

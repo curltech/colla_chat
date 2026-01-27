@@ -81,8 +81,9 @@ class LinkmanWebrtcConnectionWidget extends StatelessWidget with TileDataMixin {
             titleTail: dataChannelState?.name.substring(14),
             selected: false,
             routeName: routeName,
-            onTap: (int index, String title, {String? subtitle}) {
+            onTap: (int index, String title, {String? subtitle}) async {
               linkmanNotifier.value = linkman;
+              return null;
             });
         tiles.add(tile);
       }

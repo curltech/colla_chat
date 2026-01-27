@@ -177,9 +177,10 @@ class P2pLoginWidget extends StatelessWidget {
       Obx(() {
         return DataListView(
           onTap: (int index, String title,
-              {TileData? group, String? subtitle}) {
+              {TileData? group, String? subtitle}) async {
             myselfPeerController.setCurrentIndex = index;
             Navigator.pop(context);
+            return null;
           },
           itemCount: myselfPeerController.data.length,
           itemBuilder: (BuildContext context, int index) {

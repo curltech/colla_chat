@@ -34,8 +34,10 @@ class TileData {
   final bool isThreeLine;
 
   //缺省行为，为空的时候，是打上选择标志，颜色变化
-  Function(int index, String title, {String? subtitle})? onTap;
-  Function(int index, String title, {String? subtitle})? onLongPress;
+  Future<bool?> Function(int index, String title, {String? subtitle})?
+      onTap;
+  final Future<bool?> Function(int index, String title, {String? subtitle})?
+      onLongPress;
 
   List<TileData>? slideActions;
   List<TileData>? endSlideActions;
@@ -125,8 +127,10 @@ class DataListTile extends StatelessWidget {
   ///如果定义了点击回调函数，序号为参数进行回调
   ///回调函数有两个，一个构造函数传入的成员变量，用于处理高亮显示
   ///二是数据项里面定义的，用于自定义的后续任务
-  final Function(int index, String title, {String? subtitle})? onTap;
-  final Function(int index, String title, {String? subtitle})? onLongPress;
+  final Future<bool?> Function(int index, String title, {String? subtitle})?
+      onTap;
+  final Future<bool?> Function(int index, String title, {String? subtitle})?
+      onLongPress;
 
   const DataListTile({
     super.key,
@@ -202,29 +206,50 @@ class DataListTile extends StatelessWidget {
       ]);
     }
 
-    _onTap() async {
-      if (onTap != null ||
-          tileData.onTap != null ||
-          tileData.routeName != null) {
-        var fn = onTap;
-        await fn?.call(index, tileData.title, subtitle: tileData.subtitle);
-        fn = tileData.onTap;
-        await fn?.call(index, tileData.title, subtitle: tileData.subtitle);
-
-        ///如果路由名称存在，点击会调用路由
-        if (tileData.routeName != null) {
-          indexWidgetProvider.push(tileData.routeName!, context: context);
+    Future<bool?> onTap() async {
+      bool? value;
+      if (this.onTap != null) {
+        var fn = this.onTap;
+        value =
+            await fn?.call(index, tileData.title, subtitle: tileData.subtitle);
+        if (value == false) {
+          return false;
         }
       }
+      if (tileData.onTap != null) {
+        var fn = tileData.onTap;
+        value =
+            await fn?.call(index, tileData.title, subtitle: tileData.subtitle);
+        if (value == false) {
+          return false;
+        }
+      }
+
+      ///如果路由名称存在，点击会调用路由
+      if (tileData.routeName != null) {
+        indexWidgetProvider.push(tileData.routeName!, context: context);
+      }
+
+      return value;
     }
 
-    _onLongPress() async {
-      if (onLongPress != null || tileData.onLongPress != null) {
-        var fn = onLongPress;
-        await fn?.call(index, tileData.title, subtitle: tileData.subtitle);
-        fn = tileData.onLongPress;
-        await fn?.call(index, tileData.title, subtitle: tileData.subtitle);
+    Future<bool?> onLongPress() async {
+      bool? value;
+      if (this.onLongPress != null) {
+        var fn = this.onLongPress;
+        value =
+            await fn?.call(index, tileData.title, subtitle: tileData.subtitle);
+        if (value == false) {
+          return false;
+        }
       }
+      if (tileData.onLongPress != null) {
+        var fn = tileData.onLongPress;
+        value =
+            await fn?.call(index, tileData.title, subtitle: tileData.subtitle);
+      }
+
+      return value;
     }
 
     ///未来不使用ListTile，因为高度固定，不够灵活
@@ -247,8 +272,8 @@ class DataListTile extends StatelessWidget {
       trailing: trailingWidget,
       isThreeLine: tileData.isThreeLine,
       dense: tileData.dense,
-      onTap: _onTap,
-      onLongPress: _onLongPress,
+      onTap: onTap,
+      onLongPress: onLongPress,
     );
 
     if (selected) {

@@ -211,8 +211,9 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
                 subtitle: poem.rhythmic,
                 selected: poemController.currentIndex.value == i,
                 titleTail: '${poem.dynasty} ${poem.author}',
-                onTap: (int index, String title, {String? subtitle}) {
+                onTap: (int index, String title, {String? subtitle}) async {
                   poemController.setCurrentIndex = index;
+                  return null;
                 },
               ));
               i++;
@@ -243,10 +244,12 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
         withLeading: true,
         rightWidgets: [
           IconButton(
-              onPressed: () {
-                controller?.toggle();
-              },
-              icon: Icon(Icons.vertical_split_outlined))
+            onPressed: () {
+              controller?.toggle();
+            },
+            icon: Icon(Icons.vertical_split_outlined),
+            selectedIcon: Icon(Icons.vertical_split),
+          )
         ],
         child: Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(builder:
             (context, appDataProvider, indexWidgetProvider, myself, child) {

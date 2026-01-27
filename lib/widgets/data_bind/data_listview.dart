@@ -18,7 +18,7 @@ class DataListView extends StatefulWidget {
   final Future<void> Function()? onScrollMax;
   final Future<void> Function()? onScrollMin;
   final Future<void> Function()? onRefresh;
-  final Function(
+  final Future<bool?> Function(
     int index,
     String title, {
     String? subtitle,
@@ -90,11 +90,12 @@ class _DataListViewState extends State<DataListView> {
     }
   }
 
-  void _onTap(int index, String title, {String? subtitle}) {
+  Future<bool?> _onTap(int index, String title, {String? subtitle}) async {
     var onTap = widget.onTap;
     if (onTap != null) {
-      onTap(index, title, subtitle: subtitle, group: widget.group);
+      return await onTap(index, title, subtitle: subtitle, group: widget.group);
     }
+    return null;
   }
 
   Widget _buildListTile(BuildContext context, DataListTile dataListTile) {

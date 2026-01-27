@@ -57,11 +57,13 @@ class GroupDataListView extends StatelessWidget {
     }
   }
 
-  void _onTap(int index, String title, {String? subtitle, TileData? group}) {
+  Future<bool?> _onTap(int index, String title,
+      {String? subtitle, TileData? group}) async {
     var onTap = this.onTap;
     if (onTap != null) {
-      onTap(index, title, subtitle: subtitle, group: group);
+      return await onTap(index, title, subtitle: subtitle, group: group);
     }
+    return null;
   }
 
   Widget? _buildExpansionTile(TileData tileData) {

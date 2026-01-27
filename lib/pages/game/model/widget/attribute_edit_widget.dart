@@ -74,8 +74,9 @@ class AttributeEditWidget extends StatelessWidget with TileDataMixin {
             return tiles[index];
           },
           onTap: (int index, String title,
-              {TileData? group, String? subtitle}) {
+              {TileData? group, String? subtitle}) async {
             attribute.value = attributes.value![index];
+            return null;
           },
         );
       }

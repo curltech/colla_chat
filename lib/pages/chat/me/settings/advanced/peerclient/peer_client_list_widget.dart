@@ -81,8 +81,9 @@ class PeerClientListWidget extends StatelessWidget with TileDataMixin {
     await peerClientController.more();
   }
 
-  void _onTap(int index, String title, {String? subtitle, TileData? group}) {
+  Future<bool?> _onTap(int index, String title, {String? subtitle, TileData? group}) async {
     peerClientController.setCurrentIndex = index;
+    return null;
   }
 
   @override

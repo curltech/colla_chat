@@ -58,9 +58,10 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
           subtitle: conferenceId,
           selected: p2pConferenceClientPool.conferenceId == conferenceId,
           isThreeLine: false,
-          onTap: (int index, String title, {String? subtitle}) {
+          onTap: (int index, String title, {String? subtitle}) async {
             p2pConferenceClientPool.conferenceId == conferenceId;
             indexWidgetProvider.push('video_conference_connection');
+            return null;
           },
         );
         List<TileData> slideActions = [];

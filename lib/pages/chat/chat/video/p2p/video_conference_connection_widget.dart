@@ -62,9 +62,10 @@ class VideoConferenceConnectionWidget extends StatelessWidget
           subtitle: peerId,
           suffix: Text(signalingState.substring(17)),
           isThreeLine: false,
-          onTap: (int index, String title, {String? subtitle}) {
+          onTap: (int index, String title, {String? subtitle}) async {
             peerConnectionNotifier.value = peerConnection;
             indexWidgetProvider.push('video_conference_track');
+            return null;
           },
         );
 

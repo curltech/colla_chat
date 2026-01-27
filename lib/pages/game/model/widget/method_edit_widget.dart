@@ -72,8 +72,9 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
             return tiles[index];
           },
           onTap: (int index, String title,
-              {TileData? group, String? subtitle}) {
+              {TileData? group, String? subtitle}) async {
             method.value = methods.value![index];
+            return null;
           },
         );
       }

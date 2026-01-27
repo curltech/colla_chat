@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_resizable_container/flutter_resizable_container.dart';
 import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
-import 'package:get/get.dart';
 
 enum ContainerType { resizeable, carousel, slider, zoom }
 
@@ -16,7 +15,7 @@ class AdaptiveContainerController {
 
   final ContainerType containerType;
   final double pixels;
-  final RxInt index = 0.obs;
+  final ValueNotifier<bool> isOpen = ValueNotifier<bool>(true);
 
   AdaptiveContainerController(
       {this.containerType = ContainerType.resizeable, this.pixels = 320}) {
@@ -44,9 +43,9 @@ class AdaptiveContainerController {
   }
 
   void closeSlider() {
-    index.value = 1;
+    isOpen.value = false;
     sliderDrawerKey?.currentState?.closeSlider();
-    platformCarouselController?.move(index.value);
+    platformCarouselController?.move(isOpen.value ? 0 : 1);
     if (zoomDrawerController != null) {
       zoomDrawerController!.close!();
     }
@@ -57,9 +56,9 @@ class AdaptiveContainerController {
   }
 
   void openSlider() {
-    index.value = 0;
+    isOpen.value = true;
     sliderDrawerKey?.currentState?.openSlider();
-    platformCarouselController?.move(index.value);
+    platformCarouselController?.move(isOpen.value ? 0 : 1);
     if (zoomDrawerController != null) {
       zoomDrawerController!.open!();
     }
@@ -70,21 +69,20 @@ class AdaptiveContainerController {
   }
 
   void toggle() {
-    if (index.value == 0) {
-      index.value = 1;
-      resizableController?.setSizes([
-        ResizableSize.pixels(0),
-        ResizableSize.expand(),
-      ]);
-    } else if (index.value == 1) {
-      index.value = 0;
+    isOpen.value = !isOpen.value;
+    if (isOpen.value) {
       resizableController?.setSizes([
         ResizableSize.pixels(pixels),
         ResizableSize.expand(),
       ]);
+    } else {
+      resizableController?.setSizes([
+        ResizableSize.pixels(0),
+        ResizableSize.expand(),
+      ]);
     }
     sliderDrawerKey?.currentState?.toggle();
-    platformCarouselController?.move(index.value);
+    platformCarouselController?.move(isOpen.value ? 0 : 1);
     if (zoomDrawerController != null) {
       zoomDrawerController!.toggle!();
     }
@@ -94,7 +92,7 @@ class AdaptiveContainerController {
     if (sliderDrawerKey != null) {
       return sliderDrawerKey?.currentState?.isDrawerOpen;
     }
-    if (platformCarouselController != null) index.value == 0;
+    if (platformCarouselController != null) isOpen.value;
     if (zoomDrawerController != null) {
       return zoomDrawerController!.isOpen!();
     }
@@ -164,12 +162,12 @@ class AdaptiveContainer extends StatelessWidget {
     if (controller.containerType == ContainerType.carousel) {
       return PlatformCarouselWidget(
         controller: controller.platformCarouselController,
-        initialPage: controller.index.value,
+        initialPage: controller.isOpen.value ? 0 : 1,
         onPageChanged: (int index,
             {PlatformSwiperDirection? direction,
             int? oldIndex,
             CarouselPageChangedReason? reason}) {
-          controller.index.value = index;
+          controller.isOpen.value = index == 0;
         },
         itemCount: 2,
         itemBuilder: (BuildContext context, int index, {int? realIndex}) {

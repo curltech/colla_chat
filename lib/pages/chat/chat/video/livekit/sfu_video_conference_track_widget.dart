@@ -68,7 +68,9 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
         titleTail: platformParams.desktop ? ownerTag : null,
         subtitle: trackId,
         isThreeLine: false,
-        onTap: (int index, String title, {String? subtitle}) {},
+        onTap: (int index, String title, {String? subtitle}) async {
+          return null;
+        },
       );
 
       tiles.add(tile);
@@ -109,7 +111,9 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
         titleTail: platformParams.desktop ? ownerTag : null,
         subtitle: trackId,
         isThreeLine: false,
-        onTap: (int index, String title, {String? subtitle}) {},
+        onTap: (int index, String title, {String? subtitle}) async {
+          return null;
+        },
       );
 
       tiles.add(tile);
