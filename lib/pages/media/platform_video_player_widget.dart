@@ -83,9 +83,7 @@ class PlatformVideoPlayerWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     List<Widget>? rightWidgets = _buildRightWidgets(context);
-    return Column(
-      children: [OverflowBar(children: rightWidgets), Expanded(child: platformVideoPlayer)],
-    );
+
     return AppBarView(
       title: title,
       helpPath: routeName,
