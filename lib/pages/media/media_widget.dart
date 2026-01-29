@@ -2,6 +2,7 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/adaptive_container.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_media_widget.dart';
 import 'package:colla_chat/widgets/media_editor/image_editor_widget.dart';
 import 'package:colla_chat/pages/media/platform_audio_player_widget.dart';
@@ -11,7 +12,6 @@ import 'package:colla_chat/widgets/media_editor/video_editor_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/media_editor/video_renderer_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -37,16 +37,11 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
     videoEditorWidget,
     videoRendererWidget
   ];
-  late final List<TileData> mediaTileData;
+  late final Map<TileData, List<TileData>> mediaTileData;
   AdaptiveContainerController? controller;
   final ValueNotifier<int> index = ValueNotifier<int>(0);
 
-  MediaWidget({super.key}) {
-    mediaTileData = TileData.from(mediaTileDataMixins);
-    for (var tileData in mediaTileData) {
-      tileData.dense = true;
-    }
-  }
+  MediaWidget({super.key});
 
   @override
   bool get withLeading => true;
@@ -75,13 +70,10 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
       );
       var mediaWidget = AdaptiveContainer(
         controller: controller!,
-        main: DataListView(
-          itemCount: mediaTileData.length,
-          itemBuilder: (BuildContext context, int index) {
-            return mediaTileData[index];
-          },
+        main: GroupDataListView(
+          tileData: mediaTileData,
           onTap: (int index, String label,
-              {TileData? group, String? subtitle}) async {
+              {String? subtitle, TileData? group}) async {
             this.index.value = index;
             if (!appDataProvider.landscape) {
               controller?.closeSlider();

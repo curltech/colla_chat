@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -34,8 +35,7 @@ class TileData {
   final bool isThreeLine;
 
   //缺省行为，为空的时候，是打上选择标志，颜色变化
-  Future<bool?> Function(int index, String title, {String? subtitle})?
-      onTap;
+  Future<bool?> Function(int index, String title, {String? subtitle})? onTap;
   final Future<bool?> Function(int index, String title, {String? subtitle})?
       onLongPress;
 
@@ -56,7 +56,7 @@ class TileData {
       this.onTap,
       this.onLongPress});
 
-  static TileData of(TileDataMixin mixin, {bool dense = false}) {
+  static TileData of(TileDataMixin mixin, {bool dense = true}) {
     return TileData(
         title: AppLocalizations.t(mixin.title),
         routeName: mixin.routeName,
@@ -65,7 +65,7 @@ class TileData {
         prefix: mixin.iconData);
   }
 
-  static List<TileData> from(List<TileDataMixin> mixins, {bool dense = false}) {
+  static List<TileData> from(List<TileDataMixin> mixins, {bool dense = true}) {
     List<TileData> tileData = [];
     if (mixins.isNotEmpty) {
       for (var mixin in mixins) {
@@ -119,6 +119,8 @@ class TileData {
 class DataListTile extends StatelessWidget {
   final TileData tileData;
   final int index;
+  final double? dividerHeight;
+  final Color? dividerColor;
   final EdgeInsets? contentPadding;
   final double? horizontalTitleGap;
   final double? minVerticalPadding;
@@ -136,6 +138,8 @@ class DataListTile extends StatelessWidget {
     super.key,
     required this.tileData,
     this.index = 0,
+    this.dividerHeight,
+    this.dividerColor,
     this.onTap,
     this.onLongPress,
     this.contentPadding,
@@ -143,6 +147,31 @@ class DataListTile extends StatelessWidget {
     this.minVerticalPadding,
     this.minLeadingWidth,
   });
+
+  static Widget buildListTile(
+    TileData tileData, {
+    int index = 0,
+    double? dividerHeight,
+    Color? dividerColor,
+    Future<bool?> Function(int, String, {String? subtitle})? onTap,
+    Future<bool?> Function(int, String, {String? subtitle})? onLongPress,
+  }) {
+    var tile = DataListTile(
+        tileData: tileData,
+        index: index,
+        onTap: onTap,
+        onLongPress: onLongPress);
+    return Column(children: <Widget>[
+      tile,
+      Padding(
+        padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+        child: Divider(
+          height: dividerHeight ?? 1.0,
+          color: dividerColor ?? Colors.grey.withAlpha(0),
+        ),
+      ),
+    ]);
+  }
 
   Widget _buildListTile(BuildContext context) {
     bool selected = tileData.selected ?? false;

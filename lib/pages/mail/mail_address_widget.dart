@@ -56,7 +56,8 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
   final RxInt index = 0.obs;
   final PlatformCarouselController controller = PlatformCarouselController();
 
-  void _onTap(int index, String title, {String? subtitle, TileData? group}) {
+  Future<bool?> _onTap(int index, String title,
+      {String? subtitle, TileData? group}) async {
     int i = 0;
     for (MailAddress emailAddress in mailAddressController.data) {
       if (emailAddress.email == group!.title) {
@@ -67,6 +68,8 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
     }
     mailboxController.setCurrentMailbox(title);
     controller.move(0);
+
+    return null;
   }
 
   Widget _buildMailAddressWidget(BuildContext context) {

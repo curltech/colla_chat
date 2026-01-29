@@ -40,13 +40,18 @@ class GroupDataListController {
   }
 }
 
+/// 可扩展的列表，如果某行的子列表不为空，则显示为可扩展的列表，否则显示为直接可点击的行
 class GroupDataListView extends StatelessWidget {
+  final double? dividerHeight;
+  final Color? dividerColor;
   late final GroupDataListController groupDataListController;
-  final Function(int index, String title, {String? subtitle, TileData? group})?
-      onTap;
+  final Future<bool?> Function(int index, String title,
+      {String? subtitle, TileData? group})? onTap;
 
   GroupDataListView(
       {super.key,
+      this.dividerHeight,
+      this.dividerColor,
       GroupDataListController? controller,
       Map<TileData, List<TileData>> tileData = const {},
       this.onTap}) {
@@ -66,12 +71,12 @@ class GroupDataListView extends StatelessWidget {
     return null;
   }
 
-  Widget? _buildExpansionTile(TileData tileData) {
-    var data = groupDataListController.get(tileData);
+  Widget _buildExpansionTile(TileData tileData) {
+    List<TileData>? data = groupDataListController.get(tileData);
     if (data == null) {
-      return null;
+      throw 'group tileData error';
     }
-    Widget? leading = tileData.getPrefixWidget(true);
+    Widget? leading = tileData.getPrefixWidget(tileData.selected ?? false);
     List<Widget>? trailing = <Widget>[];
     var suffix = tileData.suffix;
     if (suffix != null) {
@@ -96,8 +101,10 @@ class GroupDataListView extends StatelessWidget {
     }
 
     Widget dataListView = DataListView(
-      onTap: _onTap,
-      group: tileData,
+      dividerHeight: dividerHeight,
+      onTap: (int index, String title, {String? subtitle}) async {
+        return _onTap(index, title, subtitle: subtitle, group: tileData);
+      },
       itemCount: data.length,
       itemBuilder: (BuildContext context, int index) {
         return data[index];
@@ -105,12 +112,11 @@ class GroupDataListView extends StatelessWidget {
     );
     bool selected = tileData.selected ?? false;
 
-    /// 未来不使用ListTile，因为高度固定，不够灵活
     Widget expansionTile = ListenableBuilder(
       listenable: myself,
       builder: (BuildContext context, Widget? child) {
         return ExpansionTile(
-          childrenPadding: const EdgeInsets.all(0),
+          childrenPadding: const EdgeInsets.only(left: 32, right: 5),
           maintainState: true,
           leading: leading,
           textColor: selected ? myself.primary : null,
@@ -132,21 +138,35 @@ class GroupDataListView extends StatelessWidget {
   }
 
   Widget _buildListView(BuildContext context) {
-    List<Widget> groups = [];
-    var controllers = groupDataListController.allData;
-    if (controllers.isNotEmpty) {
-      for (var entry in controllers.entries) {
-        Widget? groupExpansionTile = _buildExpansionTile(
-          entry.key,
-        );
-        if (groupExpansionTile != null) {
-          groups.add(groupExpansionTile);
+    List<Widget> groupWidgets = [];
+    Map<TileData, List<TileData>> tileData = groupDataListController.allData;
+    if (tileData.isNotEmpty) {
+      for (var entry in tileData.entries) {
+        TileData groupTileData = entry.key;
+        List<TileData> tileData = entry.value;
+        Widget groupWidget;
+        if (tileData.isEmpty) {
+          groupWidget = DataListTile.buildListTile(
+              dividerHeight: dividerHeight,
+              dividerColor: dividerColor,
+              groupTileData, onTap: (
+            int index,
+            String title, {
+            String? subtitle,
+            TileData? group,
+          }) async {
+            return await _onTap(index, title,
+                subtitle: subtitle, group: groupTileData);
+          });
+        } else {
+          groupWidget = _buildExpansionTile(groupTileData);
         }
+        groupWidgets.add(groupWidget);
       }
     }
     //该属性将决定列表的长度是否仅包裹其内容的长度。
     //当ListView 嵌在一个无限长的容器组件中时， shrinkWrap 必须为true
-    return ListView(shrinkWrap: true, children: groups);
+    return ListView(shrinkWrap: true, children: groupWidgets);
   }
 
   @override
