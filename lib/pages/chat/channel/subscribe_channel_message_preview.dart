@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 
 /// 订阅频道消息的展示页面
 class SubscribeChannelMessagePreview extends StatelessWidget
-    with TileDataMixin {
+    with DataTileMixin {
   SubscribeChannelMessagePreview({super.key});
 
   @override

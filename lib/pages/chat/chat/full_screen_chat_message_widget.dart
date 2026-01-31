@@ -11,7 +11,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class FullScreenChatMessageWidget extends StatelessWidget with TileDataMixin {
+class FullScreenChatMessageWidget extends StatelessWidget with DataTileMixin {
   FullScreenChatMessageWidget({super.key});
 
   @override

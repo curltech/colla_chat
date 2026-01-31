@@ -34,7 +34,7 @@ import 'package:get/get.dart';
 Rx<Conference?> conferenceNotifier = Rx<Conference?>(null);
 
 ///创建和修改群，填写群的基本信息，选择群成员和群主
-class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
+class ConferenceEditWidget extends StatelessWidget with DataTileMixin {
   ConferenceEditWidget({super.key});
 
   @override

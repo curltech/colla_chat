@@ -30,14 +30,14 @@ class NameCardMessage extends StatelessWidget {
       this.mimeType});
 
   Widget _buildLinkmanWidget(List<Linkman> linkmen) {
-    final List<TileData> linkmanInfoTileData = [];
+    final List<DataTile> linkmanInfoTileData = [];
     for (Linkman linkman in linkmen) {
       String name = linkman.name;
       var peerId = linkman.peerId;
       String? avatar = linkman.avatar;
       Widget prefix = ImageUtil.buildImageWidget(
           imageContent: avatar, isRadius: true, radius: 2.0);
-      linkmanInfoTileData.add(TileData(
+      linkmanInfoTileData.add(DataTile(
         prefix: prefix,
         title: name,
         subtitle: peerId,
@@ -56,7 +56,7 @@ class NameCardMessage extends StatelessWidget {
   }
 
   Widget _buildGroupWidget(List<Group> groups) {
-    final List<TileData> groupInfoTileData = [];
+    final List<DataTile> groupInfoTileData = [];
     for (Group group in groups) {
       String name = group.name;
       var peerId = group.peerId;
@@ -71,7 +71,7 @@ class NameCardMessage extends StatelessWidget {
           color: myself.primary,
         );
       }
-      groupInfoTileData.add(TileData(
+      groupInfoTileData.add(DataTile(
         prefix: prefix,
         title: name,
         subtitle: peerId,

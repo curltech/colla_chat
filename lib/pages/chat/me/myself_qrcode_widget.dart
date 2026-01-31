@@ -7,7 +7,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/qrcode_widget.dart';
 import 'package:flutter/material.dart';
 
-class MyselfQrcodeWidget extends StatelessWidget with TileDataMixin {
+class MyselfQrcodeWidget extends StatelessWidget with DataTileMixin {
   MyselfQrcodeWidget({super.key});
 
   @override

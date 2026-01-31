@@ -46,7 +46,7 @@ class InoutEventController extends DataListController<DayLine> {
 final InoutEventController inoutEventController = InoutEventController();
 
 /// 自定义事件在历史上发生的日线
-class InoutEventWidget extends StatelessWidget with TileDataMixin {
+class InoutEventWidget extends StatelessWidget with DataTileMixin {
   InoutEventWidget({super.key}) {
     _init();
   }
@@ -273,7 +273,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
     return AppBarView(
         title: title,
         helpPath: routeName,
-        withLeading: true,
+        isAppBar: false,
         rightWidgets: rightWidgets,
         child: Column(children: [
           _buildSearchView(context),

@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 ///自选股和分组的查询界面
-class StatScoreWidget extends StatelessWidget with TileDataMixin {
+class StatScoreWidget extends StatelessWidget with DataTileMixin {
   StatScoreWidget({super.key}) {
     _init();
   }
@@ -292,7 +292,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
     return AppBarView(
       title: title,
       helpPath: routeName,
-      withLeading: true,
+      isAppBar: false,
       rightWidgets: rightWidgets,
       child: Column(
         children: [

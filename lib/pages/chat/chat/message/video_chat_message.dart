@@ -104,7 +104,7 @@ class VideoChatMessage extends StatelessWidget {
       if (conference.topic != null) {
         subtitle = '$subtitle\n${conference.topic}';
       }
-      var tileData = TileData(
+      var tileData = DataTile(
           title: conference.sfu
               ? '$video conference invitation'
               : '$video chat invitation',
@@ -127,7 +127,7 @@ class VideoChatMessage extends StatelessWidget {
           horizontalTitleGap: 0.0,
           minVerticalPadding: 0.0,
           minLeadingWidth: 0.0,
-          tileData: tileData);
+          dataTile: tileData);
 
       return CommonMessage(child: actionWidget);
     }

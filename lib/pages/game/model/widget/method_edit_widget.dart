@@ -20,7 +20,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class MethodEditWidget extends StatelessWidget with TileDataMixin {
+class MethodEditWidget extends StatelessWidget with DataTileMixin {
   @override
   bool get withLeading => true;
 
@@ -59,10 +59,10 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
   Widget _buildMethodsWidget(BuildContext context) {
     return Obx(() {
       if (methods.value != null && methods.value!.isNotEmpty) {
-        List<TileData> tiles = [];
+        List<DataTile> tiles = [];
         for (var method in methods.value!) {
-          TileData tile =
-              TileData(title: method.name, subtitle: method.returnType);
+          DataTile tile =
+              DataTile(title: method.name, subtitle: method.returnType);
           tiles.add(tile);
         }
 
@@ -72,7 +72,7 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
             return tiles[index];
           },
           onTap: (int index, String title,
-              {TileData? group, String? subtitle}) async {
+              {DataTile? group, String? subtitle}) async {
             method.value = methods.value![index];
             return null;
           },

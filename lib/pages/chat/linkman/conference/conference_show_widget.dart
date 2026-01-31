@@ -26,7 +26,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 
 ///显示会议的基本信息，会议成员和会议发起人
-class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
+class ConferenceShowWidget extends StatelessWidget with DataTileMixin {
   final List<PlatformDataField> readOnlyConferenceDataField = [
     PlatformDataField(
         name: 'id',
@@ -224,8 +224,8 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
         child: AutoSizeText(AppLocalizations.t('No conference')));
   }
 
-  Future<List<TileData>> _buildChatReceipts() async {
-    List<TileData> tiles = [];
+  Future<List<DataTile>> _buildChatReceipts() async {
+    List<DataTile> tiles = [];
     final Conference? conference = conferenceNotifier.value;
     if (conference != null) {
       ConferenceChatMessageController? conferenceChatMessageController =
@@ -241,7 +241,7 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
         for (var chatReceipt in chatReceipts!.values) {
           Linkman? linkman = await linkmanService
               .findCachedOneByPeerId(chatReceipt.senderPeerId!);
-          var tile = TileData(
+          var tile = DataTile(
               title: chatReceipt.senderName!,
               titleTail: key,
               prefix: linkman?.avatarImage);
@@ -265,10 +265,10 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
             initiallyExpanded: true,
             children: [_buildPlatformReactiveForm(context)]),
         Expanded(
-            child: FutureBuilder<List<TileData>>(
+            child: FutureBuilder<List<DataTile>>(
           future: _buildChatReceipts(),
           builder:
-              (BuildContext context, AsyncSnapshot<List<TileData>> snapshot) {
+              (BuildContext context, AsyncSnapshot<List<DataTile>> snapshot) {
             if (snapshot.hasData && snapshot.data != null) {
               return DataListView(
                 itemCount: snapshot.data!.length,

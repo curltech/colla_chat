@@ -20,7 +20,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 ///Sfu视频聊天窗口，分页显示本地视频和远程视频
-class SfuVideoChatWidget extends StatefulWidget with TileDataMixin {
+class SfuVideoChatWidget extends StatefulWidget with DataTileMixin {
   final SfuLocalVideoWidget sfuLocalVideoWidget = const SfuLocalVideoWidget();
   final SfuRemoteVideoWidget sfuRemoteVideoWidget =
       const SfuRemoteVideoWidget();

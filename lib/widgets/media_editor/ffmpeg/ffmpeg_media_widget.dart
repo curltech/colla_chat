@@ -26,7 +26,7 @@ import 'package:ffmpeg_kit_flutter_new/session_state.dart';
 import 'package:flutter/material.dart';
 
 /// 选择多个视频文件，使用ffmpeg对video进行处理的界面
-class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
+class FFMpegMediaWidget extends StatelessWidget with DataTileMixin {
   FFMpegMediaWidget({
     super.key,
   }) {
@@ -178,7 +178,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
 
   Future<Widget> _buildTaskStateWidget(BuildContext context) async {
     List<PlatformMediaSource> mediaSources = playlistController.data.toList();
-    List<TileData> tileData = [];
+    List<DataTile> tileData = [];
     for (var mediaSource in mediaSources) {
       String filename = mediaSource.filename;
       File file = File(filename);
@@ -196,7 +196,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
       }
       Widget? stateWidget = await _buildSessionStateWidget(context, filename);
       if (stateWidget != null) {
-        TileData tile = TileData(
+        DataTile tile = DataTile(
           title: FileUtil.filename(filename),
           subtitle: '$length',
           selected: selected,

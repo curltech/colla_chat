@@ -1,6 +1,7 @@
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 
-mixin TileDataMixin on Widget {
+mixin DataTileMixin on Widget {
   //指示图标
   dynamic get iconData;
 
@@ -12,4 +13,8 @@ mixin TileDataMixin on Widget {
 
   //界面上是否有前导回退按钮
   bool get withLeading;
+
+  List<ActionData>? get actions => null;
+
+  List<Widget>? get rightWidgets => null;
 }

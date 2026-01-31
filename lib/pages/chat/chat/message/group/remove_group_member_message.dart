@@ -32,7 +32,7 @@ class RemoveGroupMemberMessage extends StatelessWidget {
           Icons.person_remove,
           color: myself.primary,
         ));
-    var tileData = TileData(
+    var tileData = DataTile(
       prefix: prefix,
       title: 'Remove group member',
       subtitle: members.toString(),

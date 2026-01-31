@@ -9,7 +9,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 /// 画中画功能主页面，带有路由回调函数
-class FlutterPipWindowWidget extends StatelessWidget with TileDataMixin {
+class FlutterPipWindowWidget extends StatelessWidget with DataTileMixin {
   final FlutterPipWindow flutterPipWindow =
       FlutterPipWindow(disabled: Center(child: Text('测试版')));
 

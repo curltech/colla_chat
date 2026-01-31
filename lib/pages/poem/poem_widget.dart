@@ -6,16 +6,14 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/poem/poem_content_widget.dart';
 import 'package:colla_chat/plugin/platform_text_to_speech_widget.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/poem/poem.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/adaptive_container.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/app_bar_adaptive_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -24,9 +22,8 @@ import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart' as p;
-import 'package:provider/provider.dart';
 
-class PoemWidget extends StatelessWidget with TileDataMixin {
+class PoemWidget extends StatelessWidget with DataTileMixin {
   final DataListController<Poem> poemController = DataListController<Poem>();
   late final PoemContentWidget poemContentWidget = PoemContentWidget(
     poemController: poemController,
@@ -153,8 +150,8 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
     poemController.addAll(poems);
   }
 
-  Future<List<TileData>> _buildJsonFiles(String path) async {
-    List<TileData> tiles = [];
+  Future<List<DataTile>> _buildJsonFiles(String path) async {
+    List<DataTile> tiles = [];
     Directory directory = Directory(path);
     if (!directory.existsSync()) {
       return [];
@@ -171,7 +168,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
           if (fileStat.type == FileSystemEntityType.file) {
             String filename = fileEntry.path;
             if (filename.endsWith('json')) {
-              tiles.add(TileData(
+              tiles.add(DataTile(
                   title: FileUtil.filename(filename), subtitle: collection));
             }
           }
@@ -201,12 +198,12 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
       _buildPlatformReactiveForm(context),
       Expanded(child: Obx(
         () {
-          List<TileData> tiles = [];
+          List<DataTile> tiles = [];
           RxList<Poem> poems = poemController.data;
           if (poems.isNotEmpty) {
             int i = 0;
             for (var poem in poems) {
-              tiles.add(TileData(
+              tiles.add(DataTile(
                 title: poem.title,
                 subtitle: poem.rhythmic,
                 selected: poemController.currentIndex.value == i,
@@ -239,37 +236,12 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    var provider = AppBarView(
+    var poemWidget = AppBarAdaptiveView(
         title: title,
         withLeading: true,
-        rightWidgets: [
-          IconButton(
-            onPressed: () {
-              controller?.toggle();
-            },
-            icon: Icon(Icons.vertical_split_outlined),
-            selectedIcon: Icon(Icons.vertical_split),
-          )
-        ],
-        child: Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(builder:
-            (context, appDataProvider, indexWidgetProvider, myself, child) {
-          ContainerType containerType = ContainerType.carousel;
-          if (appDataProvider.landscape) {
-            if (appDataProvider.bodyWidth == 0) {
-              containerType = ContainerType.resizeable;
-            }
-          }
-          controller = AdaptiveContainerController(
-            containerType: containerType,
-            pixels: 380,
-          );
-          var poemWidget = AdaptiveContainer(
-              controller: controller!,
-              main: _buildPoemListWidget(context),
-              body: poemContentWidget);
+        main: _buildPoemListWidget(context),
+        body: poemContentWidget);
 
-          return poemWidget;
-        }));
-    return provider;
+    return poemWidget;
   }
 }

@@ -47,7 +47,7 @@ class EventFilterController extends DataListController<EventFilter> {
 final EventFilterController eventFilterController = EventFilterController();
 
 /// 管理自定义的事件过滤器，事件过滤器的条件为股票的查询条件
-class EventFilterWidget extends StatelessWidget with TileDataMixin {
+class EventFilterWidget extends StatelessWidget with DataTileMixin {
   EventFilterWidget({super.key});
 
   @override
@@ -305,7 +305,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
     return AppBarView(
       title: title,
       helpPath: routeName,
-      withLeading: true,
+      isAppBar: false,
       rightWidgets: [_buildRightWidget(context)],
       child: Obx(() {
         return PlatformCarouselWidget(

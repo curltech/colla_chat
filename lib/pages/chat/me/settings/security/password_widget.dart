@@ -31,7 +31,7 @@ final List<PlatformDataField> passwordInputFieldDef = [
 ];
 
 /// 修改用户密码
-class PasswordWidget extends StatelessWidget with TileDataMixin {
+class PasswordWidget extends StatelessWidget with DataTileMixin {
   PasswordWidget({super.key});
 
   @override

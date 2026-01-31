@@ -16,7 +16,7 @@ import 'package:colla_chat/widgets/webview/html_preview_widget.dart';
 import 'package:flutter/material.dart';
 
 ///自己发布频道消息编辑页面
-class PublishChannelEditWidget extends StatefulWidget with TileDataMixin {
+class PublishChannelEditWidget extends StatefulWidget with DataTileMixin {
   PublishChannelEditWidget({super.key});
 
   @override

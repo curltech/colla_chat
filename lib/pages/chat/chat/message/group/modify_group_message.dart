@@ -24,7 +24,7 @@ class ModifyGroupMessage extends StatelessWidget {
           color: myself.primary,
         ));
     Group group = Group.fromJson(JsonUtil.toJson(content));
-    var tileData = TileData(
+    var tileData = DataTile(
       prefix: prefix,
       title: 'Modify group',
       subtitle: group.name,

@@ -5,7 +5,7 @@ import 'package:colla_chat/widgets/media/platform_video_player.dart';
 import 'package:flutter/material.dart';
 
 ///平台标准的video_player的实现，缺省采用MediaKit
-class PlatformVideoPlayerWidget extends StatelessWidget with TileDataMixin {
+class PlatformVideoPlayerWidget extends StatelessWidget with DataTileMixin {
   final PlatformVideoPlayer platformVideoPlayer = PlatformVideoPlayer();
 
   @override

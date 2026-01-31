@@ -12,7 +12,7 @@ import 'package:get/get.dart';
 final DataListController<Drule> drulesController = DataListController<Drule>();
 
 // drule页面
-class DruleListWidget extends StatelessWidget with TileDataMixin {
+class DruleListWidget extends StatelessWidget with DataTileMixin {
   final DruleEditWidget druleEditWidget = DruleEditWidget();
 
   DruleListWidget({super.key}) {
@@ -31,21 +31,21 @@ class DruleListWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Drules';
 
-  List<TileData> _buildDrulesTileData() {
+  List<DataTile> _buildDrulesTileData() {
     List<Drule> drules = drulesController.data.value;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (drules.isNotEmpty) {
       int i = 0;
       for (var drule in drules) {
         var title = drule.name;
         var subtitle = drule.id;
-        TileData tile = TileData(
+        DataTile tile = DataTile(
             selected: drulesController.currentIndex.value == i,
             title: title ?? '',
             subtitle: subtitle,
             routeName: 'drule_edit');
-        List<TileData> slideActions = [];
-        TileData deleteSlideAction = TileData(
+        List<DataTile> slideActions = [];
+        DataTile deleteSlideAction = DataTile(
             title: 'Delete',
             prefix: Icons.remove,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -53,7 +53,7 @@ class DruleListWidget extends StatelessWidget with TileDataMixin {
               drulesController.delete(index: index);
             });
         slideActions.add(deleteSlideAction);
-        TileData editSlideAction = TileData(
+        DataTile editSlideAction = DataTile(
             title: 'Edit',
             prefix: Icons.edit,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -70,7 +70,7 @@ class DruleListWidget extends StatelessWidget with TileDataMixin {
   }
 
   Future<bool?> _onTap(int index, String title,
-      {String? subtitle, TileData? group}) async {
+      {String? subtitle, DataTile? group}) async {
     drulesController.setCurrentIndex = index;
     return null;
   }

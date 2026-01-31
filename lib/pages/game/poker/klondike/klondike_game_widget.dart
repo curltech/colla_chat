@@ -4,7 +4,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 
-class KlondikeGameWidget extends StatelessWidget with TileDataMixin {
+class KlondikeGameWidget extends StatelessWidget with DataTileMixin {
   const KlondikeGameWidget({super.key});
 
   @override

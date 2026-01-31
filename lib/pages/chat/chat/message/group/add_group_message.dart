@@ -24,7 +24,7 @@ class AddGroupMessage extends StatelessWidget {
           color: myself.primary,
         ));
     Group group = Group.fromJson(JsonUtil.toJson(content));
-    var tileData = TileData(
+    var tileData = DataTile(
       prefix: prefix,
       title: 'Add group',
       subtitle: group.name,

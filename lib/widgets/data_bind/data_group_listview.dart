@@ -6,34 +6,34 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 class GroupDataListController {
-  final Map<TileData, List<TileData>> allData = <TileData, List<TileData>>{};
+  final Map<DataTile, List<DataTile>> allData = <DataTile, List<DataTile>>{};
 
-  GroupDataListController({Map<TileData, List<TileData>> tileData = const {}}) {
+  GroupDataListController({Map<DataTile, List<DataTile>> tileData = const {}}) {
     _addAll(tileData: tileData);
   }
 
-  List<TileData>? get(TileData tile) {
+  List<DataTile>? get(DataTile tile) {
     return allData[tile];
   }
 
-  void _addAll({required Map<TileData, List<TileData>> tileData}) {
+  void _addAll({required Map<DataTile, List<DataTile>> tileData}) {
     allData.addEntries(tileData.entries);
   }
 
-  void addAll({required Map<TileData, List<TileData>> tileData}) {
+  void addAll({required Map<DataTile, List<DataTile>> tileData}) {
     if (tileData.isNotEmpty) {
       _addAll(tileData: tileData);
     }
   }
 
-  void add(TileData tile, List<TileData> tileData) {
-    List<TileData>? data = allData[tile];
+  void add(DataTile tile, List<DataTile> tileData) {
+    List<DataTile>? data = allData[tile];
     data ??= [];
     data.addAll([...tileData]);
     allData[tile] = data;
   }
 
-  void remove(TileData tile) {
+  void remove(DataTile tile) {
     if (allData.containsKey(tile)) {
       allData.remove(tile);
     }
@@ -46,14 +46,14 @@ class GroupDataListView extends StatelessWidget {
   final Color? dividerColor;
   late final GroupDataListController groupDataListController;
   final Future<bool?> Function(int index, String title,
-      {String? subtitle, TileData? group})? onTap;
+      {String? subtitle, DataTile? group})? onTap;
 
   GroupDataListView(
       {super.key,
       this.dividerHeight,
       this.dividerColor,
       GroupDataListController? controller,
-      Map<TileData, List<TileData>> tileData = const {},
+      Map<DataTile, List<DataTile>> tileData = const {},
       this.onTap}) {
     if (controller != null) {
       groupDataListController = controller;
@@ -63,7 +63,7 @@ class GroupDataListView extends StatelessWidget {
   }
 
   Future<bool?> _onTap(int index, String title,
-      {String? subtitle, TileData? group}) async {
+      {String? subtitle, DataTile? group}) async {
     var onTap = this.onTap;
     if (onTap != null) {
       return await onTap(index, title, subtitle: subtitle, group: group);
@@ -71,8 +71,8 @@ class GroupDataListView extends StatelessWidget {
     return null;
   }
 
-  Widget _buildExpansionTile(TileData tileData) {
-    List<TileData>? data = groupDataListController.get(tileData);
+  Widget _buildExpansionTile(DataTile tileData) {
+    List<DataTile>? data = groupDataListController.get(tileData);
     if (data == null) {
       throw 'group tileData error';
     }
@@ -139,11 +139,11 @@ class GroupDataListView extends StatelessWidget {
 
   Widget _buildListView(BuildContext context) {
     List<Widget> groupWidgets = [];
-    Map<TileData, List<TileData>> tileData = groupDataListController.allData;
+    Map<DataTile, List<DataTile>> tileData = groupDataListController.allData;
     if (tileData.isNotEmpty) {
       for (var entry in tileData.entries) {
-        TileData groupTileData = entry.key;
-        List<TileData> tileData = entry.value;
+        DataTile groupTileData = entry.key;
+        List<DataTile> tileData = entry.value;
         Widget groupWidget;
         if (tileData.isEmpty) {
           groupWidget = DataListTile.buildListTile(
@@ -153,7 +153,7 @@ class GroupDataListView extends StatelessWidget {
             int index,
             String title, {
             String? subtitle,
-            TileData? group,
+            DataTile? group,
           }) async {
             return await _onTap(index, title,
                 subtitle: subtitle, group: groupTileData);

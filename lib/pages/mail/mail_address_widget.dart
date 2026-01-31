@@ -23,7 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 ///邮件地址子视图
-class MailAddressWidget extends StatelessWidget with TileDataMixin {
+class MailAddressWidget extends StatelessWidget with DataTileMixin {
   final AutoDiscoverWidget autoDiscoverWidget = AutoDiscoverWidget();
   final ManualAddWidget manualAddWidget = ManualAddWidget();
   final MailContentWidget mailContentWidget = MailContentWidget();
@@ -57,7 +57,7 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
   final PlatformCarouselController controller = PlatformCarouselController();
 
   Future<bool?> _onTap(int index, String title,
-      {String? subtitle, TileData? group}) async {
+      {String? subtitle, DataTile? group}) async {
     int i = 0;
     for (MailAddress emailAddress in mailAddressController.data) {
       if (emailAddress.email == group!.title) {
@@ -73,12 +73,12 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildMailAddressWidget(BuildContext context) {
-    Map<TileData, List<TileData>> mailAddressTileData = {};
+    Map<DataTile, List<DataTile>> mailAddressTileData = {};
     var mailAddresses = mailAddressController.data;
     if (mailAddresses.isNotEmpty) {
       int i = 0;
       for (var mailAddress in mailAddresses) {
-        TileData groupTile = TileData(
+        DataTile groupTile = DataTile(
             title: mailAddress.email,
             subtitle: mailAddress.name,
             prefix: IconButton(
@@ -95,7 +95,7 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
               tooltip: AppLocalizations.t('Delete'),
             ),
             selected: mailAddressController.currentIndex.value == i);
-        List<TileData> tiles = [];
+        List<DataTile> tiles = [];
         List<String>? mailboxNames =
             mailboxController.getMailboxNames(mailAddress.email);
 
@@ -109,7 +109,7 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
             if (mailbox != null) {
               titleTail = '${mailbox.messagesUnseen}/${mailbox.messagesExists}';
             }
-            TileData tile = TileData(
+            DataTile tile = DataTile(
                 title: mailboxName,
                 prefix: icon,
                 titleTail: titleTail,

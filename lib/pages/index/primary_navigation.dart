@@ -21,7 +21,7 @@ class PrimaryNavigation {
   void initController(TickerProvider vsync) {
     int index = 0;
     for (String mainView in indexWidgetProvider.mainViews) {
-      TileDataMixin? view = indexWidgetProvider.allViews[mainView];
+      DataTileMixin? view = indexWidgetProvider.allViews[mainView];
       if (view != null) {
         _slideControllers.add(AnimationController(
           duration: Duration(milliseconds: 100 + index * 20),
@@ -133,7 +133,7 @@ class PrimaryNavigation {
     List<NavigationRailDestination> destinations = [];
     double index = 0;
     for (String mainView in indexWidgetProvider.mainViews) {
-      TileDataMixin? view = indexWidgetProvider.allViews[mainView];
+      DataTileMixin? view = indexWidgetProvider.allViews[mainView];
       if (view != null) {
         AnimationController slideController = _slideControllers[index.toInt()];
         destinations.add(slideInNavigationRailDestination(

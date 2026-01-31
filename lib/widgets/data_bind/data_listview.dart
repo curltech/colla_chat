@@ -14,8 +14,8 @@ class DataListView extends StatelessWidget {
   final double? dividerHeight;
   final Color? dividerColor;
   final ScrollController scrollController = ScrollController();
-  final TileData? Function(BuildContext, int)? itemBuilder;
-  final Future<TileData?> Function(BuildContext, int)? futureItemBuilder;
+  final DataTile? Function(BuildContext, int)? itemBuilder;
+  final Future<DataTile?> Function(BuildContext, int)? futureItemBuilder;
   final Future<void> Function()? onScrollMax;
   final Future<void> Function()? onScrollMin;
   final Future<void> Function()? onRefresh;
@@ -86,7 +86,7 @@ class DataListView extends StatelessWidget {
         controller: scrollController,
         itemBuilder: (BuildContext context, int index) {
           if (itemBuilder != null) {
-            TileData? tileData = itemBuilder!(context, index);
+            DataTile? tileData = itemBuilder!(context, index);
             if (tileData != null) {
               return DataListTile.buildListTile(
                 tileData,
@@ -100,7 +100,7 @@ class DataListView extends StatelessWidget {
           if (futureItemBuilder != null) {
             return PlatformFutureBuilder(
                 future: futureItemBuilder!(context, index),
-                builder: (BuildContext context, TileData? tileData) {
+                builder: (BuildContext context, DataTile? tileData) {
                   return DataListTile.buildListTile(
                     tileData!,
                     index: index,

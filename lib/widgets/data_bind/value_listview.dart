@@ -12,7 +12,7 @@ class ValueListView extends StatelessWidget {
   });
 
   Widget _buildDataListView(BuildContext context) {
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     for (var entry in values.entries) {
       var key = entry.key;
       String value = '';
@@ -21,12 +21,12 @@ class ValueListView extends StatelessWidget {
       }
       var length = value.length;
       if (length < 30) {
-        tiles.add(TileData(
+        tiles.add(DataTile(
           title: key,
           suffix: value,
         ));
       } else {
-        tiles.add(TileData(
+        tiles.add(DataTile(
           title: key,
           subtitle: value,
         ));
@@ -40,12 +40,12 @@ class ValueListView extends StatelessWidget {
         String value = values[key] == null ? '' : values[key].toString();
         var length = value.length;
         if (length < 30) {
-          return TileData(
+          return DataTile(
             title: key,
             suffix: value,
           );
         } else {
-          return TileData(
+          return DataTile(
             title: key,
             subtitle: value,
           );

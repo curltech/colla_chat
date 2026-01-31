@@ -8,7 +8,7 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 /// 游戏功能主页面，带有路由回调函数
-class GameMainWidget extends StatelessWidget with TileDataMixin {
+class GameMainWidget extends StatelessWidget with DataTileMixin {
   final Majiang18mWidget mahjong18mWidget = Majiang18mWidget();
   final MetaModellerWidget metaModellerWidget = MetaModellerWidget();
 
@@ -31,7 +31,7 @@ class GameMainWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    final List<TileData> gameTileData = TileData.from([
+    final List<DataTile> gameTileData = DataTile.from([
       mahjong18mWidget,
       metaModellerWidget,
     ]);

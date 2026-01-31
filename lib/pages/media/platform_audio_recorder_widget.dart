@@ -20,7 +20,7 @@ enum MediaRecorderType {
 }
 
 ///平台标准的record的实现
-class PlatformAudioRecorderWidget extends StatefulWidget with TileDataMixin {
+class PlatformAudioRecorderWidget extends StatefulWidget with DataTileMixin {
   AbstractAudioRecorderController audioRecorderController =
       globalRecordAudioRecorderController;
 

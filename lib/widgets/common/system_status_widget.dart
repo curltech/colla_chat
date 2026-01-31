@@ -11,7 +11,7 @@ import 'package:system_status/system_status.dart';
 
 import 'package:colla_chat/plugin/talker_logger.dart';
 
-class SystemStatusWidget extends StatelessWidget with TileDataMixin {
+class SystemStatusWidget extends StatelessWidget with DataTileMixin {
   final Rx<Battery?> battery = Rx<Battery?>(null);
 
   final Rx<BatteryState?> batteryState = Rx<BatteryState?>(null);
@@ -57,105 +57,105 @@ class SystemStatusWidget extends StatelessWidget with TileDataMixin {
   Widget _buildMacSystemMonitorWidget() {
     return Obx(() {
       SystemStatusModel? systemStatusModel = this.systemStatusModel.value;
-      List<TileData> cpuTiles = [
-        TileData(
+      List<DataTile> cpuTiles = [
+        DataTile(
             title: 'CPU usage userPercentage',
             titleTail:
                 '${systemStatusModel?.cpuUsage?.userPercentage?.toStringAsFixed(2)}%'),
-        TileData(
+        DataTile(
             title: 'CPU usage sysPercentage',
             titleTail:
                 '${systemStatusModel?.cpuUsage?.sysPercentage?.toStringAsFixed(2)}%'),
-        TileData(
+        DataTile(
             title: 'CPU usage idlePercentage',
             titleTail:
                 '${systemStatusModel?.cpuUsage?.idlePercentage?.toStringAsFixed(2)}%'),
       ];
-      List<TileData> batteryTiles = [
-        TileData(
+      List<DataTile> batteryTiles = [
+        DataTile(
             title: 'Battery',
             titleTail: '${systemStatusModel?.batteryStatus?.currentCapacity}%'),
-        TileData(
+        DataTile(
             title: 'Health',
             titleTail: '${systemStatusModel?.batteryStatus?.healthString}'),
-        TileData(
+        DataTile(
             title: 'Charging',
             titleTail: systemStatusModel?.batteryStatus?.isCharging == true
                 ? 'Yes'
                 : 'No'),
-        TileData(
+        DataTile(
             title: 'Charged',
             titleTail: systemStatusModel?.batteryStatus?.isCharged == true
                 ? 'Yes'
                 : 'No'),
-        TileData(
+        DataTile(
             title: 'Cycle Count',
             titleTail: '${systemStatusModel?.batteryStatus?.cycleCount}'),
-        TileData(
+        DataTile(
             title: 'Ac Powered',
             titleTail: systemStatusModel?.batteryStatus?.acPowered == true
                 ? 'Yes'
                 : 'No'),
-        TileData(
+        DataTile(
             title: 'Temperature',
             titleTail:
                 '${systemStatusModel?.batteryStatus?.temperature?.toStringAsFixed(2)} C'),
       ];
-      List<TileData> diskSpaceTiles = [
-        TileData(
+      List<DataTile> diskSpaceTiles = [
+        DataTile(
             title: 'Total',
             titleTail:
                 '${((systemStatusModel?.diskSpace?.totalDiskSpace ?? 0) / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB'),
-        TileData(
+        DataTile(
             title: 'Free',
             titleTail:
                 '${((systemStatusModel?.diskSpace?.freeDiskSpace ?? 0) / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB'),
-        TileData(
+        DataTile(
             title: 'Used',
             titleTail:
                 '${((systemStatusModel?.diskSpace?.usedDiskSpace ?? 0) / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB'),
-        TileData(
+        DataTile(
             title: 'Used Percentage',
             titleTail:
                 '${systemStatusModel?.diskSpace?.usedPercentage?.toStringAsFixed(2)}%'),
       ];
-      List<TileData> memoryTiles = [
-        TileData(
+      List<DataTile> memoryTiles = [
+        DataTile(
             title: 'Memory Statistics',
             titleTail:
                 '%${systemStatusModel?.memoryStatistics?.memoryUsageRatio?.toStringAsFixed(2)}'),
-        TileData(
+        DataTile(
             title: 'Application Memory',
             titleTail:
                 '${systemStatusModel?.memoryStatistics?.applicationMemory} bytes'),
-        TileData(
+        DataTile(
             title: 'Wired Memory',
             titleTail:
                 '${systemStatusModel?.memoryStatistics?.wiredMemory} bytes'),
-        TileData(
+        DataTile(
             title: 'Compressed Memory',
             titleTail:
                 '${systemStatusModel?.memoryStatistics?.compressedMemory} bytes'),
-        TileData(
+        DataTile(
             title: 'Memory Pressure',
             titleTail:
                 ' ${systemStatusModel?.memoryStatistics?.memoryPressure}'),
       ];
 
-      Map<TileData, List<TileData>> tileData = {
-        TileData(
+      Map<DataTile, List<DataTile>> tileData = {
+        DataTile(
           title: 'CPU status',
           selected: true,
         ): cpuTiles,
-        TileData(
+        DataTile(
           title: 'Battery status',
           selected: true,
         ): batteryTiles,
-        TileData(
+        DataTile(
           title: 'DiskSpace status',
           selected: true,
         ): diskSpaceTiles,
-        TileData(
+        DataTile(
           title: 'Memory status',
           selected: true,
         ): memoryTiles,
@@ -169,28 +169,28 @@ class SystemStatusWidget extends StatelessWidget with TileDataMixin {
 
   Widget _buildNonMacSystemMonitorWidget() {
     return Obx(() {
-      List<TileData> batteryTiles = [
-        TileData(
+      List<DataTile> batteryTiles = [
+        DataTile(
             title: 'batteryState', titleTail: '${batteryState.value?.name}'),
-        TileData(
+        DataTile(
             title: 'batteryLevel', titleTail: '${battery.value?.batteryLevel}'),
-        TileData(
+        DataTile(
             title: 'batteryLevel',
             titleTail: '${battery.value?.isInBatterySaveMode}'),
       ];
 
-      List<TileData> systemResourceTiles = [
-        TileData(
+      List<DataTile> systemResourceTiles = [
+        DataTile(
             title: 'cpuLoadAvg', titleTail: '${SystemResources.cpuLoadAvg()}'),
-        TileData(title: 'memUsage', titleTail: '${SystemResources.memUsage()}'),
+        DataTile(title: 'memUsage', titleTail: '${SystemResources.memUsage()}'),
       ];
 
-      Map<TileData, List<TileData>> tileData = {
-        TileData(
+      Map<DataTile, List<DataTile>> tileData = {
+        DataTile(
           title: 'System status',
           selected: true,
         ): systemResourceTiles,
-        TileData(
+        DataTile(
           title: 'Battery status',
           selected: true,
         ): batteryTiles,

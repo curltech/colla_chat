@@ -14,14 +14,14 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 //设置页面，带有回退回调函数
-class SettingWidget extends StatelessWidget with TileDataMixin {
+class SettingWidget extends StatelessWidget with DataTileMixin {
   final GeneralSettingWidget generalSettingWidget =
       const GeneralSettingWidget();
   final AdvancedSettingWidget advancedSettingWidget = AdvancedSettingWidget();
   final PeerProfileEditWidget peerProfileEditWidget = PeerProfileEditWidget();
   final SecuritySettingWidget securitySettingWidget = SecuritySettingWidget();
   final AuthMethod authMethod = AuthMethod.app;
-  List<TileData> settingTileData = [];
+  List<DataTile> settingTileData = [];
 
   SettingWidget({super.key}) {
     indexWidgetProvider.define(generalSettingWidget);
@@ -54,14 +54,14 @@ class SettingWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  List<TileData> _buildSettingTileData(BuildContext context) {
-    List<TileDataMixin> mixins = [
+  List<DataTile> _buildSettingTileData(BuildContext context) {
+    List<DataTileMixin> mixins = [
       generalSettingWidget,
       advancedSettingWidget,
       peerProfileEditWidget,
       securitySettingWidget
     ];
-    settingTileData = TileData.from(mixins);
+    settingTileData = DataTile.from(mixins);
     for (var tile in settingTileData) {
       tile.dense = true;
     }

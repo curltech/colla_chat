@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 ///自选股和分组的查询界面
-class QStatWidget extends StatelessWidget with TileDataMixin {
+class QStatWidget extends StatelessWidget with DataTileMixin {
   QStatWidget({super.key}) {
     _init();
   }
@@ -342,7 +342,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
     List<Widget> rightWidgets = [];
     return AppBarView(
       title: title,
-      withLeading: true,
+      isAppBar: false,
       rightWidgets: rightWidgets,
       child: Column(
         children: [

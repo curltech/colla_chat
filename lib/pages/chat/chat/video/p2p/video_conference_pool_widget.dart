@@ -13,7 +13,7 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 ///会议池的显示界面
-class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
+class VideoConferencePoolWidget extends StatelessWidget with DataTileMixin {
   final VideoConferenceConnectionWidget videoConferenceConnectionWidget =
       VideoConferenceConnectionWidget();
 
@@ -35,10 +35,10 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
 
 
 
-  List<TileData> _buildConferenceTileData(BuildContext context) {
+  List<DataTile> _buildConferenceTileData(BuildContext context) {
     List<P2pConferenceClient> p2pConferenceClients =
         p2pConferenceClientPool.conferenceClients;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (p2pConferenceClients.isNotEmpty) {
       for (P2pConferenceClient p2pConferenceClient in p2pConferenceClients) {
         ConferenceChatMessageController conferenceChatMessageController =
@@ -51,7 +51,7 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
         var conferenceName = conference.name;
         var conferenceOwnerName = conference.conferenceOwnerName;
         var topic = conference.topic;
-        TileData tile = TileData(
+        DataTile tile = DataTile(
           prefix: conference.avatarImage,
           title: conferenceName,
           titleTail: topic,
@@ -64,9 +64,9 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
             return null;
           },
         );
-        List<TileData> slideActions = [];
+        List<DataTile> slideActions = [];
         if (p2pConferenceClientPool.conferenceId != conferenceId) {
-          TileData checkSlideAction = TileData(
+          DataTile checkSlideAction = DataTile(
               title: 'Check',
               prefix: Icons.playlist_add_check_outlined,
               onTap: (int index, String label, {String? subtitle}) async {
@@ -77,7 +77,7 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
               });
           slideActions.add(checkSlideAction);
         }
-        TileData deleteSlideAction = TileData(
+        DataTile deleteSlideAction = DataTile(
             title: 'Delete',
             prefix: Icons.playlist_remove_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -87,7 +87,7 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
                       '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is closed')}');
             });
         slideActions.add(deleteSlideAction);
-        TileData conferenceSlideAction = TileData(
+        DataTile conferenceSlideAction = DataTile(
             title: 'Conference',
             prefix: Icons.meeting_room,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -97,8 +97,8 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
         slideActions.add(conferenceSlideAction);
         tile.slideActions = slideActions;
 
-        List<TileData> endSlideActions = [];
-        TileData renegotiateSlideAction = TileData(
+        List<DataTile> endSlideActions = [];
+        DataTile renegotiateSlideAction = DataTile(
             title: 'Renegotiate',
             prefix: Icons.repeat_one_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -108,7 +108,7 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
                       '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is renegotiate')}');
             });
         endSlideActions.add(renegotiateSlideAction);
-        TileData toggleIceSlideAction = TileData(
+        DataTile toggleIceSlideAction = DataTile(
             title: 'Toggle',
             prefix: Icons.recycling_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -128,7 +128,7 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildVideoConferenceListView(BuildContext context) {
-    List<TileData> tileData = _buildConferenceTileData(context);
+    List<DataTile> tileData = _buildConferenceTileData(context);
     var conferenceView = DataListView(
       itemCount: tileData.length,
       itemBuilder: (BuildContext context, int index) {

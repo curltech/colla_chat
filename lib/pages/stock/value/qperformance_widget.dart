@@ -20,7 +20,7 @@ import 'package:get/get.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 ///自选股和分组的查询界面
-class QPerformanceWidget extends StatelessWidget with TileDataMixin {
+class QPerformanceWidget extends StatelessWidget with DataTileMixin {
   QPerformanceWidget({super.key}) {
     _init();
   }
@@ -411,7 +411,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
     List<Widget> rightWidgets = [];
     return AppBarView(
       title: title,
-      withLeading: true,
+      isAppBar: false,
       helpPath: routeName,
       rightWidgets: rightWidgets,
       child: Column(

@@ -789,7 +789,7 @@ class MessageWidget {
           Icons.extension,
           color: myself.primary,
         ));
-    var tileData = TileData(
+    var tileData = DataTile(
       prefix: prefix,
       title: title ?? '',
       subtitle: 'Not exist',
@@ -816,7 +816,7 @@ class MessageWidget {
           Icons.local_post_office_outlined,
           color: myself.primary,
         ));
-    var tileData = TileData(
+    var tileData = DataTile(
       prefix: prefix,
       title: title ?? '',
       dense: true,

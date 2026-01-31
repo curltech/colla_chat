@@ -33,7 +33,7 @@ class AddGroupMemberMessage extends StatelessWidget {
           Icons.person_add,
           color: myself.primary,
         ));
-    var tileData = TileData(
+    var tileData = DataTile(
       prefix: prefix,
       title: 'Add group member',
       subtitle: members.toString(),

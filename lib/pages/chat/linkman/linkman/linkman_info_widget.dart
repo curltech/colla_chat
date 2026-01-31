@@ -7,7 +7,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-class LinkmanInfoWidget extends StatefulWidget with TileDataMixin {
+class LinkmanInfoWidget extends StatefulWidget with DataTileMixin {
   const LinkmanInfoWidget({super.key});
 
   @override
@@ -44,24 +44,24 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget>
     if (linkman != null) {
       String name = linkman.name;
       var peerId = linkman.peerId;
-      final List<TileData> linkmanInfoTileData = [
-        TileData(
+      final List<DataTile> linkmanInfoTileData = [
+        DataTile(
           title: 'Avatar',
           suffix: linkman.avatarImage,
         ),
-        TileData(
+        DataTile(
           title: 'PeerId',
           subtitle: peerId,
         ),
-        TileData(
+        DataTile(
           title: 'Name',
           suffix: name,
         ),
-        TileData(
+        DataTile(
           title: 'Email',
           suffix: linkman.email,
         ),
-        TileData(
+        DataTile(
           title: 'Mobile',
           suffix: linkman.mobile,
         ),

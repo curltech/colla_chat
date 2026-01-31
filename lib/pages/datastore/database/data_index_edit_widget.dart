@@ -13,7 +13,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
+class DataIndexEditWidget extends StatelessWidget with DataTileMixin {
   @override
   bool get withLeading => true;
 

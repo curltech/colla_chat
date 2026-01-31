@@ -5,7 +5,7 @@ import 'package:colla_chat/widgets/media/platform_audio_player.dart';
 import 'package:flutter/material.dart';
 
 ///平台标准的AudioPlayer的实现，支持标准的audioplayers，just_audio和webview
-class PlatformAudioPlayerWidget extends StatelessWidget with TileDataMixin {
+class PlatformAudioPlayerWidget extends StatelessWidget with DataTileMixin {
   final PlatformAudioPlayer platformAudioPlayer = PlatformAudioPlayer();
 
   PlatformAudioPlayerWidget({super.key});

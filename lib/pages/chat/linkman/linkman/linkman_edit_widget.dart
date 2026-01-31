@@ -23,7 +23,7 @@ import 'package:flutter/material.dart';
 final ValueNotifier<Linkman?> linkmanNotifier = ValueNotifier<Linkman?>(null);
 
 //联系人信息页面
-class LinkmanEditWidget extends StatefulWidget with TileDataMixin {
+class LinkmanEditWidget extends StatefulWidget with DataTileMixin {
   LinkmanEditWidget({super.key});
 
   @override

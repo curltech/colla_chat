@@ -7,8 +7,8 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
-class ContactWidget extends StatelessWidget with TileDataMixin {
-  List<TileData> _tileData = [];
+class ContactWidget extends StatelessWidget with DataTileMixin {
+  List<DataTile> _tileData = [];
 
   ContactWidget({super.key});
 
@@ -48,7 +48,7 @@ class ContactWidget extends StatelessWidget with TileDataMixin {
         final phones = contact.phones.map((e) => e.number).join(', ');
         final emails = contact.emails.map((e) => e.address).join(', ');
         final name = contact.name.first + contact.name.last;
-        TileData tile = TileData(title: name, subtitle: phones);
+        DataTile tile = DataTile(title: name, subtitle: phones);
         _tileData.add(tile);
       }
     }

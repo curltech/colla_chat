@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 
-class NfcLinkmanAddWidget extends StatefulWidget with TileDataMixin {
+class NfcLinkmanAddWidget extends StatefulWidget with DataTileMixin {
   const NfcLinkmanAddWidget({super.key});
 
   @override

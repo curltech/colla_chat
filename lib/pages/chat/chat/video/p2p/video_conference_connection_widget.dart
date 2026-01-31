@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 
 ///会议池的会议的连接列表显示界面
 class VideoConferenceConnectionWidget extends StatelessWidget
-    with TileDataMixin {
+    with DataTileMixin {
   final VideoConferenceTrackWidget videoConferenceTrackWidget =
       const VideoConferenceTrackWidget();
 
@@ -33,10 +33,10 @@ class VideoConferenceConnectionWidget extends StatelessWidget
 
   
 
-  Future<List<TileData>> _buildConnectionTileData(BuildContext context) async {
+  Future<List<DataTile>> _buildConnectionTileData(BuildContext context) async {
     P2pConferenceClient? p2pConferenceClient =
         p2pConferenceClientPool.conferenceClient;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (p2pConferenceClient != null) {
       List<AdvancedPeerConnection> peerConnections =
           await p2pConferenceClient.peerConnections;
@@ -47,7 +47,7 @@ class VideoConferenceConnectionWidget extends StatelessWidget
         var initiator = peerConnection.basePeerConnection.initiator;
         var signalingState =
             peerConnection.basePeerConnection.signalingState?.name ?? '';
-        TileData tile = TileData(
+        DataTile tile = DataTile(
           prefix: initiator == true
               ? const Icon(
                   Icons.light_mode,
@@ -78,7 +78,7 @@ class VideoConferenceConnectionWidget extends StatelessWidget
   Widget _buildConnectionListView(BuildContext context) {
     var connectionView = PlatformFutureBuilder(
         future: _buildConnectionTileData(context),
-        builder: (BuildContext context, List<TileData> tileData) {
+        builder: (BuildContext context, List<DataTile> tileData) {
           return DataListView(
             itemCount: tileData.length,
             itemBuilder: (BuildContext context, int index) {

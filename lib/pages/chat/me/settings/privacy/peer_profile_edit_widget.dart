@@ -135,7 +135,7 @@ final List<PlatformDataField> peerProfileDataFields = [
 ];
 
 ///客户端
-class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
+class PeerProfileEditWidget extends StatelessWidget with DataTileMixin {
   PeerProfileEditWidget({super.key});
 
   @override

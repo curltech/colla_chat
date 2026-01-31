@@ -25,9 +25,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 ///Contact增加联系人
-class ContactLinkmanAddWidget extends StatelessWidget with TileDataMixin {
-  final DataListController<TileData> controller =
-      DataListController<TileData>();
+class ContactLinkmanAddWidget extends StatelessWidget with DataTileMixin {
+  final DataListController<DataTile> controller =
+      DataListController<DataTile>();
   late final Widget dataListView;
 
   ContactLinkmanAddWidget({super.key}) {
@@ -86,7 +86,7 @@ class ContactLinkmanAddWidget extends StatelessWidget with TileDataMixin {
   }
 
   Future<void> _transfer(List<Contact> contacts) async {
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     contactMap = {};
     if (contacts.isNotEmpty) {
       for (var contact in contacts) {
@@ -117,8 +117,8 @@ class ContactLinkmanAddWidget extends StatelessWidget with TileDataMixin {
             },
           );
         }
-        TileData tile =
-            TileData(title: title, subtitle: subtitle, suffix: suffix);
+        DataTile tile =
+            DataTile(title: title, subtitle: subtitle, suffix: suffix);
         tiles.add(tile);
       }
     }

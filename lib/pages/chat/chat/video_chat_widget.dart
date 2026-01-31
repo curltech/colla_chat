@@ -93,7 +93,7 @@ class VideoChatDragOverlay {
 final VideoChatDragOverlay videoChatDragOverlay = VideoChatDragOverlay();
 
 ///视频聊天窗口，分页显示本地视频和远程视频
-class VideoChatWidget extends StatefulWidget with TileDataMixin {
+class VideoChatWidget extends StatefulWidget with DataTileMixin {
   final LocalVideoWidget localVideoWidget = const LocalVideoWidget();
   final RemoteVideoWidget remoteVideoWidget = const RemoteVideoWidget();
   final VideoConferencePoolWidget videoConferencePoolWidget =

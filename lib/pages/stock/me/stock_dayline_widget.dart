@@ -20,7 +20,7 @@ import 'package:get/get.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 /// 查询满足条件的日线数据
-class DayLineWidget extends StatelessWidget with TileDataMixin {
+class DayLineWidget extends StatelessWidget with DataTileMixin {
   DayLineWidget({super.key}) {
     _init();
   }
@@ -399,7 +399,7 @@ class DayLineWidget extends StatelessWidget with TileDataMixin {
     return AppBarView(
         title: title,
         helpPath: routeName,
-        withLeading: true,
+        isAppBar: false,
         rightWidgets: rightWidgets,
         child: Column(children: [
           _buildSearchView(context),

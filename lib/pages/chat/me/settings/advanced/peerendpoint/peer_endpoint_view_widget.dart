@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 final List<String> peerEndpointFields = ['id', 'name', 'peerId'];
 
 //邮件内容组件
-class PeerEndpointViewWidget extends StatelessWidget with TileDataMixin {
+class PeerEndpointViewWidget extends StatelessWidget with DataTileMixin {
   final PeerEndpointController peerEndpointController;
 
   const PeerEndpointViewWidget(

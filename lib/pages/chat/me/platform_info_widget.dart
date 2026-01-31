@@ -7,7 +7,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-class PlatformInfoWidget extends StatelessWidget with TileDataMixin {
+class PlatformInfoWidget extends StatelessWidget with DataTileMixin {
   const PlatformInfoWidget({super.key});
 
   @override
@@ -26,48 +26,48 @@ class PlatformInfoWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    final List<TileData> platformInfoTileData = [
-      TileData(
+    final List<DataTile> platformInfoTileData = [
+      DataTile(
         title: 'AppName',
         suffix: appName,
       ),
-      TileData(
+      DataTile(
         title: 'AppVersion',
         suffix: appVersion,
       ),
-      TileData(
+      DataTile(
         title: 'AppVendor',
         suffix: appVendor,
       ),
-      TileData(
+      DataTile(
         title: 'VendorUrl',
         suffix: vendorUrl,
       ),
-      TileData(
+      DataTile(
         title: 'LocalHostname',
         suffix: platformParams.localHostname,
       ),
-      TileData(
+      DataTile(
         title: 'OperatingSystem',
         suffix: platformParams.operatingSystem,
       ),
-      TileData(
+      DataTile(
         title: 'OperatingSystemVersion',
         subtitle: platformParams.operatingSystemVersion,
       ),
-      TileData(
+      DataTile(
         title: 'Environment Version',
         subtitle: platformParams.version,
       ),
-      TileData(
+      DataTile(
         title: 'DeviceData',
         subtitle: platformParams.deviceData.toString(),
       ),
-      TileData(
+      DataTile(
         title: 'Sqlite3Path',
         subtitle: appDataProvider.sqlite3Path,
       ),
-      TileData(
+      DataTile(
         title: 'DataLength',
         subtitle: appDataProvider.dataLength.toString(),
       ),

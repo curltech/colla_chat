@@ -20,9 +20,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 ///面对面建群
-class FaceGroupAddWidget extends StatelessWidget with TileDataMixin {
-  final DataListController<TileData> controller =
-      DataListController<TileData>();
+class FaceGroupAddWidget extends StatelessWidget with DataTileMixin {
+  final DataListController<DataTile> controller =
+      DataListController<DataTile>();
   late final Widget dataListView;
 
   FaceGroupAddWidget({super.key}) {
@@ -81,12 +81,12 @@ class FaceGroupAddWidget extends StatelessWidget with TileDataMixin {
         }
       }
 
-      List<TileData> tiles = [];
+      List<DataTile> tiles = [];
       if (peerClients.isNotEmpty) {
         for (var peerClient in peerClients) {
           var title = peerClient.name ?? '';
           var subtitle = peerClient.peerId ?? '';
-          TileData tile = TileData(
+          DataTile tile = DataTile(
               title: title,
               subtitle: subtitle,
               suffix: IconButton(

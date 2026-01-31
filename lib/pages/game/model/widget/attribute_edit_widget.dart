@@ -20,7 +20,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class AttributeEditWidget extends StatelessWidget with TileDataMixin {
+class AttributeEditWidget extends StatelessWidget with DataTileMixin {
   @override
   bool get withLeading => true;
 
@@ -59,9 +59,9 @@ class AttributeEditWidget extends StatelessWidget with TileDataMixin {
   Widget _buildAttributesWidget(BuildContext context) {
     return Obx(() {
       if (attributes.value != null && attributes.value!.isNotEmpty) {
-        List<TileData> tiles = [];
+        List<DataTile> tiles = [];
         for (var attribute in attributes.value!) {
-          TileData tile = TileData(
+          DataTile tile = DataTile(
               title: attribute.name,
               titleTail: attribute.dataType,
               selected: this.attribute.value == attribute);
@@ -74,7 +74,7 @@ class AttributeEditWidget extends StatelessWidget with TileDataMixin {
             return tiles[index];
           },
           onTap: (int index, String title,
-              {TileData? group, String? subtitle}) async {
+              {DataTile? group, String? subtitle}) async {
             attribute.value = attributes.value![index];
             return null;
           },

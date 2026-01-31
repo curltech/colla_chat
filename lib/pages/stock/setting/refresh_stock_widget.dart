@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 /// 运行后台批处理，刷新数据，针对所有的股票
-class RefreshStockWidget extends StatelessWidget with TileDataMixin {
+class RefreshStockWidget extends StatelessWidget with DataTileMixin {
   RefreshStockWidget({super.key});
 
   @override
@@ -28,12 +28,12 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
 
   final TextEditingController _startDateTextController =
       TextEditingController();
-  final RxList<TileData> tileData = <TileData>[].obs;
+  final RxList<DataTile> tileData = <DataTile>[].obs;
 
   void _initTileData(BuildContext context) {
     tileData.clear();
     tileData.addAll([
-      TileData(
+      DataTile(
           title: '调度',
           subtitle: '获取数据，汇总，计算评分',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -44,7 +44,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
             }
             stockLineService.schedule();
           }),
-      TileData(
+      DataTile(
           title: '所有股票今天日线',
           subtitle: '刷新所有股票今天的日线数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -61,7 +61,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
               stockLineService.refreshTodayLine();
             }
           }),
-      TileData(
+      DataTile(
           title: '分钟线',
           subtitle: '刷新所有股票的分钟线数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -72,7 +72,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
             }
             stockLineService.refreshMinLine();
           }),
-      TileData(
+      DataTile(
           title: '所有股票今天分钟线',
           subtitle: '刷新所有股票今天的分钟线数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -83,7 +83,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
             }
             stockLineService.refreshTodayMinLine();
           }),
-      TileData(
+      DataTile(
           title: '季度业绩汇总',
           subtitle: '汇总所有股票的季度业绩数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -94,7 +94,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
             }
             stockLineService.refreshQPerformance();
           }),
-      TileData(
+      DataTile(
           title: '季度业绩统计汇总',
           subtitle: '汇总所有股票的季度业绩统计数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -105,7 +105,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
             }
             stockLineService.refreshQStat();
           }),
-      TileData(
+      DataTile(
           title: '季度业绩评分汇总',
           subtitle: '汇总所有股票的季度业绩评分数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -116,7 +116,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
             }
             stockLineService.refreshStatScore();
           }),
-      TileData(
+      DataTile(
           title: '季度业绩分位评分汇总',
           subtitle: '汇总所有股票的季度业绩分位评分数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -127,7 +127,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
             }
             stockLineService.createScorePercentile();
           }),
-      TileData(
+      DataTile(
           title: '日线统计',
           subtitle: '计算所有股票的日线统计数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -141,7 +141,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
               stockLineService.refreshStat(startDate: startDate);
             }
           }),
-      TileData(
+      DataTile(
           title: '过去1,3,5日线均线',
           subtitle: '计算所有股票的过去1,3,5日线均线统计数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -155,7 +155,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
               stockLineService.refreshBeforeMa(startDate: startDate);
             }
           }),
-      TileData(
+      DataTile(
           title: '计算所有股票的买卖点事件',
           subtitle: '计算所有股票的买卖点事件',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -166,7 +166,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
             }
             stockLineService.refreshEventCond();
           }),
-      TileData(
+      DataTile(
           title: '更新股票信息',
           subtitle: '更新股票信息',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -177,7 +177,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
             }
             stockLineService.updateShares();
           }),
-      TileData(
+      DataTile(
           title: '创建模型数据文件',
           subtitle: '创建模型数据文件',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -222,7 +222,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
     _initTileData(context);
     return AppBarView(
         title: title,
-        withLeading: true,
+        isAppBar: false,
         child: _buildRefreshStockView(context));
   }
 }

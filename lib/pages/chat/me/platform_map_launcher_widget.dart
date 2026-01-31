@@ -12,7 +12,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:map_launcher/map_launcher.dart';
 
-class PlatformMapLauncherWidget extends StatelessWidget with TileDataMixin {
+class PlatformMapLauncherWidget extends StatelessWidget with DataTileMixin {
   ValueNotifier<List<AvailableMap>> maps =
       ValueNotifier<List<AvailableMap>>([]);
 
@@ -42,9 +42,9 @@ class PlatformMapLauncherWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  TileData? buildMapTileData(BuildContext context, int index) {
+  DataTile? buildMapTileData(BuildContext context, int index) {
     AvailableMap map = maps.value[index];
-    TileData tile = TileData(
+    DataTile tile = DataTile(
         title: map.mapName,
         prefix: SvgPicture.asset(
           map.icon,

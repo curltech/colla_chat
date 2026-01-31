@@ -11,7 +11,7 @@ import 'package:colla_chat/widgets/webview/platform_webview.dart';
 import 'package:flutter/material.dart';
 
 /// 发布频道消息的展示页面
-class PublishedChannelMessagePreview extends StatefulWidget with TileDataMixin {
+class PublishedChannelMessagePreview extends StatefulWidget with DataTileMixin {
   PublishedChannelMessagePreview({super.key});
 
   @override

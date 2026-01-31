@@ -17,7 +17,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 
 ///根据token创建匿名的SFU会议
-class AnonymousConferenceEditWidget extends StatelessWidget with TileDataMixin {
+class AnonymousConferenceEditWidget extends StatelessWidget with DataTileMixin {
   AnonymousConferenceEditWidget({super.key});
 
   @override

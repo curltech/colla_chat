@@ -31,7 +31,7 @@ import 'package:get/get.dart';
 import 'package:colla_chat/constant/base.dart';
 
 /// 元模型建模器
-class MetaModellerWidget extends StatelessWidget with TileDataMixin {
+class MetaModellerWidget extends StatelessWidget with DataTileMixin {
   final JsonViewerWidget jsonViewerWidget = JsonViewerWidget();
   final ModelNodeEditWidget modelNodeEditWidget = ModelNodeEditWidget();
 

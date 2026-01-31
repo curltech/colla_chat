@@ -11,7 +11,7 @@ import 'package:re_highlight/styles/atom-one-light.dart';
 final RxString codeContent = ''.obs;
 
 /// 代码编辑器，可用于json
-class CodeEditorWidget extends StatelessWidget with TileDataMixin {
+class CodeEditorWidget extends StatelessWidget with DataTileMixin {
   CodeEditorWidget({super.key});
 
   @override

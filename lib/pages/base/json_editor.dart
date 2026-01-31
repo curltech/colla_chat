@@ -6,7 +6,7 @@ import 'package:json_editor_flutter/json_editor_flutter.dart';
 
 final RxString jsonContent = ''.obs;
 
-class JsonEditorWidget extends StatelessWidget with TileDataMixin {
+class JsonEditorWidget extends StatelessWidget with DataTileMixin {
   JsonEditorWidget({super.key});
 
   @override

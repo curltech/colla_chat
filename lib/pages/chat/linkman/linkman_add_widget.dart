@@ -15,7 +15,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
 /// 增加联系人页面，列出了所有的增加联系人的路由
-class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
+class LinkmanAddWidget extends StatelessWidget with DataTileMixin {
   final P2pLinkmanAddWidget p2pLinkmanAddWidget = P2pLinkmanAddWidget();
   final ContactLinkmanAddWidget contactLinkmanAddWidget =
       ContactLinkmanAddWidget();
@@ -33,7 +33,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
 
   //final NfcLinkmanAddWidget nfcLinkmanAddWidget = NfcLinkmanAddWidget();
 
-  final Map<TileData, List<TileData>> tileData = {};
+  final Map<DataTile, List<DataTile>> tileData = {};
 
   LinkmanAddWidget({super.key}) {
     indexWidgetProvider.define(p2pLinkmanAddWidget);
@@ -52,7 +52,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   }
 
   void _init() {
-    final List<TileData> linkmanTileData = TileData.from([
+    final List<DataTile> linkmanTileData = DataTile.from([
       p2pLinkmanAddWidget,
       contactLinkmanAddWidget,
       jsonLinkmanAddWidget,
@@ -64,7 +64,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
       tile.dense = false;
       tile.selected = false;
     }
-    final List<TileData> groupTileData = TileData.from([
+    final List<DataTile> groupTileData = DataTile.from([
       groupEditWidget,
       nearbyGroupAddWidget,
       faceGroupAddWidget,
@@ -76,7 +76,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
       tile.dense = false;
       tile.selected = false;
     }
-    final List<TileData> conferenceTileData = TileData.from([
+    final List<DataTile> conferenceTileData = DataTile.from([
       conferenceEditWidget,
       anonymousConferenceEditWidget,
     ]);
@@ -85,9 +85,9 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
       tile.dense = false;
       tile.selected = false;
     }
-    tileData[TileData(title: 'Linkman', selected: true)] = linkmanTileData;
-    tileData[TileData(title: 'Group', selected: true)] = groupTileData;
-    tileData[TileData(title: 'Conference', selected: true)] =
+    tileData[DataTile(title: 'Linkman', selected: true)] = linkmanTileData;
+    tileData[DataTile(title: 'Group', selected: true)] = groupTileData;
+    tileData[DataTile(title: 'Conference', selected: true)] =
         conferenceTileData;
   }
 

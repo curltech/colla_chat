@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 ///消息体：命令消息，由固定文本和icon组成
 class CommonMessage extends StatelessWidget {
-  final TileData? tileData;
+  final DataTile? tileData;
   final Widget? child;
 
   const CommonMessage({
@@ -19,7 +19,7 @@ class CommonMessage extends StatelessWidget {
       actionWidget = child!;
     } else {
       actionWidget = DataListTile(
-        tileData: tileData!,
+        dataTile: tileData!,
         contentPadding: EdgeInsets.zero,
         horizontalTitleGap: 0.0,
         minVerticalPadding: 0.0,

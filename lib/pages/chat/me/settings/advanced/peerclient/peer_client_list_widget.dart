@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 //设置页面，带有回退回调函数
-class PeerClientListWidget extends StatelessWidget with TileDataMixin {
+class PeerClientListWidget extends StatelessWidget with DataTileMixin {
   final PeerClientViewWidget peerClientViewWidget = PeerClientViewWidget();
   final PeerClientEditWidget peerClientEditWidget = PeerClientEditWidget();
 
@@ -37,22 +37,22 @@ class PeerClientListWidget extends StatelessWidget with TileDataMixin {
 
   
 
-  List<TileData> _buildPeerClientTileData() {
+  List<DataTile> _buildPeerClientTileData() {
     List<PeerClient> peerClients = peerClientController.data.value;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (peerClients.isNotEmpty) {
       int i = 0;
       for (var peerClient in peerClients) {
         var title = peerClient.name;
         var subtitle = peerClient.peerId;
-        TileData tile = TileData(
+        DataTile tile = DataTile(
             selected: peerClientController.currentIndex.value == i,
             prefix: peerClient.avatarImage,
             title: title,
             subtitle: subtitle,
             routeName: 'peer_client_edit');
-        List<TileData> slideActions = [];
-        TileData deleteSlideAction = TileData(
+        List<DataTile> slideActions = [];
+        DataTile deleteSlideAction = DataTile(
             title: 'Delete',
             prefix: Icons.remove,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -61,7 +61,7 @@ class PeerClientListWidget extends StatelessWidget with TileDataMixin {
               peerClientController.delete();
             });
         slideActions.add(deleteSlideAction);
-        TileData editSlideAction = TileData(
+        DataTile editSlideAction = DataTile(
             title: 'Edit',
             prefix: Icons.edit,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -81,7 +81,7 @@ class PeerClientListWidget extends StatelessWidget with TileDataMixin {
     await peerClientController.more();
   }
 
-  Future<bool?> _onTap(int index, String title, {String? subtitle, TileData? group}) async {
+  Future<bool?> _onTap(int index, String title, {String? subtitle, DataTile? group}) async {
     peerClientController.setCurrentIndex = index;
     return null;
   }

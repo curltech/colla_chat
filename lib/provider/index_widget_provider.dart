@@ -9,15 +9,15 @@ const animateDuration = Duration(milliseconds: 1000);
 /// 主工作区的视图状态管理器，维护了主工作区的控制器，视图列表，当前视图
 class IndexWidgetProvider with ChangeNotifier {
   //所以可以出现在工作区的视图，开始序号是是主视图，其余是副视图，
-  Map<String, TileDataMixin> allViews = {};
+  Map<String, DataTileMixin> allViews = {};
 
   ///主菜单和对应的主视图
   final List<String> mainViews = [];
 
   ///当前出现在工作区的视图，mainViews是主视图，始终都在，然后每进入一个新视图，则添加
   ///每退出一个则删除，
-  List<TileDataMixin> views = [];
-  List<TileDataMixin> recentViews = [];
+  List<DataTileMixin> views = [];
+  List<DataTileMixin> recentViews = [];
 
   //当前的主视图，左边栏和底部栏的指示，范围0-mainViews.length-1
   int _currentMainIndex = 0;
@@ -27,8 +27,8 @@ class IndexWidgetProvider with ChangeNotifier {
   IndexWidgetProvider();
 
   ///初始化主菜单视图
-  void initMainView(List<TileDataMixin> views) {
-    for (TileDataMixin view in views) {
+  void initMainView(List<DataTileMixin> views) {
+    for (DataTileMixin view in views) {
       define(view);
       mainViews.add(view.routeName);
       this.views.add(view);
@@ -51,7 +51,7 @@ class IndexWidgetProvider with ChangeNotifier {
 
   ///增加新的视图，不能在initState和build构建方法中调用listen=true，
   ///因为本方法会引起整个pageview视图的重新构建
-  void define(TileDataMixin view, {bool listen = false}) {
+  void define(DataTileMixin view, {bool listen = false}) {
     allViews[view.routeName] = view;
     if (listen) {
       notifyListeners();
@@ -70,14 +70,14 @@ class IndexWidgetProvider with ChangeNotifier {
   }
 
   ///当前视图的序号
-  TileDataMixin get currentMainView {
+  DataTileMixin get currentMainView {
     return views[_currentMainIndex];
   }
 
   ///当前视图的序号
-  TileDataMixin? get currentView {
+  DataTileMixin? get currentView {
     if (views.length > mainViews.length) {
-      TileDataMixin view = views.last;
+      DataTileMixin view = views.last;
 
       return view;
     }
@@ -114,7 +114,7 @@ class IndexWidgetProvider with ChangeNotifier {
   ///把名字压入堆栈，然后跳转
   void push(String name, {bool push = true, BuildContext? context}) {
     //判断要进入的页面是否存在
-    TileDataMixin? view = allViews[name];
+    DataTileMixin? view = allViews[name];
     if (view == null) {
       logger.e('view: $name is not exist');
       return;
@@ -163,7 +163,7 @@ class IndexWidgetProvider with ChangeNotifier {
 
   String getLabel(int index) {
     String name = mainViews[index];
-    TileDataMixin? widget = allViews[name];
+    DataTileMixin? widget = allViews[name];
     if (widget != null) {
       return AppLocalizations.t(widget.title);
     }

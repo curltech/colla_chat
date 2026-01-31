@@ -28,7 +28,7 @@ import 'package:colla_chat/widgets/media_editor/video_renderer_widget.dart';
 import 'package:flutter/material.dart';
 
 //其他的应用的页面，带有路由回调函数
-class OtherAppWidget extends StatelessWidget with TileDataMixin {
+class OtherAppWidget extends StatelessWidget with DataTileMixin {
   final PlatformWebViewWidget webViewWidget = PlatformWebViewWidget();
   final OpenVpnWidget openVpnWidget = const OpenVpnWidget();
   final FlutterOverlayWindowWidget flutterOverlayWindowWidget =
@@ -55,7 +55,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   final VideoEditorWidget videoEditorWidget = VideoEditorWidget();
   final VideoRendererWidget videoRendererWidget = VideoRendererWidget();
 
-  late final List<TileDataMixin> mediaTileDataMixins = [
+  late final List<DataTileMixin> mediaTileDataMixins = [
     videoPlayerWidget,
     audioPlayerWidget,
     audioRecorderWidget,
@@ -67,7 +67,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   final Majiang18mWidget mahjong18mWidget = Majiang18mWidget();
   final MetaModellerWidget metaModellerWidget = MetaModellerWidget();
 
-  final Map<TileData, List<TileData>> otherAppTileData = {};
+  final Map<DataTile, List<DataTile>> otherAppTileData = {};
 
   OtherAppWidget({super.key}) {
     indexWidgetProvider.define(videoPlayerWidget);
@@ -77,53 +77,53 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(ffmpegMediaWidget);
     indexWidgetProvider.define(videoEditorWidget);
     indexWidgetProvider.define(videoRendererWidget);
-    List<TileData> mediaTileData = TileData.from(mediaTileDataMixins);
-    otherAppTileData[TileData(title: 'Media', prefix: Icons.perm_media)] =
+    List<DataTile> mediaTileData = DataTile.from(mediaTileDataMixins);
+    otherAppTileData[DataTile(title: 'Media', prefix: Icons.perm_media)] =
         mediaTileData;
 
     indexWidgetProvider.define(webViewWidget);
-    otherAppTileData[TileData.of(webViewWidget)] = [];
+    otherAppTileData[DataTile.of(webViewWidget)] = [];
 
     indexWidgetProvider.define(mailAddressWidget);
     final bool emailSwitch = myself.peerProfile.emailSwitch;
     if (emailSwitch) {
-      otherAppTileData[TileData.of(mailAddressWidget)] = [];
+      otherAppTileData[DataTile.of(mailAddressWidget)] = [];
     }
     indexWidgetProvider.define(stockMainWidget);
     final bool stockSwitch = myself.peerProfile.stockSwitch;
     if (stockSwitch) {
-      otherAppTileData[TileData.of(stockMainWidget)] = [];
+      otherAppTileData[DataTile.of(stockMainWidget)] = [];
     }
     indexWidgetProvider.define(mahjong18mWidget);
     indexWidgetProvider.define(metaModellerWidget);
     final bool gameSwitch = myself.peerProfile.gameSwitch;
     if (gameSwitch) {
-      List<TileData> gameTileData =
-          TileData.from([mahjong18mWidget, metaModellerWidget]);
-      otherAppTileData[TileData(title: 'Game', prefix: Icons.games_outlined)] =
+      List<DataTile> gameTileData =
+          DataTile.from([mahjong18mWidget, metaModellerWidget]);
+      otherAppTileData[DataTile(title: 'Game', prefix: Icons.games_outlined)] =
           gameTileData;
     }
 
     indexWidgetProvider.define(poemWidget);
-    otherAppTileData[TileData.of(poemWidget)] = [];
+    otherAppTileData[DataTile.of(poemWidget)] = [];
     indexWidgetProvider.define(openVpnWidget);
     if (platformParams.mobile) {
       if (myself.peerProfile.vpnSwitch) {
-        otherAppTileData[TileData.of(openVpnWidget)] = [];
+        otherAppTileData[DataTile.of(openVpnWidget)] = [];
       }
     }
     indexWidgetProvider.define(flutterOverlayWindowWidget);
     if (myself.peerProfile.developerSwitch) {
-      otherAppTileData[TileData.of(flutterOverlayWindowWidget)] = [];
+      otherAppTileData[DataTile.of(flutterOverlayWindowWidget)] = [];
     }
     indexWidgetProvider.define(flutterPipWindowWidget);
-    otherAppTileData[TileData.of(flutterPipWindowWidget)] = [];
+    otherAppTileData[DataTile.of(flutterPipWindowWidget)] = [];
     indexWidgetProvider.define(platformMapLauncherWidget);
-    otherAppTileData[TileData.of(platformMapLauncherWidget)] = [];
+    otherAppTileData[DataTile.of(platformMapLauncherWidget)] = [];
     indexWidgetProvider.define(dataSourceWidget);
-    otherAppTileData[TileData.of(dataSourceWidget)] = [];
+    otherAppTileData[DataTile.of(dataSourceWidget)] = [];
     indexWidgetProvider.define(fileSystemWidget);
-    otherAppTileData[TileData.of(fileSystemWidget)] = [];
+    otherAppTileData[DataTile.of(fileSystemWidget)] = [];
   }
 
   @override
@@ -138,7 +138,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Apps';
 
-  Map<TileData, List<TileData>> _buildOtherAppTileData(BuildContext context) {
+  Map<DataTile, List<DataTile>> _buildOtherAppTileData(BuildContext context) {
     return {};
   }
 

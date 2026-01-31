@@ -16,9 +16,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
-  final ValueNotifier<List<TileData>> personalInfoTileData =
-      ValueNotifier<List<TileData>>([]);
+class PersonalInfoWidget extends StatelessWidget with DataTileMixin {
+  final ValueNotifier<List<DataTile>> personalInfoTileData =
+      ValueNotifier<List<DataTile>>([]);
 
   final MyselfQrcodeWidget qrcodeWidget = MyselfQrcodeWidget();
 
@@ -42,7 +42,7 @@ class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
 
   void _buildPersonalInfo(BuildContext context) {
     personalInfoTileData.value = [
-      TileData(
+      DataTile(
           title: 'Avatar',
           suffix: myself.avatarImage,
           onTap: (
@@ -55,15 +55,15 @@ class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
               myself.peerId!,
             );
           }),
-      TileData(
+      DataTile(
         title: 'Id',
         subtitle: myself.myselfPeer.id?.toString(),
       ),
-      TileData(
+      DataTile(
         title: 'PeerId',
         subtitle: myself.peerId,
       ),
-      TileData(
+      DataTile(
           title: 'Name',
           suffix: myself.myselfPeer.name,
           onTap: (
@@ -82,15 +82,15 @@ class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
               _buildPersonalInfo(context);
             }
           }),
-      TileData(
+      DataTile(
         title: 'LoginName',
         suffix: myself.myselfPeer.loginName,
       ),
-      TileData(
+      DataTile(
         title: 'ConnectPeerId',
         suffix: myself.myselfPeer.connectPeerId,
       ),
-      TileData(
+      DataTile(
           title: 'Email',
           suffix: myself.myselfPeer.email,
           onTap: (
@@ -109,7 +109,7 @@ class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
               _buildPersonalInfo(context);
             }
           }),
-      TileData(
+      DataTile(
           title: 'Mobile',
           suffix: myself.myselfPeer.mobile,
           onTap: (
@@ -128,11 +128,11 @@ class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
               _buildPersonalInfo(context);
             }
           }),
-      TileData(
+      DataTile(
         title: 'StartDate',
         suffix: myself.myselfPeer.startDate,
       ),
-      TileData(
+      DataTile(
         title: 'Myself Qrcode',
         routeName: 'myself_qrcode',
       ),
@@ -185,7 +185,7 @@ class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
       child: Column(children: [
         ValueListenableBuilder(
             valueListenable: personalInfoTileData,
-            builder: (BuildContext context, List<TileData> personalInfoTileData,
+            builder: (BuildContext context, List<DataTile> personalInfoTileData,
                 Widget? child) {
               return DataListView(
                 itemCount: personalInfoTileData.length,

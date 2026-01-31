@@ -23,7 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 //频道的页面,展示自己发布的频道消息列表
-class PublishChannelListWidget extends StatefulWidget with TileDataMixin {
+class PublishChannelListWidget extends StatefulWidget with DataTileMixin {
   final Future<void> Function()? onRefresh;
   final Function()? onScrollMax;
   final Function()? onScrollMin;

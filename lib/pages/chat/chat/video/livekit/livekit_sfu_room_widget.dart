@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 /// 创建房间和管理房间的界面
-class LiveKitSfuRoomWidget extends StatelessWidget with TileDataMixin {
+class LiveKitSfuRoomWidget extends StatelessWidget with DataTileMixin {
   LiveKitSfuRoomWidget({super.key});
 
   @override
@@ -29,19 +29,19 @@ class LiveKitSfuRoomWidget extends StatelessWidget with TileDataMixin {
 
   
 
-  final Rx<List<TileData>> tileData = Rx<List<TileData>>([]);
+  final Rx<List<DataTile>> tileData = Rx<List<DataTile>>([]);
 
   Future<void> _init() async {
     LiveKitManageRoom liveKitManageRoom = await conferenceService.listSfuRoom();
     List<LiveKitRoom>? rooms = liveKitManageRoom.rooms;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (rooms != null && rooms.isNotEmpty) {
       for (LiveKitRoom room in rooms) {
         String name = room.name ?? '';
         DateTime? creationTime = room.creationTime;
         Duration emptyTimeout = Duration(seconds: room.emptyTimeout ?? 0);
         LiveKitRoom current = room;
-        TileData tile = TileData(
+        DataTile tile = DataTile(
             title: name,
             subtitle: creationTime.toString(),
             titleTail: emptyTimeout.toString(),
@@ -51,13 +51,13 @@ class LiveKitSfuRoomWidget extends StatelessWidget with TileDataMixin {
               return null;
             });
         tile.endSlideActions = [
-          TileData(
+          DataTile(
               title: 'Delete',
               onTap: (int index, String title, {String? subtitle}) async {
                 await conferenceService.deleteRoom(name);
                 await _init();
               }),
-          TileData(
+          DataTile(
               title: 'Participant',
               onTap: (int index, String title, {String? subtitle}) async {
                 roomName.value = name;

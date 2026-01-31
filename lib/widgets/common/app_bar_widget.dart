@@ -5,6 +5,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
 
 ///工作区的顶部栏AppBar，定义了前导组件，比如回退按钮
@@ -50,9 +51,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
 
   AppBar _buildAppBar(BuildContext context) {
     var btns = <Widget>[];
-    if (rightWidgets != null && rightWidgets!.isNotEmpty) {
-      btns.addAll(rightWidgets!);
-    }
+
     if (actions != null && actions!.isNotEmpty) {
       btns.add(IconButton(
           onPressed: () {
@@ -62,6 +61,9 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
             Icons.more_horiz,
             color: foregroundColor,
           )));
+    }
+    if (rightWidgets != null && rightWidgets!.isNotEmpty) {
+      btns.addAll(rightWidgets!);
     }
 
     Widget? leading = leadingWidget;
@@ -89,12 +91,22 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
 
   Widget _buildTitleBar(BuildContext context) {
     List<Widget> children = [];
-    var btns = <Widget>[const Spacer()];
+    Widget? leading = leadingWidget;
+
+    ///左边的回退按钮
+    if (withLeading) {
+      leading ??= _buildBackButton(context);
+    }
+    if (leading != null) {
+      children.add(leading);
+    }
+    children.add(Expanded(child: title!));
+
     if (rightWidgets != null && rightWidgets!.isNotEmpty) {
-      btns.addAll(rightWidgets!);
+      children.addAll(rightWidgets!);
     }
     if (actions != null && actions!.isNotEmpty) {
-      btns.add(IconButton(
+      children.add(IconButton(
           onPressed: () {
             _showActionCard(context);
           },
@@ -103,40 +115,20 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
             color: foregroundColor,
           )));
     }
-    Widget? leading = leadingWidget;
-
-    ///左边的回退按钮
-    if (withLeading) {
-      leading ??= _buildBackButton(context);
-    }
-    if (leading != null) {
-      if (centerTitle || title == null) {
-        children.add(Row(
-          children: [leading, ...btns],
-        ));
-      } else {
-        children.add(Row(
-          children: [leading, title!, ...btns],
-        ));
-      }
-    } else {
-      if (!centerTitle && title != null) {
-        children.add(Row(
-          children: [title!, ...btns],
-        ));
-      }
-    }
-    if (centerTitle && title != null) {
-      children.add(Align(alignment: Alignment.center, child: title!));
-    }
     return Container(
-      height: toolbarHeight ?? appDataProvider.toolbarHeight,
-      padding: const EdgeInsets.all(10),
-      color: backgroundColor ?? myself.primary,
-      child: Stack(
-        children: children,
-      ),
-    );
+        height: toolbarHeight ?? appDataProvider.toolbarHeight,
+        padding: const EdgeInsets.all(10),
+        color: (backgroundColor ?? myself.primary).withAlpha(64),
+        child: Card(
+          elevation: 0,
+          margin: const EdgeInsets.all(0),
+          shape: ContinuousRectangleBorder(),
+          color: (backgroundColor ?? myself.primary).withAlpha(0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: children,
+          ),
+        ));
   }
 
   Widget? _buildBackButton(BuildContext context) {

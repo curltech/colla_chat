@@ -24,7 +24,7 @@ class AdaptiveLayoutIndex extends StatefulWidget {
   final BottomNavigation bottomNavigation = BottomNavigation();
 
   AdaptiveLayoutIndex({super.key}) {
-    List<TileDataMixin> views = [
+    List<DataTileMixin> views = [
       ChatListWidget(),
       LinkmanListWidget(),
       SubscribeChannelListWidget(),
@@ -49,7 +49,7 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
 
   ///Body视图
   Widget _buildBodyView() {
-    TileDataMixin mixin =
+    DataTileMixin mixin =
         indexWidgetProvider.views[indexWidgetProvider.currentMainIndex];
 
     return mixin;

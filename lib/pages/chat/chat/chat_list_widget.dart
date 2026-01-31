@@ -89,7 +89,7 @@ final ConferenceChatSummaryController conferenceChatSummaryController =
 
 /// 聊天的主页面，展示可以聊天的目标对象，可以是一个人，或者是一个群，或者是一个会议
 /// 选择好目标点击进入具体的聊天页面ChatMessage
-class ChatListWidget extends StatefulWidget with TileDataMixin {
+class ChatListWidget extends StatefulWidget with DataTileMixin {
   ChatListWidget({super.key}) {
     websocketPool.getDefault();
     indexWidgetProvider.define(ChatMessageView());
@@ -298,9 +298,9 @@ class _ChatListWidgetState extends State<ChatListWidget>
     return badge;
   }
 
-  Future<List<TileData>> _buildLinkmanTileData() async {
+  Future<List<DataTile>> _buildLinkmanTileData() async {
     RxList<ChatSummary> linkmenChatSummary = linkmanChatSummaryController.data;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (linkmenChatSummary.isNotEmpty) {
       for (var chatSummary in linkmenChatSummary) {
         var title = chatSummary.title ?? '';
@@ -343,7 +343,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         var badge =
             _buildBadge(unreadNumber, avatarImage: avatarImage, peerId: peerId);
 
-        TileData tile = _buildTile(badge, name, sendReceiveTime, subtitle,
+        DataTile tile = _buildTile(badge, name, sendReceiveTime, subtitle,
             peerId, linkmanChatSummaryController);
         tiles.add(tile);
       }
@@ -351,14 +351,14 @@ class _ChatListWidgetState extends State<ChatListWidget>
     return tiles;
   }
 
-  TileData _buildTile(
+  DataTile _buildTile(
       Widget badge,
       String name,
       String sendReceiveTime,
       String subtitle,
       String peerId,
       DataListController<ChatSummary> chatSummaryController) {
-    TileData tile = TileData(
+    DataTile tile = DataTile(
         prefix: badge,
         title: name,
         titleTail: sendReceiveTime,
@@ -378,8 +378,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
             indexWidgetProvider.push('chat_message');
           }
         });
-    List<TileData> slideActions = [];
-    TileData deleteSlideAction = TileData(
+    List<DataTile> slideActions = [];
+    DataTile deleteSlideAction = DataTile(
         title: 'Delete',
         prefix: Icons.bookmark_remove,
         onTap: (int index, String label, {String? subtitle}) async {
@@ -400,9 +400,9 @@ class _ChatListWidgetState extends State<ChatListWidget>
     return tile;
   }
 
-  Future<List<TileData>> _buildGroupTileData() async {
+  Future<List<DataTile>> _buildGroupTileData() async {
     RxList<ChatSummary> groupChatSummary = groupChatSummaryController.data;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (groupChatSummary.isNotEmpty) {
       for (var chatSummary in groupChatSummary) {
         var title = chatSummary.title ?? '';
@@ -425,7 +425,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         }
         var badge = _buildBadge(unreadNumber, avatarImage: group.avatarImage);
 
-        TileData tile = _buildTile(badge, name, sendReceiveTime, subtitle,
+        DataTile tile = _buildTile(badge, name, sendReceiveTime, subtitle,
             peerId, groupChatSummaryController);
         tiles.add(tile);
       }
@@ -433,10 +433,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
     return tiles;
   }
 
-  Future<List<TileData>> _buildConferenceTileData() async {
+  Future<List<DataTile>> _buildConferenceTileData() async {
     RxList<ChatSummary> conferenceChatSummary =
         conferenceChatSummaryController.data;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (conferenceChatSummary.isNotEmpty) {
       for (var chatSummary in conferenceChatSummary) {
         var title = chatSummary.title ?? '';
@@ -464,7 +464,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         }
         var badge =
             _buildBadge(unreadNumber, avatarImage: conference.avatarImage);
-        TileData tile = _buildTile(badge, name, sendReceiveTime, subtitle,
+        DataTile tile = _buildTile(badge, name, sendReceiveTime, subtitle,
             peerId, conferenceChatSummaryController);
         tiles.add(tile);
       }
@@ -540,7 +540,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
     Widget linkmanView = Obx(() {
       return PlatformFutureBuilder(
         future: _buildLinkmanTileData(),
-        builder: (BuildContext context, List<TileData> tiles) {
+        builder: (BuildContext context, List<DataTile> tiles) {
           return DataListView(
             itemCount: tiles.length,
             itemBuilder: (BuildContext context, int index) {
@@ -554,7 +554,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
     Widget groupView = Obx(() {
       return PlatformFutureBuilder(
           future: _buildGroupTileData(),
-          builder: (BuildContext context, List<TileData> tiles) {
+          builder: (BuildContext context, List<DataTile> tiles) {
             return DataListView(
               itemCount: tiles.length,
               itemBuilder: (BuildContext context, int index) {
@@ -566,7 +566,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
     Widget conferenceView = Obx(() {
       return PlatformFutureBuilder(
           future: _buildConferenceTileData(),
-          builder: (BuildContext context, List<TileData> tiles) {
+          builder: (BuildContext context, List<DataTile> tiles) {
             return DataListView(
               itemCount: tiles.length,
               itemBuilder: (BuildContext context, int index) {

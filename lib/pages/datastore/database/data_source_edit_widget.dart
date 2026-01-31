@@ -15,7 +15,7 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
+class DataSourceEditWidget extends StatelessWidget with DataTileMixin {
   DataSourceEditWidget({super.key});
 
   @override

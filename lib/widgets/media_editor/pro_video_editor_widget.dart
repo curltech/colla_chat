@@ -14,7 +14,7 @@ import 'package:pro_image_editor/pro_image_editor.dart';
 import 'package:pro_video_editor/pro_video_editor.dart';
 import 'package:video_player/video_player.dart';
 
-class ProVideoEditorWidget extends StatelessWidget with TileDataMixin {
+class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
   ProVideoEditorWidget({super.key});
 
   @override

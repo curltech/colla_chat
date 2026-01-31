@@ -24,7 +24,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
 //频道的页面,展示自己订阅的频道消息列表
-class SubscribeChannelListWidget extends StatefulWidget with TileDataMixin {
+class SubscribeChannelListWidget extends StatefulWidget with DataTileMixin {
   final Future<void> Function()? onRefresh;
   final Function()? onScrollMax;
   final Function()? onScrollMin;
@@ -247,7 +247,7 @@ class ChannelChatMessageItem extends StatelessWidget {
 
     var sendTime = chatMessage.sendTime;
     sendTime = sendTime != null ? DateUtil.formatEasyRead(sendTime) : '';
-    TileData tile = TileData(
+    DataTile tile = DataTile(
         prefix: avatarImage,
         title: title,
         titleTail: sendTime,
@@ -260,8 +260,8 @@ class ChannelChatMessageItem extends StatelessWidget {
           indexWidgetProvider.push('subscribe_channel_message_preview');
           return null;
         });
-    List<TileData> slideActions = [];
-    TileData deleteSlideAction = TileData(
+    List<DataTile> slideActions = [];
+    DataTile deleteSlideAction = DataTile(
         title: 'Delete',
         prefix: Icons.bookmark_remove,
         onTap: (int index, String label, {String? subtitle}) async {
@@ -278,7 +278,7 @@ class ChannelChatMessageItem extends StatelessWidget {
     tile.slideActions = slideActions;
 
     Widget chatMessageItem = DataListTile(
-      tileData: tile,
+      dataTile: tile,
     );
 
     return chatMessageItem;

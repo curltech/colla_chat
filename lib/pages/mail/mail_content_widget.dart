@@ -27,7 +27,7 @@ import 'package:get/get.dart';
 import 'package:mimecon/mimecon.dart';
 
 ///邮件内容子视图
-class MailContentWidget extends StatelessWidget with TileDataMixin {
+class MailContentWidget extends StatelessWidget with DataTileMixin {
   MailContentWidget({super.key}) {
     FullScreenAttachmentWidget fullScreenAttachmentWidget =
         const FullScreenAttachmentWidget();
@@ -105,7 +105,7 @@ class MailContentWidget extends StatelessWidget with TileDataMixin {
     if (sendTime != null) {
       titleTail = DateUtil.formatEasyRead(sendTime);
     }
-    TileData tileData = TileData(
+    DataTile tileData = DataTile(
         prefix: decryptedMimeMessage.needDecrypt
             ? const Icon(
                 Icons.mail_lock,
@@ -116,7 +116,7 @@ class MailContentWidget extends StatelessWidget with TileDataMixin {
         titleTail: titleTail,
         subtitle: subtitle.toString());
 
-    return DataListTile(tileData: tileData);
+    return DataListTile(dataTile: tileData);
   }
 
   ///邮件内容发生变化时，移动平台将重新创建mimeMessageViewer

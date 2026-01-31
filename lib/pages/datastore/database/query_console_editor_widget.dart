@@ -37,7 +37,7 @@ class QueryResultController extends DataPageController<Map<String, dynamic>> {
   }
 }
 
-class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
+class QueryConsoleEditorWidget extends StatelessWidget with DataTileMixin {
   QueryConsoleEditorWidget({super.key});
 
   @override

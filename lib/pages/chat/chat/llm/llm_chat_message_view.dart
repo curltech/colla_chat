@@ -25,7 +25,7 @@ import 'package:visibility_detector/visibility_detector.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 /// 大模型聊天界面
-class LlmChatMessageView extends StatelessWidget with TileDataMixin {
+class LlmChatMessageView extends StatelessWidget with DataTileMixin {
   final LlmChatMessageWidget llmChatMessageWidget = LlmChatMessageWidget();
   final LlmChatMessageInputWidget llmChatMessageInputWidget =
       LlmChatMessageInputWidget();

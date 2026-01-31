@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 //定位器列表
-class PeerEndpointListWidget extends StatelessWidget with TileDataMixin {
+class PeerEndpointListWidget extends StatelessWidget with DataTileMixin {
   late final List<Widget> rightWidgets;
   late final PeerEndpointViewWidget peerEndpointViewWidget;
   late final PeerEndpointEditWidget peerEndpointEditWidget;
@@ -142,21 +142,21 @@ class PeerEndpointListWidget extends StatelessWidget with TileDataMixin {
     return libp2pLight;
   }
 
-  List<TileData> _buildTileData() {
+  List<DataTile> _buildTileData() {
     var peerEndpoints = peerEndpointController.data;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (peerEndpoints.isNotEmpty) {
       int i = 0;
       for (var peerEndpoint in peerEndpoints) {
         var title = peerEndpoint.name;
         var subtitle = peerEndpoint.peerId;
-        TileData tile = TileData(
+        DataTile tile = DataTile(
             selected: peerEndpointController.currentIndex.value == i,
             title: title,
             subtitle: subtitle,
             routeName: 'peer_endpoint_edit');
-        List<TileData> slideActions = [];
-        TileData deleteSlideAction = TileData(
+        List<DataTile> slideActions = [];
+        DataTile deleteSlideAction = DataTile(
             title: 'Delete',
             prefix: Icons.remove,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -165,7 +165,7 @@ class PeerEndpointListWidget extends StatelessWidget with TileDataMixin {
               peerEndpointController.delete();
             });
         slideActions.add(deleteSlideAction);
-        TileData editSlideAction = TileData(
+        DataTile editSlideAction = DataTile(
             title: 'Edit',
             prefix: Icons.edit,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -173,7 +173,7 @@ class PeerEndpointListWidget extends StatelessWidget with TileDataMixin {
               indexWidgetProvider.push('peer_endpoint_edit');
             });
         slideActions.add(editSlideAction);
-        TileData statusSlideAction = TileData(
+        DataTile statusSlideAction = DataTile(
             title: 'Status',
             prefix: Icons.light_mode,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -185,8 +185,8 @@ class PeerEndpointListWidget extends StatelessWidget with TileDataMixin {
         slideActions.add(statusSlideAction);
         tile.slideActions = slideActions;
 
-        List<TileData> endSlideActions = [];
-        TileData wsConnectSlideAction = TileData(
+        List<DataTile> endSlideActions = [];
+        DataTile wsConnectSlideAction = DataTile(
             title: 'WsConnect',
             prefix: Icons.private_connectivity_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -203,7 +203,7 @@ class PeerEndpointListWidget extends StatelessWidget with TileDataMixin {
     return tiles;
   }
 
-  Future<bool?> _onTap(int index, String title, {String? subtitle, TileData? group}) async {
+  Future<bool?> _onTap(int index, String title, {String? subtitle, DataTile? group}) async {
     peerEndpointController.setCurrentIndex = index;
     return null;
   }

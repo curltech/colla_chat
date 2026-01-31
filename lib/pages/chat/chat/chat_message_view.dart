@@ -49,7 +49,7 @@ import 'package:window_manager/window_manager.dart';
 /// 聊天界面，包括文本聊天，视频通话呼叫，视频通话，全屏展示四个组件
 /// 支持群聊
 class ChatMessageView extends StatelessWidget
-    with TileDataMixin, WidgetsBindingObserver, WindowListener {
+    with DataTileMixin, WidgetsBindingObserver, WindowListener {
   final FullScreenChatMessageWidget fullScreenChatMessageWidget =
       FullScreenChatMessageWidget();
   final VideoChatWidget videoChatWidget = VideoChatWidget();

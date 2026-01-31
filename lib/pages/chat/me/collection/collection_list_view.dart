@@ -6,7 +6,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 //收藏的页面
-class CollectionListView extends StatelessWidget with TileDataMixin {
+class CollectionListView extends StatelessWidget with DataTileMixin {
   final Future<void> Function()? onRefresh;
   final Function()? onScrollMax;
   final Function()? onScrollMin;

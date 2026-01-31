@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:system_alert_window/system_alert_window.dart';
 
-class FlutterOverlayWindowWidget extends StatelessWidget with TileDataMixin {
+class FlutterOverlayWindowWidget extends StatelessWidget with DataTileMixin {
   FlutterOverlayWindowWidget({super.key});
 
   @override

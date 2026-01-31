@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 //邮件内容组件
-class PeerEndpointEditWidget extends StatelessWidget with TileDataMixin {
+class PeerEndpointEditWidget extends StatelessWidget with DataTileMixin {
   final PeerEndpointController peerEndpointController;
 
   PeerEndpointEditWidget({super.key, required this.peerEndpointController});

@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 /// 自动邮件发现视图，一个card下的录入框和按钮组合
-class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
+class AutoDiscoverWidget extends StatelessWidget with DataTileMixin {
   AutoDiscoverWidget({super.key}) {
     platformReactiveFormController =
         PlatformReactiveFormController(_getAutoDiscoveryColumnField());

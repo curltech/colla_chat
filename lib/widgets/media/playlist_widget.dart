@@ -219,7 +219,7 @@ class PlaylistWidget extends StatelessWidget {
   }
 
   final RxBool gridMode = false.obs;
-  final RxList<TileData> tileData = RxList<TileData>([]);
+  final RxList<DataTile> tileData = RxList<DataTile>([]);
 
   ///从收藏的文件中加入播放列表
   Future<void> _collect() async {
@@ -252,7 +252,7 @@ class PlaylistWidget extends StatelessWidget {
 
   void _buildTileData() {
     List<PlatformMediaSource> mediaSources = playlistController.data;
-    List<TileData> tileData = [];
+    List<DataTile> tileData = [];
     for (var mediaSource in mediaSources) {
       var filename = mediaSource.filename;
       File file = File(filename);
@@ -269,7 +269,7 @@ class PlaylistWidget extends StatelessWidget {
         }
       }
       Widget? thumbnailWidget = mediaSource.thumbnailWidget;
-      TileData tile = TileData(
+      DataTile tile = DataTile(
         prefix: thumbnailWidget,
         title: FileUtil.filename(filename),
         subtitle: '$length',
@@ -286,7 +286,7 @@ class PlaylistWidget extends StatelessWidget {
     this.tileData.assignAll(tileData);
   }
 
-  Widget _buildThumbnailWidget(BuildContext context, TileData tile) {
+  Widget _buildThumbnailWidget(BuildContext context, DataTile tile) {
     List<Widget> children = [];
     children.add(const Spacer());
     children.add(AutoSizeText(
@@ -359,7 +359,7 @@ class PlaylistWidget extends StatelessWidget {
       } else {
         return DataListView(
           onTap: (int index, String title,
-              {TileData? group, String? subtitle}) async {
+              {DataTile? group, String? subtitle}) async {
             playlistController.setCurrentIndex = index;
             if (onSelected != null) {
               onSelected!(index, title);

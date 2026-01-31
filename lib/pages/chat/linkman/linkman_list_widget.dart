@@ -63,22 +63,22 @@ final DataListController<Conference> conferenceController =
     DataListController<Conference>();
 
 ///联系人和群的查询界面
-class LinkmanListWidget extends StatefulWidget with TileDataMixin {
+class LinkmanListWidget extends StatefulWidget with DataTileMixin {
   final LinkmanAddWidget linkmanAddWidget = LinkmanAddWidget();
   final LinkmanEditWidget linkmanEditWidget = LinkmanEditWidget();
   final ConferenceShowWidget conferenceShowWidget = ConferenceShowWidget();
-  late final List<TileData> linkmanTileData;
+  late final List<DataTile> linkmanTileData;
 
   LinkmanListWidget({super.key}) {
     indexWidgetProvider.define(linkmanEditWidget);
     indexWidgetProvider.define(linkmanAddWidget);
     indexWidgetProvider.define(conferenceShowWidget);
-    List<TileDataMixin> mixins = [
+    List<DataTileMixin> mixins = [
       linkmanEditWidget,
       linkmanAddWidget,
       conferenceShowWidget,
     ];
-    linkmanTileData = TileData.from(mixins);
+    linkmanTileData = DataTile.from(mixins);
     for (var tile in linkmanTileData) {
       tile.dense = false;
       tile.selected = false;
@@ -232,9 +232,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   }
 
   //将linkman和group数据转换从列表显示数据
-  List<TileData> _buildLinkmanTileData() {
+  List<DataTile> _buildLinkmanTileData() {
     var linkmen = linkmanController.data;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (linkmen.isNotEmpty) {
       for (var linkman in linkmen) {
         var name = linkman.name;
@@ -265,7 +265,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         if (connections.isNotEmpty) {
           connectionNum = connections.length;
         }
-        TileData tile = TileData(
+        DataTile tile = DataTile(
             prefix: _buildBadge(connectionNum, avatarImage: prefix),
             title: name,
             subtitle: linkmanStatus,
@@ -275,8 +275,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               linkmanNotifier.value = linkman;
               return null;
             });
-        List<TileData> slideActions = [];
-        TileData deleteSlideAction = TileData(
+        List<DataTile> slideActions = [];
+        DataTile deleteSlideAction = DataTile(
             title: 'Delete',
             prefix: Icons.person_remove,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -302,7 +302,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           slideActions.add(deleteSlideAction);
         }
 
-        TileData requestSlideAction = TileData(
+        DataTile requestSlideAction = DataTile(
             title: 'Request add friend',
             prefix: Icons.request_quote_outlined,
             onTap: (int index, String title, {String? subtitle}) async {
@@ -325,7 +325,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         if (peerId != myself.peerId && linkmanStatus != LinkmanStatus.G.name) {
           slideActions.add(requestSlideAction);
         }
-        TileData chatSlideAction = TileData(
+        DataTile chatSlideAction = DataTile(
             title: 'Chat',
             prefix: Icons.chat,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -338,10 +338,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         slideActions.add(chatSlideAction);
         tile.slideActions = slideActions;
 
-        List<TileData> endSlideActions = [];
+        List<DataTile> endSlideActions = [];
         if (peerId != myself.peerId && linkmanStatus != LinkmanStatus.G.name) {
           if (linkman.linkmanStatus == LinkmanStatus.F.name) {
-            endSlideActions.add(TileData(
+            endSlideActions.add(DataTile(
                 title: 'Remove friend',
                 prefix: Icons.person_remove_outlined,
                 onTap: (int index, String title, {String? subtitle}) async {
@@ -363,7 +363,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           if (linkman.linkmanStatus == null ||
               linkman.linkmanStatus == LinkmanStatus.N.name ||
               linkman.linkmanStatus == LinkmanStatus.S.name) {
-            endSlideActions.add(TileData(
+            endSlideActions.add(DataTile(
                 title: 'Add friend',
                 prefix: Icons.person_add_outlined,
                 onTap: (int index, String title, {String? subtitle}) async {
@@ -384,7 +384,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           }
           if (linkman.linkmanStatus == LinkmanStatus.B.name) {
             endSlideActions.add(
-              TileData(
+              DataTile(
                   title: 'Remove blacklist',
                   prefix: Icons.person_outlined,
                   onTap: (int index, String title, {String? subtitle}) async {
@@ -404,7 +404,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                   }),
             );
           } else {
-            endSlideActions.add(TileData(
+            endSlideActions.add(DataTile(
                 title: 'Add blacklist',
                 prefix: Icons.person_off,
                 onTap: (int index, String title, {String? subtitle}) async {
@@ -425,7 +425,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           }
           if (linkman.subscriptStatus == LinkmanStatus.C.name) {
             endSlideActions.add(
-              TileData(
+              DataTile(
                   title: 'Remove subscript',
                   prefix: Icons.unsubscribe,
                   onTap: (int index, String title, {String? subtitle}) async {
@@ -445,7 +445,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                   }),
             );
           } else {
-            endSlideActions.add(TileData(
+            endSlideActions.add(DataTile(
                 title: 'Add subscript',
                 prefix: Icons.subscriptions,
                 onTap: (int index, String title, {String? subtitle}) async {
@@ -473,16 +473,16 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     return tiles;
   }
 
-  List<TileData> _buildGroupTileData() {
+  List<DataTile> _buildGroupTileData() {
     var groups = groupController.data;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (groups.isNotEmpty) {
       for (var group in groups) {
         var groupName = group.name;
         var peerId = group.peerId;
         var groupOwnerName = group.groupOwnerName;
         var groupOwnerPeerId = group.groupOwnerPeerId;
-        TileData tile = TileData(
+        DataTile tile = DataTile(
             prefix: group.avatarImage ?? AppImage.mdAppImage,
             title: groupName,
             subtitle: groupOwnerName,
@@ -492,9 +492,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               return null;
             },
             routeName: 'group_edit');
-        List<TileData> slideActions = [];
+        List<DataTile> slideActions = [];
 
-        TileData deleteSlideAction = TileData(
+        DataTile deleteSlideAction = DataTile(
             title: 'Delete',
             prefix: Icons.group_remove,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -520,7 +520,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         if (groupOwnerPeerId != myself.peerId) {
           slideActions.add(deleteSlideAction);
         }
-        TileData dismissSlideAction = TileData(
+        DataTile dismissSlideAction = DataTile(
             title: 'Dismiss',
             prefix: Icons.group_off,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -553,8 +553,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         }
         tile.slideActions = slideActions;
 
-        List<TileData> endSlideActions = [];
-        TileData chatSlideAction = TileData(
+        List<DataTile> endSlideActions = [];
+        DataTile chatSlideAction = DataTile(
             title: 'Chat',
             prefix: Icons.chat,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -573,9 +573,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     return tiles;
   }
 
-  List<TileData> _buildConferenceTileData() {
+  List<DataTile> _buildConferenceTileData() {
     List<Conference> conferences = conferenceController.data;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (conferences.isNotEmpty) {
       for (var conference in conferences) {
         var conferenceName = conference.name;
@@ -589,7 +589,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         } else {
           routeName = 'conference_show';
         }
-        TileData tile = TileData(
+        DataTile tile = DataTile(
             prefix: conference.avatarImage ?? AppImage.mdAppImage,
             title: conferenceName,
             titleTail: conferenceOwnerName,
@@ -601,9 +601,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               return null;
             },
             routeName: routeName);
-        List<TileData> slideActions = [];
+        List<DataTile> slideActions = [];
 
-        TileData deleteSlideAction = TileData(
+        DataTile deleteSlideAction = DataTile(
             title: 'Delete',
             prefix: Icons.playlist_remove_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -628,8 +628,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         slideActions.add(deleteSlideAction);
         tile.slideActions = slideActions;
 
-        List<TileData> endSlideActions = [];
-        TileData chatSlideAction = TileData(
+        List<DataTile> endSlideActions = [];
+        DataTile chatSlideAction = DataTile(
             title: 'Chat',
             prefix: Icons.chat,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -650,19 +650,19 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   }
 
   Future<bool?> _onTapLinkman(int index, String title,
-      {String? subtitle, TileData? group}) async {
+      {String? subtitle, DataTile? group}) async {
     linkmanController.setCurrentIndex = index;
     return null;
   }
 
   Future<bool?> _onTapGroup(int index, String title,
-      {String? subtitle, TileData? group}) async {
+      {String? subtitle, DataTile? group}) async {
     groupController.setCurrentIndex = index;
     return null;
   }
 
   Future<bool?> _onTapConference(int index, String title,
-      {String? subtitle, TileData? group}) async {
+      {String? subtitle, DataTile? group}) async {
     conferenceController.setCurrentIndex = index;
     return null;
   }
@@ -731,7 +731,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     var linkmanView = Column(children: [
       _buildLinkmanSearchTextField(context),
       Expanded(child: Obx(() {
-        List<TileData> tiles = _buildLinkmanTileData();
+        List<DataTile> tiles = _buildLinkmanTileData();
         return DataListView(
           itemCount: tiles.length,
           itemBuilder: (BuildContext context, int index) {
@@ -745,7 +745,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     var groupView = Column(children: [
       _buildGroupSearchTextField(context),
       Expanded(child: Obx(() {
-        List<TileData> tiles = _buildGroupTileData();
+        List<DataTile> tiles = _buildGroupTileData();
         return DataListView(
           itemCount: tiles.length,
           itemBuilder: (BuildContext context, int index) {
@@ -759,7 +759,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     var conferenceView = Column(children: [
       _buildConferenceSearchTextField(context),
       Expanded(child: Obx(() {
-        List<TileData> tiles = _buildConferenceTileData();
+        List<DataTile> tiles = _buildConferenceTileData();
         return DataListView(
           itemCount: tiles.length,
           itemBuilder: (BuildContext context, int index) {

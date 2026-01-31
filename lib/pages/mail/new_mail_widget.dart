@@ -52,7 +52,7 @@ class PlatformAttachmentInfo {
 }
 
 ///邮件内容子视图
-class NewMailWidget extends StatelessWidget with TileDataMixin {
+class NewMailWidget extends StatelessWidget with DataTileMixin {
   NewMailWidget({super.key});
 
   @override

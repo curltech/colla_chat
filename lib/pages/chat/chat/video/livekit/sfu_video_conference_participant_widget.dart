@@ -13,7 +13,7 @@ import 'package:livekit_client/livekit_client.dart' as livekit_client;
 
 ///Sfu会议池的会议的远程参与者列表显示界面
 class SfuVideoConferenceParticipantWidget extends StatelessWidget
-    with TileDataMixin {
+    with DataTileMixin {
   final SfuVideoConferenceTrackWidget sfuVideoConferenceTrackWidget =
       SfuVideoConferenceTrackWidget();
 
@@ -35,16 +35,16 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
 
   
 
-  List<TileData> _buildRemoteParticipantTileData(BuildContext context) {
+  List<DataTile> _buildRemoteParticipantTileData(BuildContext context) {
     LiveKitConferenceClient? liveKitConferenceClient =
         liveKitConferenceClientPool.conferenceClient;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (liveKitConferenceClient != null) {
       List<livekit_client.RemoteParticipant> remoteParticipants =
           liveKitConferenceClient.remoteParticipants;
       for (livekit_client.RemoteParticipant remoteParticipant
           in remoteParticipants) {
-        TileData tile = _buildTileData(remoteParticipant);
+        DataTile tile = _buildTileData(remoteParticipant);
 
         tiles.add(tile);
       }
@@ -52,12 +52,12 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
     return tiles;
   }
 
-  TileData _buildTileData(livekit_client.Participant participant) {
+  DataTile _buildTileData(livekit_client.Participant participant) {
     var identity = participant.identity;
     var name = participant.name;
     var joinedAt = participant.joinedAt;
     var connectionQuality = participant.connectionQuality;
-    TileData tile = TileData(
+    DataTile tile = DataTile(
       prefix: connectionQuality.name,
       title: name,
       titleTail: joinedAt.toIso8601String(),
@@ -68,8 +68,8 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
         return null;
       },
     );
-    List<TileData> slideActions = [];
-    TileData checkSlideAction = TileData(
+    List<DataTile> slideActions = [];
+    DataTile checkSlideAction = DataTile(
         title: 'Track',
         prefix: Icons.multitrack_audio_outlined,
         onTap: (int index, String label, {String? subtitle}) async {
@@ -82,7 +82,7 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
   }
 
   Widget _buildRemoteParticipantListView(BuildContext context) {
-    List<TileData> tileData = _buildRemoteParticipantTileData(context);
+    List<DataTile> tileData = _buildRemoteParticipantTileData(context);
     return SizedBox(
         height: 200,
         child: DataListView(
@@ -146,7 +146,7 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
   }
 
   Widget _buildLocalParticipantWidget(BuildContext context) {
-    List<TileData> tileData = [];
+    List<DataTile> tileData = [];
     LiveKitConferenceClient? liveKitConferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (liveKitConferenceClient != null) {

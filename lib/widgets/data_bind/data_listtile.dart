@@ -1,4 +1,3 @@
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -12,7 +11,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 enum RouteStyle { workspace, navigator }
 
 /// 通用列表项的数据模型
-class TileData {
+class DataTile {
   //可以是Widget，String，IconData
   final dynamic prefix;
 
@@ -39,10 +38,10 @@ class TileData {
   final Future<bool?> Function(int index, String title, {String? subtitle})?
       onLongPress;
 
-  List<TileData>? slideActions;
-  List<TileData>? endSlideActions;
+  List<DataTile>? slideActions;
+  List<DataTile>? endSlideActions;
 
-  TileData(
+  DataTile(
       {this.prefix,
       required this.title,
       this.subtitle,
@@ -56,8 +55,8 @@ class TileData {
       this.onTap,
       this.onLongPress});
 
-  static TileData of(TileDataMixin mixin, {bool dense = true}) {
-    return TileData(
+  static DataTile of(DataTileMixin mixin, {bool dense = true}) {
+    return DataTile(
         title: AppLocalizations.t(mixin.title),
         routeName: mixin.routeName,
         helpPath: mixin.routeName,
@@ -65,11 +64,11 @@ class TileData {
         prefix: mixin.iconData);
   }
 
-  static List<TileData> from(List<TileDataMixin> mixins, {bool dense = true}) {
-    List<TileData> tileData = [];
+  static List<DataTile> from(List<DataTileMixin> mixins, {bool dense = true}) {
+    List<DataTile> tileData = [];
     if (mixins.isNotEmpty) {
       for (var mixin in mixins) {
-        TileData tile = TileData.of(mixin, dense: dense);
+        DataTile tile = DataTile.of(mixin, dense: dense);
         tileData.add(tile);
       }
     }
@@ -82,7 +81,7 @@ class TileData {
     if (identical(this, other)) {
       return true;
     }
-    if (other is TileData) {
+    if (other is DataTile) {
       return runtimeType == other.runtimeType && title == other.title;
     }
     return false;
@@ -117,7 +116,7 @@ class TileData {
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class DataListTile extends StatelessWidget {
-  final TileData tileData;
+  final DataTile dataTile;
   final int index;
   final double? dividerHeight;
   final Color? dividerColor;
@@ -136,7 +135,7 @@ class DataListTile extends StatelessWidget {
 
   const DataListTile({
     super.key,
-    required this.tileData,
+    required this.dataTile,
     this.index = 0,
     this.dividerHeight,
     this.dividerColor,
@@ -149,7 +148,7 @@ class DataListTile extends StatelessWidget {
   });
 
   static Widget buildListTile(
-    TileData tileData, {
+    DataTile tileData, {
     int index = 0,
     double? dividerHeight,
     Color? dividerColor,
@@ -157,7 +156,7 @@ class DataListTile extends StatelessWidget {
     Future<bool?> Function(int, String, {String? subtitle})? onLongPress,
   }) {
     var tile = DataListTile(
-        tileData: tileData,
+        dataTile: tileData,
         index: index,
         onTap: onTap,
         onLongPress: onLongPress);
@@ -174,14 +173,14 @@ class DataListTile extends StatelessWidget {
   }
 
   Widget _buildListTile(BuildContext context) {
-    bool selected = tileData.selected ?? false;
+    bool selected = dataTile.selected ?? false;
 
     ///前导组件，一般是自定义图标或者图像
-    Widget? leading = tileData.getPrefixWidget(selected);
+    Widget? leading = dataTile.getPrefixWidget(selected);
 
     ///尾部组件数组，首先加入suffix自定义组件或者文本
     List<Widget>? trailing = <Widget>[];
-    var suffix = tileData.suffix;
+    var suffix = dataTile.suffix;
     if (suffix != null) {
       if (suffix is Widget) {
         trailing.add(suffix);
@@ -195,7 +194,7 @@ class DataListTile extends StatelessWidget {
     }
 
     ///然后，如果路由名称存在，加入路由图标
-    if (tileData.routeName != null) {
+    if (dataTile.routeName != null) {
       trailing.add(Icon(Icons.chevron_right, color: myself.primary));
     }
 
@@ -210,20 +209,20 @@ class DataListTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end, children: trailing));
     }
     Widget titleWidget = AutoSizeText(
-      tileData.title,
-      style: tileData.dense
+      dataTile.title,
+      style: dataTile.dense
           ? const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)
           : null,
       // softWrap: true,
       // overflow: TextOverflow.ellipsis,
     );
-    if (tileData.titleTail != null) {
+    if (dataTile.titleTail != null) {
       titleWidget = Row(children: [
         Expanded(child: titleWidget),
         //const Spacer(),
         AutoSizeText(
-          tileData.titleTail ?? '',
-          style: tileData.dense
+          dataTile.titleTail ?? '',
+          style: dataTile.dense
               ? const TextStyle(
                   fontSize: 12,
                 )
@@ -240,23 +239,23 @@ class DataListTile extends StatelessWidget {
       if (this.onTap != null) {
         var fn = this.onTap;
         value =
-            await fn?.call(index, tileData.title, subtitle: tileData.subtitle);
+            await fn?.call(index, dataTile.title, subtitle: dataTile.subtitle);
         if (value == false) {
           return false;
         }
       }
-      if (tileData.onTap != null) {
-        var fn = tileData.onTap;
+      if (dataTile.onTap != null) {
+        var fn = dataTile.onTap;
         value =
-            await fn?.call(index, tileData.title, subtitle: tileData.subtitle);
+            await fn?.call(index, dataTile.title, subtitle: dataTile.subtitle);
         if (value == false) {
           return false;
         }
       }
 
       ///如果路由名称存在，点击会调用路由
-      if (tileData.routeName != null) {
-        indexWidgetProvider.push(tileData.routeName!, context: context);
+      if (dataTile.routeName != null) {
+        indexWidgetProvider.push(dataTile.routeName!, context: context);
       }
 
       return value;
@@ -267,15 +266,15 @@ class DataListTile extends StatelessWidget {
       if (this.onLongPress != null) {
         var fn = this.onLongPress;
         value =
-            await fn?.call(index, tileData.title, subtitle: tileData.subtitle);
+            await fn?.call(index, dataTile.title, subtitle: dataTile.subtitle);
         if (value == false) {
           return false;
         }
       }
-      if (tileData.onLongPress != null) {
-        var fn = tileData.onLongPress;
+      if (dataTile.onLongPress != null) {
+        var fn = dataTile.onLongPress;
         value =
-            await fn?.call(index, tileData.title, subtitle: tileData.subtitle);
+            await fn?.call(index, dataTile.title, subtitle: dataTile.subtitle);
       }
 
       return value;
@@ -292,15 +291,15 @@ class DataListTile extends StatelessWidget {
       selectedTileColor: myself.primary,
       leading: leading,
       title: titleWidget,
-      subtitle: tileData.subtitle != null
+      subtitle: dataTile.subtitle != null
           ? AutoSizeText(
-              tileData.subtitle!,
+              dataTile.subtitle!,
               maxLines: 2,
             )
           : null,
       trailing: trailingWidget,
-      isThreeLine: tileData.isThreeLine,
-      dense: tileData.dense,
+      isThreeLine: dataTile.isThreeLine,
+      dense: dataTile.dense,
       onTap: onTap,
       onLongPress: onLongPress,
     );
@@ -316,7 +315,7 @@ class DataListTile extends StatelessWidget {
     return listTile;
   }
 
-  ActionPane _buildActionPane(List<TileData>? slideActions) {
+  ActionPane _buildActionPane(List<DataTile>? slideActions) {
     List<SlidableAction> slidableActions = [];
     int i = 0;
 
@@ -337,7 +336,7 @@ class DataListTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0),
         onPressed: (context) {
           if (slideAction.onTap != null) {
-            slideAction.onTap!(index, tileData.title,
+            slideAction.onTap!(index, dataTile.title,
                 subtitle: slideAction.title);
           }
         },
@@ -368,18 +367,18 @@ class DataListTile extends StatelessWidget {
   }
 
   Widget _buildSlideActionListTile(BuildContext context) {
-    if (tileData.slideActions == null && tileData.endSlideActions == null) {
+    if (dataTile.slideActions == null && dataTile.endSlideActions == null) {
       return _buildListTile(context);
     }
 
     ActionPane? startActionPane;
-    if (tileData.slideActions != null && tileData.slideActions!.isNotEmpty) {
-      startActionPane = _buildActionPane(tileData.slideActions);
+    if (dataTile.slideActions != null && dataTile.slideActions!.isNotEmpty) {
+      startActionPane = _buildActionPane(dataTile.slideActions);
     }
     ActionPane? endActionPane;
-    if (tileData.endSlideActions != null &&
-        tileData.endSlideActions!.isNotEmpty) {
-      endActionPane = _buildActionPane(tileData.endSlideActions);
+    if (dataTile.endSlideActions != null &&
+        dataTile.endSlideActions!.isNotEmpty) {
+      endActionPane = _buildActionPane(dataTile.endSlideActions);
     }
     return Slidable(
       key: UniqueKey(),

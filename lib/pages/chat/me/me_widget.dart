@@ -20,7 +20,7 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 //我的页面，带有路由回调函数
-class MeWidget extends StatelessWidget with TileDataMixin {
+class MeWidget extends StatelessWidget with DataTileMixin {
   final PersonalInfoWidget personalInfoWidget = PersonalInfoWidget();
   final CollectionListView collectionListView = CollectionListView();
   final SettingWidget settingWidget = SettingWidget();
@@ -62,9 +62,9 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Me';
 
-  List<TileData> _buildMeTileData(BuildContext context) {
+  List<DataTile> _buildMeTileData(BuildContext context) {
     final bool developerSwitch = myself.peerProfile.developerSwitch;
-    List<TileDataMixin> mixins = [
+    List<DataTileMixin> mixins = [
       settingWidget,
       collectionListView,
     ];
@@ -84,7 +84,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       mixins.add(contactWidget);
     }
 
-    List<TileData> meTileData = TileData.from(mixins);
+    List<DataTile> meTileData = DataTile.from(mixins);
     for (var tile in meTileData) {
       tile.dense = false;
       tile.selected = false;
@@ -95,7 +95,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    List<TileData> meTileData = _buildMeTileData(context);
+    List<DataTile> meTileData = _buildMeTileData(context);
     Widget child = DataListView(
       itemCount: meTileData.length,
       itemBuilder: (BuildContext context, int index) {

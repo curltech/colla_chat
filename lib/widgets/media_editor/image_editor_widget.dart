@@ -16,7 +16,7 @@ import 'package:pro_image_editor/core/models/editor_callbacks/pro_image_editor_c
 import 'package:pro_image_editor/features/main_editor/main_editor.dart';
 
 /// 图像编辑界面
-class ImageEditorWidget extends StatelessWidget with TileDataMixin {
+class ImageEditorWidget extends StatelessWidget with DataTileMixin {
   ImageEditorWidget({
     super.key,
   });

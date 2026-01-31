@@ -18,7 +18,7 @@ final DataListController<Linkman> groupLinkmanController =
     DataListController<Linkman>();
 
 /// 群或者会议中的联系人的信息和webrtc连接状态
-class LinkmanWebrtcConnectionWidget extends StatelessWidget with TileDataMixin {
+class LinkmanWebrtcConnectionWidget extends StatelessWidget with DataTileMixin {
   LinkmanWebrtcConnectionWidget({super.key});
 
   @override
@@ -35,8 +35,8 @@ class LinkmanWebrtcConnectionWidget extends StatelessWidget with TileDataMixin {
 
   
 
-  final ValueNotifier<List<TileData>> tileData =
-      ValueNotifier<List<TileData>>([]);
+  final ValueNotifier<List<DataTile>> tileData =
+      ValueNotifier<List<DataTile>>([]);
 
   Widget _buildBadge(int connectionNum, {Widget? avatarImage}) {
     var badge = avatarImage ?? AppImage.mdAppImage;
@@ -55,9 +55,9 @@ class LinkmanWebrtcConnectionWidget extends StatelessWidget with TileDataMixin {
     return badge;
   }
 
-  Future<List<TileData>> _buildConnectionTileData(BuildContext context) async {
+  Future<List<DataTile>> _buildConnectionTileData(BuildContext context) async {
     RxList<Linkman> linkmen = groupLinkmanController.data;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (linkmen.isNotEmpty) {
       for (var linkman in linkmen) {
         var name = linkman.name;
@@ -74,7 +74,7 @@ class LinkmanWebrtcConnectionWidget extends StatelessWidget with TileDataMixin {
           connectionNum = connections.length;
           dataChannelState = connections.first.dataChannelState;
         }
-        TileData tile = TileData(
+        DataTile tile = DataTile(
             prefix: _buildBadge(connectionNum, avatarImage: prefix),
             title: name,
             subtitle: peerId,
@@ -96,7 +96,7 @@ class LinkmanWebrtcConnectionWidget extends StatelessWidget with TileDataMixin {
     var connectionView = Obx(() {
       return PlatformFutureBuilder(
         future: _buildConnectionTileData(context),
-        builder: (BuildContext context, List<TileData> tileData) {
+        builder: (BuildContext context, List<DataTile> tileData) {
           return DataListView(
             itemCount: tileData.length,
             itemBuilder: (BuildContext context, int index) {

@@ -3,7 +3,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_performance_pulse/flutter_performance_pulse.dart';
 
-class PerformancePulseWidget extends StatelessWidget with TileDataMixin {
+class PerformancePulseWidget extends StatelessWidget with DataTileMixin {
   PerformancePulseWidget({super.key}) {
     _init();
   }

@@ -30,7 +30,7 @@ DataListController<data_source.DataColumn> dataTableColumnController =
 DataListController<data_source.DataIndex> dataTableIndexController =
     DataListController<data_source.DataIndex>(data: []);
 
-class DataTableEditWidget extends StatefulWidget with TileDataMixin {
+class DataTableEditWidget extends StatefulWidget with DataTileMixin {
   @override
   bool get withLeading => true;
 
@@ -371,14 +371,14 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
 
   Widget _buildDataIndexesWidget(BuildContext context) {
     return Obx(() {
-      final List<TileData> tiles = [];
+      final List<DataTile> tiles = [];
       for (int i = 0; i < dataTableIndexController.data.length; ++i) {
         DataIndex dataIndex = dataTableIndexController.data[i];
         String titleTail = '';
         if (dataIndex.isUnique != null && dataIndex.isUnique!) {
           titleTail = 'Unique';
         }
-        tiles.add(TileData(
+        tiles.add(DataTile(
             prefix: Icon(
               Icons.content_paste_search,
               color: myself.primary,

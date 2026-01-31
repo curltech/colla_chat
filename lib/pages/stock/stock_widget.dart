@@ -9,15 +9,14 @@ import 'package:colla_chat/pages/stock/value/performance_widget.dart';
 import 'package:colla_chat/pages/stock/value/qperformance_widget.dart';
 import 'package:colla_chat/pages/stock/value/qstat_widget.dart';
 import 'package:colla_chat/pages/stock/value/stat_score_widget.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/app_bar_adaptive_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
 /// 股票功能主页面，带有路由回调函数
-class StockMainWidget extends StatelessWidget with TileDataMixin {
+class StockMainWidget extends StatelessWidget with DataTileMixin {
   final ShareSelectionWidget shareSelectionWidget = ShareSelectionWidget();
   final AddShareWidget addShareWidget = AddShareWidget();
   final RefreshStockWidget refreshStockWidget = RefreshStockWidget();
@@ -29,19 +28,13 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
   final QPerformanceWidget qperformanceWidget = QPerformanceWidget();
   final QStatWidget qstatWidget = QStatWidget();
   final StatScoreWidget statScoreWidget = StatScoreWidget();
+  final Map<DataTile, List<DataTile>> stockTileData = {};
+  final Map<DataTile, List<Widget>> stockWidgets = {};
+  late final ValueNotifier<Widget> currentBody =
+      ValueNotifier<Widget>(shareSelectionWidget);
 
   StockMainWidget({super.key}) {
-    indexWidgetProvider.define(shareSelectionWidget);
-    indexWidgetProvider.define(addShareWidget);
-    indexWidgetProvider.define(refreshStockWidget);
-    indexWidgetProvider.define(updateStockWidget);
-    indexWidgetProvider.define(inoutEventWidget);
-    indexWidgetProvider.define(eventFilterWidget);
-    indexWidgetProvider.define(dayLineWidget);
-    indexWidgetProvider.define(performanceWidget);
-    indexWidgetProvider.define(qperformanceWidget);
-    indexWidgetProvider.define(qstatWidget);
-    indexWidgetProvider.define(statScoreWidget);
+    init();
   }
 
   @override
@@ -56,53 +49,63 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Stock';
 
-  @override
-  Widget build(BuildContext context) {
-    Map<TileData, List<TileData>> tileData = {};
-    final List<TileData> meTileData = TileData.from([
+  void init() {
+    final List<DataTileMixin> meWidgets = [
       shareSelectionWidget,
       addShareWidget,
       dayLineWidget,
       eventFilterWidget,
       inoutEventWidget
-    ]);
-    for (var tile in meTileData) {
-      tile.dense = false;
-      tile.selected = false;
-    }
-    tileData[TileData(title: 'Me', selected: true)] = meTileData;
+    ];
+    final List<DataTile> meDataTiles = DataTile.from(meWidgets);
+    DataTile meDataTile = DataTile(title: 'Me', selected: true);
+    stockTileData[meDataTile] = meDataTiles;
+    stockWidgets[meDataTile] = meWidgets;
 
-    final List<TileData> valueTileData = TileData.from([
+    final List<DataTileMixin> valueWidgets = [
       performanceWidget,
       qperformanceWidget,
       qstatWidget,
       statScoreWidget,
-    ]);
-    for (var tile in valueTileData) {
-      tile.dense = false;
-      tile.selected = false;
-    }
-    tileData[TileData(title: 'Value', selected: true)] = valueTileData;
+    ];
+    final List<DataTile> valueDataTiles = DataTile.from(valueWidgets);
+    DataTile valueDataTile = DataTile(title: 'Value', selected: true);
+    stockTileData[valueDataTile] = valueDataTiles;
+    stockWidgets[valueDataTile] = valueWidgets;
 
-    List<TileDataMixin> mixins = [
+    final List<DataTileMixin> settingWidgets = [
       refreshStockWidget,
       updateStockWidget,
     ];
-
-    final List<TileData> settingTileData = TileData.from(mixins);
-    for (var tile in settingTileData) {
-      tile.dense = false;
-      tile.selected = false;
-    }
-    tileData[TileData(
+    final List<DataTile> settingDataTiles = DataTile.from(settingWidgets);
+    DataTile settingDataTile = DataTile(
       title: 'Setting',
       selected: true,
-    )] = settingTileData;
+    );
+    stockTileData[settingDataTile] = settingDataTiles;
+    stockWidgets[settingDataTile] = settingWidgets;
+  }
 
-    Widget stockMain = AppBarView(
-        title: title,
-        withLeading: true,
-        child: GroupDataListView(tileData: tileData));
+  @override
+  Widget build(BuildContext context) {
+    Widget stockMain = ValueListenableBuilder(
+        valueListenable: currentBody,
+        builder: (BuildContext context, Widget value, Widget? child) {
+          // String title = this.title + currentBody.value.title ?? '';
+          return AppBarAdaptiveView(
+              title: title,
+              withLeading: true,
+              main: GroupDataListView(
+                tileData: stockTileData,
+                onTap: (int index, String title,
+                    {DataTile? group, String? subtitle}) async {
+                  currentBody.value =
+                      stockWidgets[group]?[index] ?? shareSelectionWidget;
+                  return null;
+                },
+              ),
+              body: currentBody.value);
+        });
 
     return stockMain;
   }

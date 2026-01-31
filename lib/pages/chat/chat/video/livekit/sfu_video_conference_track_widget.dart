@@ -14,7 +14,7 @@ ValueNotifier<livekit_client.Participant?> participantNotifier =
     ValueNotifier<livekit_client.Participant?>(null);
 
 ///Sfu会议池的会议的远程参与者的轨道列表显示界面
-class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
+class SfuVideoConferenceTrackWidget extends StatelessWidget with DataTileMixin {
   ValueNotifier<livekit_client.TrackPublication?> trackPublication =
       ValueNotifier<livekit_client.TrackPublication?>(null);
 
@@ -34,9 +34,9 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
 
   
 
-  List<TileData> _buildAudioTrackTileData(BuildContext context) {
+  List<DataTile> _buildAudioTrackTileData(BuildContext context) {
     livekit_client.Participant? participant = participantNotifier.value;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (participant == null) {
       return tiles;
     }
@@ -56,7 +56,7 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
       var trackId = track.id;
       var kind = track.kind;
       var label = track.label;
-      TileData tile = TileData(
+      DataTile tile = DataTile(
         prefix: kind == 'video'
             ? const Icon(
                 Icons.video_call_outlined,
@@ -78,9 +78,9 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
     return tiles;
   }
 
-  List<TileData> _buildVideoTrackTileData(BuildContext context) {
+  List<DataTile> _buildVideoTrackTileData(BuildContext context) {
     livekit_client.Participant? participant = participantNotifier.value;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (participant == null) {
       return tiles;
     }
@@ -99,7 +99,7 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
       var trackId = track.id;
       var kind = track.kind;
       var label = track.label;
-      TileData tile = TileData(
+      DataTile tile = DataTile(
         prefix: kind == 'video'
             ? const Icon(
                 Icons.video_call_outlined,

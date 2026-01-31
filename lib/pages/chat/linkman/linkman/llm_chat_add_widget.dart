@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 //联系人信息页面
-class LlmChatAddWidget extends StatelessWidget with TileDataMixin {
+class LlmChatAddWidget extends StatelessWidget with DataTileMixin {
   LlmChatAddWidget({super.key}) {
     linkman ??= linkmanController.current;
   }

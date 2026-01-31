@@ -43,7 +43,7 @@ class RequestAddFriendMessage extends StatelessWidget {
               }
             },
     );
-    var tileData = TileData(
+    var tileData = DataTile(
       prefix: prefix,
       title: 'Request add friend',
       subtitle: title,

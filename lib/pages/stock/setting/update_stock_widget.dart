@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 /// 运行后台批处理，更新数据，支持单个股票的数据更新
-class UpdateStockWidget extends StatelessWidget with TileDataMixin {
+class UpdateStockWidget extends StatelessWidget with DataTileMixin {
   UpdateStockWidget({super.key});
 
   @override
@@ -29,12 +29,12 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
   final TextEditingController _startDateTextController =
       TextEditingController();
   final TextEditingController _tsCodeTextController = TextEditingController();
-  final RxList<TileData> tileData = <TileData>[].obs;
+  final RxList<DataTile> tileData = <DataTile>[].obs;
 
   void _initTileData(BuildContext context) {
     tileData.clear();
     tileData.addAll([
-      TileData(
+      DataTile(
           title: '预测',
           subtitle: '获取预测数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -47,7 +47,7 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
               stockLineService.getUpdateForecast(_tsCodeTextController.text);
             }
           }),
-      TileData(
+      DataTile(
           title: '快报',
           subtitle: '获取快报数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -60,7 +60,7 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
               stockLineService.getUpdateExpress(_tsCodeTextController.text);
             }
           }),
-      TileData(
+      DataTile(
           title: '业绩',
           subtitle: '获取业绩数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -73,7 +73,7 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
               stockLineService.getUpdatePerformance(_tsCodeTextController.text);
             }
           }),
-      TileData(
+      DataTile(
           title: '日线',
           subtitle: '获取日线数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -86,7 +86,7 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
               stockLineService.getUpdateDayLine(_tsCodeTextController.text);
             }
           }),
-      TileData(
+      DataTile(
           title: '今天日线',
           subtitle: '获取今天的日线数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -100,7 +100,7 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
                   int.parse(_startDateTextController.text));
             }
           }),
-      TileData(
+      DataTile(
           title: '分钟线',
           subtitle: '获取分钟线数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -113,7 +113,7 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
               stockLineService.getUpdateMinLine(_tsCodeTextController.text);
             }
           }),
-      TileData(
+      DataTile(
           title: '单只股票今天分钟线',
           subtitle: '获取今天的分钟线数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -127,7 +127,7 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
                   .getUpdateTodayMinLine(_tsCodeTextController.text);
             }
           }),
-      TileData(
+      DataTile(
           title: '周月季年线',
           subtitle: '获取周月季年线数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -140,7 +140,7 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
               stockLineService.getUpdateWmqyLine(_tsCodeTextController.text);
             }
           }),
-      TileData(
+      DataTile(
           title: '单只季度业绩汇总',
           subtitle: '汇总单只股票的季度业绩数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -154,7 +154,7 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
                   .getUpdateWmqyQPerformance(_tsCodeTextController.text);
             }
           }),
-      TileData(
+      DataTile(
           title: '单只季度业绩最新价汇总',
           subtitle: '汇总单只股票的季度业绩最新价数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -168,7 +168,7 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
                   .getUpdateDayQPerformance(_tsCodeTextController.text);
             }
           }),
-      TileData(
+      DataTile(
           title: '单只季度业绩统计汇总',
           subtitle: '汇总单只股票的季度业绩统计数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -181,7 +181,7 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
               stockLineService.getUpdateQStat(_tsCodeTextController.text);
             }
           }),
-      TileData(
+      DataTile(
           title: '单只季度业绩评分汇总',
           subtitle: '汇总单只股票的季度业绩评分数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -194,7 +194,7 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
               stockLineService.getUpdateStatScore(_tsCodeTextController.text);
             }
           }),
-      TileData(
+      DataTile(
           title: '单只日线统计',
           subtitle: '计算单只股票的日线统计数据',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -209,7 +209,7 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
                   int.parse(_startDateTextController.text));
             }
           }),
-      TileData(
+      DataTile(
           title: '单只过去1,3,5日线均线',
           subtitle: '计算单只股票的过去1,3,5日线均线',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -224,7 +224,7 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
                   int.parse(_startDateTextController.text));
             }
           }),
-      TileData(
+      DataTile(
           title: '计算单只股票的买卖点事件',
           subtitle: '计算单只股票的买卖点事件',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -237,7 +237,7 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
               stockLineService.getUpdateEventCond(_tsCodeTextController.text);
             }
           }),
-      TileData(
+      DataTile(
           title: '创建模型数据文件',
           subtitle: '创建模型数据文件',
           onTap: (int index, String title, {String? subtitle}) async {
@@ -288,6 +288,6 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     _initTileData(context);
     return AppBarView(
-        title: title, withLeading: true, child: _buildUpdateStockView(context));
+        title: title, isAppBar: false, child: _buildUpdateStockView(context));
   }
 }

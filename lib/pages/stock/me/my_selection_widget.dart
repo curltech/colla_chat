@@ -236,7 +236,7 @@ class MyShareController {
 MyShareController myShareController = MyShareController();
 
 ///自选股和分组的查询界面
-class ShareSelectionWidget extends StatefulWidget with TileDataMixin {
+class ShareSelectionWidget extends StatefulWidget with DataTileMixin {
   final StockLineChartWidget stockLineChartWidget = StockLineChartWidget();
 
   ShareSelectionWidget({super.key}) {
@@ -510,7 +510,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
     });
   }
 
-  List<ActionData> _buildShareActions(BuildContext context) {
+  List<ActionData> get actions {
     List<ActionData> actions = [
       ActionData(
         label: AppLocalizations.t('Add share'),
@@ -574,9 +574,10 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
   Widget build(BuildContext context) {
     return AppBarView(
       title: widget.title,
+      isAppBar: false,
       helpPath: widget.routeName,
-      withLeading: true,
-      actions: _buildShareActions(context),
+      withLeading: false,
+      actions: actions,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

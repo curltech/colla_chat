@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 ///客户端
-class PeerClientEditWidget extends StatelessWidget with TileDataMixin {
+class PeerClientEditWidget extends StatelessWidget with DataTileMixin {
   PeerClientEditWidget({super.key});
 
   @override

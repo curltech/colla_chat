@@ -22,7 +22,7 @@ import 'package:pro_image_editor/core/models/editor_callbacks/pro_image_editor_c
 import 'package:pro_image_editor/features/main_editor/main_editor.dart';
 
 /// 通用的视频编辑界面，使用ffmpeg分离视频成为图像
-class VideoEditorWidget extends StatelessWidget with TileDataMixin {
+class VideoEditorWidget extends StatelessWidget with DataTileMixin {
   VideoEditorWidget({
     super.key,
   }) {

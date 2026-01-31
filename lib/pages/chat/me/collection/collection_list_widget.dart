@@ -95,7 +95,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
     return subtitle;
   }
 
-  TileData _buildCollectionTileData(ChatMessage chatMessage) {
+  DataTile _buildCollectionTileData(ChatMessage chatMessage) {
     var id = chatMessage.id;
     var senderPeerId = chatMessage.senderPeerId ?? '';
     var senderName = chatMessage.senderName ?? '';
@@ -112,7 +112,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
         contentType: chatMessage.contentType,
         content: chatMessage.content);
 
-    TileData tile = TileData(
+    DataTile tile = DataTile(
         title: title,
         titleTail: sendTime,
         subtitle: subtitle,
@@ -120,8 +120,8 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
         selected: false,
         isThreeLine: false,
         routeName: 'collection_item');
-    List<TileData> slideActions = [];
-    TileData deleteSlideAction = TileData(
+    List<DataTile> slideActions = [];
+    DataTile deleteSlideAction = DataTile(
         title: 'Delete',
         prefix: Icons.bookmark_remove,
         onTap: (int index, String label, {String? subtitle}) async {
@@ -134,7 +134,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
   }
 
   Future<bool?> _onTapCollection(int index, String title,
-      {String? subtitle, TileData? group}) async {
+      {String? subtitle, DataTile? group}) async {
     collectionChatMessageController.setCurrentIndex = index;
     return null;
   }
@@ -145,7 +145,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
     ChatMessage chatMessage = messages[index];
     Widget chatMessageItem = DataListTile(
       index: index,
-      tileData: _buildCollectionTileData(chatMessage),
+      dataTile: _buildCollectionTileData(chatMessage),
       onTap: _onTapCollection,
     );
 

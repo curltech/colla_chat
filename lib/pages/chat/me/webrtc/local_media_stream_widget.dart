@@ -16,7 +16,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-class LocalMediaStreamWidget extends StatelessWidget with TileDataMixin {
+class LocalMediaStreamWidget extends StatelessWidget with DataTileMixin {
   @override
   bool get withLeading => true;
 

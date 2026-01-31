@@ -4,7 +4,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 /// 日志显示
-class LoggerConsoleView extends StatelessWidget with TileDataMixin {
+class LoggerConsoleView extends StatelessWidget with DataTileMixin {
   const LoggerConsoleView({super.key});
 
   @override

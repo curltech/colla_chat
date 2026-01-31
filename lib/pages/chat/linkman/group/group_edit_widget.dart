@@ -32,7 +32,7 @@ import 'package:get/get.dart';
 final Rx<Group?> groupNotifier = Rx<Group?>(null);
 
 ///创建和修改群，填写群的基本信息，选择群成员和群主
-class GroupEditWidget extends StatelessWidget with TileDataMixin {
+class GroupEditWidget extends StatelessWidget with DataTileMixin {
   GroupEditWidget({super.key});
 
   @override

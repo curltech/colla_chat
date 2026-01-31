@@ -11,24 +11,24 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 /// 高级设置组件，包括定位器配置
-class AdvancedSettingWidget extends StatelessWidget with TileDataMixin {
+class AdvancedSettingWidget extends StatelessWidget with DataTileMixin {
   final PeerEndpointListWidget peerEndpointListWidget =
       PeerEndpointListWidget();
   final PeerClientListWidget peerClientListWidget = PeerClientListWidget();
   final MyselfPeerListWidget myselfPeerListWidget =
       const MyselfPeerListWidget();
-  late final List<TileData> advancedSettingTileData;
+  late final List<DataTile> advancedSettingTileData;
 
   AdvancedSettingWidget({super.key}) {
     indexWidgetProvider.define(peerEndpointListWidget);
     indexWidgetProvider.define(peerClientListWidget);
     indexWidgetProvider.define(myselfPeerListWidget);
-    List<TileDataMixin> mixins = [
+    List<DataTileMixin> mixins = [
       peerEndpointListWidget,
       peerClientListWidget,
       myselfPeerListWidget,
     ];
-    advancedSettingTileData = TileData.from(mixins);
+    advancedSettingTileData = DataTile.from(mixins);
     for (var tile in advancedSettingTileData) {
       tile.dense = true;
     }

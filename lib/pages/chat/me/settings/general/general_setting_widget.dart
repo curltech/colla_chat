@@ -8,7 +8,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 /// 一般设置组件，包括颜色，亮度，语言
-class GeneralSettingWidget extends StatelessWidget with TileDataMixin {
+class GeneralSettingWidget extends StatelessWidget with DataTileMixin {
   const GeneralSettingWidget({super.key});
 
   @override

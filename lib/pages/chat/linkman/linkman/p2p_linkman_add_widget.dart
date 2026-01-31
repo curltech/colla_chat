@@ -22,7 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 ///p2p网络节点搜索增加
-class P2pLinkmanAddWidget extends StatelessWidget with TileDataMixin {
+class P2pLinkmanAddWidget extends StatelessWidget with DataTileMixin {
   P2pLinkmanAddWidget({super.key}) {
     _init();
   }
@@ -40,8 +40,8 @@ class P2pLinkmanAddWidget extends StatelessWidget with TileDataMixin {
   bool get withLeading => true;
 
   TextEditingController controller = TextEditingController();
-  final DataListController<TileData> tileDataController =
-      DataListController<TileData>();
+  final DataListController<DataTile> tileDataController =
+      DataListController<DataTile>();
   late final Widget dataListView;
   StreamSubscription<ChainMessage>? chainMessageListen;
 
@@ -102,7 +102,7 @@ class P2pLinkmanAddWidget extends StatelessWidget with TileDataMixin {
   }
 
   Future<void> _buildTiles(List<PeerClient> peerClients) async {
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (peerClients.isNotEmpty) {
       for (var peerClient in peerClients) {
         var title = peerClient.name;
@@ -148,7 +148,7 @@ class P2pLinkmanAddWidget extends StatelessWidget with TileDataMixin {
             );
           }
         }
-        TileData tile = TileData(
+        DataTile tile = DataTile(
             title: title, subtitle: peerId, suffix: suffix, selected: false);
         tiles.add(tile);
       }

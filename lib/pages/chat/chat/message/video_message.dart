@@ -70,7 +70,7 @@ class _VideoMessageState extends State<VideoMessage> {
           imageContent: widget.thumbnail,
         );
       }
-      var tileData = TileData(
+      var tileData = DataTile(
         prefix: prefix,
         title: widget.title!,
       );

@@ -7,7 +7,7 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 ///自己的本地账号组件
-class MyselfPeerListWidget extends StatelessWidget with TileDataMixin {
+class MyselfPeerListWidget extends StatelessWidget with DataTileMixin {
   const MyselfPeerListWidget({super.key});
 
   @override
@@ -24,13 +24,13 @@ class MyselfPeerListWidget extends StatelessWidget with TileDataMixin {
 
   
 
-  List<TileData> _buildMyselfPeerTileData() {
-    List<TileData> tiles = [];
+  List<DataTile> _buildMyselfPeerTileData() {
+    List<DataTile> tiles = [];
     List<MyselfPeer> myselfPeers = myselfPeerController.data;
     if (myselfPeers.isNotEmpty) {
       int i = 0;
       for (var myselfPeer in myselfPeers) {
-        var tile = TileData(
+        var tile = DataTile(
           selected: myselfPeerController.currentIndex.value == i,
           title: myselfPeer.loginName,
           subtitle: myselfPeer.peerId,
@@ -47,13 +47,13 @@ class MyselfPeerListWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    List<TileData> tiles = _buildMyselfPeerTileData();
+    List<DataTile> tiles = _buildMyselfPeerTileData();
     var myselfPeers = DataListView(
       itemCount: tiles.length,
       itemBuilder: (BuildContext context, int index) {
         return tiles[index];
       },
-      onTap: (int index, String title, {TileData? group, String? subtitle}) async {
+      onTap: (int index, String title, {DataTile? group, String? subtitle}) async {
         myselfPeerController.setCurrentIndex = index;
         return null;
       },

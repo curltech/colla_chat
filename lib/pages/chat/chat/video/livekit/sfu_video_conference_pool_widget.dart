@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart' as livekit_client;
 
 ///Sfu会议池的显示界面
-class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
+class SfuVideoConferencePoolWidget extends StatelessWidget with DataTileMixin {
   final SfuVideoConferenceParticipantWidget
       sfuVideoConferenceParticipantWidget =
       SfuVideoConferenceParticipantWidget();
@@ -39,10 +39,10 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
 
   
 
-  List<TileData> _buildConferenceTileData(BuildContext context) {
+  List<DataTile> _buildConferenceTileData(BuildContext context) {
     List<LiveKitConferenceClient> liveKitConferenceClients =
         liveKitConferenceClientPool.conferenceClients;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (liveKitConferenceClients.isNotEmpty) {
       for (LiveKitConferenceClient liveKitConferenceClient
           in liveKitConferenceClients) {
@@ -56,7 +56,7 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
         var conferenceName = conference.name;
         var conferenceOwnerName = conference.conferenceOwnerName;
         var topic = conference.topic;
-        TileData tile = TileData(
+        DataTile tile = DataTile(
             prefix: conference.avatarImage,
             title: conferenceName,
             titleTail: topic,
@@ -67,9 +67,9 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
               return null;
             },
             routeName: 'sfu_video_conference_participant');
-        List<TileData> slideActions = [];
+        List<DataTile> slideActions = [];
         if (liveKitConferenceClientPool.conferenceId != conferenceId) {
-          TileData checkSlideAction = TileData(
+          DataTile checkSlideAction = DataTile(
               title: 'Check',
               prefix: Icons.playlist_add_check_outlined,
               onTap: (int index, String label, {String? subtitle}) async {
@@ -80,7 +80,7 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
               });
           slideActions.add(checkSlideAction);
         }
-        TileData deleteSlideAction = TileData(
+        DataTile deleteSlideAction = DataTile(
             title: 'Delete',
             prefix: Icons.playlist_remove_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
@@ -91,7 +91,7 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
                       '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is closed')}');
             });
         slideActions.add(deleteSlideAction);
-        TileData conferenceSlideAction = TileData(
+        DataTile conferenceSlideAction = DataTile(
             title: 'Conference',
             prefix: Icons.meeting_room,
             onTap: (int index, String label, {String? subtitle}) async {

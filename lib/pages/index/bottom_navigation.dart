@@ -40,7 +40,7 @@ class BottomNavigation {
   List<NavigationDestination> _buildNavigationDestination() {
     List<NavigationDestination> destinations = [];
     for (String mainView in indexWidgetProvider.mainViews) {
-      TileDataMixin? view = indexWidgetProvider.allViews[mainView];
+      DataTileMixin? view = indexWidgetProvider.allViews[mainView];
       if (view != null) {
         destinations.add(NavigationDestination(
           label: AppLocalizations.t(view.title),

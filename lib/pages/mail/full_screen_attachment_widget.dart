@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 
 final Rx<MediaProvider?> attachmentMediaProvider = Rx<MediaProvider?>(null);
 
-class FullScreenAttachmentWidget extends StatelessWidget with TileDataMixin {
+class FullScreenAttachmentWidget extends StatelessWidget with DataTileMixin {
   const FullScreenAttachmentWidget({super.key});
 
   @override

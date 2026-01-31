@@ -27,7 +27,7 @@ class FileMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String? mimeType = FileUtil.mimeType(title);
-    var tileData = TileData(
+    var tileData = DataTile(
         prefix: Mimecon(
           mimetype: mimeType ?? this.mimeType,
           color: myself.primary,

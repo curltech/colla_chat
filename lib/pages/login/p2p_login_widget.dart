@@ -115,12 +115,12 @@ class P2pLoginWidget extends StatelessWidget {
     }
   }
 
-  TileData? _buildMyselfPeerTile(int index) {
-    TileData? tileData;
+  DataTile? _buildMyselfPeerTile(int index) {
+    DataTile? tileData;
     List<MyselfPeer> myselfPeers = myselfPeerController.data;
     if (myselfPeers.isNotEmpty) {
       MyselfPeer myselfPeer = myselfPeers[index];
-      tileData = TileData(
+      tileData = DataTile(
         title: myselfPeer.loginName,
         subtitle: myselfPeer.peerId,
         titleTail: myselfPeer.name,
@@ -177,7 +177,7 @@ class P2pLoginWidget extends StatelessWidget {
       Obx(() {
         return DataListView(
           onTap: (int index, String title,
-              {TileData? group, String? subtitle}) async {
+              {DataTile? group, String? subtitle}) async {
             myselfPeerController.setCurrentIndex = index;
             Navigator.pop(context);
             return null;

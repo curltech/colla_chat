@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_json_view/flutter_json_view.dart';
 import 'package:get/get.dart';
 
-class JsonViewerWidget extends StatelessWidget with TileDataMixin {
+class JsonViewerWidget extends StatelessWidget with DataTileMixin {
   JsonViewerWidget({super.key});
 
   @override

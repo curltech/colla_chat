@@ -32,21 +32,21 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 /// 安全设置组件，包括修改密码，登录选项（免登录设置），加密选项（加密算法，signal）
-class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
+class SecuritySettingWidget extends StatelessWidget with DataTileMixin {
   final PasswordWidget passwordWidget = PasswordWidget();
   final LoggerConsoleView loggerConsoleView = const LoggerConsoleView();
-  late final List<TileData> securitySettingTileData;
+  late final List<DataTile> securitySettingTileData;
 
   SecuritySettingWidget({super.key}) {
     indexWidgetProvider.define(passwordWidget);
     indexWidgetProvider.define(loggerConsoleView);
-    List<TileDataMixin> mixins = [
+    List<DataTileMixin> mixins = [
       passwordWidget,
     ];
     if (myself.peerProfile.developerSwitch) {
       mixins.add(loggerConsoleView);
     }
-    securitySettingTileData = TileData.from(mixins);
+    securitySettingTileData = DataTile.from(mixins);
     for (var tile in securitySettingTileData) {
       tile.dense = true;
     }
@@ -67,19 +67,19 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
   
 
   Widget _buildBackupTileWidget(BuildContext context) {
-    List<TileData> tiles = [
-      TileData(title: 'Vacuum', prefix: Icons.compress_outlined),
-      TileData(title: 'Backup', prefix: Icons.backup),
-      TileData(title: 'Restore', prefix: Icons.restore),
-      TileData(title: 'Backup peer', prefix: Icons.backup_table),
-      TileData(title: 'Delete peer', prefix: Icons.delete_outline),
-      TileData(title: 'Restore peer', prefix: Icons.restore_page),
-      TileData(title: 'Backup attachment', prefix: Icons.copy),
-      TileData(title: 'Restore attachment', prefix: Icons.paste),
+    List<DataTile> tiles = [
+      DataTile(title: 'Vacuum', prefix: Icons.compress_outlined),
+      DataTile(title: 'Backup', prefix: Icons.backup),
+      DataTile(title: 'Restore', prefix: Icons.restore),
+      DataTile(title: 'Backup peer', prefix: Icons.backup_table),
+      DataTile(title: 'Delete peer', prefix: Icons.delete_outline),
+      DataTile(title: 'Restore peer', prefix: Icons.restore_page),
+      DataTile(title: 'Backup attachment', prefix: Icons.copy),
+      DataTile(title: 'Restore attachment', prefix: Icons.paste),
     ];
     if (myself.peerProfile.developerSwitch) {
       tiles.add(
-        TileData(title: 'Clean log', prefix: Icons.cleaning_services),
+        DataTile(title: 'Clean log', prefix: Icons.cleaning_services),
       );
     }
 
@@ -88,14 +88,14 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
         itemBuilder: (BuildContext context, int index) {
           return tiles[index];
         },
-        onTap: (int index, String title, {TileData? group, String? subtitle}) async {
+        onTap: (int index, String title, {DataTile? group, String? subtitle}) async {
           _onTap(context, index, title, group: group, subtitle: subtitle);
           return null;
         });
   }
 
   void _onTap(BuildContext context, int index, String title,
-      {TileData? group, String? subtitle}) {
+      {DataTile? group, String? subtitle}) {
     switch (title) {
       case 'Vacuum':
         _vacuum(context);

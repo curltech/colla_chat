@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 /// 加自选股和分组的查询界面
-class AddShareWidget extends StatelessWidget with TileDataMixin {
+class AddShareWidget extends StatelessWidget with DataTileMixin {
   AddShareWidget({super.key});
 
   @override
@@ -35,16 +35,16 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
 
   /// 增加自选股的查询结果
   final RxList<Share> shares = <Share>[].obs;
-  final RxList<TileData> tileData = <TileData>[].obs;
+  final RxList<DataTile> tileData = <DataTile>[].obs;
 
   /// 将linkman和group数据转换从列表显示数据
-  Future<List<TileData>> _buildShareTileData() async {
-    List<TileData> tiles = [];
+  Future<List<DataTile>> _buildShareTileData() async {
+    List<DataTile> tiles = [];
     if (shares.isNotEmpty) {
       for (var share in shares) {
         var name = share.name;
         var tsCode = share.tsCode;
-        TileData tile = TileData(
+        DataTile tile = DataTile(
           title: name!,
           subtitle: tsCode,
           selected: false,
@@ -53,7 +53,7 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
         if (tsCode != null) {
           bool contain = subscription.contains(tsCode);
           if (!contain) {
-            tile = TileData(
+            tile = DataTile(
                 title: name,
                 subtitle: tsCode,
                 selected: false,
@@ -141,7 +141,7 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
     return AppBarView(
         title: title,
         helpPath: routeName,
-        withLeading: true,
+        isAppBar: false,
         child: _buildSearchShareView(context));
   }
 }

@@ -20,7 +20,7 @@ import 'package:colla_chat/widgets/data_bind/tree_view.dart';
 import 'package:flutter/material.dart';
 
 /// 数据源管理功能主页面，带有路由回调函数
-class DataSourceWidget extends StatelessWidget with TileDataMixin {
+class DataSourceWidget extends StatelessWidget with DataTileMixin {
   final DataSourceEditWidget dataSourceEditWidget = DataSourceEditWidget();
   final DataTableEditWidget dataTableEditWidget = DataTableEditWidget();
   final DataColumnEditWidget dataColumnEditWidget = DataColumnEditWidget();

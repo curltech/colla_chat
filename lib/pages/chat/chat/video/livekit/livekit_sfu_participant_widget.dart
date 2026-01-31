@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 final Rx<String?> roomName = Rx<String?>(null);
 
 /// 创建参与者和管理参与者的界面
-class LiveKitSfuParticipantWidget extends StatelessWidget with TileDataMixin {
+class LiveKitSfuParticipantWidget extends StatelessWidget with DataTileMixin {
   LiveKitSfuParticipantWidget({super.key}) {
     _init();
   }
@@ -28,7 +28,7 @@ class LiveKitSfuParticipantWidget extends StatelessWidget with TileDataMixin {
 
   
 
-  final RxList<TileData> tileData = <TileData>[].obs;
+  final RxList<DataTile> tileData = <DataTile>[].obs;
 
   Future<void> _init() async {
     if (roomName.value == null) {
@@ -36,13 +36,13 @@ class LiveKitSfuParticipantWidget extends StatelessWidget with TileDataMixin {
     }
     List<LiveKitParticipant>? participants =
         await conferenceService.listSfuParticipants(roomName.value!);
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (participants != null && participants.isNotEmpty) {
       for (var participant in participants) {
         String? name = participant.name;
         String? identity = participant.identity;
         int? joinedAt = participant.joinedAt;
-        TileData tile = TileData(
+        DataTile tile = DataTile(
           title: name!,
           subtitle: identity.toString(),
           titleTail: joinedAt.toString(),

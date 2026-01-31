@@ -23,7 +23,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
+class ModelNodeEditWidget extends StatelessWidget with DataTileMixin {
   final AttributeEditWidget attributeEditWidget = AttributeEditWidget();
   final MethodEditWidget methodEditWidget = MethodEditWidget();
   final NodeRelationshipEditWidget nodeRelationshipEditWidget =

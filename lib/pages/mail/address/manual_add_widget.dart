@@ -15,7 +15,7 @@ import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
 
 /// 邮件地址手工注册组件，录入框和按钮组合
-class ManualAddWidget extends StatelessWidget with TileDataMixin {
+class ManualAddWidget extends StatelessWidget with DataTileMixin {
   ManualAddWidget({super.key});
 
   @override

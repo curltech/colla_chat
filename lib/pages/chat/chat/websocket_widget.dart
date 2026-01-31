@@ -5,7 +5,7 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 //我的页面，带有路由回调函数
-class WebSocketWidget extends StatelessWidget with TileDataMixin {
+class WebSocketWidget extends StatelessWidget with DataTileMixin {
   WebSocketWidget({super.key});
 
   @override
@@ -22,13 +22,13 @@ class WebSocketWidget extends StatelessWidget with TileDataMixin {
 
   
 
-  List<TileData> _buildMeTileData(BuildContext context) {
+  List<DataTile> _buildMeTileData(BuildContext context) {
     return [];
   }
 
   @override
   Widget build(BuildContext context) {
-    List<TileData> meTileData = _buildMeTileData(context);
+    List<DataTile> meTileData = _buildMeTileData(context);
     Widget child = DataListView(
       itemCount: meTileData.length,
       itemBuilder: (BuildContext context, int index) {

@@ -14,7 +14,7 @@ ValueNotifier<AdvancedPeerConnection?> peerConnectionNotifier =
     ValueNotifier<AdvancedPeerConnection?>(null);
 
 ///会议池的会议的连接的轨道列表显示界面
-class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
+class VideoConferenceTrackWidget extends StatelessWidget with DataTileMixin {
   const VideoConferenceTrackWidget({super.key});
 
   @override
@@ -31,10 +31,10 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
 
   
 
-  Future<List<TileData>> _buildTrackSenderTileData(BuildContext context) async {
+  Future<List<DataTile>> _buildTrackSenderTileData(BuildContext context) async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionNotifier.value;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (advancedPeerConnection == null) {
       return tiles;
     }
@@ -51,7 +51,7 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
         var trackId = track.id;
         var kind = track.kind;
         var label = track.label;
-        TileData tile = TileData(
+        DataTile tile = DataTile(
             prefix: kind == 'video'
                 ? const Icon(
                     Icons.video_call_outlined,
@@ -75,10 +75,10 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
     return tiles;
   }
 
-  List<TileData> _buildTrackTileData(BuildContext context) {
+  List<DataTile> _buildTrackTileData(BuildContext context) {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionNotifier.value;
-    List<TileData> tiles = [];
+    List<DataTile> tiles = [];
     if (advancedPeerConnection == null) {
       return tiles;
     }
@@ -107,7 +107,7 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
         var trackId = track.id;
         var kind = track.kind;
         var label = track.label;
-        TileData tile = TileData(
+        DataTile tile = DataTile(
             prefix: kind == 'video'
                 ? const Icon(
                     Icons.video_call_outlined,
@@ -136,7 +136,7 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
       AutoSizeText(AppLocalizations.t('TrackSender')),
       PlatformFutureBuilder(
           future: _buildTrackSenderTileData(context),
-          builder: (BuildContext context, List<TileData> tiles) {
+          builder: (BuildContext context, List<DataTile> tiles) {
             return DataListView(
               itemCount: tiles.length,
               itemBuilder: (BuildContext context, int index) {

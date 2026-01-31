@@ -44,7 +44,7 @@ final HelpInformationController helpInformationController =
     HelpInformationController();
 
 // 帮助信息页面
-class HelpInformationWidget extends StatelessWidget with TileDataMixin {
+class HelpInformationWidget extends StatelessWidget with DataTileMixin {
   const HelpInformationWidget({super.key});
 
   @override

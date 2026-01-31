@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 final List<String> peerClientFields = ['id', 'name', 'peerId'];
 
 //邮件内容组件
-class PeerClientViewWidget extends StatelessWidget with TileDataMixin {
+class PeerClientViewWidget extends StatelessWidget with DataTileMixin {
   PeerClientViewWidget({super.key});
 
   @override

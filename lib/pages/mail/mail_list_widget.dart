@@ -22,7 +22,7 @@ class MailListWidget extends StatelessWidget {
   }
 
   ///当前邮箱邮件消息转换成tileData，如果为空则返回空列表
-  Future<TileData?> findMailMessageTile(int index) async {
+  Future<DataTile?> findMailMessageTile(int index) async {
     List<MailMessage>? currentMailMessages =
         mailMimeMessageController.currentMailMessages;
     if (currentMailMessages == null || currentMailMessages.isEmpty) {
@@ -119,7 +119,7 @@ class MailListWidget extends StatelessWidget {
     );
   }
 
-  Future<TileData?> _convertMimeMessage(
+  Future<DataTile?> _convertMimeMessage(
       MailMessage mailMessage, int index) async {
     MailAddress? sender = mailMessage.decodeSender();
     var title = sender?.personalName;
@@ -175,7 +175,7 @@ class MailListWidget extends StatelessWidget {
         color: Colors.red,
       );
     }
-    TileData tile = TileData(
+    DataTile tile = DataTile(
       prefix: prefix,
       title: title,
       titleTail: titleTail,
@@ -190,7 +190,7 @@ class MailListWidget extends StatelessWidget {
     return tile;
   }
 
-  Future<Null> _onTap(int index, String title, {String? subtitle, TileData? group}) async {
+  Future<Null> _onTap(int index, String title, {String? subtitle, DataTile? group}) async {
     mailMimeMessageController.currentMailIndex.value = index;
     MailMessage? mailMessage = mailMimeMessageController.currentMailMessage;
     if (mailMessage == null) {
