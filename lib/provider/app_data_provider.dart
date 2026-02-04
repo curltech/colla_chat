@@ -60,7 +60,11 @@ class AppDataProvider with ChangeNotifier {
     if (context == null) {
       return;
     }
-    _totalSize = MediaQuery.sizeOf(context!);
+    try {
+      _totalSize = MediaQuery.sizeOf(context!);
+    } catch (e) {
+      logger.e(e.toString());
+    }
     if (landscape) {
       if (_totalSize.width >= largeBreakpointLimit) {
         totalBodyWidth = _totalSize.width - primaryNavigationWidth;
