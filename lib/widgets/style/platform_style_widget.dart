@@ -95,8 +95,12 @@ extension PlatformStyleWidget<T extends Widget> on T {
           shape: shape,
         );
       case PlatformStyle.liquidGlass:
-        child =
-            asLiquidGlassEffect(height: height, width: width, blurAmount: blur);
+        child = asLiquidGlassEffect(
+            height: height,
+            width: width,
+            padding: padding,
+            borderRadius: borderRadius.topLeft.x,
+            blurAmount: blur);
       case PlatformStyle.liquidGlassDesign:
         child = asLiquidGlassDesign(
             height: height,

@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/stock/stock_widget.dart';
 import 'package:colla_chat/plugin/chart/k_chart/k_chart_plus_widget.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_tool_panel_widget.dart';
@@ -22,8 +23,6 @@ class StockLineChartWidget extends StatelessWidget with DataTileMixin {
   @override
   String get title => 'StockLineChart';
 
-  
-
   final KChartPlusController kChartPlusController = KChartPlusController();
 
   @override
@@ -41,7 +40,11 @@ class StockLineChartWidget extends StatelessWidget with DataTileMixin {
     return AppBarView(
       titleWidget: titleWidget,
       helpPath: routeName,
+      isAppBar: false,
       withLeading: true,
+      leadingCallBack: () {
+        stockController.pop();
+      },
       child: Center(
           child: Column(children: [
         KlineToolPanelWidget(

@@ -5,6 +5,7 @@ import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/entity/stock/share_group.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/me/stock_line_chart_widget.dart';
+import 'package:colla_chat/pages/stock/stock_widget.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
@@ -237,11 +238,7 @@ MyShareController myShareController = MyShareController();
 
 ///自选股和分组的查询界面
 class ShareSelectionWidget extends StatefulWidget with DataTileMixin {
-  final StockLineChartWidget stockLineChartWidget = StockLineChartWidget();
-
-  ShareSelectionWidget({super.key}) {
-    indexWidgetProvider.define(stockLineChartWidget);
-  }
+  ShareSelectionWidget({super.key});
 
   @override
   bool get withLeading => true;
@@ -322,7 +319,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
       onPressed: () async {
         String tsCode = dayLine.tsCode;
         await multiKlineController.put(tsCode);
-        indexWidgetProvider.push('stockline_chart');
+        stockController.push('stockline_chart');
       },
       icon: const Icon(
         Icons.filter,
@@ -515,7 +512,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
       ActionData(
         label: AppLocalizations.t('Add share'),
         onTap: (int index, String label, {String? value}) {
-          indexWidgetProvider.push('add_share');
+          stockController.push('add_share');
         },
         icon: const Icon(Icons.add_chart_outlined),
       ),

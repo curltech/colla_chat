@@ -1,10 +1,10 @@
 import 'package:colla_chat/entity/stock/day_line.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/stock/stock_widget.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/day_line.dart';
 import 'package:colla_chat/tool/date_util.dart';
@@ -334,7 +334,7 @@ class DayLineWidget extends StatelessWidget with DataTileMixin {
       onPressed: () async {
         String tsCode = dayLine.tsCode;
         await multiKlineController.put(tsCode);
-        indexWidgetProvider.push('stockline_chart');
+        stockController.push('stockline_chart');
       },
       icon: const Icon(
         Icons.filter,

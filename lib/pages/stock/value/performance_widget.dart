@@ -1,10 +1,10 @@
 import 'package:colla_chat/entity/stock/performance.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
+import 'package:colla_chat/pages/stock/stock_widget.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/performance.dart';
 import 'package:colla_chat/tool/date_util.dart';
@@ -223,7 +223,7 @@ class PerformanceWidget extends StatelessWidget with DataTileMixin {
           onPressed: () async {
             String tsCode = performance.securityCode;
             await multiKlineController.put(tsCode);
-            indexWidgetProvider.push('stockline_chart');
+            stockController.push('stockline_chart');
           },
           icon: const Icon(
             Icons.filter,

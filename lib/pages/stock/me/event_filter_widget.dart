@@ -1,10 +1,10 @@
 import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/entity/stock/event_filter.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/stock/stock_widget.dart';
 import 'package:colla_chat/pages/stock/trade/in_out_event_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/event_filter.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -151,7 +151,7 @@ class EventFilterWidget extends StatelessWidget with DataTileMixin {
           onPressed: () async {
             inoutEventController.setEventCode(eventFilter.eventCode,
                 eventName: eventFilter.eventName);
-            indexWidgetProvider.push('in_out_event');
+            stockController.push('in_out_event');
           },
           icon: const Icon(
             Icons.event,
@@ -235,7 +235,8 @@ class EventFilterWidget extends StatelessWidget with DataTileMixin {
     return platformReactiveForm;
   }
 
-  Future<void> _onSubmit(BuildContext context, Map<String, dynamic> values) async {
+  Future<void> _onSubmit(
+      BuildContext context, Map<String, dynamic> values) async {
     EventFilter currentFilterCond = EventFilter.fromJson(values);
     if (currentFilterCond.id == null) {
       await eventFilterService.insert(currentFilterCond);
@@ -321,8 +322,8 @@ class EventFilterWidget extends StatelessWidget with DataTileMixin {
           },
           onPageChanged: (int index,
               {PlatformSwiperDirection? direction,
-                int? oldIndex,
-                CarouselPageChangedReason? reason}) {
+              int? oldIndex,
+              CarouselPageChangedReason? reason}) {
             this.index.value = index;
           },
         );

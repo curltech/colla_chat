@@ -115,10 +115,8 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
             color: foregroundColor,
           )));
     }
-    return Container(
+    return SizedBox(
         height: toolbarHeight ?? appDataProvider.toolbarHeight,
-        padding: const EdgeInsets.all(10),
-        color: (backgroundColor ?? myself.primary).withAlpha(64),
         child: Card(
           elevation: 0,
           margin: const EdgeInsets.all(0),
@@ -128,7 +126,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: children,
           ),
-        ));
+        )).asStyle(blur: 128);
   }
 
   Widget? _buildBackButton(BuildContext context) {

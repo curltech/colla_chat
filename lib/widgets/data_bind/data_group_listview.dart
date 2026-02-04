@@ -103,7 +103,7 @@ class GroupDataListView extends StatelessWidget {
     Widget dataListView = DataListView(
       dividerHeight: dividerHeight,
       onTap: (int index, String title, {String? subtitle}) async {
-        return _onTap(index, title, subtitle: subtitle, group: tileData);
+        return await _onTap(index, title, subtitle: subtitle, group: tileData);
       },
       itemCount: data.length,
       itemBuilder: (BuildContext context, int index) {

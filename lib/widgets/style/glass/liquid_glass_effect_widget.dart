@@ -26,7 +26,7 @@ extension LiquidGlassEffectWidget<T extends Widget> on T {
     Clip clipBehavior = Clip.none,
     double borderRadius = 14.0,
     Color? baseColor,
-    EdgeInsets? padding,
+    EdgeInsetsGeometry? padding,
     Color? borderColor,
     double borderWidth = 1.0,
     double elevation = 0,
@@ -82,7 +82,7 @@ extension LiquidGlassEffectWidget<T extends Widget> on T {
             borderRadius: borderRadius,
             baseColor: baseColor ?? myself.primary.withAlpha(32),
             blurAmount: blurAmount,
-            padding: padding ?? EdgeInsets.all(0.0),
+            padding: padding?.resolve(null) ?? EdgeInsets.all(0.0),
             onTap: onPressed,
             borderColor: borderColor ?? myself.primary.withAlpha(32),
             borderWidth: borderWidth,
@@ -101,7 +101,7 @@ class LiquidGlassAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double borderRadius;
   final Color? baseColor;
   final double? blurAmount;
-  final EdgeInsets? padding;
+  final EdgeInsetsGeometry? padding;
   final Color? borderColor;
   final double borderWidth;
   final double elevation;
@@ -135,7 +135,7 @@ class LiquidGlassAppBar extends StatelessWidget implements PreferredSizeWidget {
         borderRadius: borderRadius,
         baseColor: baseColor ?? myself.primaryColor,
         blurAmount: blurAmount,
-        padding: padding,
+        padding: padding?.resolve(null),
         borderColor: borderColor ?? myself.primaryColor,
         borderWidth: borderWidth,
         elevation: elevation,

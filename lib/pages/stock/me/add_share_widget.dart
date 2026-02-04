@@ -2,6 +2,7 @@ import 'package:auto_size_text_field/auto_size_text_field.dart';
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
+import 'package:colla_chat/pages/stock/stock_widget.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -70,7 +71,7 @@ class AddShareWidget extends StatelessWidget with DataTileMixin {
                 onTap: (int index, String title, {String? subtitle}) async {
                   await multiKlineController.put(tsCode);
                   multiKlineController.replaceAll([tsCode]);
-                  indexWidgetProvider.push('stockline_chart');
+                  stockController.push('stockline_chart');
                 });
           }
         }
