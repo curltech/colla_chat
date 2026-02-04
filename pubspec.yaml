@@ -213,7 +213,7 @@ dependencies:
 #  cryptography_flutter_plus: ^2.3.4
   encrypt: ^5.0.3 #aes
   openpgp: ^3.10.7 #rsa,sha
-  libsignal_protocol_dart: ^0.7.1
+  libsignal: ^2.2.1
   crypto: ^3.0.3 #sha
   bs58: ^1.0.2
   local_auth: ^3.0.0
@@ -341,7 +341,7 @@ dependency_overrides:
   liquid_glass_easy: ^1.1.1
   pretty_qr_code: ^3.5.0
   insta_assets_picker: ^3.4.0
-  livekit_client: ^2.6.0 #livekit sfu server flutter client
+  livekit_client: ^2.6.2 #livekit sfu server flutter client
   dart_jsonwebtoken: ^3.3.1
   wechat_assets_picker: ^10.0.0 #移动平台，选择图像，视频等媒体并展示
   langchain: ^0.8.0+1
@@ -350,8 +350,9 @@ dependency_overrides:
   langchain_google: ^0.7.0+1
   ollama_dart: ^0.3.0+1
   dart_openai: ^6.1.0
-  sqlite3: ^3.1.1
+  sqlite3: ^3.1.4
   sqlite3_flutter_libs: 0.5.41
+  cbl: ^3.6.0+2
   petitparser: ^7.0.0
   fluent_ui: ^4.13.0
   fluentui_system_icons: ^1.1.201 #FluentIcons.access_time_24_regular
@@ -443,7 +444,7 @@ dependency_overrides:
   flutter_webrtc: ^1.2.0
   #  flutter_webrtc_plus: ^0.11.2+5
   #  medea_flutter_webrtc: ^0.11.0
-  protobuf: 4.2.0
+  protobuf: ^6.0.0
   analyzer: ^9.0.0
   provider: ^6.1.4
   flex_seed_scheme: ^4.0.1

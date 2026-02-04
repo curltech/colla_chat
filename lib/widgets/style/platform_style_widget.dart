@@ -99,9 +99,9 @@ extension PlatformStyleWidget<T extends Widget> on T {
             height: height,
             width: width,
             padding: padding,
-            baseColor: color,
+            // baseColor: color,
             shadowColor: shadowColor,
-            borderColor: borderColor,
+            // borderColor: borderColor,
             borderRadius: borderRadius.topLeft.x,
             blurAmount: blur);
       case PlatformStyle.liquidGlassDesign:

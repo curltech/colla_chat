@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/cryptography.dart';
-import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/dht/base.dart';
@@ -389,7 +388,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   Future<void> postLogin() async {
     var peerId = peerConnectionPool.peerId;
     logger.i('peerConnectionPool init: $peerId');
-    signalSessionPool.init();
+    // signalSessionPool.init();
   }
 
   Future<bool> logout() async {
@@ -429,7 +428,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   Future<void> postLogout() async {
     await removeAutoCredential();
     peerConnectionPool.clear();
-    signalSessionPool.clear();
+    // signalSessionPool.clear();
   }
 
   ///保存MyselfPeer，同时保存对应的PeerClient和Linkman

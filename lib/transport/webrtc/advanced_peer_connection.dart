@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/p2p/chain/action/signal.dart';
 import 'package:colla_chat/pages/index/global_chat_message.dart';
@@ -349,7 +348,7 @@ class AdvancedPeerConnection {
   ///从池中移除连接
   Future<void> onClosed(WebrtcEvent event) async {
     peerConnectionPool.remove(event.peerId, clientId: event.clientId);
-    signalSessionPool.close(peerId: event.peerId, clientId: event.clientId);
+    // signalSessionPool.close(peerId: event.peerId, clientId: event.clientId);
   }
 
   ///连接状态发生改变

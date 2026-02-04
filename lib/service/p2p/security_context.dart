@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/cryptography.dart';
-import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
@@ -610,15 +609,15 @@ class SignalCryptographySecurityContextService
       SecurityContext securityContext, List<int> data) async {
     var targetPeerId = securityContext.targetPeerId;
     var targetClientId = securityContext.targetClientId;
-    SignalSession? signalSession =
-        signalSessionPool.get(peerId: targetPeerId!, clientId: targetClientId!);
-    if (signalSession != null) {
-      data = await signalSession.encrypt(Uint8List.fromList(data));
-      logger.i('call signal encrypt');
-    } else {
-      logger.e(
-          'encrypt signalSession:$targetPeerId,targetClientId:$targetClientId is not exist');
-    }
+    // SignalSession? signalSession =
+    //     signalSessionPool.get(peerId: targetPeerId!, clientId: targetClientId!);
+    // if (signalSession != null) {
+    //   data = await signalSession.encrypt(Uint8List.fromList(data));
+    //   logger.i('call signal encrypt');
+    // } else {
+    //   logger.e(
+    //       'encrypt signalSession:$targetPeerId,targetClientId:$targetClientId is not exist');
+    // }
     return data;
   }
 
@@ -627,20 +626,20 @@ class SignalCryptographySecurityContextService
       SecurityContext securityContext, List<int> data) async {
     var srcPeerId = securityContext.srcPeerId;
     var targetClientId = securityContext.targetClientId;
-    SignalSession? signalSession =
-        signalSessionPool.get(peerId: srcPeerId!, clientId: targetClientId!);
-    if (signalSession != null) {
-      try {
-        data = await signalSession.decrypt(data);
-        logger.i('call signal decrypt');
-      } catch (err) {
-        logger.e(
-            'signalSession.decrypt signalSession:$srcPeerId,targetClientId:$targetClientId error:$err');
-      }
-    } else {
-      logger.e(
-          'decrypt signalSession:$srcPeerId,targetClientId:$targetClientId is not exist');
-    }
+    // SignalSession? signalSession =
+    //     signalSessionPool.get(peerId: srcPeerId!, clientId: targetClientId!);
+    // if (signalSession != null) {
+    //   try {
+    //     data = await signalSession.decrypt(data);
+    //     logger.i('call signal decrypt');
+    //   } catch (err) {
+    //     logger.e(
+    //         'signalSession.decrypt signalSession:$srcPeerId,targetClientId:$targetClientId error:$err');
+    //   }
+    // } else {
+    //   logger.e(
+    //       'decrypt signalSession:$srcPeerId,targetClientId:$targetClientId is not exist');
+    // }
     return data;
   }
 }

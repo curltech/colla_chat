@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
@@ -29,7 +28,6 @@ import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
-import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import 'package:telephony/telephony.dart';
 
 ///跟踪影响全局的消息到来，对不同类型的消息进行分派
@@ -355,32 +353,7 @@ class GlobalChatMessage {
     String content = chatMessageService.recoverContent(chatMessage.content!);
     String peerId = chatMessage.senderPeerId!;
     String? clientId = chatMessage.senderClientId;
-    if (chatMessage.subMessageType == ChatMessageSubType.preKeyBundle.name) {
-      PreKeyBundle? retrievedPreKeyBundle =
-          signalSessionPool.signalKeyPair.preKeyBundleFromJson(content);
-      if (retrievedPreKeyBundle != null) {
-        SignalSession? signalSession;
-        try {
-          signalSession = await signalSessionPool.create(
-              peerId: peerId,
-              clientId: clientId,
-              deviceId: retrievedPreKeyBundle.getDeviceId(),
-              retrievedPreKeyBundle: retrievedPreKeyBundle);
-        } catch (e) {
-          logger.e(
-              'peerId: $peerId clientId:$clientId received PreKeyBundle, signalSession create failure:$e');
-        }
-        if (signalSession != null) {
-          logger.i(
-              'peerId: $peerId clientId:$clientId received PreKeyBundle, signalSession created');
-        } else {
-          logger.e(
-              'peerId: $peerId clientId:$clientId received PreKeyBundle, signalSession create failure');
-        }
-      } else {
-        logger.i('chatMessage content transfer to PreKeyBundle failure');
-      }
-    }
+    if (chatMessage.subMessageType == ChatMessageSubType.preKeyBundle.name) {}
   }
 
   /// 收到webrtc signal消息
@@ -401,20 +374,9 @@ class GlobalChatMessage {
   }
 
   ///发送PreKeyBundle
-  Future<void> sendPreKeyBundle(String peerId, {required String clientId}) async {
+  Future<void> sendPreKeyBundle(String peerId,
+      {required String clientId}) async {
     return;
-    PreKeyBundle preKeyBundle =
-        signalSessionPool.signalKeyPair.getPreKeyBundle();
-    var json = signalSessionPool.signalKeyPair.preKeyBundleToJson(preKeyBundle);
-    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-        receiverPeerId: peerId,
-        clientId: clientId,
-        messageType: ChatMessageType.system,
-        subMessageType: ChatMessageSubType.preKeyBundle,
-        content: json);
-    await chatMessageService.sendAndStore(chatMessage,
-        cryptoOption: CryptoOption.linkman);
-    logger.i('peerId: $peerId clientId:$clientId sent PreKeyBundle');
   }
 }
 
