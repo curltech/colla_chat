@@ -83,7 +83,7 @@ class DataListGridView extends StatelessWidget {
       if (dataListGridController.data.isEmpty) {
         return Container(
             alignment: Alignment.center,
-            child: AutoSizeText(AppLocalizations.t('Playlist is empty'),
+            child: AutoSizeText(AppLocalizations.t('List is empty'),
                 style: TextStyle(fontSize: AppFontSize.maxFontSize)));
       }
       int crossAxisCount = (appDataProvider.secondaryBodyWidth / 250).ceil();
