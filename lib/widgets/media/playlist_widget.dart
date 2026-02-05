@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -15,11 +14,9 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:colla_chat/widgets/data_bind/data_list_grid_view.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -210,16 +207,15 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
 class PlaylistWidget extends StatelessWidget {
   final Function(int index, String filename)? onSelected;
   final PlaylistController playlistController;
+  final DataListGridController dataListGridController =
+      DataListGridController();
 
   PlaylistWidget(
       {super.key, this.onSelected, required this.playlistController}) {
     playlistController.currentIndex.addListener(() async {
-      _buildTileData();
+      _buildDataTiles();
     });
   }
-
-  final RxBool gridMode = false.obs;
-  final RxList<DataTile> tileData = RxList<DataTile>([]);
 
   ///从收藏的文件中加入播放列表
   Future<void> _collect() async {
@@ -250,9 +246,9 @@ class PlaylistWidget extends StatelessWidget {
     playlistController.addMediaFiles(filenames: filenames);
   }
 
-  void _buildTileData() {
+  void _buildDataTiles() {
     List<PlatformMediaSource> mediaSources = playlistController.data;
-    List<DataTile> tileData = [];
+    List<DataTile> dataTiles = [];
     for (var mediaSource in mediaSources) {
       var filename = mediaSource.filename;
       File file = File(filename);
@@ -280,99 +276,10 @@ class PlaylistWidget extends StatelessWidget {
           return null;
         },
       );
-      tileData.add(tile);
+      dataTiles.add(tile);
     }
 
-    this.tileData.assignAll(tileData);
-  }
-
-  Widget _buildThumbnailWidget(BuildContext context, DataTile tile) {
-    List<Widget> children = [];
-    children.add(const Spacer());
-    children.add(AutoSizeText(
-      tile.title,
-      style: const TextStyle(fontSize: AppFontSize.minFontSize),
-    ));
-    if (tile.subtitle != null) {
-      children.add(const SizedBox(
-        height: 2.0,
-      ));
-      children.add(AutoSizeText(
-        tile.subtitle!,
-        style: const TextStyle(fontSize: AppFontSize.minFontSize),
-      ));
-    }
-    Widget thumbnail = Container(
-        decoration: tile.selected ?? false
-            ? BoxDecoration(border: Border.all(width: 2, color: myself.primary))
-            : null,
-        padding: EdgeInsets.zero,
-        child: Card(
-            elevation: 0.0,
-            margin: EdgeInsets.zero,
-            shape: const ContinuousRectangleBorder(),
-            child: Stack(
-              children: [
-                tile.prefix ?? nilBox,
-                Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: children)
-              ],
-            )));
-
-    return thumbnail;
-  }
-
-  Widget _buildThumbnailView(BuildContext context) {
-    return Obx(() {
-      if (tileData.isEmpty) {
-        return Container(
-            alignment: Alignment.center,
-            child: AutoSizeText(AppLocalizations.t('Playlist is empty'),
-                style: TextStyle(fontSize: AppFontSize.maxFontSize)));
-      }
-      int crossAxisCount = (appDataProvider.secondaryBodyWidth / 250).ceil();
-      if (gridMode.isTrue) {
-        return GridView.builder(
-            itemCount: tileData.length,
-            //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                //横轴元素个数
-                crossAxisCount: crossAxisCount,
-                //纵轴间距
-                mainAxisSpacing: 4.0,
-                //横轴间距
-                crossAxisSpacing: 4.0,
-                //子组件宽高长度比例
-                childAspectRatio: 1),
-            itemBuilder: (BuildContext context, int index) {
-              return InkWell(
-                  child: _buildThumbnailWidget(context, tileData[index]),
-                  onTap: () {
-                    playlistController.setCurrentIndex = index;
-                    if (onSelected != null) {
-                      onSelected!(index, tileData[index].title);
-                    }
-                  });
-            });
-      } else {
-        return DataListView(
-          onTap: (int index, String title,
-              {DataTile? group, String? subtitle}) async {
-            playlistController.setCurrentIndex = index;
-            if (onSelected != null) {
-              onSelected!(index, title);
-            }
-            return null;
-          },
-          itemCount: tileData.length,
-          itemBuilder: (BuildContext context, int index) {
-            return tileData[index];
-          },
-        );
-      }
-    });
+    dataListGridController.data.assignAll(dataTiles);
   }
 
   ///选择文件加入播放列表
@@ -432,19 +339,7 @@ class PlaylistWidget extends StatelessWidget {
   ///播放列表按钮
   List<ActionData> _buildActions(BuildContext context) {
     return [
-      ActionData(
-        label: gridMode.isTrue ? 'List' : 'Grid',
-        icon: Obx(() {
-          return Icon(
-            gridMode.isTrue ? Icons.list : Icons.grid_on,
-            color: myself.primary,
-          );
-        }),
-        onTap: (int index, String label, {String? value}) {
-          gridMode(!gridMode.value);
-        },
-        tooltip: AppLocalizations.t('Toggle grid mode'),
-      ),
+      dataListGridController.toggleActionData,
       ActionData(
         label: 'Add directory',
         icon: Icon(
@@ -534,6 +429,7 @@ class PlaylistWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _buildThumbnailView(context);
+    return DataListGridView(
+        onSelected: onSelected, dataListGridController: dataListGridController);
   }
 }
