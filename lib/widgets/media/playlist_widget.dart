@@ -12,6 +12,7 @@ import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
+import 'package:colla_chat/tool/number_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -256,7 +257,7 @@ class PlaylistWidget extends StatelessWidget {
       if (!exist) {
         continue;
       }
-      var length = file.lengthSync();
+      var length = NumberUtil.toGMK(file.lengthSync());
       bool selected = false;
       PlatformMediaSource? current = playlistController.current;
       if (current != null) {
@@ -268,7 +269,7 @@ class PlaylistWidget extends StatelessWidget {
       DataTile tile = DataTile(
         prefix: thumbnailWidget,
         title: FileUtil.filename(filename),
-        subtitle: '$length',
+        subtitle: length,
         selected: selected,
         onTap: (int index, String title, {String? subtitle}) async {
           playlistController.setCurrentIndex = index;

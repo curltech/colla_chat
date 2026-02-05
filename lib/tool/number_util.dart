@@ -1,3 +1,5 @@
+import "dart:math";
+
 import "package:intl/intl.dart";
 
 /// 格式化数字
@@ -29,5 +31,23 @@ class NumberUtil {
     }
 
     return null;
+  }
+
+  /// 浮点数的G,M,K显示
+  static String toGMK<T>(int value) {
+    num v = pow(2, 30);
+    if (value > v) {
+      return '${stdDouble(value / v)}G';
+    }
+    v = pow(2, 20);
+    if (value > v) {
+      return '${stdDouble(value / v)}M';
+    }
+    v = pow(2, 10);
+    if (value > v) {
+      return '${stdDouble(value / v)}K';
+    }
+
+    return '$value';
   }
 }
