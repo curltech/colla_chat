@@ -88,34 +88,42 @@ class DataListGridView extends StatelessWidget {
       }
       int crossAxisCount = (appDataProvider.secondaryBodyWidth / 250).ceil();
       if (dataListGridController.gridMode.isTrue) {
-        return GridView.builder(
-            itemCount: dataListGridController.data.length,
-            //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                //横轴元素个数
-                crossAxisCount: crossAxisCount,
-                //纵轴间距
-                mainAxisSpacing: 4.0,
-                //横轴间距
-                crossAxisSpacing: 4.0,
-                //子组件宽高长度比例
-                childAspectRatio: 1),
-            itemBuilder: (BuildContext context, int index) {
-              return InkWell(
-                  child: _buildThumbnailWidget(
-                      context, dataListGridController.data[index]),
-                  onTap: () {
-                    dataListGridController.setCurrentIndex = index;
-                    if (onSelected != null) {
-                      onSelected!(
-                          index, dataListGridController.data[index].title);
-                    }
+        return ListenableBuilder(
+            listenable: dataListGridController.currentIndex,
+            builder: (BuildContext context, Widget? child) {
+              return GridView.builder(
+                  itemCount: dataListGridController.data.length,
+                  //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      //横轴元素个数
+                      crossAxisCount: crossAxisCount,
+                      //纵轴间距
+                      mainAxisSpacing: 2.0,
+                      //横轴间距
+                      crossAxisSpacing: 2.0,
+                      //子组件宽高长度比例
+                      childAspectRatio: 1),
+                  itemBuilder: (BuildContext context, int index) {
+                    return InkWell(
+                        child: _buildThumbnailWidget(
+                            context, dataListGridController.data[index]),
+                        onTap: () {
+                          dataListGridController.current?.selected = false;
+                          dataListGridController.data[index].selected = true;
+                          dataListGridController.setCurrentIndex = index;
+                          if (onSelected != null) {
+                            onSelected!(index,
+                                dataListGridController.data[index].title);
+                          }
+                        });
                   });
             });
       } else {
         return DataListView(
           onTap: (int index, String title,
               {DataTile? group, String? subtitle}) async {
+            dataListGridController.current?.selected = false;
+            dataListGridController.data[index].selected = true;
             dataListGridController.setCurrentIndex = index;
             if (onSelected != null) {
               onSelected!(index, title);
