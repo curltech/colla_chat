@@ -15,8 +15,7 @@ class MenuUtil {
       {double? width,
       double? height,
       double iconSize = 32,
-      required List<ActionData> actions,
-      required Function(BuildContext context, int index, String label,
+      required List<ActionData> actions, Function(BuildContext context, int index, String label,
               {String? value})?
           onPressed}) async {
     await DialogUtil.show(
@@ -28,7 +27,7 @@ class MenuUtil {
             child: DataActionCard(
                 onPressed: (int index, String label, {String? value}) {
                   Navigator.pop(context);
-                  onPressed!(context, index, label, value: value);
+                  onPressed?.call(context, index, label, value: value);
                 },
                 crossAxisCount: 4,
                 actions: actions,
