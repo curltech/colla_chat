@@ -279,6 +279,7 @@ dependencies:
   fl_video: ^1.4.0  #video_Player control panel
   better_player_plus: ^1.1.5
   awesome_video_player: ^1.0.5
+  better_player_enhanced: ^1.0.1
   chewie: ^1.13.0 #video_player的封装
   media_kit: ^1.2.2                            # Primary package.
   media_kit_video: ^2.0.0                       # For video rendering.
