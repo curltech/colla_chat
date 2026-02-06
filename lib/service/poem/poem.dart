@@ -68,6 +68,40 @@ class PoemService extends GeneralBaseService<Poem> {
     return poem;
   }
 
+  Future<List<Poem>> search(
+      {String? title,
+      String? author,
+      String? rhythmic,
+      String? dynasty,
+      String? paragraphs}) async {
+    String where = '1=1';
+    List<Object> whereArgs = [];
+    if (title != null) {
+      where = '$where and title like "%$title%"';
+    }
+    if (author != null) {
+      where = '$where and author=?';
+      whereArgs.add(author);
+    }
+    if (rhythmic != null) {
+      where = '$where and rhythmic=?';
+      whereArgs.add(rhythmic);
+    }
+    if (dynasty != null) {
+      where = '$where and dynasty=?';
+      whereArgs.add(dynasty);
+    }
+    if (paragraphs != null) {
+      where = '$where and paragraphs like "%$paragraphs%"';
+    }
+    var poem = await find(
+      where: where,
+      whereArgs: whereArgs,
+    );
+
+    return poem;
+  }
+
   Future<void> parseJson(String collection, String filename) async {
     File file = File(filename);
     String jsonStr = file.readAsStringSync();
