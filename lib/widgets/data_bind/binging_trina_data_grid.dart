@@ -182,12 +182,12 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
           cells[name] = dataCell;
         }
       }
-      bool? selected = EntityUtil.getSelected(d);
-      selected ??= false;
+      bool? checked = EntityUtil.getChecked(d);
+      checked ??= false;
       var dataRow = TrinaRow(
         sortIdx: index,
         type: TrinaRowType.normal(),
-        checked: selected,
+        checked: checked,
         cells: cells,
         data: d,
       );
@@ -319,10 +319,10 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
           int? index = event.row?.sortIdx;
           bool? isChecked = event.isChecked;
           if (value != null) {
-            EntityUtil.setSelected(value, isChecked);
+            EntityUtil.setChecked(value, isChecked);
           } else {
             for (var value in controller.data) {
-              EntityUtil.setSelected(value, isChecked);
+              EntityUtil.setChecked(value, isChecked);
             }
           }
           var fn = onRowChecked;

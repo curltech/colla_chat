@@ -255,7 +255,7 @@ class DataListController<T> {
     return selectedData;
   }
 
-  void selectAll(l) {
+  void selectAll() {
     for (var t in data) {
       EntityUtil.setSelected(t, true);
     }
@@ -264,6 +264,30 @@ class DataListController<T> {
   void unselectAll() {
     for (var t in data) {
       EntityUtil.setSelected(t, false);
+    }
+  }
+
+  List<T> get checked {
+    List<T> checkedData = [];
+    for (var t in data) {
+      bool? checked = EntityUtil.getChecked(t);
+      if (checked != null && checked) {
+        checkedData.add(t);
+      }
+    }
+
+    return checkedData;
+  }
+
+  void checkAll() {
+    for (var t in data) {
+      EntityUtil.setChecked(t, true);
+    }
+  }
+
+  void uncheckAll() {
+    for (var t in data) {
+      EntityUtil.setChecked(t, false);
     }
   }
 }

@@ -30,6 +30,7 @@ class DataTile {
   //是否缩小
   bool dense;
   bool? selected;
+  bool? checked;
 
   final bool isThreeLine;
 
@@ -51,6 +52,7 @@ class DataTile {
       this.helpPath,
       this.dense = true,
       this.selected = false,
+      this.checked = false,
       this.isThreeLine = false,
       this.onTap,
       this.onLongPress});
@@ -132,6 +134,8 @@ class DataListTile extends StatelessWidget {
       onTap;
   final Future<bool?> Function(int index, String title, {String? subtitle})?
       onLongPress;
+  final void Function(int index, String title, bool? value, {String? subtitle})?
+      onChanged;
 
   const DataListTile({
     super.key,
@@ -141,6 +145,7 @@ class DataListTile extends StatelessWidget {
     this.dividerColor,
     this.onTap,
     this.onLongPress,
+    this.onChanged,
     this.contentPadding,
     this.horizontalTitleGap,
     this.minVerticalPadding,
@@ -172,8 +177,57 @@ class DataListTile extends StatelessWidget {
     ]);
   }
 
+  Future<bool?> _onTap(
+    BuildContext context,
+  ) async {
+    bool? value;
+    if (onTap != null) {
+      var fn = onTap;
+      value =
+          await fn?.call(index, dataTile.title, subtitle: dataTile.subtitle);
+      if (value == false) {
+        return false;
+      }
+    }
+    if (dataTile.onTap != null) {
+      var fn = dataTile.onTap;
+      value =
+          await fn?.call(index, dataTile.title, subtitle: dataTile.subtitle);
+      if (value == false) {
+        return false;
+      }
+    }
+
+    ///如果路由名称存在，点击会调用路由
+    if (dataTile.routeName != null) {
+      indexWidgetProvider.push(dataTile.routeName!, context: context);
+    }
+
+    return value;
+  }
+
+  Future<bool?> _onLongPress() async {
+    bool? value;
+    if (onLongPress != null) {
+      var fn = onLongPress;
+      value =
+          await fn?.call(index, dataTile.title, subtitle: dataTile.subtitle);
+      if (value == false) {
+        return false;
+      }
+    }
+    if (dataTile.onLongPress != null) {
+      var fn = dataTile.onLongPress;
+      value =
+          await fn?.call(index, dataTile.title, subtitle: dataTile.subtitle);
+    }
+
+    return value;
+  }
+
   Widget _buildListTile(BuildContext context) {
     bool selected = dataTile.selected ?? false;
+    bool checked = dataTile.checked ?? false;
 
     ///前导组件，一般是自定义图标或者图像
     Widget? leading = dataTile.getPrefixWidget(selected);
@@ -234,76 +288,57 @@ class DataListTile extends StatelessWidget {
       ]);
     }
 
-    Future<bool?> onTap() async {
-      bool? value;
-      if (this.onTap != null) {
-        var fn = this.onTap;
-        value =
-            await fn?.call(index, dataTile.title, subtitle: dataTile.subtitle);
-        if (value == false) {
-          return false;
-        }
-      }
-      if (dataTile.onTap != null) {
-        var fn = dataTile.onTap;
-        value =
-            await fn?.call(index, dataTile.title, subtitle: dataTile.subtitle);
-        if (value == false) {
-          return false;
-        }
-      }
-
-      ///如果路由名称存在，点击会调用路由
-      if (dataTile.routeName != null) {
-        indexWidgetProvider.push(dataTile.routeName!, context: context);
-      }
-
-      return value;
-    }
-
-    Future<bool?> onLongPress() async {
-      bool? value;
-      if (this.onLongPress != null) {
-        var fn = this.onLongPress;
-        value =
-            await fn?.call(index, dataTile.title, subtitle: dataTile.subtitle);
-        if (value == false) {
-          return false;
-        }
-      }
-      if (dataTile.onLongPress != null) {
-        var fn = dataTile.onLongPress;
-        value =
-            await fn?.call(index, dataTile.title, subtitle: dataTile.subtitle);
-      }
-
-      return value;
-    }
-
     ///未来不使用ListTile，因为高度固定，不够灵活
-    var listTile = ListTile(
-      contentPadding: contentPadding,
-      horizontalTitleGap: horizontalTitleGap,
-      minVerticalPadding: minVerticalPadding,
-      minLeadingWidth: minLeadingWidth,
-      selected: selected,
-      selectedColor: Colors.white,
-      selectedTileColor: myself.primary,
-      leading: leading,
-      title: titleWidget,
-      subtitle: dataTile.subtitle != null
-          ? AutoSizeText(
-              dataTile.subtitle!,
-              maxLines: 2,
-            )
-          : null,
-      trailing: trailingWidget,
-      isThreeLine: dataTile.isThreeLine,
-      dense: dataTile.dense,
-      onTap: onTap,
-      onLongPress: onLongPress,
-    );
-
+    Widget listTile;
+    if (checked == false) {
+      listTile = ListTile(
+        contentPadding: contentPadding,
+        horizontalTitleGap: horizontalTitleGap,
+        minVerticalPadding: minVerticalPadding,
+        minLeadingWidth: minLeadingWidth,
+        selected: selected,
+        selectedColor: Colors.white,
+        selectedTileColor: myself.primary,
+        leading: leading,
+        title: titleWidget,
+        subtitle: dataTile.subtitle != null
+            ? AutoSizeText(
+                dataTile.subtitle!,
+                maxLines: 2,
+              )
+            : null,
+        trailing: trailingWidget,
+        isThreeLine: dataTile.isThreeLine,
+        dense: dataTile.dense,
+        onTap: () {
+          _onTap(context);
+        },
+        onLongPress: _onLongPress,
+      );
+    } else {
+      listTile = CheckboxListTile(
+        contentPadding: contentPadding,
+        selected: selected,
+        selectedTileColor: myself.primary,
+        title: titleWidget,
+        subtitle: dataTile.subtitle != null
+            ? AutoSizeText(
+                dataTile.subtitle!,
+                maxLines: 2,
+              )
+            : null,
+        isThreeLine: dataTile.isThreeLine,
+        dense: dataTile.dense,
+        value: checked,
+        onChanged: (bool? value) {
+          dataTile.checked = value;
+          if (onChanged != null) {
+            var fn = onChanged;
+            fn?.call(index, dataTile.title, value, subtitle: dataTile.subtitle);
+          }
+        },
+      );
+    }
     if (selected) {
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 0.0),
