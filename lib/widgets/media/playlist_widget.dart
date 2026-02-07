@@ -333,7 +333,7 @@ class PlaylistWidget extends StatelessWidget {
 
   Future<dynamic> showActionCard(BuildContext context) async {
     List<ActionData> actions = _buildActions(context);
-    return MenuUtil.popModalBottomSheet(context,
+    return MenuUtil.showPopActionMenu(context,
         actions: actions, width: appDataProvider.secondaryBodyWidth);
   }
 

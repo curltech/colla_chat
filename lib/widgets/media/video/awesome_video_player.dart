@@ -1,10 +1,10 @@
-import 'package:better_player_plus/better_player_plus.dart';
+import 'package:awesome_video_player/awesome_video_player.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:flutter/material.dart';
 
-///基于better实现的媒体播放器和记录器，
-class BetterVideoPlayerController extends AbstractMediaPlayerController {
+///基于awesome better实现的媒体播放器和记录器，
+class AwesomeVideoPlayerController extends AbstractMediaPlayerController {
   late final BetterPlayerController betterPlayerController =
       BetterPlayerController(
     BetterPlayerConfiguration(
@@ -14,16 +14,19 @@ class BetterVideoPlayerController extends AbstractMediaPlayerController {
     betterPlayerPlaylistConfiguration: BetterPlayerPlaylistConfiguration(),
   );
 
-  BetterVideoPlayerController(super.playlistController);
+  AwesomeVideoPlayerController(super.playlistController);
 
+  @override
   Future<bool?> isPictureInPictureSupported() async {
     return await betterPlayerController.isPictureInPictureSupported();
   }
 
+  @override
   Future<void> enablePictureInPicture() async {
     await betterPlayerController.enablePictureInPicture(key);
   }
 
+  @override
   Future<void> disablePictureInPicture() async {
     await betterPlayerController.disablePictureInPicture();
   }

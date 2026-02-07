@@ -292,6 +292,18 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     return nilBox;
   }
 
+  Future<bool?> isPictureInPictureSupported() async {
+    throw 'Not support Pip';
+  }
+
+  Future<void> enablePictureInPicture() async {
+    throw 'Not support Pip';
+  }
+
+  Future<void> disablePictureInPicture() async {
+    throw 'Not support Pip';
+  }
+
   Widget buildMediaPlayer({
     Key? key,
     bool showClosedCaptionButton = true,

@@ -5,9 +5,10 @@ import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
-import 'package:colla_chat/widgets/media/video/better_video_player.dart';
+import 'package:colla_chat/widgets/media/video/better_plus_video_player.dart';
+import 'package:colla_chat/widgets/media/video/better_enhance_video_player.dart';
+import 'package:colla_chat/widgets/media/video/awesome_video_player.dart';
 import 'package:colla_chat/widgets/media/video/chewie_video_player.dart';
-import 'package:colla_chat/widgets/media/video/flick_video_player.dart';
 import 'package:colla_chat/widgets/media/video/mediakit_video_player.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:colla_chat/widgets/media/video/vlc_video_player.dart';
@@ -42,11 +43,11 @@ class PlatformVideoPlayer extends StatelessWidget {
       mediaPlayerController: mediaKitVideoPlayerController,
     ));
     if (platformParams.mobile) {
-      BetterVideoPlayerController betterVideoPlayerController =
-          BetterVideoPlayerController(playlistController);
-      mediaPlayerControllers.add(betterVideoPlayerController);
+      AwesomeVideoPlayerController awesomeVideoPlayerController =
+          AwesomeVideoPlayerController(playlistController);
+      mediaPlayerControllers.add(awesomeVideoPlayerController);
       platformMediaPlayers.add(PlatformMediaPlayer(
-        mediaPlayerController: betterVideoPlayerController,
+        mediaPlayerController: awesomeVideoPlayerController,
       ));
     }
     if (platformParams.mobile) {
@@ -56,18 +57,24 @@ class PlatformVideoPlayer extends StatelessWidget {
       platformMediaPlayers.add(PlatformMediaPlayer(
         mediaPlayerController: mobileVlcPlayerController,
       ));
+      BetterPlusVideoPlayerController betterPlusVideoPlayerController =
+          BetterPlusVideoPlayerController(playlistController);
+      mediaPlayerControllers.add(betterPlusVideoPlayerController);
+      platformMediaPlayers.add(PlatformMediaPlayer(
+        mediaPlayerController: betterPlusVideoPlayerController,
+      ));
+      BetterEnhanceVideoPlayerController betterEnhanceVideoPlayerController =
+          BetterEnhanceVideoPlayerController(playlistController);
+      mediaPlayerControllers.add(betterEnhanceVideoPlayerController);
+      platformMediaPlayers.add(PlatformMediaPlayer(
+        mediaPlayerController: betterEnhanceVideoPlayerController,
+      ));
     }
     ChewieVideoPlayerController chewieVideoPlayerController =
         ChewieVideoPlayerController(playlistController);
     mediaPlayerControllers.add(chewieVideoPlayerController);
     platformMediaPlayers.add(PlatformMediaPlayer(
       mediaPlayerController: chewieVideoPlayerController,
-    ));
-    FlickVideoPlayerController flickVideoPlayerController =
-        FlickVideoPlayerController(playlistController);
-    mediaPlayerControllers.add(flickVideoPlayerController);
-    platformMediaPlayers.add(PlatformMediaPlayer(
-      mediaPlayerController: flickVideoPlayerController,
     ));
     OriginVideoPlayerController originVideoPlayerController =
         OriginVideoPlayerController(playlistController);

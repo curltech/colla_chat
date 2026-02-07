@@ -9,6 +9,7 @@ import 'package:fl_video/fl_video.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player_control_panel/video_player_control_panel.dart';
 import 'package:video_player_media_kit/video_player_media_kit.dart';
+import 'package:fvp/fvp.dart' as fvp;
 
 class OriginMediaSource {
   static Future<VideoPlayerController?> media(
@@ -57,18 +58,29 @@ class OriginMediaSource {
   }
 }
 
-///基于VideoPlayerControlPanel实现的媒体播放器
+enum BackendType { fvp, mediaKit }
+
+/// 基于VideoPlayer实现的媒体播放器
 class OriginVideoPlayerController extends AbstractMediaPlayerController {
+  final BackendType? backendType;
   VideoPlayerController? videoPlayerController;
 
-  OriginVideoPlayerController(super.playlistController) {
-    VideoPlayerMediaKit.ensureInitialized(
-      android: true,
-      iOS: true,
-      macOS: true,
-      windows: true,
-      linux: true,
-    );
+  OriginVideoPlayerController(super.playlistController, {this.backendType}) {
+    /// add fvp backend
+    if (backendType == BackendType.fvp) {
+      fvp.registerWith();
+    }
+
+    /// add MediaKit backend
+    if (backendType == BackendType.mediaKit) {
+      VideoPlayerMediaKit.ensureInitialized(
+        android: true,
+        iOS: true,
+        macOS: true,
+        windows: true,
+        linux: true,
+      );
+    }
   }
 
   @override

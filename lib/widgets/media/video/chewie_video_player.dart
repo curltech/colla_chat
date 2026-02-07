@@ -31,6 +31,7 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
       },
       hideControlsTimer: const Duration(seconds: 3),
       showControls: true,
+      materialSeekButtonSize : 13,
       materialProgressColors: ChewieProgressColors(
         playedColor: myself.primary,
         handleColor: myself.primary,
