@@ -371,28 +371,8 @@ class PlaylistWidget extends StatelessWidget {
     List<DataTile> dataTiles = [];
     for (var mediaSource in mediaSources) {
       var filename = mediaSource.filename;
-      bool exist = false;
-      String length = '';
-      if (mediaSource.mediaSourceType == MediaSourceType.file) {
-        File file = File(filename);
-        exist = file.existsSync();
-        if (exist) {
-          length = NumberUtil.toGMK(file.lengthSync());
-        }
-      } else {
-        if (mediaSource.mediaSourceType == MediaSourceType.directory) {
-          Directory dir = Directory(filename);
-          exist = dir.existsSync();
-          if (exist) {
-            if (filename != '..') {
-              length = '${dir.listSync().length}';
-            }
-          }
-        }
-      }
-      if (!exist) {
-        continue;
-      }
+      var title = mediaSource.title;
+      var length = mediaSource.length;
       bool selected = false;
       PlatformMediaSource? current =
           playlistController.mediaSourceController.current;
@@ -404,7 +384,7 @@ class PlaylistWidget extends StatelessWidget {
       Widget? thumbnailWidget = mediaSource.thumbnailWidget;
       DataTile tile = DataTile(
         prefix: thumbnailWidget,
-        title: mediaSource.title,
+        title: title,
         subtitle: length,
         selected: selected,
         onTap: (int index, String title, {String? subtitle}) async {

@@ -7,6 +7,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/number_util.dart';
 import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -79,6 +80,7 @@ enum MediaSourceType { asset, file, network, memory, directory }
 class PlatformMediaSource {
   final String title;
   final String filename;
+  final String? length;
   final String? mediaFormat;
   final MediaSourceType mediaSourceType;
 
@@ -90,6 +92,7 @@ class PlatformMediaSource {
   PlatformMediaSource({
     required this.title,
     required this.filename,
+    this.length,
     this.mediaSourceType = MediaSourceType.memory,
     this.mediaFormat,
     this.messageId,
@@ -138,64 +141,79 @@ class PlatformMediaSource {
           mediaSourceType: MediaSourceType.network,
           mediaFormat: mediaFormat == null ? extension : mediaFormat.name);
     } else {
-      if (filename == '..') {
+      if (title == '..') {
         mediaSource = PlatformMediaSource(
             title: title,
             filename: filename,
             mediaSourceType: MediaSourceType.directory);
         mediaSource.thumbnailWidget = Icon(Icons.subdirectory_arrow_left);
-      }
-      Directory dir = Directory(filename);
-      if (dir.existsSync()) {
-        FileStat stat = dir.statSync();
-        if (stat.type == FileSystemEntityType.directory) {
-          mediaSource = PlatformMediaSource(
-              title: title,
-              filename: filename,
-              mediaSourceType: MediaSourceType.directory);
-          mediaSource.thumbnailWidget = Icon(Icons.file_copy_outlined);
-        }
       } else {
-        File file = File(filename);
-        FileStat stat = file.statSync();
-        if (stat.type == FileSystemEntityType.file) {
-          String? mimeType = FileUtil.mimeType(filename);
-          if (mimeType != null &&
-              (mimeType.startsWith('video') ||
-                  mimeType.startsWith('audio') ||
-                  mimeType.startsWith('image'))) {
+        String? length;
+        Directory dir = Directory(filename);
+        if (dir.existsSync()) {
+          FileStat stat = dir.statSync();
+          if (stat.type == FileSystemEntityType.directory) {
+            if (title != '..') {
+              length = '${dir.listSync().length}';
+            }
             mediaSource = PlatformMediaSource(
                 title: title,
                 filename: filename,
-                mediaSourceType: MediaSourceType.file,
-                mediaFormat:
-                    mediaFormat == null ? extension : mediaFormat.name);
-            if (mimeType.startsWith('video')) {
-              try {
-                Uint8List? data;
-                if (filename.endsWith('mp4') || filename.endsWith('3gp')) {
-                  data = await VideoUtil.getByteThumbnail(videoFile: filename);
-                } else {
-                  data = await FFMpegUtil.thumbnail(videoFile: filename);
+                length: length,
+                mediaSourceType: MediaSourceType.directory);
+            mediaSource.thumbnailWidget = Icon(Icons.file_copy_outlined);
+          }
+        } else {
+          File file = File(filename);
+          if (file.existsSync()) {
+            FileStat stat = file.statSync();
+            if (stat.type == FileSystemEntityType.file) {
+              String? mimeType = FileUtil.mimeType(filename);
+              if (mimeType != null &&
+                  (mimeType.startsWith('video') ||
+                      mimeType.startsWith('audio') ||
+                      mimeType.startsWith('image'))) {
+                bool exist = file.existsSync();
+                if (exist) {
+                  length = NumberUtil.toGMK(file.lengthSync());
                 }
-                if (data != null) {
-                  mediaSource.thumbnailWidget =
-                      ImageUtil.buildMemoryImageWidget(
-                    data,
-                    fit: BoxFit.cover,
-                  );
+                mediaSource = PlatformMediaSource(
+                    title: title,
+                    filename: filename,
+                    length: length,
+                    mediaSourceType: MediaSourceType.file,
+                    mediaFormat:
+                        mediaFormat == null ? extension : mediaFormat.name);
+                if (mimeType.startsWith('video')) {
+                  try {
+                    Uint8List? data;
+                    if (filename.endsWith('mp4') || filename.endsWith('3gp')) {
+                      data =
+                          await VideoUtil.getByteThumbnail(videoFile: filename);
+                    } else {
+                      data = await FFMpegUtil.thumbnail(videoFile: filename);
+                    }
+                    if (data != null) {
+                      mediaSource.thumbnailWidget =
+                          ImageUtil.buildMemoryImageWidget(
+                        data,
+                        fit: BoxFit.cover,
+                      );
+                    }
+                  } catch (e) {
+                    logger.e('thumbnailData failure:$e');
+                  }
+                } else if (mimeType.startsWith('audio')) {
+                } else if (mimeType.startsWith('image')) {
+                  Uint8List? data = await FileUtil.readFileAsBytes(filename);
+                  if (data != null) {
+                    mediaSource.thumbnailWidget =
+                        ImageUtil.buildMemoryImageWidget(
+                      data,
+                      fit: BoxFit.cover,
+                    );
+                  }
                 }
-              } catch (e) {
-                logger.e('thumbnailData failure:$e');
-              }
-            } else if (mimeType.startsWith('audio')) {
-            } else if (mimeType.startsWith('image')) {
-              Uint8List? data = await FileUtil.readFileAsBytes(filename);
-              if (data != null) {
-                mediaSource.thumbnailWidget = ImageUtil.buildMemoryImageWidget(
-                  data,
-                  fit: BoxFit.cover,
-                );
               }
             }
           }
