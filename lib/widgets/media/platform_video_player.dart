@@ -34,7 +34,7 @@ class PlatformVideoPlayer extends StatelessWidget {
     List<String>? filenames,
   }) {
     if (filenames != null) {
-      playlistController.addMediaFiles(filenames: filenames);
+      playlistController.rootMediaSourceController.addMediaFiles(filenames: filenames);
     }
     MediaKitVideoPlayerController mediaKitVideoPlayerController =
         MediaKitVideoPlayerController(playlistController);
@@ -154,13 +154,13 @@ class PlatformVideoPlayer extends StatelessWidget {
   }
 
   void play() {
-    int? currentIndex = playlistController.currentIndex.value;
+    int? currentIndex = playlistController.mediaSourceController.currentIndex.value;
     currentIndex ??= 0;
-    int length = playlistController.data.length;
+    int length = playlistController.mediaSourceController.data.length;
     for (int i = 0; i < mediaPlayerControllers.length; ++i) {
       if (currentIndex + i < length) {
         PlatformMediaSource mediaSource =
-            playlistController.data[currentIndex + i];
+        playlistController.mediaSourceController.data[currentIndex + i];
         mediaPlayerControllers[i].playMediaSource(mediaSource);
       }
     }

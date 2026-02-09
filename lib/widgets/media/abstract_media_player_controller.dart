@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
@@ -72,15 +73,11 @@ class MediaPlayerState {
 }
 
 ///媒体源的类型
-enum MediaSourceType {
-  asset,
-  file,
-  network,
-  memory,
-}
+enum MediaSourceType { asset, file, network, memory, directory }
 
-///平台定义的媒体源
+/// 平台定义的媒体源
 class PlatformMediaSource {
+  final String title;
   final String filename;
   final String? mediaFormat;
   final MediaSourceType mediaSourceType;
@@ -91,6 +88,7 @@ class PlatformMediaSource {
   Uint8List? thumbnail;
 
   PlatformMediaSource({
+    required this.title,
     required this.filename,
     this.mediaSourceType = MediaSourceType.memory,
     this.mediaFormat,
@@ -111,8 +109,10 @@ class PlatformMediaSource {
   }
 
   static Future<PlatformMediaSource?> media(
-      {required String filename, ChatMessageMimeType? mediaFormat}) async {
-    PlatformMediaSource mediaSource;
+      {required String filename,
+      String? title,
+      ChatMessageMimeType? mediaFormat}) async {
+    PlatformMediaSource? mediaSource;
     String? extension = FileUtil.extension(filename);
     if (mediaFormat == null) {
       if (extension != null) {
@@ -124,48 +124,80 @@ class PlatformMediaSource {
         }
       }
     }
+    title ??= FileUtil.filename(filename);
     if (filename.startsWith('assets')) {
       mediaSource = PlatformMediaSource(
+          title: title,
           filename: filename,
           mediaSourceType: MediaSourceType.asset,
           mediaFormat: mediaFormat == null ? extension : mediaFormat.name);
     } else if (filename.startsWith('http')) {
       mediaSource = PlatformMediaSource(
+          title: title,
           filename: filename,
           mediaSourceType: MediaSourceType.network,
           mediaFormat: mediaFormat == null ? extension : mediaFormat.name);
     } else {
-      mediaSource = PlatformMediaSource(
-          filename: filename,
-          mediaSourceType: MediaSourceType.file,
-          mediaFormat: mediaFormat == null ? extension : mediaFormat.name);
-      String? mimeType = FileUtil.mimeType(filename);
-      if (mimeType != null) {
-        if (mimeType.startsWith('video')) {
-          try {
-            Uint8List? data;
-            if (filename.endsWith('mp4') || filename.endsWith('3gp')) {
-              data = await VideoUtil.getByteThumbnail(videoFile: filename);
-            } else {
-              data = await FFMpegUtil.thumbnail(videoFile: filename);
+      if (filename == '..') {
+        mediaSource = PlatformMediaSource(
+            title: title,
+            filename: filename,
+            mediaSourceType: MediaSourceType.directory);
+        mediaSource.thumbnailWidget = Icon(Icons.subdirectory_arrow_left);
+      }
+      Directory dir = Directory(filename);
+      if (dir.existsSync()) {
+        FileStat stat = dir.statSync();
+        if (stat.type == FileSystemEntityType.directory) {
+          mediaSource = PlatformMediaSource(
+              title: title,
+              filename: filename,
+              mediaSourceType: MediaSourceType.directory);
+          mediaSource.thumbnailWidget = Icon(Icons.file_copy_outlined);
+        }
+      } else {
+        File file = File(filename);
+        FileStat stat = file.statSync();
+        if (stat.type == FileSystemEntityType.file) {
+          String? mimeType = FileUtil.mimeType(filename);
+          if (mimeType != null &&
+              (mimeType.startsWith('video') ||
+                  mimeType.startsWith('audio') ||
+                  mimeType.startsWith('image'))) {
+            mediaSource = PlatformMediaSource(
+                title: title,
+                filename: filename,
+                mediaSourceType: MediaSourceType.file,
+                mediaFormat:
+                    mediaFormat == null ? extension : mediaFormat.name);
+            if (mimeType.startsWith('video')) {
+              try {
+                Uint8List? data;
+                if (filename.endsWith('mp4') || filename.endsWith('3gp')) {
+                  data = await VideoUtil.getByteThumbnail(videoFile: filename);
+                } else {
+                  data = await FFMpegUtil.thumbnail(videoFile: filename);
+                }
+                if (data != null) {
+                  mediaSource.thumbnailWidget =
+                      ImageUtil.buildMemoryImageWidget(
+                    data,
+                    fit: BoxFit.cover,
+                  );
+                }
+              } catch (e) {
+                logger.e('thumbnailData failure:$e');
+              }
+            } else if (mimeType.startsWith('audio')) {
+            } else if (mimeType.startsWith('image')) {
+              Uint8List? data = await FileUtil.readFileAsBytes(filename);
+              if (data != null) {
+                mediaSource.thumbnailWidget = ImageUtil.buildMemoryImageWidget(
+                  data,
+                  fit: BoxFit.cover,
+                );
+              }
             }
-            if (data != null) {
-              mediaSource.thumbnailWidget = ImageUtil.buildMemoryImageWidget(
-                data,
-                fit: BoxFit.cover,
-              );
-            }
-          } catch (e) {
-            logger.e('thumbnailData failure:$e');
-          }
-        } else if (mimeType.startsWith('audio')) {
-        } else if (mimeType.startsWith('image')) {
-          Uint8List? data = await FileUtil.readFileAsBytes(filename);
-          if (data != null) {
-            mediaSource.thumbnailWidget = ImageUtil.buildMemoryImageWidget(
-              data,
-              fit: BoxFit.cover,
-            );
           }
         }
       }
@@ -185,6 +217,22 @@ class PlatformMediaSource {
     }
 
     return playlist;
+  }
+
+  @override
+  String toString() {
+    return filename;
+  }
+
+  @override
+  int get hashCode {
+    return toString().hashCode;
+  }
+
+  /// 相同的牌，可能id不同
+  @override
+  bool operator ==(Object other) {
+    return toString() == (other as PlatformMediaSource).toString();
   }
 }
 
@@ -224,8 +272,8 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
 
   /// 如果没有播放，则播放当前文件
   void play() {
-    if (playlistController.current != null) {
-      playMediaSource(playlistController.current!);
+    if (playlistController.mediaSourceController.current != null) {
+      playMediaSource(playlistController.mediaSourceController.current!);
     }
   }
 
@@ -234,16 +282,16 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   resume();
 
   void next() {
-    playlistController.next();
-    if (playlistController.current != null) {
-      playMediaSource(playlistController.current!);
+    playlistController.mediaSourceController.next();
+    if (playlistController.mediaSourceController.current != null) {
+      playMediaSource(playlistController.mediaSourceController.current!);
     }
   }
 
   void previous() {
-    playlistController.previous();
-    if (playlistController.current != null) {
-      playMediaSource(playlistController.current!);
+    playlistController.mediaSourceController.previous();
+    if (playlistController.mediaSourceController.current != null) {
+      playMediaSource(playlistController.mediaSourceController.current!);
     }
   }
 
@@ -266,8 +314,9 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   ///选择文件加入播放列表
   Future<void> _addMediaSource() async {
     try {
-      await playlistController.sourceFilePicker();
-      PlatformMediaSource? mediaSource = playlistController.current;
+      await playlistController.rootMediaSourceController.sourceFilePicker();
+      PlatformMediaSource? mediaSource =
+          playlistController.mediaSourceController.current;
       if (mediaSource != null) {
         await playMediaSource(mediaSource);
       }
@@ -313,8 +362,8 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
 
   Widget buildPlaylistController() {
     List<Widget> children = [];
-    if (playlistController.currentIndex.value != null &&
-        playlistController.currentIndex.value! > 0) {
+    if (playlistController.mediaSourceController.currentIndex.value != null &&
+        playlistController.mediaSourceController.currentIndex.value! > 0) {
       children.add(
         IconButton(
             hoverColor: myself.primary,
@@ -336,10 +385,11 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
             )),
       );
     }
-    int? currentIndex = playlistController.currentIndex.value;
+    int? currentIndex =
+        playlistController.mediaSourceController.currentIndex.value;
     if (currentIndex != null &&
         currentIndex >= 0 &&
-        currentIndex < playlistController.length) {
+        currentIndex < playlistController.mediaSourceController.length) {
       if (filename.value != null) {
         String name = FileUtil.filename(filename.value!);
         children.add(AutoSizeText(
@@ -349,7 +399,8 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
         ));
       }
     }
-    if (currentIndex != null && currentIndex < playlistController.length - 1) {
+    if (currentIndex != null &&
+        currentIndex < playlistController.mediaSourceController.length - 1) {
       children.add(
         IconButton(
             hoverColor: myself.primary,

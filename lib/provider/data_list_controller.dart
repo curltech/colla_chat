@@ -78,6 +78,7 @@ class DataListController<T> {
   T? get current {
     if (currentIndex.value != -1 &&
         currentIndex.value != null &&
+        currentIndex.value! < data.length &&
         data.isNotEmpty) {
       return data[currentIndex.value!];
     }

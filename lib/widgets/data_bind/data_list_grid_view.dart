@@ -111,10 +111,14 @@ class DataListGridView extends StatelessWidget {
                           dataListGridController.current?.selected = false;
                           dataListGridController.data[index].selected = true;
                           dataListGridController.setCurrentIndex = index;
+                          String title =
+                              dataListGridController.data[index].title;
                           if (onSelected != null) {
                             onSelected!(index,
                                 dataListGridController.data[index].title);
                           }
+                          dataListGridController.data[index].onTap
+                              ?.call(index, title);
                         });
                   });
             });

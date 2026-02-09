@@ -67,7 +67,8 @@ class FFMpegMediaWidget extends StatelessWidget with DataTileMixin {
     String? mimeType = FileUtil.mimeType(filename);
     if (mimeType != null) {
       if (mimeType.startsWith('video') || filename.endsWith('rmvb')) {
-        for (var videoExtension in playlistController.videoExtensions) {
+        for (var videoExtension
+            in playlistController.mediaSourceController.videoExtensions) {
           if (videoExtension != mimeType) {
             filePopActionData.add(
               ActionData(
@@ -81,7 +82,8 @@ class FFMpegMediaWidget extends StatelessWidget with DataTileMixin {
           }
         }
       } else if (mimeType.startsWith('audio')) {
-        for (var audioExtension in playlistController.audioExtensions) {
+        for (var audioExtension
+            in playlistController.mediaSourceController.audioExtensions) {
           if (audioExtension != mimeType) {
             filePopActionData.add(
               ActionData(
@@ -95,7 +97,8 @@ class FFMpegMediaWidget extends StatelessWidget with DataTileMixin {
           }
         }
       } else if (mimeType.startsWith('image')) {
-        for (var imageExtension in playlistController.imageExtensions) {
+        for (var imageExtension
+            in playlistController.mediaSourceController.imageExtensions) {
           if (imageExtension != mimeType) {
             filePopActionData.add(
               ActionData(
@@ -177,7 +180,8 @@ class FFMpegMediaWidget extends StatelessWidget with DataTileMixin {
   }
 
   Future<Widget> _buildTaskStateWidget(BuildContext context) async {
-    List<PlatformMediaSource> mediaSources = playlistController.data.toList();
+    List<PlatformMediaSource> mediaSources =
+        playlistController.rootMediaSourceController.data.toList();
     List<DataTile> tileData = [];
     for (var mediaSource in mediaSources) {
       String filename = mediaSource.filename;

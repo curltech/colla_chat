@@ -83,8 +83,11 @@ class _VideoMessageState extends State<VideoMessage> {
         valueListenable: filename,
         builder: (context, filename, child) {
           if (filename != null) {
-            videoMessagePlayerController.playlistController.clear();
-            videoMessagePlayerController.playlistController
+            videoMessagePlayerController
+                .playlistController.rootMediaSourceController
+                .clear();
+            videoMessagePlayerController
+                .playlistController.rootMediaSourceController
                 .addMediaFiles(filenames: [filename]);
             return videoMessagePlayer;
           }

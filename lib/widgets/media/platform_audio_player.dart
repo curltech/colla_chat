@@ -28,7 +28,7 @@ class PlatformAudioPlayer extends StatelessWidget {
     List<String>? filenames,
   }) {
     if (filenames != null) {
-      playlistController.addMediaFiles(filenames: filenames);
+      playlistController.rootMediaSourceController.addMediaFiles(filenames: filenames);
     }
   }
 
