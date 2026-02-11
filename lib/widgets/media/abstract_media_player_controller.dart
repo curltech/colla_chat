@@ -330,12 +330,14 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   }
 
   ///选择文件加入播放列表
-  Future<void> _addMediaSource() async {
+  Future<void> _addTempMediaSource() async {
     try {
-      await playlistController.rootMediaSourceController.sourceFilePicker();
-      PlatformMediaSource? mediaSource = playlistController.current;
-      if (mediaSource != null) {
-        await playMediaSource(mediaSource);
+      MediaSourceController mediaSourceController =
+          MediaSourceController('temp');
+      List<PlatformMediaSource>? mediaSources =
+          await mediaSourceController.sourceFilePicker();
+      if (mediaSources != null && mediaSources.isNotEmpty) {
+        await playMediaSource(mediaSources.first);
       }
     } catch (e) {
       DialogUtil.error(content: 'add media file failure:$e');
@@ -350,7 +352,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
           color: Colors.white,
         ),
         onPressed: () async {
-          await _addMediaSource();
+          await _addTempMediaSource();
         },
         tooltip: AppLocalizations.t('Open media file'),
       );

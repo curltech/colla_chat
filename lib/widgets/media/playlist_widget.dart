@@ -310,7 +310,7 @@ class MediaSourceController extends DataListController<PlatformMediaSource> {
     return mediaSource;
   }
 
-  Future<void> sourceFilePicker({
+  Future<List<PlatformMediaSource>?> sourceFilePicker({
     String? dialogTitle,
     bool directory = false,
     String? initialDirectory,
@@ -331,7 +331,10 @@ class MediaSourceController extends DataListController<PlatformMediaSource> {
       String? path = await FileUtil.directoryPathPicker(
           dialogTitle: dialogTitle, initialDirectory: initialDirectory);
       if (path != null) {
-        await addMediaFile(filename: path);
+        PlatformMediaSource? mediaSource = await addMediaFile(filename: path);
+        if (mediaSource != null) {
+          return [mediaSource];
+        }
       }
     } else {
       final List<XFile>? xfiles = await FileUtil.pickFiles(
@@ -339,6 +342,7 @@ class MediaSourceController extends DataListController<PlatformMediaSource> {
           type: _fileType,
           allowedExtensions: allowedExtensions.toList());
       if (xfiles != null && xfiles.isNotEmpty) {
+        List<PlatformMediaSource>? mediaSources;
         for (var xfile in xfiles) {
           String? extension = FileUtil.extension(xfile.path);
           if (extension == null) {
@@ -346,11 +350,19 @@ class MediaSourceController extends DataListController<PlatformMediaSource> {
           }
           bool? contain = allowedExtensions.contains(extension);
           if (contain) {
-            addMediaFile(filename: xfile.path);
+            PlatformMediaSource? mediaSource =
+                await addMediaFile(filename: xfile.path);
+            if (mediaSource != null) {
+              mediaSources ??= [];
+              mediaSources.add(mediaSource);
+            }
           }
         }
+
+        return mediaSources;
       }
     }
+    return null;
   }
 }
 
