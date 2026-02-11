@@ -12,7 +12,6 @@ import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
-import 'package:colla_chat/tool/number_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -25,44 +24,49 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class PlaylistController {
-  final MediaSourceController rootMediaSourceController =
-      MediaSourceController('/');
-  late MediaSourceController mediaSourceController = rootMediaSourceController;
+  final ValueNotifier<String> currentControllerName =
+      ValueNotifier<String>('/');
+  late final MediaSourceController rootMediaSourceController =
+      MediaSourceController(currentControllerName.value);
   late final Map<String, MediaSourceController> mediaSourceControllers = {
     rootMediaSourceController.path: rootMediaSourceController
   };
 
   PlaylistController();
 
+  MediaSourceController? get currentController {
+    return mediaSourceControllers[currentControllerName.value];
+  }
+
   PlatformMediaSource? get current {
-    return mediaSourceController.current;
+    return currentController?.current;
   }
 
-  Rx<int?> get currentIndex {
-    return mediaSourceController.currentIndex;
+  Rx<int?>? get currentIndex {
+    return currentController?.currentIndex;
   }
 
-  int get length {
-    return mediaSourceController.length;
+  int? get length {
+    return currentController?.length;
   }
 
   Future<void> previous() async {
-    if (currentIndex.value == null || currentIndex.value == 0) {
+    if (currentIndex?.value == null || currentIndex?.value == 0) {
       return;
     }
-    mediaSourceController.setCurrentIndex = currentIndex.value! - 1;
+    currentController?.setCurrentIndex = currentIndex!.value! - 1;
   }
 
   Future<void> next() async {
-    if (currentIndex.value == null ||
-        currentIndex.value! >= mediaSourceController.data.length - 1) {
+    if (currentIndex?.value == null ||
+        currentIndex!.value! >= currentController!.length - 1) {
       return;
     }
-    mediaSourceController.setCurrentIndex = currentIndex.value! + 1;
+    currentController?.setCurrentIndex = currentIndex!.value! + 1;
   }
 
   set setCurrentIndex(int? index) {
-    mediaSourceController.setCurrentIndex = index;
+    currentController?.setCurrentIndex = index;
   }
 
   void enter(PlatformMediaSource mediaSource) async {
@@ -83,15 +87,14 @@ class PlaylistController {
             }
             controller = MediaSourceController(mediaSource.filename);
             controller.addMediaFile(
-                filename: mediaSourceController.path, title: '..');
+                filename: currentController!.path, title: '..');
             controller.addMediaFiles(filenames: filenames);
             mediaSourceControllers[mediaSource.filename] = controller;
           }
         }
       }
       if (controller != null) {
-        mediaSourceController.data.clear();
-        mediaSourceController.replaceAll(controller.data);
+        currentControllerName.value = mediaSource.filename;
       }
     }
   }
@@ -328,7 +331,7 @@ class MediaSourceController extends DataListController<PlatformMediaSource> {
       String? path = await FileUtil.directoryPathPicker(
           dialogTitle: dialogTitle, initialDirectory: initialDirectory);
       if (path != null) {
-        addMediaFile(filename: path);
+        await addMediaFile(filename: path);
       }
     } else {
       final List<XFile>? xfiles = await FileUtil.pickFiles(
@@ -359,23 +362,18 @@ class PlaylistWidget extends StatelessWidget {
       DataListGridController();
 
   PlaylistWidget(
-      {super.key, this.onSelected, required this.playlistController}) {
-    playlistController.mediaSourceController.currentIndex.addListener(() async {
-      _buildDataTiles();
-    });
-  }
+      {super.key, this.onSelected, required this.playlistController});
 
   void _buildDataTiles() {
     List<PlatformMediaSource> mediaSources =
-        playlistController.mediaSourceController.data;
+        playlistController.currentController!.data;
     List<DataTile> dataTiles = [];
     for (var mediaSource in mediaSources) {
       var filename = mediaSource.filename;
       var title = mediaSource.title;
       var length = mediaSource.length;
       bool selected = false;
-      PlatformMediaSource? current =
-          playlistController.mediaSourceController.current;
+      PlatformMediaSource? current = playlistController.current;
       if (current != null) {
         if (current.filename == filename) {
           selected = true;
@@ -389,12 +387,13 @@ class PlaylistWidget extends StatelessWidget {
         selected: selected,
         onTap: (int index, String title, {String? subtitle}) async {
           PlatformMediaSource mediaSource =
-              playlistController.mediaSourceController.data[index];
+              playlistController.currentController!.data[index];
           if (mediaSource.mediaSourceType == MediaSourceType.directory) {
+            playlistController.currentController!.setCurrentIndex = index;
             playlistController.enter(mediaSource);
           }
           if (mediaSource.mediaSourceType == MediaSourceType.file) {
-            playlistController.mediaSourceController.setCurrentIndex = index;
+            playlistController.currentController!.setCurrentIndex = index;
           }
 
           return null;
@@ -509,7 +508,17 @@ class PlaylistWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DataListGridView(
-        onSelected: onSelected, dataListGridController: dataListGridController);
+    return ListenableBuilder(
+        listenable: playlistController.currentControllerName,
+        builder: (BuildContext context, Widget? child) {
+          return ListenableBuilder(
+              listenable: playlistController.currentIndex!,
+              builder: (BuildContext context, Widget? child) {
+                _buildDataTiles();
+                return DataListGridView(
+                    onSelected: onSelected,
+                    dataListGridController: dataListGridController);
+              });
+        });
   }
 }

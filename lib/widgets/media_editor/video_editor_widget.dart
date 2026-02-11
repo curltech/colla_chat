@@ -27,7 +27,6 @@ class VideoEditorWidget extends StatelessWidget with DataTileMixin {
     super.key,
   }) {
     scrollController.addListener(_onScroll);
-    playlistController.currentIndex.addListener(_update);
   }
 
   @override
@@ -68,10 +67,6 @@ class VideoEditorWidget extends StatelessWidget with DataTileMixin {
         scrollController.position.minScrollExtent) {
       logger.i('scrolled to min');
     }
-  }
-
-  void _update() {
-    _splitImageFiles();
   }
 
   /// 将视频文件按帧分离成图像
@@ -174,7 +169,7 @@ class VideoEditorWidget extends StatelessWidget with DataTileMixin {
     return seekBar;
   }
 
-  Widget _buildImageSlide(context) {
+  Widget _buildImageSlide(BuildContext context) {
     return Obx(() {
       List<Widget> children = [];
       String? current = imageFileController.current;
@@ -250,7 +245,11 @@ class VideoEditorWidget extends StatelessWidget with DataTileMixin {
                     }));
               })),
               _buildSeekBar(context),
-              _buildImageSlide(context),
+              ListenableBuilder(
+                  listenable: playlistController.currentIndex!,
+                  builder: (BuildContext context, Widget? child) {
+                    return _buildImageSlide(context);
+                  }),
             ]);
           }
           return nilBox;

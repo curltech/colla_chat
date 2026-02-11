@@ -68,7 +68,7 @@ class FFMpegMediaWidget extends StatelessWidget with DataTileMixin {
     if (mimeType != null) {
       if (mimeType.startsWith('video') || filename.endsWith('rmvb')) {
         for (var videoExtension
-            in playlistController.mediaSourceController.videoExtensions) {
+            in playlistController.currentController!.videoExtensions) {
           if (videoExtension != mimeType) {
             filePopActionData.add(
               ActionData(
@@ -83,7 +83,7 @@ class FFMpegMediaWidget extends StatelessWidget with DataTileMixin {
         }
       } else if (mimeType.startsWith('audio')) {
         for (var audioExtension
-            in playlistController.mediaSourceController.audioExtensions) {
+            in playlistController.currentController!.audioExtensions) {
           if (audioExtension != mimeType) {
             filePopActionData.add(
               ActionData(
@@ -98,7 +98,7 @@ class FFMpegMediaWidget extends StatelessWidget with DataTileMixin {
         }
       } else if (mimeType.startsWith('image')) {
         for (var imageExtension
-            in playlistController.mediaSourceController.imageExtensions) {
+            in playlistController.currentController!.imageExtensions) {
           if (imageExtension != mimeType) {
             filePopActionData.add(
               ActionData(

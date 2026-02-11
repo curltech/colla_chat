@@ -290,8 +290,8 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
 
   /// 如果没有播放，则播放当前文件
   void play() {
-    if (playlistController.mediaSourceController.current != null) {
-      playMediaSource(playlistController.mediaSourceController.current!);
+    if (playlistController.current != null) {
+      playMediaSource(playlistController.current!);
     }
   }
 
@@ -300,16 +300,16 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   resume();
 
   void next() {
-    playlistController.mediaSourceController.next();
-    if (playlistController.mediaSourceController.current != null) {
-      playMediaSource(playlistController.mediaSourceController.current!);
+    playlistController.next();
+    if (playlistController.current != null) {
+      playMediaSource(playlistController.current!);
     }
   }
 
   void previous() {
-    playlistController.mediaSourceController.previous();
-    if (playlistController.mediaSourceController.current != null) {
-      playMediaSource(playlistController.mediaSourceController.current!);
+    playlistController.previous();
+    if (playlistController.current != null) {
+      playMediaSource(playlistController.current!);
     }
   }
 
@@ -333,8 +333,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   Future<void> _addMediaSource() async {
     try {
       await playlistController.rootMediaSourceController.sourceFilePicker();
-      PlatformMediaSource? mediaSource =
-          playlistController.mediaSourceController.current;
+      PlatformMediaSource? mediaSource = playlistController.current;
       if (mediaSource != null) {
         await playMediaSource(mediaSource);
       }
@@ -380,8 +379,8 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
 
   Widget buildPlaylistController() {
     List<Widget> children = [];
-    if (playlistController.mediaSourceController.currentIndex.value != null &&
-        playlistController.mediaSourceController.currentIndex.value! > 0) {
+    if (playlistController.currentIndex?.value != null &&
+        playlistController.currentIndex!.value! > 0) {
       children.add(
         IconButton(
             hoverColor: myself.primary,
@@ -403,11 +402,10 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
             )),
       );
     }
-    int? currentIndex =
-        playlistController.mediaSourceController.currentIndex.value;
+    int? currentIndex = playlistController.currentIndex?.value;
     if (currentIndex != null &&
         currentIndex >= 0 &&
-        currentIndex < playlistController.mediaSourceController.length) {
+        currentIndex < playlistController.length!) {
       if (filename.value != null) {
         String name = FileUtil.filename(filename.value!);
         children.add(AutoSizeText(
@@ -417,8 +415,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
         ));
       }
     }
-    if (currentIndex != null &&
-        currentIndex < playlistController.mediaSourceController.length - 1) {
+    if (currentIndex != null && currentIndex < playlistController.length! - 1) {
       children.add(
         IconButton(
             hoverColor: myself.primary,
