@@ -279,11 +279,7 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
             ),
           ),
         ),
-        paintEditor: const PaintEditorConfigs(
-          /// Blur and pixelate are not supported.
-          enableModePixelate: false,
-          enableModeBlur: false,
-        ),
+        paintEditor: const PaintEditorConfigs(),
         videoEditor: _videoConfigs.copyWith(
           playTimeSmoothingDuration: const Duration(milliseconds: 600),
         ),
