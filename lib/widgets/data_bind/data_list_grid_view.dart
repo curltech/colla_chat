@@ -81,6 +81,7 @@ class DataListGridView extends StatelessWidget {
   Widget _buildThumbnailView(BuildContext context) {
     return Obx(() {
       if (dataListGridController.data.isEmpty) {
+        return nilBox;
         return Container(
             alignment: Alignment.center,
             child: AutoSizeText(AppLocalizations.t('List is empty'),

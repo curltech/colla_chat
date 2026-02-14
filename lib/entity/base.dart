@@ -35,6 +35,7 @@ abstract class BaseEntity {
   String? entityId;
   EntityState? state;
   bool? selected;
+  bool? checked;
 
   BaseEntity();
 

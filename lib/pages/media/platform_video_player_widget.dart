@@ -1,12 +1,20 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/app_bar_adaptive_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/platform_video_player.dart';
+import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:flutter/material.dart';
 
 ///平台标准的video_player的实现，缺省采用MediaKit
 class PlatformVideoPlayerWidget extends StatelessWidget with DataTileMixin {
-  final PlatformVideoPlayer platformVideoPlayer = PlatformVideoPlayer();
+  final PlaylistController playlistController = PlaylistController();
+  late final PlaylistWidget playlistWidget = PlaylistWidget(
+    onSelected: _onSelected,
+    playlistController: playlistController,
+  );
+  late final PlatformVideoPlayer platformVideoPlayer = PlatformVideoPlayer(
+    playlistController: playlistController,
+  );
 
   @override
   String get routeName => 'video_player';
@@ -22,45 +30,37 @@ class PlatformVideoPlayerWidget extends StatelessWidget with DataTileMixin {
 
   PlatformVideoPlayerWidget({
     super.key,
-  });
+    List<String>? filenames,
+  }) {
+    if (filenames != null) {
+      playlistController.rootMediaSourceController
+          .addMediaFiles(filenames: filenames);
+    }
+  }
+
+  void _onSelected(int index, String filename) {
+    // swiperController.move(1);
+  }
 
   List<Widget> _buildRightWidgets(BuildContext context) {
     List<Widget> children = [];
-    Widget btn = ValueListenableBuilder(
-        valueListenable: platformVideoPlayer.index,
-        builder: (BuildContext context, int index, Widget? child) {
-          if (index == 0) {
-            return IconButton(
-              tooltip: AppLocalizations.t('Video player'),
-              onPressed: () async {
-                platformVideoPlayer.controller.move(1);
-                platformVideoPlayer.play();
-              },
-              icon: const Icon(Icons.video_call),
-            );
-          } else {
-            return Row(children: [
-              IconButton(
-                tooltip: AppLocalizations.t('Playlist'),
-                onPressed: () async {
-                  platformVideoPlayer.controller.move(0);
-                },
-                icon: const Icon(Icons.featured_play_list_outlined),
-              ),
-              IconButton(
-                tooltip: AppLocalizations.t('Toggle'),
-                onPressed: () async {
-                  platformVideoPlayer.toggleCrossAxisCount();
-                },
-                icon: const Icon(Icons.toggle_off_outlined),
-              ),
-            ]);
-          }
-        });
-    children.add(btn);
+    children.add(IconButton(
+      tooltip: AppLocalizations.t('Play'),
+      onPressed: () async {
+        platformVideoPlayer.play();
+      },
+      icon: const Icon(Icons.play_circle_outline_outlined),
+    ));
+    children.add(IconButton(
+      tooltip: AppLocalizations.t('Toggle'),
+      onPressed: () async {
+        platformVideoPlayer.toggleCrossAxisCount();
+      },
+      icon: const Icon(Icons.toggle_off_outlined),
+    ));
     children.add(
       IconButton(
-        tooltip: AppLocalizations.t('Close'),
+        tooltip: AppLocalizations.t('Close all'),
         onPressed: () async {
           platformVideoPlayer.close();
         },
@@ -71,7 +71,7 @@ class PlatformVideoPlayerWidget extends StatelessWidget with DataTileMixin {
       IconButton(
         tooltip: AppLocalizations.t('More'),
         onPressed: () {
-          platformVideoPlayer.playlistWidget.showActionCard(context);
+          playlistWidget.showActionCard(context);
         },
         icon: const Icon(Icons.more_horiz_outlined),
       ),
@@ -84,12 +84,13 @@ class PlatformVideoPlayerWidget extends StatelessWidget with DataTileMixin {
   Widget build(BuildContext context) {
     List<Widget>? rightWidgets = _buildRightWidgets(context);
 
-    return AppBarView(
+    return AppBarAdaptiveView(
       title: title,
-      helpPath: routeName,
       withLeading: true,
+      helpPath: routeName,
       rightWidgets: rightWidgets,
-      child: platformVideoPlayer,
+      main: playlistWidget,
+      body: platformVideoPlayer,
     );
   }
 }

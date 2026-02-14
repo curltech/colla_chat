@@ -65,7 +65,10 @@ class AppBarAdaptiveView extends StatelessWidget {
         pixels: pixels,
       );
       List<ActionData> actions = this.actions ?? [];
-      List<Widget> rightWidgets = this.rightWidgets ?? [];
+      List<Widget> rightWidgets = [];
+      if (this.rightWidgets != null) {
+        rightWidgets.addAll(this.rightWidgets!);
+      }
       if (body is DataTileMixin) {
         DataTileMixin dataTileMixin = body as DataTileMixin;
         if (dataTileMixin.actions != null) {
