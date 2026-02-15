@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
@@ -9,9 +8,8 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/app_bar_adaptive_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_helper.dart';
@@ -45,8 +43,6 @@ class VideoEditorWidget extends StatelessWidget with DataTileMixin {
   late final PlaylistWidget playlistWidget = PlaylistWidget(
     playlistController: playlistController,
   );
-  final ValueNotifier<int> index = ValueNotifier<int>(0);
-  final PlatformCarouselController controller = PlatformCarouselController();
 
   ///视频文件拆分成图像文件
   final DataListController<String> imageFileController =
@@ -205,55 +201,36 @@ class VideoEditorWidget extends StatelessWidget with DataTileMixin {
   }
 
   Widget _buildVideoEditor(BuildContext context) {
-    Widget mediaView = PlatformCarouselWidget(
-        itemCount: 2,
-        initialPage: index.value,
-        controller: controller,
-        onPageChanged: (int index,
-            {PlatformSwiperDirection? direction,
-            int? oldIndex,
-            CarouselPageChangedReason? reason}) {
-          this.index.value = index;
-        },
-        itemBuilder: (BuildContext context, int index, {int? realIndex}) {
-          if (index == 0) {
-            return playlistWidget;
-          }
-          if (index == 1) {
-            return Column(children: [
-              Expanded(child: Obx(() {
-                String? filename = imageFileController.current;
-                if (filename == null) {
-                  return nilBox;
-                }
-                return ProImageEditor.file(File(filename),
-                    key: UniqueKey(),
-                    callbacks: ProImageEditorCallbacks(
-                        onImageEditingComplete: (Uint8List bytes) async {
-                      bool? confirm = await DialogUtil.confirm(
-                        context: context,
-                        title: 'Save as',
-                        content: filename,
-                      );
-                      if (confirm != null && confirm) {
-                        await FileUtil.writeFileAsBytes(bytes, filename);
-                        DialogUtil.info(
-                            content: 'Save file:$filename successfully');
-                      }
-                    }, onCloseEditor: (EditorMode mode) {
-                      imageFileController.clear();
-                    }));
-              })),
-              _buildSeekBar(context),
-              ListenableBuilder(
-                  listenable: playlistController.currentIndex!,
-                  builder: (BuildContext context, Widget? child) {
-                    return _buildImageSlide(context);
-                  }),
-            ]);
-          }
+    Widget mediaView = Column(children: [
+      Expanded(child: Obx(() {
+        String? filename = imageFileController.current;
+        if (filename == null) {
           return nilBox;
-        });
+        }
+        return ProImageEditor.file(File(filename),
+            key: UniqueKey(),
+            callbacks: ProImageEditorCallbacks(
+                onImageEditingComplete: (Uint8List bytes) async {
+              bool? confirm = await DialogUtil.confirm(
+                context: context,
+                title: 'Save as',
+                content: filename,
+              );
+              if (confirm != null && confirm) {
+                await FileUtil.writeFileAsBytes(bytes, filename);
+                DialogUtil.info(content: 'Save file:$filename successfully');
+              }
+            }, onCloseEditor: (EditorMode mode) {
+              imageFileController.clear();
+            }));
+      })),
+      _buildSeekBar(context),
+      ListenableBuilder(
+          listenable: playlistController.currentIndex!,
+          builder: (BuildContext context, Widget? child) {
+            return _buildImageSlide(context);
+          }),
+    ]);
 
     return Center(
       child: mediaView,
@@ -261,52 +238,28 @@ class VideoEditorWidget extends StatelessWidget with DataTileMixin {
   }
 
   List<Widget>? _buildRightWidgets(BuildContext context) {
-    List<Widget> children = [];
-    Widget btn = ValueListenableBuilder(
-        valueListenable: index,
-        builder: (BuildContext context, int index, Widget? child) {
-          if (index == 0) {
-            return Row(children: [
-              IconButton(
-                tooltip: AppLocalizations.t('Video editor'),
-                onPressed: () async {
-                  controller.move(1);
-                },
-                icon: const Icon(Icons.task_alt_outlined),
-              ),
-              IconButton(
-                tooltip: AppLocalizations.t('More'),
-                onPressed: () {
-                  playlistWidget.showActionCard(context);
-                },
-                icon: const Icon(Icons.more_horiz_outlined),
-              ),
-            ]);
-          } else {
-            return Row(children: [
-              IconButton(
-                tooltip: AppLocalizations.t('Playlist'),
-                onPressed: () async {
-                  controller.move(0);
-                },
-                icon: const Icon(Icons.featured_play_list_outlined),
-              ),
-            ]);
-          }
-        });
-    children.add(btn);
+    List<Widget> children = [
+      IconButton(
+        tooltip: AppLocalizations.t('More'),
+        onPressed: () {
+          playlistWidget.showActionCard(context);
+        },
+        icon: const Icon(Icons.more_horiz_outlined),
+      ),
+    ];
 
     return children;
   }
 
   @override
   Widget build(BuildContext context) {
-    return AppBarView(
+    return AppBarAdaptiveView(
       title: title,
       helpPath: routeName,
       withLeading: true,
       rightWidgets: _buildRightWidgets(context),
-      child: _buildVideoEditor(context),
+      main: playlistWidget,
+      body: _buildVideoEditor(context),
     );
   }
 }

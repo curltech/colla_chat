@@ -1,11 +1,8 @@
-import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:colla_chat/widgets/common/platform_carousel.dart';
+import 'package:colla_chat/widgets/common/app_bar_adaptive_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
@@ -39,8 +36,6 @@ class VideoRendererWidget extends StatelessWidget with DataTileMixin {
   late final PlaylistWidget playlistWidget = PlaylistWidget(
     playlistController: playlistController,
   );
-  final ValueNotifier<int> index = ValueNotifier<int>(0);
-  final PlatformCarouselController controller = PlatformCarouselController();
 
   // 原视频播放器
   late final _player = Player();
@@ -348,43 +343,24 @@ class VideoRendererWidget extends StatelessWidget with DataTileMixin {
   }
 
   Widget _buildVideoPlayer(BuildContext context) {
-    Widget mediaView = PlatformCarouselWidget(
-      itemCount: 2,
-      initialPage: index.value,
-      controller: controller,
-      onPageChanged: (int index,
-          {PlatformSwiperDirection? direction,
-          int? oldIndex,
-          CarouselPageChangedReason? reason}) {
-        this.index.value = index;
-      },
-      itemBuilder: (BuildContext context, int index, {int? realIndex}) {
-        if (index == 0) {
-          return playlistWidget;
-        }
-        if (index == 1) {
-          return Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            alignment: WrapAlignment.center,
-            children: [
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: appDataProvider.secondaryBodyWidth,
-                ),
-                child: _buildSourceVideoPlayer(),
-              ),
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: appDataProvider.secondaryBodyWidth,
-                ),
-                child: _buildTargetVideoPlayer(),
-              ),
-            ],
-          );
-        }
-        return nilBox;
-      },
+    Widget mediaView = Wrap(
+      spacing: 16,
+      runSpacing: 16,
+      alignment: WrapAlignment.center,
+      children: [
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: appDataProvider.secondaryBodyWidth,
+          ),
+          child: _buildSourceVideoPlayer(),
+        ),
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: appDataProvider.secondaryBodyWidth,
+          ),
+          child: _buildTargetVideoPlayer(),
+        ),
+      ],
     );
 
     return Center(
@@ -436,40 +412,15 @@ class VideoRendererWidget extends StatelessWidget with DataTileMixin {
   }
 
   List<Widget>? _buildRightWidgets(BuildContext context) {
-    List<Widget> children = [];
-    Widget btn = ValueListenableBuilder(
-        valueListenable: index,
-        builder: (BuildContext context, int index, Widget? child) {
-          if (index == 0) {
-            return Row(children: [
-              IconButton(
-                tooltip: AppLocalizations.t('Video render'),
-                onPressed: () async {
-                  controller.move(1);
-                },
-                icon: const Icon(Icons.task_alt_outlined),
-              ),
-              IconButton(
-                tooltip: AppLocalizations.t('More'),
-                onPressed: () {
-                  playlistWidget.showActionCard(context);
-                },
-                icon: const Icon(Icons.more_horiz_outlined),
-              ),
-            ]);
-          } else {
-            return Row(children: [
-              IconButton(
-                tooltip: AppLocalizations.t('Playlist'),
-                onPressed: () async {
-                  controller.move(0);
-                },
-                icon: const Icon(Icons.featured_play_list_outlined),
-              ),
-            ]);
-          }
-        });
-    children.add(btn);
+    List<Widget> children = [
+      IconButton(
+        tooltip: AppLocalizations.t('More'),
+        onPressed: () {
+          playlistWidget.showActionCard(context);
+        },
+        icon: const Icon(Icons.more_horiz_outlined),
+      )
+    ];
     // 渲染参数输入界面的按钮
     children.add(IconButton(
         onPressed: () {
@@ -486,12 +437,13 @@ class VideoRendererWidget extends StatelessWidget with DataTileMixin {
 
   @override
   Widget build(BuildContext context) {
-    return AppBarView(
+    return AppBarAdaptiveView(
       title: title,
       helpPath: routeName,
       withLeading: true,
       rightWidgets: _buildRightWidgets(context),
-      child: _buildVideoPlayer(context),
+      main: playlistWidget,
+      body: _buildVideoPlayer(context),
     );
   }
 

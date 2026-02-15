@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:io' as io;
-import 'package:carousel_slider_plus/carousel_options.dart';
+
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:colla_chat/widgets/common/platform_carousel.dart';
+import 'package:colla_chat/widgets/common/app_bar_adaptive_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:colla_chat/widgets/media_editor/pro_video_render.dart';
@@ -14,6 +12,7 @@ import 'package:pro_image_editor/pro_image_editor.dart';
 import 'package:pro_video_editor/pro_video_editor.dart';
 import 'package:video_player/video_player.dart';
 
+/// 通用的视频编辑界面，使用pro_video_editor
 class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
   ProVideoEditorWidget({super.key});
 
@@ -33,10 +32,6 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
   late final PlaylistWidget playlistWidget = PlaylistWidget(
     playlistController: playlistController,
   );
-  final ValueNotifier<int> index = ValueNotifier<int>(0);
-  final PlatformCarouselController controller = PlatformCarouselController();
-
-  final _outputFormat = VideoOutputFormat.mp4;
 
   /// Video editor configuration settings.
   late final VideoEditorConfigs _videoConfigs = const VideoEditorConfigs(
@@ -69,6 +64,7 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
 
   /// 视频渲染类
   late final ProVideoRender _videoRender;
+  final _outputFormat = VideoOutputFormat.mp4;
 
   /// 保存输出的视频文件
   String? _outputVideoFile;
@@ -163,88 +159,25 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
     );
   }
 
-  /// 关闭视频编辑
-  void onCloseEditor(EditorMode editorMode) async {
-    if (editorMode != EditorMode.main) {
-      controller.move(0);
-    }
-    if (_outputVideoFile != null) {
-    } else {
-      controller.move(0);
-    }
-  }
-
-  Widget _buildVideoEditor(BuildContext context) {
-    Widget mediaView = PlatformCarouselWidget(
-        itemCount: 2,
-        initialPage: index.value,
-        controller: controller,
-        onPageChanged: (int index,
-            {PlatformSwiperDirection? direction,
-            int? oldIndex,
-            CarouselPageChangedReason? reason}) {
-          this.index.value = index;
-        },
-        itemBuilder: (BuildContext context, int index, {int? realIndex}) {
-          if (index == 0) {
-            return playlistWidget;
-          }
-          if (index == 1) {
-            return _buildProImageEditor();
-          }
-          return nilBox;
-        });
-
-    return Center(
-      child: mediaView,
-    );
-  }
-
   List<Widget>? _buildRightWidgets(BuildContext context) {
-    List<Widget> children = [];
-    Widget btn = ValueListenableBuilder(
-        valueListenable: index,
-        builder: (BuildContext context, int index, Widget? child) {
-          if (index == 0) {
-            return Row(children: [
-              IconButton(
-                tooltip: AppLocalizations.t('Pro video editor'),
-                onPressed: () async {
-                  controller.move(1);
-                },
-                icon: const Icon(Icons.task_alt_outlined),
-              ),
-              IconButton(
-                tooltip: AppLocalizations.t('More'),
-                onPressed: () {
-                  playlistWidget.showActionCard(context);
-                },
-                icon: const Icon(Icons.more_horiz_outlined),
-              ),
-            ]);
-          } else {
-            return Row(children: [
-              IconButton(
-                tooltip: AppLocalizations.t('Playlist'),
-                onPressed: () async {
-                  controller.move(0);
-                },
-                icon: const Icon(Icons.featured_play_list_outlined),
-              ),
-            ]);
-          }
-        });
-    children.add(btn);
+    List<Widget> children = [
+      IconButton(
+        tooltip: AppLocalizations.t('More'),
+        onPressed: () {
+          playlistWidget.showActionCard(context);
+        },
+        icon: const Icon(Icons.more_horiz_outlined),
+      )
+    ];
 
     return children;
   }
 
-  Widget _buildProImageEditor() {
+  Widget _buildVideoEditor() {
     return ProImageEditor.video(
       _proVideoController!,
       callbacks: ProImageEditorCallbacks(
         onCompleteWithParameters: generateVideo,
-        onCloseEditor: onCloseEditor,
         videoEditorCallbacks: VideoEditorCallbacks(
           onPause: _videoController.pause,
           onPlay: _videoController.play,
@@ -300,12 +233,13 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
 
   @override
   Widget build(BuildContext context) {
-    return AppBarView(
+    return AppBarAdaptiveView(
       title: title,
       helpPath: routeName,
       withLeading: true,
       rightWidgets: _buildRightWidgets(context),
-      child: _buildVideoEditor(context),
+      main: playlistWidget,
+      body: _buildVideoEditor(),
     );
   }
 }

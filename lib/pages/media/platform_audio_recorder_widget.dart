@@ -20,15 +20,12 @@ enum MediaRecorderType {
 }
 
 ///平台标准的record的实现
-class PlatformAudioRecorderWidget extends StatefulWidget with DataTileMixin {
+class PlatformAudioRecorderWidget extends StatelessWidget with DataTileMixin {
   AbstractAudioRecorderController audioRecorderController =
       globalRecordAudioRecorderController;
 
   PlatformAudioRecorderWidget(
       {super.key, AbstractAudioRecorderController? controller});
-
-  @override
-  State createState() => _PlatformAudioRecorderWidgetState();
 
   @override
   String get routeName => 'audio_recorder';
@@ -42,39 +39,25 @@ class PlatformAudioRecorderWidget extends StatefulWidget with DataTileMixin {
   @override
   bool get withLeading => true;
 
-  
-}
-
-class _PlatformAudioRecorderWidgetState
-    extends State<PlatformAudioRecorderWidget> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   Widget _buildAudioFormats() {
     List<bool> isSelected = const [true, false, false, false, false];
-    if (widget.audioRecorderController is RecordAudioRecorderController) {
+    if (audioRecorderController is RecordAudioRecorderController) {
       RecordAudioRecorderController recordAudioRecorderController =
-          widget.audioRecorderController as RecordAudioRecorderController;
-      if (recordAudioRecorderController.encoder == AudioEncoder.aacLc) {
+          audioRecorderController as RecordAudioRecorderController;
+      if (recordAudioRecorderController.encoder.value == AudioEncoder.aacLc) {
         isSelected = const [true, false, false, false, false];
       }
-      if (recordAudioRecorderController.encoder == AudioEncoder.flac) {
+      if (recordAudioRecorderController.encoder.value == AudioEncoder.flac) {
         isSelected = const [false, true, false, false, false];
       }
-      if (recordAudioRecorderController.encoder == AudioEncoder.pcm16bits) {
+      if (recordAudioRecorderController.encoder.value ==
+          AudioEncoder.pcm16bits) {
         isSelected = const [false, false, true, false, false];
       }
-      if (recordAudioRecorderController.encoder == AudioEncoder.opus) {
+      if (recordAudioRecorderController.encoder.value == AudioEncoder.opus) {
         isSelected = const [false, false, false, true, false];
       }
-      if (recordAudioRecorderController.encoder == AudioEncoder.wav) {
+      if (recordAudioRecorderController.encoder.value == AudioEncoder.wav) {
         isSelected = const [false, false, false, false, true];
       }
     }
@@ -86,44 +69,40 @@ class _PlatformAudioRecorderWidgetState
       isSelected: isSelected,
       onPressed: (int newIndex) {
         if (newIndex == 0) {
-          if (widget.audioRecorderController is RecordAudioRecorderController) {
+          if (audioRecorderController is RecordAudioRecorderController) {
             RecordAudioRecorderController recordAudioRecorderController =
-                widget.audioRecorderController as RecordAudioRecorderController;
-            setState(() {
-              recordAudioRecorderController.encoder = AudioEncoder.aacLc;
-            });
+                audioRecorderController as RecordAudioRecorderController;
+
+            recordAudioRecorderController.encoder.value = AudioEncoder.aacLc;
           }
         } else if (newIndex == 1) {
-          if (widget.audioRecorderController is RecordAudioRecorderController) {
+          if (audioRecorderController is RecordAudioRecorderController) {
             RecordAudioRecorderController recordAudioRecorderController =
-                widget.audioRecorderController as RecordAudioRecorderController;
-            setState(() {
-              recordAudioRecorderController.encoder = AudioEncoder.flac;
-            });
+                audioRecorderController as RecordAudioRecorderController;
+
+            recordAudioRecorderController.encoder.value = AudioEncoder.flac;
           }
         } else if (newIndex == 2) {
-          if (widget.audioRecorderController is RecordAudioRecorderController) {
+          if (audioRecorderController is RecordAudioRecorderController) {
             RecordAudioRecorderController recordAudioRecorderController =
-                widget.audioRecorderController as RecordAudioRecorderController;
-            setState(() {
-              recordAudioRecorderController.encoder = AudioEncoder.pcm16bits;
-            });
+                audioRecorderController as RecordAudioRecorderController;
+
+            recordAudioRecorderController.encoder.value =
+                AudioEncoder.pcm16bits;
           }
         } else if (newIndex == 3) {
-          if (widget.audioRecorderController is RecordAudioRecorderController) {
+          if (audioRecorderController is RecordAudioRecorderController) {
             RecordAudioRecorderController recordAudioRecorderController =
-                widget.audioRecorderController as RecordAudioRecorderController;
-            setState(() {
-              recordAudioRecorderController.encoder = AudioEncoder.opus;
-            });
+                audioRecorderController as RecordAudioRecorderController;
+
+            recordAudioRecorderController.encoder.value = AudioEncoder.opus;
           }
         } else if (newIndex == 4) {
-          if (widget.audioRecorderController is RecordAudioRecorderController) {
+          if (audioRecorderController is RecordAudioRecorderController) {
             RecordAudioRecorderController recordAudioRecorderController =
-                widget.audioRecorderController as RecordAudioRecorderController;
-            setState(() {
-              recordAudioRecorderController.encoder = AudioEncoder.wav;
-            });
+                audioRecorderController as RecordAudioRecorderController;
+
+            recordAudioRecorderController.encoder.value = AudioEncoder.wav;
           }
         }
       },
@@ -154,7 +133,7 @@ class _PlatformAudioRecorderWidgetState
   List<Widget>? _buildRightWidgets() {
     if (platformParams.mobile) {
       List<bool> isSelected = const [true, false];
-      if (widget.audioRecorderController is WaveformsAudioRecorderController) {
+      if (audioRecorderController is WaveformsAudioRecorderController) {
         isSelected = const [false, true];
       }
       var toggleWidget = ToggleButtons(
@@ -164,15 +143,9 @@ class _PlatformAudioRecorderWidgetState
         isSelected: isSelected,
         onPressed: (int newIndex) {
           if (newIndex == 0) {
-            setState(() {
-              widget.audioRecorderController =
-                  globalRecordAudioRecorderController;
-            });
+            audioRecorderController = globalRecordAudioRecorderController;
           } else if (newIndex == 1) {
-            setState(() {
-              widget.audioRecorderController =
-                  globalWaveformsAudioRecorderController;
-            });
+            audioRecorderController = globalWaveformsAudioRecorderController;
           }
         },
         children: const <Widget>[
@@ -200,8 +173,8 @@ class _PlatformAudioRecorderWidgetState
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: widget.title,
-        helpPath: widget.routeName,
+        title: title,
+        helpPath: routeName,
         withLeading: true,
         rightWidgets: _buildRightWidgets(),
         child: Column(
@@ -210,17 +183,15 @@ class _PlatformAudioRecorderWidgetState
             const Spacer(),
             PlatformAudioRecorder(
               onStop: (String filename) async {
-                if (mounted) {
-                  bool? confirm = await DialogUtil.confirm(
-                      content:
-                          '${AppLocalizations.t('Need you play record audio filename')} $filename?');
-                  if (confirm != null && confirm) {
-                    BlueFireAudioPlayer audioPlayer = globalBlueFireAudioPlayer;
-                    audioPlayer.play(filename);
-                  }
+                bool? confirm = await DialogUtil.confirm(
+                    content:
+                        '${AppLocalizations.t('Need you play record audio filename')} $filename?');
+                if (confirm != null && confirm) {
+                  BlueFireAudioPlayer audioPlayer = globalBlueFireAudioPlayer;
+                  audioPlayer.play(filename);
                 }
               },
-              audioRecorderController: widget.audioRecorderController,
+              audioRecorderController: audioRecorderController,
             ),
             const Spacer(),
           ],

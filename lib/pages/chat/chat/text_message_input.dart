@@ -47,7 +47,7 @@ class TextMessageInputWidget extends StatelessWidget {
   Widget _buildVoiceRecordButton() {
     RecordAudioRecorderController audioRecorderController =
         globalRecordAudioRecorderController;
-    audioRecorderController.encoder = AudioEncoder.aacLc;
+    audioRecorderController.encoder.value = AudioEncoder.aacLc;
     platformAudioRecorder = PlatformAudioRecorder(
       onStop: _onStop,
       audioRecorderController: audioRecorderController,

@@ -1,12 +1,21 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/widgets/common/app_bar_adaptive_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/platform_audio_player.dart';
+import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:flutter/material.dart';
 
 ///平台标准的AudioPlayer的实现，支持标准的audioplayers，just_audio和webview
 class PlatformAudioPlayerWidget extends StatelessWidget with DataTileMixin {
-  final PlatformAudioPlayer platformAudioPlayer = PlatformAudioPlayer();
+  final PlaylistController playlistController = PlaylistController();
+  late final PlaylistWidget playlistWidget = PlaylistWidget(
+    onSelected: _onSelected,
+    playlistController: playlistController,
+  );
+  late final PlatformAudioPlayer platformAudioPlayer = PlatformAudioPlayer(
+    playlistController: playlistController,
+  );
 
   PlatformAudioPlayerWidget({super.key});
 
@@ -22,34 +31,12 @@ class PlatformAudioPlayerWidget extends StatelessWidget with DataTileMixin {
   @override
   bool get withLeading => true;
 
+  void _onSelected(int index, String filename) {
+    // swiperController.move(1);
+  }
+
   List<Widget>? _buildRightWidgets(BuildContext context) {
     List<Widget> children = [
-      ValueListenableBuilder(
-          valueListenable: platformAudioPlayer.index,
-          builder: (BuildContext context, int index, Widget? child) {
-            if (index == 0) {
-              return IconButton(
-                tooltip: AppLocalizations.t('Audio player'),
-                onPressed: () {
-                  platformAudioPlayer.controller
-                      .move(1);
-                },
-                icon: const Icon(Icons.audiotrack),
-              );
-            } else {
-              return IconButton(
-                tooltip: AppLocalizations.t('Playlist'),
-                onPressed: () {
-                  platformAudioPlayer.controller
-                      .move(0);
-                },
-                icon: const Icon(Icons.featured_play_list_outlined),
-              );
-            }
-          }),
-      const SizedBox(
-        width: 5.0,
-      ),
       IconButton(
         tooltip: AppLocalizations.t('Close'),
         onPressed: () async {
@@ -62,8 +49,7 @@ class PlatformAudioPlayerWidget extends StatelessWidget with DataTileMixin {
       IconButton(
         tooltip: AppLocalizations.t('More'),
         onPressed: () {
-          platformAudioPlayer.playlistWidget
-              .showActionCard(context);
+          playlistWidget.showActionCard(context);
         },
         icon: const Icon(Icons.more_horiz_outlined),
       ),
@@ -75,12 +61,12 @@ class PlatformAudioPlayerWidget extends StatelessWidget with DataTileMixin {
   Widget build(BuildContext context) {
     List<Widget>? rightWidgets = _buildRightWidgets(context);
 
-    return AppBarView(
+    return AppBarAdaptiveView(
       title: title,
       helpPath: routeName,
-      withLeading: true,
       rightWidgets: rightWidgets,
-      child: platformAudioPlayer,
+      main: playlistWidget,
+      body: platformAudioPlayer,
     );
   }
 }

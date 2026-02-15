@@ -23,13 +23,13 @@ class WaveformsAudioRecorderController extends AbstractAudioRecorderController {
 
   set state(RecorderState state) {
     if (state == RecorderState.recording) {
-      status = RecorderStatus.recording;
+      status.value = RecorderStatus.recording;
     } else if (state == RecorderState.paused) {
-      status = RecorderStatus.pause;
+      status.value = RecorderStatus.pause;
     } else if (state == RecorderState.stopped) {
-      status = RecorderStatus.stop;
+      status.value = RecorderStatus.stop;
     } else {
-      status = RecorderStatus.stop;
+      status.value = RecorderStatus.stop;
     }
   }
 
@@ -46,7 +46,7 @@ class WaveformsAudioRecorderController extends AbstractAudioRecorderController {
         await recorderController.record(path: filename);
         await super.start();
       }
-      status = RecorderStatus.recording;
+      status.value = RecorderStatus.recording;
     } catch (e) {
       logger.e('recorder start $e');
     }
@@ -54,12 +54,13 @@ class WaveformsAudioRecorderController extends AbstractAudioRecorderController {
 
   @override
   Future<String?> stop() async {
-    if (status == RecorderStatus.recording || status == RecorderStatus.pause) {
+    if (status.value == RecorderStatus.recording ||
+        status.value == RecorderStatus.pause) {
       String? filename = await recorderController.stop();
       logger.i('audio recorder filename:$filename');
       this.filename = filename;
       await super.stop();
-      status = RecorderStatus.stop;
+      status.value = RecorderStatus.stop;
 
       return filename;
     }
@@ -68,25 +69,23 @@ class WaveformsAudioRecorderController extends AbstractAudioRecorderController {
 
   @override
   Future<void> pause() async {
-    if (status == RecorderStatus.recording) {
+    if (status.value == RecorderStatus.recording) {
       await recorderController.pause();
-      status = RecorderStatus.pause;
+      status.value = RecorderStatus.pause;
     }
   }
 
   @override
   Future<void> resume() async {
-    if (status == RecorderStatus.pause) {
+    if (status.value == RecorderStatus.pause) {
       await recorderController.record();
-      status = RecorderStatus.recording;
+      status.value = RecorderStatus.recording;
     }
   }
 
-  @override
-  dispose() async {
+  Future<void> dispose() async {
     recorderController.dispose();
-    status = RecorderStatus.stop;
-    super.dispose();
+    status.value = RecorderStatus.stop;
   }
 }
 

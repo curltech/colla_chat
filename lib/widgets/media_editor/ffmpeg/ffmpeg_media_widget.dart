@@ -1,16 +1,13 @@
 import 'dart:io';
 
-import 'package:carousel_slider_plus/carousel_options.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/app_bar_adaptive_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -52,8 +49,6 @@ class FFMpegMediaWidget extends StatelessWidget with DataTileMixin {
   final ValueNotifier<bool> ffmpegPresent = ValueNotifier<bool>(false);
   final ValueNotifier<String?> output = ValueNotifier<String?>(null);
   final Map<String, FFMpegHelperSession> ffmpegSessions = {};
-  final ValueNotifier<int> index = ValueNotifier<int>(0);
-  final PlatformCarouselController controller = PlatformCarouselController();
 
   Future<bool> checkFFMpeg() async {
     ffmpegPresent.value = await FFMpegHelper.initialize();
@@ -319,46 +314,26 @@ class FFMpegMediaWidget extends StatelessWidget with DataTileMixin {
   }
 
   Widget _buildFfmpegMedia(BuildContext context) {
-    Widget mediaView = PlatformCarouselWidget(
-      itemCount: 2,
-      initialPage: index.value,
-      controller: controller,
-      onPageChanged: (int index,
-          {PlatformSwiperDirection? direction,
-          int? oldIndex,
-          CarouselPageChangedReason? reason}) {
-        this.index.value = index;
-      },
-      itemBuilder: (BuildContext context, int index, {int? realIndex}) {
-        if (index == 0) {
-          return playlistWidget;
-        }
-        if (index == 1) {
-          return ValueListenableBuilder(
-            valueListenable: ffmpegPresent,
-            builder: (BuildContext context, value, Widget? child) {
-              if (value) {
-                return FutureBuilder(
-                  future: _buildTaskStateWidget(context),
-                  builder:
-                      (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-                    Widget? child = snapshot.data;
-                    if (child != null) {
-                      return child;
-                    }
-                    return LoadingUtil.buildLoadingIndicator();
-                  },
-                );
+    Widget mediaView = ValueListenableBuilder(
+      valueListenable: ffmpegPresent,
+      builder: (BuildContext context, value, Widget? child) {
+        if (value) {
+          return FutureBuilder(
+            future: _buildTaskStateWidget(context),
+            builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+              Widget? child = snapshot.data;
+              if (child != null) {
+                return child;
               }
-              return FFMpegInstallWidget(
-                onDownloadComplete: () {
-                  checkFFMpeg();
-                },
-              );
+              return LoadingUtil.buildLoadingIndicator();
             },
           );
         }
-        return nilBox;
+        return FFMpegInstallWidget(
+          onDownloadComplete: () {
+            checkFFMpeg();
+          },
+        );
       },
     );
 
@@ -368,63 +343,39 @@ class FFMpegMediaWidget extends StatelessWidget with DataTileMixin {
   }
 
   List<Widget>? _buildRightWidgets(BuildContext context) {
-    List<Widget> children = [];
-    Widget btn = ValueListenableBuilder(
-        valueListenable: index,
-        builder: (BuildContext context, int index, Widget? child) {
-          if (index == 0) {
-            return Row(children: [
-              IconButton(
-                tooltip: AppLocalizations.t('Ffmpeg task'),
-                onPressed: () async {
-                  controller.move(1);
-                },
-                icon: const Icon(Icons.task_alt_outlined),
-              ),
-              IconButton(
-                tooltip: AppLocalizations.t('Ffmpeg actions'),
-                onPressed: () {
-                  List<ActionData> actions = _buildActions(context);
-                  MenuUtil.popModalBottomSheet(
-                    context,
-                    actions: actions,
-                  );
-                },
-                icon: const Icon(Icons.perm_media_outlined),
-              ),
-              IconButton(
-                tooltip: AppLocalizations.t('Playlist action'),
-                onPressed: () {
-                  playlistWidget.showActionCard(context);
-                },
-                icon: const Icon(Icons.more_horiz_outlined),
-              ),
-            ]);
-          } else {
-            return Row(children: [
-              IconButton(
-                tooltip: AppLocalizations.t('Playlist'),
-                onPressed: () async {
-                  controller.move(0);
-                },
-                icon: const Icon(Icons.featured_play_list_outlined),
-              ),
-            ]);
-          }
-        });
-    children.add(btn);
+    List<Widget> children = [
+      IconButton(
+        tooltip: AppLocalizations.t('Ffmpeg actions'),
+        onPressed: () {
+          List<ActionData> actions = _buildActions(context);
+          MenuUtil.popModalBottomSheet(
+            context,
+            actions: actions,
+          );
+        },
+        icon: const Icon(Icons.perm_media_outlined),
+      ),
+      IconButton(
+        tooltip: AppLocalizations.t('Playlist action'),
+        onPressed: () {
+          playlistWidget.showActionCard(context);
+        },
+        icon: const Icon(Icons.more_horiz_outlined),
+      ),
+    ];
 
     return children;
   }
 
   @override
   Widget build(BuildContext context) {
-    return AppBarView(
+    return AppBarAdaptiveView(
       title: title,
       helpPath: routeName,
       withLeading: true,
       rightWidgets: _buildRightWidgets(context),
-      child: _buildFfmpegMedia(context),
+      main: playlistWidget,
+      body: _buildFfmpegMedia(context),
     );
   }
 }

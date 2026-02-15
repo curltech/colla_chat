@@ -6,25 +6,15 @@ import 'package:flutter/material.dart';
 enum RecorderStatus { pause, recording, stop }
 
 ///定义音频录音控制器的接口
-abstract class AbstractAudioRecorderController with ChangeNotifier {
+abstract class AbstractAudioRecorderController {
   String? filename;
-  RecorderStatus _status = RecorderStatus.stop;
+  ValueNotifier<RecorderStatus> status =
+      ValueNotifier<RecorderStatus>(RecorderStatus.stop);
   Timer? _timer;
-  int _duration = -1;
+  final ValueNotifier<int> duration = ValueNotifier<int>(-1);
   String _durationText = '';
 
   Future<bool> hasPermission();
-
-  RecorderStatus get status {
-    return _status;
-  }
-
-  set status(RecorderStatus status) {
-    if (_status != status) {
-      _status = status;
-      notifyListeners();
-    }
-  }
 
   /// 开始录音
   Future<void> start() async {
@@ -54,9 +44,8 @@ abstract class AbstractAudioRecorderController with ChangeNotifier {
     cancelTimer();
 
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
-      if (status == RecorderStatus.recording) {
-        duration = duration + 1;
-        notifyListeners();
+      if (status.value == RecorderStatus.recording) {
+        duration.value = duration.value + 1;
       }
     });
   }
@@ -66,17 +55,13 @@ abstract class AbstractAudioRecorderController with ChangeNotifier {
     if (_timer != null) {
       _timer?.cancel();
       _timer = null;
-      duration = 0;
+      duration.value = 0;
     }
   }
 
-  int get duration {
-    return _duration;
-  }
-
-  set duration(int duration) {
-    if (_duration != duration) {
-      _duration = duration;
+  void setDuration(int duration) {
+    if (this.duration.value != duration) {
+      this.duration.value = duration;
       _changeDurationText();
     }
   }
@@ -86,7 +71,7 @@ abstract class AbstractAudioRecorderController with ChangeNotifier {
   }
 
   void _changeDurationText() {
-    var duration = Duration(seconds: _duration);
+    var duration = Duration(seconds: this.duration.value);
 
     _durationText = StringUtil.durationText(duration);
   }

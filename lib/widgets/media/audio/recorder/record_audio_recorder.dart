@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/abstract_audio_recorder_controller.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:record/record.dart';
 
 ///采用record实现的音频记录器，支持多种设备，windows测试通过
@@ -12,7 +13,8 @@ import 'package:record/record.dart';
 class RecordAudioRecorderController extends AbstractAudioRecorderController {
   final AudioRecorder _audioRecorder = AudioRecorder();
 
-  AudioEncoder encoder = AudioEncoder.aacLc;
+  final ValueNotifier<AudioEncoder> encoder =
+      ValueNotifier<AudioEncoder>(AudioEncoder.aacLc);
   int bitRate = 128000;
   int sampleRate = 44100;
   int numChannels = 2;
@@ -40,7 +42,7 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
       logger.e(e.toString());
     }
     //设置开始的计时提示
-    duration = 0;
+    duration.value = 0;
   }
 
   Amplitude? get amplitude {
@@ -54,11 +56,11 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
 
   set state(RecordState state) {
     if (state == RecordState.record) {
-      status = RecorderStatus.recording;
+      status.value = RecorderStatus.recording;
     } else if (state == RecordState.pause) {
-      status = RecorderStatus.pause;
+      status.value = RecorderStatus.pause;
     } else {
-      status = RecorderStatus.stop;
+      status.value = RecorderStatus.stop;
     }
   }
 
@@ -79,7 +81,7 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
   }) async {
     try {
       if (await _audioRecorder.hasPermission()) {
-        encoder = encoder ?? this.encoder;
+        encoder = encoder ?? this.encoder.value;
         String extension = encoder.name;
         if (extension.startsWith('aac')) {
           extension = 'm4a';
@@ -112,7 +114,7 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
         //     status = RecorderStatus.stop;
         //   },
         // );
-        status = RecorderStatus.recording;
+        status.value = RecorderStatus.recording;
       }
     } catch (e) {
       logger.e('recorder start $e');
@@ -121,7 +123,8 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
 
   @override
   Future<String?> stop() async {
-    if (status == RecorderStatus.recording || status == RecorderStatus.pause) {
+    if (status.value == RecorderStatus.recording ||
+        status.value == RecorderStatus.pause) {
       String? filename = await _audioRecorder.stop();
       if (filename != null) {
         File file = File(filename);
@@ -138,7 +141,7 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
         logger.i('record audio recorder filename:$filename');
         this.filename = filename;
         await super.stop();
-        status = RecorderStatus.stop;
+        status.value = RecorderStatus.stop;
 
         return filename;
       }
@@ -148,22 +151,21 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
 
   @override
   Future<void> pause() async {
-    if (status == RecorderStatus.recording) {
+    if (status.value == RecorderStatus.recording) {
       await _audioRecorder.pause();
-      status = RecorderStatus.pause;
+      status.value = RecorderStatus.pause;
     }
   }
 
   @override
   Future<void> resume() async {
-    if (status == RecorderStatus.pause) {
+    if (status.value == RecorderStatus.pause) {
       await _audioRecorder.resume();
-      status = RecorderStatus.recording;
+      status.value = RecorderStatus.recording;
     }
   }
 
-  @override
-  dispose() async {
+  Future<void> dispose() async {
     if (stateSubscription != null) {
       stateSubscription!.cancel();
       stateSubscription = null;
@@ -174,7 +176,6 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
     }
     await stop();
     await _audioRecorder.dispose();
-    super.dispose();
   }
 }
 

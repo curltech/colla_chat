@@ -21,7 +21,6 @@ class PlatformVideoPlayer extends StatelessWidget {
   PlatformVideoPlayer({
     super.key,
     required this.playlistController,
-    List<String>? filenames,
   }) {
     MediaKitVideoPlayerController mediaKitVideoPlayerController =
         MediaKitVideoPlayerController(playlistController);

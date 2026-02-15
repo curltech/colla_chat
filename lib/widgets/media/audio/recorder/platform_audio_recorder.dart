@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:record/record.dart';
 
 ///采用record和another实现的音频记录器组件
-class PlatformAudioRecorder extends StatefulWidget {
+class PlatformAudioRecorder extends StatelessWidget {
   final AbstractAudioRecorderController audioRecorderController;
   final void Function(String filename)? onStop;
   final double width;
@@ -39,86 +39,57 @@ class PlatformAudioRecorder extends StatefulWidget {
     }
   }
 
-  @override
-  State createState() => _PlatformAudioRecorderState();
-}
-
-class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
-  late String controlText;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.audioRecorderController.addListener(_update);
-  }
-
-  void _update() {
-    setState(() {});
-  }
-
   Future<void> _action() async {
-    if (widget.audioRecorderController.status == RecorderStatus.recording) {
+    if (audioRecorderController.status == RecorderStatus.recording) {
       await _pause();
-    } else if (widget.audioRecorderController.status == RecorderStatus.stop) {
+    } else if (audioRecorderController.status == RecorderStatus.stop) {
       await _start();
-    } else if (widget.audioRecorderController.status == RecorderStatus.pause) {
+    } else if (audioRecorderController.status == RecorderStatus.pause) {
       await _resume();
     }
   }
 
   Future<void> _start() async {
     try {
-      if (widget.audioRecorderController is RecordAudioRecorderController) {
+      if (audioRecorderController is RecordAudioRecorderController) {
         RecordAudioRecorderController recordAudioRecorderController =
-            widget.audioRecorderController as RecordAudioRecorderController;
+            audioRecorderController as RecordAudioRecorderController;
         if (recordAudioRecorderController.encoder == AudioEncoder.pcm16bits) {
           if (platformParams.linux) {
             throw 'Not support pcm in ios and macos, please use another recorder';
           }
         }
       }
-      await widget.audioRecorderController.start();
+      await audioRecorderController.start();
     } catch (e) {
       logger.e(e.toString());
     }
   }
 
   Future<void> _stop() async {
-    if (widget.audioRecorderController.status == RecorderStatus.recording ||
-        widget.audioRecorderController.status == RecorderStatus.pause) {
-      final filename = await widget.audioRecorderController.stop();
+    if (audioRecorderController.status == RecorderStatus.recording ||
+        audioRecorderController.status == RecorderStatus.pause) {
+      final filename = await audioRecorderController.stop();
 
-      if (filename != null && widget.onStop != null) {
-        widget.onStop!(filename);
+      if (filename != null && onStop != null) {
+        onStop!(filename);
       }
     }
   }
 
   Future<void> _pause() async {
-    await widget.audioRecorderController.pause();
+    await audioRecorderController.pause();
   }
 
   Future<void> _resume() async {
-    await widget.audioRecorderController.resume();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _buildRecorderWidget(context);
-  }
-
-  @override
-  void dispose() {
-    widget.audioRecorderController.removeListener(_update);
-    super.dispose();
+    await audioRecorderController.resume();
   }
 
   Widget _buildRecorderWidget(BuildContext context) {
-    var controlText =
-        AppLocalizations.t(widget.audioRecorderController.durationText);
+    var controlText = AppLocalizations.t(audioRecorderController.durationText);
     Icon playIcon;
     String tooltip;
-    if (widget.audioRecorderController.status == RecorderStatus.recording) {
+    if (audioRecorderController.status == RecorderStatus.recording) {
       playIcon = const Icon(
         Icons.pause,
         size: 32,
@@ -134,8 +105,8 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
       tooltip = AppLocalizations.t('Play');
     }
     List<Widget> controls = [];
-    if (widget.audioRecorderController.status == RecorderStatus.recording ||
-        widget.audioRecorderController.status == RecorderStatus.pause) {
+    if (audioRecorderController.status == RecorderStatus.recording ||
+        audioRecorderController.status == RecorderStatus.pause) {
       controls.add(
         IconButton(
           tooltip: AppLocalizations.t('Stop'),
@@ -176,11 +147,16 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
       ),
     );
     var container = SizedBox(
-      width: widget.width,
-      height: widget.height,
+      width: width,
+      height: height,
       child:
           Row(mainAxisAlignment: MainAxisAlignment.center, children: controls),
     );
     return container;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildRecorderWidget(context);
   }
 }
