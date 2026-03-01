@@ -71,7 +71,7 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
   final Map<String, List<Uint8List>> _cachedKeyFrameList = {};
 
   Duration _videoGenerationTime = Duration.zero;
-  late VideoPlayerController _videoController;
+  late VideoController _videoController;
 
   late final _audioService = AudioHelperService(
     videoController: _videoController,
@@ -180,6 +180,8 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
   }
 
   Future<void> initializePlayer() async {
+    MediaKit.ensureInitialized();
+    _videoController = VideoController(Player());
     _videoConfigs.clipsEditor.clips.first =
         _videoConfigs.clipsEditor.clips.first.copyWith(
       duration: _videoMetadata.duration,
@@ -190,16 +192,15 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
 
     String? filename = playlistController.current?.filename;
     if (filename != null) {
-      _videoController = VideoPlayerController.file(io.File(filename));
+      _videoController.player.open(Media(filename));
 
       await Future.wait([
-        _videoController.initialize(),
-        _videoController.setLooping(false),
-        _videoController
+        _videoController.player.setPlaylistMode(PlaylistMode.loop),
+        _videoController.player
             .setVolume(_videoConfigs.videoEditor.initialMuted ? 0 : 100),
         _videoConfigs.videoEditor.initialPlay
-            ? _videoController.play()
-            : _videoController.pause(),
+            ? _videoController.player.play()
+            : _videoController.player.pause(),
         _audioService.initialize(),
       ]);
       _videoRender = ProVideoRender(videoInputPath: filename);
@@ -214,12 +215,13 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
     );
     _thumbnails = await _videoRender.getThumbnails(
         thumbnailCount: _thumbnailCount, height: 32, width: 32);
-    _videoController.addListener(_onDurationChange);
+    _videoController.player.stream.duration.listen((e) {
+      _onDurationChange(e);
+    });
   }
 
-  void _onDurationChange() {
+  void _onDurationChange(Duration duration) {
     var totalVideoDuration = _videoMetadata.duration;
-    var duration = _videoController.value.position;
     _proVideoController!.setPlayTime(duration);
 
     if (_durationSpan != null && duration >= _durationSpan!.end) {
@@ -243,8 +245,8 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
     _proVideoController!.pause();
     _proVideoController!.setPlayTime(_durationSpan!.start);
 
-    await _videoController.pause();
-    await _videoController.seekTo(span.start);
+    await _videoController.player.pause();
+    await _videoController.player.seek(span.start);
 
     _isSeeking = false;
     if (_tempDurationSpan != null) {
@@ -338,12 +340,12 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
             editor.callbacks.videoEditorCallbacks ?? VideoEditorCallbacks(),
       );
 
-    final controller = VideoPlayerController.file(io.File(filename!));
-    await controller.initialize();
+    final controller = VideoController(Player());
+    controller.player.open(Media(filename!));
     LoadingDialog.instance.hide();
 
     _videoController = controller;
-    _videoController.addListener(_onDurationChange);
+    _videoController.player.stream.duration.listen((e) => _onDurationChange(e));
     editor.initializeVideoEditor();
 
     _updateClipsNotifier.value = false;
@@ -391,18 +393,18 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
         onCloseEditor: (EditorMode editorMode) =>
             _handleCloseEditor(context, editorMode),
         videoEditorCallbacks: VideoEditorCallbacks(
-          onPause: _videoController.pause,
-          onPlay: _videoController.play,
+          onPause: _videoController.player.pause,
+          onPlay: _videoController.player.play,
           onMuteToggle: (isMuted) {
             if (isMuted) {
               _audioService.setVolume(0);
-              _videoController.setVolume(0);
+              _videoController.player.setVolume(0);
             } else {
               _audioService.balanceAudio();
             }
           },
           onTrimSpanUpdate: (durationSpan) {
-            if (_videoController.value.isPlaying) {
+            if (_videoController.player.state.playing) {
               _proVideoController!.pause();
             }
           },
@@ -413,7 +415,7 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
           onStartTimeChange: (startTime) async {
             await Future.value([
               _audioService.seek(startTime),
-              _videoController.seekTo(Duration.zero),
+              _videoController.player.seek(Duration.zero),
             ]);
           },
           onPlay: _audioService.play,
@@ -478,11 +480,8 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
           return Center(
             child: isLoading
                 ? const CircularProgressIndicator.adaptive()
-                : AspectRatio(
-                    aspectRatio: _videoController.value.size.aspectRatio,
-                    child: VideoPlayer(
-                      _videoController,
-                    ),
+                : Video(
+                    controller: _videoController,
                   ),
           );
         });
@@ -691,7 +690,7 @@ class AudioHelperService {
   final _audioPlayer = AudioPlayer();
 
   /// The controller managing video playback.
-  final VideoPlayerController videoController;
+  final VideoController videoController;
 
   /// Stores the last applied audio balance between video and overlay.
   double _lastVolumeBalance = 0;
@@ -775,7 +774,7 @@ class AudioHelperService {
     }
     await Future.wait([
       setVolume(overlayVolume),
-      videoController.setVolume(originalVolume),
+      videoController.player.setVolume(originalVolume),
     ]);
     _lastVolumeBalance = volumeBalance;
   }
