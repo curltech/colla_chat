@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:flutter/material.dart';
+import 'package:pro_image_editor/features/audio_editor/models/audio_track.dart';
 import 'package:pro_video_editor/pro_video_editor.dart' as pro;
 
 /// ProVideoEditor实现的适用于移动和mac平台的视频编辑类
@@ -11,6 +12,7 @@ class ProVideoRender {
   final Uint8List? videoBytes;
   late final pro.ProVideoEditor editor = pro.ProVideoEditor.instance;
   late pro.EditorVideo editorVideo;
+  Duration videoGenerationTime = Duration.zero;
 
   ProVideoRender({this.videoInputPath, this.videoBytes}) {
     if (videoInputPath != null) {
@@ -40,56 +42,86 @@ class ProVideoRender {
       double? scaleY,
       int rotateTurns = 0,
       bool enableAudio = true,
+      AudioTrack? audioTrack,
+      String? customAudioPath,
+      double? originalAudioVolume,
+      double? customAudioVolume,
       Size? resolution,
       pro.VideoQualityPreset? preset,
+      List<pro.VideoSegment>? videoSegments,
+      String? outputFilename,
+      String? extension,
       Function(StreamBuilder)? onCreatedProgressStreamBuilder,
       Function(double)? onProgress}) async {
+    final stopwatch = Stopwatch()..start();
     String taskId = DateTime.now().microsecondsSinceEpoch.toString();
     pro.VideoQualityConfig? qualityConfig;
     if (bitrate != null && resolution != null && preset != null) {
       qualityConfig = pro.VideoQualityConfig(
           bitrate: bitrate, resolution: resolution, preset: preset);
     }
+    if (audioTrack != null) {
+      final double volumeBalance = audioTrack.volumeBalance;
+      if (volumeBalance < 0 && customAudioVolume != null) {
+        customAudioVolume += volumeBalance;
+      } else if (originalAudioVolume != null) {
+        originalAudioVolume -= volumeBalance;
+      }
+    }
     var data = pro.VideoRenderData(
-        id: taskId,
-        video: editorVideo,
-        outputFormat: pro.VideoOutputFormat.mp4,
-        // 输出是否包含音频
-        enableAudio: enableAudio,
-        // 放置图像
-        imageBytes: overlayImageBytes,
-        // 视频播放速度
-        playbackSpeed: playbackSpeed,
-        // 视频字节率
-        bitrate: bitrate,
-        // 视频模糊
-        blur: blur,
-        // 视频过滤
-        colorMatrixList: colorMatrixList,
-        // 视频截取功能
-        startTime:
-            startTimeMs != null ? Duration(milliseconds: startTimeMs) : null,
-        endTime: endTimeMs != null ? Duration(milliseconds: endTimeMs) : null,
-        // 视频转换功能，包括裁剪，旋转，缩放
-        transform: pro.ExportTransform(
-            width: cropWidth,
-            height: cropHeight,
-            rotateTurns: rotateTurns,
-            x: cropX,
-            y: cropY,
-            flipX: flipX,
-            flipY: flipY,
-            scaleX: scaleX,
-            scaleY: scaleY),
-        qualityConfig: qualityConfig);
-    final Uint8List exportedVideo =
-        await pro.ProVideoEditor.instance.renderVideo(data);
+      id: taskId,
+      video: editorVideo,
+      outputFormat: pro.VideoOutputFormat.mp4,
+      // 输出是否包含音频
+      enableAudio: enableAudio,
+      // 放置图像
+      imageBytes: overlayImageBytes,
+      // 视频播放速度
+      playbackSpeed: playbackSpeed,
+      // 视频字节率
+      bitrate: bitrate,
+      // 视频模糊
+      blur: blur,
+      // 视频过滤
+      colorMatrixList: colorMatrixList,
+      // 视频截取功能
+      startTime:
+          startTimeMs != null ? Duration(milliseconds: startTimeMs) : null,
+      endTime: endTimeMs != null ? Duration(milliseconds: endTimeMs) : null,
+      // 视频转换功能，包括裁剪，旋转，缩放
+      transform: pro.ExportTransform(
+          width: cropWidth,
+          height: cropHeight,
+          rotateTurns: rotateTurns,
+          x: cropX,
+          y: cropY,
+          flipX: flipX,
+          flipY: flipY,
+          scaleX: scaleX,
+          scaleY: scaleY),
+      qualityConfig: qualityConfig,
+      videoSegments: videoSegments,
+      customAudioPath: customAudioPath,
+      originalAudioVolume: originalAudioVolume,
+      customAudioVolume: customAudioVolume,
+    );
     StreamBuilder streamBuilder =
         getProgressStreamBuilder(taskId, onProgress: onProgress);
     if (onCreatedProgressStreamBuilder != null) {
       onCreatedProgressStreamBuilder(streamBuilder);
     }
-    final filename = await FileUtil.writeTempFileAsBytes(exportedVideo);
+    String? filename;
+    try {
+      filename = await pro.ProVideoEditor.instance.renderVideoToFile(
+          await FileUtil.getTempFilename(
+              filename: outputFilename, extension: extension),
+          data);
+    } on pro.RenderCanceledException {
+      stopwatch.stop();
+      videoGenerationTime = Duration.zero;
+      return null;
+    }
+    videoGenerationTime = stopwatch.elapsed;
 
     return filename;
   }
