@@ -23,8 +23,8 @@ import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_media_widget.dart';
 import 'package:colla_chat/widgets/media_editor/image_editor_widget.dart';
+import 'package:colla_chat/widgets/media_editor/pro_video_editor_widget.dart';
 import 'package:colla_chat/widgets/media_editor/video_editor_widget.dart';
-import 'package:colla_chat/widgets/media_editor/video_renderer_widget.dart';
 import 'package:flutter/material.dart';
 
 //其他的应用的页面，带有路由回调函数
@@ -53,7 +53,7 @@ class OtherAppWidget extends StatelessWidget with DataTileMixin {
   final FFMpegMediaWidget ffmpegMediaWidget = FFMpegMediaWidget();
   final ImageEditorWidget imageEditorWidget = ImageEditorWidget();
   final VideoEditorWidget videoEditorWidget = VideoEditorWidget();
-  final VideoRendererWidget videoRendererWidget = VideoRendererWidget();
+  final ProVideoEditorWidget proVideoEditorWidget = ProVideoEditorWidget();
 
   late final List<DataTileMixin> mediaTileDataMixins = [
     videoPlayerWidget,
@@ -62,7 +62,7 @@ class OtherAppWidget extends StatelessWidget with DataTileMixin {
     imageEditorWidget,
     ffmpegMediaWidget,
     videoEditorWidget,
-    videoRendererWidget
+    proVideoEditorWidget
   ];
   final Majiang18mWidget mahjong18mWidget = Majiang18mWidget();
   final MetaModellerWidget metaModellerWidget = MetaModellerWidget();
@@ -76,7 +76,7 @@ class OtherAppWidget extends StatelessWidget with DataTileMixin {
     indexWidgetProvider.define(imageEditorWidget);
     indexWidgetProvider.define(ffmpegMediaWidget);
     indexWidgetProvider.define(videoEditorWidget);
-    indexWidgetProvider.define(videoRendererWidget);
+    indexWidgetProvider.define(proVideoEditorWidget);
     List<DataTile> mediaTileData = DataTile.from(mediaTileDataMixins);
     otherAppTileData[DataTile(title: 'Media', prefix: Icons.perm_media)] =
         mediaTileData;

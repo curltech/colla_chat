@@ -374,7 +374,14 @@ class PlaylistWidget extends StatelessWidget {
       DataListGridController();
 
   PlaylistWidget(
-      {super.key, this.onSelected, required this.playlistController});
+      {super.key, this.onSelected, required this.playlistController}){
+    playlistController.currentControllerName.addListener(_update);
+    playlistController.currentIndex!.addListener(_update);
+  }
+
+  _update(){
+
+  }
 
   void _buildDataTiles() {
     List<PlatformMediaSource> mediaSources =
