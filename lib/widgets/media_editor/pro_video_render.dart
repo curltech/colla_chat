@@ -160,6 +160,7 @@ class ProVideoRender {
       {required int thumbnailCount,
       required double height,
       required double width,
+      List<Duration>? timestamps,
       pro.ThumbnailFormat outputFormat = pro.ThumbnailFormat.jpeg}) async {
     final pro.VideoMetadata videoMetadata =
         await editor.getMetadata(editorVideo);
@@ -169,10 +170,11 @@ class ProVideoRender {
       video: editorVideo,
       outputSize: Size(width, height),
       boxFit: pro.ThumbnailBoxFit.cover,
-      timestamps: List.generate(thumbnailCount, (i) {
-        final midpointMs = (i + 0.5) * segmentDuration;
-        return Duration(milliseconds: midpointMs.round());
-      }),
+      timestamps: timestamps ??
+          List.generate(thumbnailCount, (i) {
+            final midpointMs = (i + 0.5) * segmentDuration;
+            return Duration(milliseconds: midpointMs.round());
+          }),
       outputFormat: outputFormat,
     );
     final List<Uint8List> thumbnailList =
