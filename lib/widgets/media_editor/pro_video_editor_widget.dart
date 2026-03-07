@@ -156,11 +156,11 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _generateThumbnails();
     });
-    _audioService.initialize();
     _videoController = VideoController(Player());
     _audioService = AudioHelperService(
       videoController: _videoController,
     );
+    _audioService.initialize();
   }
 
   /// Generates thumbnails for the given [_video].
