@@ -71,11 +71,8 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
   String? _outputVideoFile;
   final Map<String, Uint8List> _cachedKeyFrames = {};
   final Map<String, List<Uint8List>> _cachedKeyFrameList = {};
-  final VideoController _videoController = VideoController(Player());
-
-  late final _audioService = AudioHelperService(
-    videoController: _videoController,
-  );
+  late final VideoController _videoController;
+  late final AudioHelperService _audioService;
   final _updateClipsNotifier = ValueNotifier(false);
 
   late final ProImageEditorConfigs _videoConfigs = ProImageEditorConfigs(
@@ -160,6 +157,10 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
       _generateThumbnails();
     });
     _audioService.initialize();
+    _videoController = VideoController(Player());
+    _audioService = AudioHelperService(
+      videoController: _videoController,
+    );
   }
 
   /// Generates thumbnails for the given [_video].
