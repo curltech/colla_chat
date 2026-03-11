@@ -67,7 +67,7 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
   final int _thumbnailCount = 7;
 
   // 视频渲染类
-  late final ProVideoRender _videoRender;
+  ProVideoRender? _videoRender;
   String? _outputVideoFile;
   final Map<String, Uint8List> _cachedKeyFrames = {};
   final Map<String, List<Uint8List>> _cachedKeyFrameList = {};
@@ -127,17 +127,7 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
       ],
     ),
     audioEditor: AudioEditorConfigs(),
-    clipsEditor: ClipsEditorConfigs(
-      clips: [
-        VideoClip(
-          id: '001',
-          title: 'My awesome video',
-          // subtitle: 'Optional',
-          duration: Duration.zero,
-          clip: EditorVideoClip.file(_videoRender.videoInputPath),
-        ),
-      ],
-    ),
+    clipsEditor: ClipsEditorConfigs(clips: []),
     videoEditor: const VideoEditorConfigs(
       initialMuted: false,
       initialPlay: false,
@@ -166,7 +156,7 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
   /// Generates thumbnails for the given [_video].
   Future<void> _generateThumbnails() async {
     var imageWidth = appDataProvider.secondaryBodyWidth / _thumbnailCount;
-    _thumbnails = await _videoRender.getThumbnails(
+    _thumbnails = await _videoRender!.getThumbnails(
       thumbnailCount: _thumbnailCount,
       width: imageWidth,
       outputFormat: ThumbnailFormat.jpeg,
@@ -196,7 +186,8 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
     if (_inputVideoFile != null) {
       String? filename = _inputVideoFile!;
       _videoController.player.open(Media(filename));
-
+      _videoRender = ProVideoRender(videoInputPath: filename);
+      _videoMetadata = await _videoRender!.getMetadata();
       await Future.wait([
         _videoController.player.setPlaylistMode(PlaylistMode.loop),
         _videoController.player
@@ -205,16 +196,20 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
             ? _videoController.player.play()
             : _videoController.player.pause(),
       ]);
-      _videoRender = ProVideoRender(videoInputPath: filename);
-      _videoMetadata = await _videoRender.getMetadata();
-      _videoConfigs.clipsEditor.clips.first =
-          _videoConfigs.clipsEditor.clips.first.copyWith(
-        duration: _videoMetadata.duration,
+
+      _videoConfigs.clipsEditor.clips.first = VideoClip(
+        id: '001',
+        title: 'My awesome video',
+        // subtitle: 'Optional',
+        duration: Duration.zero,
+        clip: EditorVideoClip.autoSource(
+          file: filename,
+        ),
       );
     }
 
-    _thumbnails = await _videoRender.getThumbnails(
-        thumbnailCount: _thumbnailCount, height: 32, width: 32);
+    _thumbnails = await _videoRender!
+        .getThumbnails(thumbnailCount: _thumbnailCount, height: 32, width: 32);
     _proVideoController = ProVideoController(
       videoPlayer: _buildVideoPlayer(),
       initialResolution: _videoMetadata.resolution,
@@ -265,7 +260,7 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
 
   /// 渲染视频
   Future<void> generateVideo(CompleteParameters parameters) async {
-    _outputVideoFile = await _videoRender.render(
+    _outputVideoFile = await _videoRender!.render(
       blur: parameters.blur,
       enableAudio: _proVideoController?.isAudioEnabled ?? true,
       colorMatrixList: parameters.colorFilters,
@@ -282,17 +277,17 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
   }
 
   Future<VideoClip?> _addClip(BuildContext context) async {
-    final String name = _videoRender.videoInputPath!;
+    final String name = _videoRender!.videoInputPath!;
     final title = name.split('.').first;
     LoadingDialog.instance.show(context, configs: _videoConfigs);
-    final meta = await _videoRender.getMetadata();
+    final meta = await _videoRender!.getMetadata();
     LoadingDialog.instance.hide();
 
     // Create and return your video clip
     return VideoClip(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: title,
-      clip: EditorVideoClip.file(_videoRender.videoInputPath!),
+      clip: EditorVideoClip.file(_videoRender!.videoInputPath!),
       duration: meta.duration,
     );
   }
@@ -305,7 +300,7 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
     LoadingDialog.instance.show(context, configs: _videoConfigs);
 
     _updateClipsNotifier.value = true;
-    final String? filename = await _videoRender.render(
+    final String? filename = await _videoRender!.render(
       extension: 'mp4',
       videoSegments: clips.map(
         (el) {
@@ -353,7 +348,7 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
         context,
         MaterialPageRoute(builder: (_) {
           previewVideo.updateVideoFile(
-              _outputVideoFile!, _videoRender.videoGenerationTime);
+              _outputVideoFile!, _videoRender!.videoGenerationTime);
           return previewVideo;
         }),
       );

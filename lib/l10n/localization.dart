@@ -89,3 +89,9 @@ class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   @override
   bool shouldReload(AppLocalizationsDelegate old) => true;
 }
+
+extension AppLocalizationsExtension<T extends String> on T {
+  String get t {
+    return AppLocalizations.t(this);
+  }
+}
