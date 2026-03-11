@@ -82,46 +82,47 @@ class DataListGridView extends StatelessWidget {
     return Obx(() {
       if (dataListGridController.data.isEmpty) {
         return nilBox;
-        return Container(
-            alignment: Alignment.center,
-            child: AutoSizeText(AppLocalizations.t('List is empty'),
-                style: TextStyle(fontSize: AppFontSize.maxFontSize)));
       }
-      int crossAxisCount = (appDataProvider.secondaryBodyWidth / 250).ceil();
+
       if (dataListGridController.gridMode.isTrue) {
         return ListenableBuilder(
             listenable: dataListGridController.currentIndex,
             builder: (BuildContext context, Widget? child) {
-              return GridView.builder(
-                  itemCount: dataListGridController.data.length,
-                  //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      //横轴元素个数
-                      crossAxisCount: crossAxisCount,
-                      //纵轴间距
-                      mainAxisSpacing: 2.0,
-                      //横轴间距
-                      crossAxisSpacing: 2.0,
-                      //子组件宽高长度比例
-                      childAspectRatio: 1),
-                  itemBuilder: (BuildContext context, int index) {
-                    return InkWell(
-                        child: _buildThumbnailWidget(
-                            context, dataListGridController.data[index]),
-                        onTap: () {
-                          dataListGridController.current?.selected = false;
-                          dataListGridController.data[index].selected = true;
-                          dataListGridController.setCurrentIndex = index;
-                          String title =
-                              dataListGridController.data[index].title;
-                          if (onSelected != null) {
-                            onSelected!(index,
-                                dataListGridController.data[index].title);
-                          }
-                          dataListGridController.data[index].onTap
-                              ?.call(index, title);
-                        });
-                  });
+              return LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                // constraints.maxWidth, constraints.maxHeight
+                int crossAxisCount = (constraints.maxWidth / 250).floor();
+                return GridView.builder(
+                    itemCount: dataListGridController.data.length,
+                    //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        //横轴元素个数
+                        crossAxisCount: crossAxisCount,
+                        //纵轴间距
+                        mainAxisSpacing: 2.0,
+                        //横轴间距
+                        crossAxisSpacing: 2.0,
+                        //子组件宽高长度比例
+                        childAspectRatio: 1),
+                    itemBuilder: (BuildContext context, int index) {
+                      return InkWell(
+                          child: _buildThumbnailWidget(
+                              context, dataListGridController.data[index]),
+                          onTap: () {
+                            dataListGridController.current?.selected = false;
+                            dataListGridController.data[index].selected = true;
+                            dataListGridController.setCurrentIndex = index;
+                            String title =
+                                dataListGridController.data[index].title;
+                            if (onSelected != null) {
+                              onSelected!(index,
+                                  dataListGridController.data[index].title);
+                            }
+                            dataListGridController.data[index].onTap
+                                ?.call(index, title);
+                          });
+                    });
+              });
             });
       } else {
         return ListenableBuilder(
