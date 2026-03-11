@@ -124,22 +124,26 @@ class DataListGridView extends StatelessWidget {
                   });
             });
       } else {
-        return DataListView(
-          onTap: (int index, String title,
-              {DataTile? group, String? subtitle}) async {
-            dataListGridController.current?.selected = false;
-            dataListGridController.data[index].selected = true;
-            dataListGridController.setCurrentIndex = index;
-            if (onSelected != null) {
-              onSelected!(index, title);
-            }
-            return null;
-          },
-          itemCount: dataListGridController.data.length,
-          itemBuilder: (BuildContext context, int index) {
-            return dataListGridController.data[index];
-          },
-        );
+        return ListenableBuilder(
+            listenable: dataListGridController.currentIndex,
+            builder: (BuildContext context, Widget? child) {
+              return DataListView(
+                onTap: (int index, String title,
+                    {DataTile? group, String? subtitle}) async {
+                  dataListGridController.current?.selected = false;
+                  dataListGridController.data[index].selected = true;
+                  dataListGridController.setCurrentIndex = index;
+                  if (onSelected != null) {
+                    onSelected!(index, title);
+                  }
+                  return null;
+                },
+                itemCount: dataListGridController.data.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return dataListGridController.data[index];
+                },
+              );
+            });
       }
     });
   }

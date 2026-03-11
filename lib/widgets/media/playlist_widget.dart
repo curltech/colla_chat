@@ -86,9 +86,9 @@ class PlaylistController {
               filenames.add(path);
             }
             controller = MediaSourceController(mediaSource.filename);
-            controller.addMediaFile(
+            await controller.addMediaFile(
                 filename: currentController!.path, title: '..');
-            controller.addMediaFiles(filenames: filenames);
+            await controller.addMediaFiles(filenames: filenames);
             mediaSourceControllers[mediaSource.filename] = controller;
           }
         }
@@ -374,13 +374,13 @@ class PlaylistWidget extends StatelessWidget {
       DataListGridController();
 
   PlaylistWidget(
-      {super.key, this.onSelected, required this.playlistController}){
+      {super.key, this.onSelected, required this.playlistController}) {
     playlistController.currentControllerName.addListener(_update);
     playlistController.currentIndex!.addListener(_update);
   }
 
-  _update(){
-
+  void _update() {
+    _buildDataTiles();
   }
 
   void _buildDataTiles() {
@@ -527,17 +527,7 @@ class PlaylistWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-        listenable: playlistController.currentControllerName,
-        builder: (BuildContext context, Widget? child) {
-          return ListenableBuilder(
-              listenable: playlistController.currentIndex!,
-              builder: (BuildContext context, Widget? child) {
-                _buildDataTiles();
-                return DataListGridView(
-                    onSelected: onSelected,
-                    dataListGridController: dataListGridController);
-              });
-        });
+    return DataListGridView(
+        onSelected: onSelected, dataListGridController: dataListGridController);
   }
 }
