@@ -248,7 +248,7 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
         child: SizedBox(
       width: size.width * dialogSizeIndex,
       height: size.height * dialogSizeIndex,
-      child: Card(child: Column(children: children)),
+      child: Column(children: children),
     ));
     return selector;
   }
@@ -304,7 +304,7 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
 class CustomSingleSelectField extends StatefulWidget {
   final OptionController optionController;
   final Future<void> Function(String keyword)? onSearch;
-  final String title;
+  final String? title;
   final Widget? prefix;
   final Widget? suffix;
   final SelectType selectType;
@@ -313,7 +313,7 @@ class CustomSingleSelectField extends StatefulWidget {
   const CustomSingleSelectField({
     super.key,
     required this.optionController,
-    required this.title,
+    this.title,
     this.prefix,
     this.suffix,
     this.selectType = SelectType.chipMultiSelect,
@@ -603,7 +603,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
         child: SizedBox(
       width: size.width * dialogSizeIndex,
       height: size.height * dialogSizeIndex,
-      child: Card(child: Column(children: children)),
+      child: Column(children: children),
     ));
     return selector;
   }
@@ -667,7 +667,7 @@ class CustomMultiSelectField extends StatefulWidget {
   final Future<void> Function(String keyword)? onSearch;
   final Function(List<String>? value)? onConfirm;
   final Function()? onCancel;
-  final String title;
+  final String? title;
   final Widget? prefix;
   final Widget? suffix;
   final SelectType selectType;
@@ -680,7 +680,7 @@ class CustomMultiSelectField extends StatefulWidget {
       required this.onSearch,
       this.onConfirm,
       this.onCancel,
-      required this.title,
+      this.title,
       this.prefix,
       this.suffix,
       this.height = 40,

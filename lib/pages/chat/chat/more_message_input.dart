@@ -133,7 +133,8 @@ class MoreMessageInput extends StatelessWidget {
     return actionData;
   }
 
-  Future<void> _onAction(int index, String name, {String? value}) async {
+  Future<void> _onAction(BuildContext context, int index, String name,
+      {String? value}) async {
     if (onAction != null) {
       onAction!(index, name, value: value);
       return;
@@ -155,7 +156,7 @@ class MoreMessageInput extends StatelessWidget {
         _onActionSfuVideoChat();
         break;
       case 'Location':
-        _onActionLocation();
+        _onActionLocation(context);
         break;
       case 'Name card':
         _onActionNameCard();
@@ -356,7 +357,7 @@ class MoreMessageInput extends StatelessWidget {
   }
 
   ///位置
-  void _onActionLocation() async {
+  void _onActionLocation(BuildContext? context) async {
     Position? position = await GeolocatorUtil.currentPosition();
     if (position == null) {
       return;
@@ -382,23 +383,25 @@ class MoreMessageInput extends StatelessWidget {
       ),
       rightWidgets: rightWidgets,
     );
-    LocationPosition? locationPosition =
-        await DialogUtil.show(builder: (BuildContext? context) {
-      return Card(
-          elevation: 0.0,
-          margin: EdgeInsets.zero,
-          shape: const ContinuousRectangleBorder(),
-          child: Column(children: [
-            title,
-            Expanded(
-                child: GeolocatorUtil.buildLocationPicker(
-                    latitude: latitude,
-                    longitude: longitude,
-                    onSelectedMarker: ({LocationPosition? locationPosition}) {
-                      Navigator.pop(context!, locationPosition);
-                    }))
-          ]));
-    });
+    LocationPosition? locationPosition = await DialogUtil.show(
+        context: context,
+        builder: (BuildContext? context) {
+          return Card(
+              elevation: 0.0,
+              margin: EdgeInsets.zero,
+              shape: const ContinuousRectangleBorder(),
+              child: Column(children: [
+                title,
+                Expanded(
+                    child: GeolocatorUtil.buildLocationPicker(
+                        latitude: latitude,
+                        longitude: longitude,
+                        onSelectedMarker: (
+                            {LocationPosition? locationPosition}) {
+                          Navigator.pop(context!, locationPosition);
+                        }))
+              ]));
+        });
     if (locationPosition != null) {
       Map<String, dynamic> map = locationPosition.toJson();
       EntityUtil.removeNull(map);
@@ -410,18 +413,20 @@ class MoreMessageInput extends StatelessWidget {
 
   ///名片
   Future<void> _onActionNameCard() async {
-    await DialogUtil.show(builder: (BuildContext context) {
-      return LinkmanGroupSearchWidget(
-          onSelected: (List<String>? selected) async {
-            if (selected != null && selected.isNotEmpty) {
-              await _sendNameCard(selected);
-            }
-            Navigator.pop(context);
-          },
-          includeGroup: false,
-          selected: const <String>[],
-          selectType: SelectType.chipMultiSelect);
-    });
+    await DialogUtil.show(
+        title: AutoSizeText(AppLocalizations.t('Select linkman for name card')),
+        builder: (BuildContext context) {
+          return LinkmanGroupSearchWidget(
+              onSelected: (List<String>? selected) async {
+                if (selected != null && selected.isNotEmpty) {
+                  await _sendNameCard(selected);
+                }
+                Navigator.pop(context);
+              },
+              includeGroup: false,
+              selected: const <String>[],
+              selectType: SelectType.chipMultiSelect);
+        });
   }
 
   ///发送linkman的消息
@@ -452,17 +457,11 @@ class MoreMessageInput extends StatelessWidget {
 
   ///选择收藏，并发送收藏的内容成为消息
   Future<void> _onActionCollection() async {
-    await DialogUtil.show(builder: (BuildContext context) {
-      return Dialog(
-        child: Column(children: [
-          AppBarWidget(
-            title: AutoSizeText(
-                AppLocalizations.t('Select collect message')),
-          ),
-          Expanded(child: CollectionListWidget())
-        ]),
-      );
-    });
+    await DialogUtil.show(
+        title: AutoSizeText(AppLocalizations.t('Select collect message')),
+        builder: (BuildContext context) {
+          return CollectionListWidget();
+        });
     var collection = collectionChatMessageController.current;
     if (collection != null) {
       String? thumbnail = collection.thumbnail!;
@@ -505,7 +504,9 @@ class MoreMessageInput extends StatelessWidget {
               actions: actionData,
               width: appDataProvider.secondaryBodyWidth,
               height: chatMessageViewController.moreMessageInputHeight,
-              onPressed: _onAction,
+              onPressed: (int index, String name, {String? value}) {
+                _onAction(context, index, name, value: value);
+              },
               mainAxisSpacing: 10,
               crossAxisSpacing: 10,
               crossAxisCount: 4,

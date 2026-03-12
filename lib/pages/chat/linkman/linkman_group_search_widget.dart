@@ -16,6 +16,8 @@ class LinkmanGroupSearchWidget extends StatefulWidget {
   final SelectType selectType;
   final bool includeLinkman;
   final bool includeGroup;
+  final String? title;
+  final String? placeholder;
 
   const LinkmanGroupSearchWidget(
       {super.key,
@@ -23,6 +25,8 @@ class LinkmanGroupSearchWidget extends StatefulWidget {
       required this.selected,
       this.selectType = SelectType.chipMultiSelect,
       this.includeLinkman = true,
+      this.title,
+      this.placeholder,
       this.includeGroup = true});
 
   @override
@@ -30,23 +34,11 @@ class LinkmanGroupSearchWidget extends StatefulWidget {
 }
 
 class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
-  String title = '';
-  String placeholder = '';
   OptionController optionController = OptionController();
 
   @override
   initState() {
     super.initState();
-    if (widget.includeLinkman && widget.includeGroup) {
-      title = 'Linkman and group';
-      placeholder = 'linkmen and groups';
-    } else if (widget.includeLinkman) {
-      title = 'Linkman';
-      placeholder = 'linkmen ';
-    } else if (widget.includeGroup) {
-      title = 'Group';
-      placeholder = 'groups';
-    }
     _initOption();
   }
 
@@ -115,11 +107,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
   /// 复杂多选对话框样式，选择项通过传入的回调方法返回
   Widget _buildChipMultiSelectField(BuildContext context) {
     var selector = CustomMultiSelectField(
-      title: title,
-      // prefix: Icon(
-      //   Icons.person_add,
-      //   color: myself.primary,
-      // ),
+      title: widget.title,
       optionController: optionController,
       onSearch: _onSearch,
       onConfirm: (selected) {
@@ -134,7 +122,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
   /// 简单多选字段，选择项通过传入的回调方法返回
   Widget _buildDataListMultiSelectField(BuildContext context) {
     var selector = CustomMultiSelectField(
-      title: title,
+      title: widget.title,
       prefix: Icon(
         Icons.person_add,
         color: myself.primary,
@@ -158,7 +146,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
       onConfirm: (selected) {
         widget.onSelected(selected);
       },
-      title: title,
+      title: widget.title,
     );
     return selector;
   }
@@ -171,7 +159,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
         widget.onSelected(selected);
       },
       selectType: SelectType.dataListMultiSelect,
-      title: title,
+      title: widget.title,
     );
   }
 
@@ -183,7 +171,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
       onChanged: (String? value) {
         widget.onSelected([value!]);
       },
-      title: title,
+      title: widget.title,
     );
     return dataListView;
   }
@@ -195,7 +183,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
       onChanged: (String? value) {
         widget.onSelected([value!]);
       },
-      title: title,
+      title: widget.title,
     );
     return dataListView;
   }

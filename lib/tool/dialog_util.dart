@@ -128,16 +128,11 @@ class DialogUtil {
       options.add(option);
     }
     T? value = await show<T>(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          child: Column(children: [
-            AppBarWidget(title: title),
-            Expanded(child: ListView(children: options).asStyle())
-          ]),
-        );
-      },
-    );
+        context: context,
+        title: title,
+        builder: (BuildContext context) {
+          return ListView(children: options).asStyle();
+        });
 
     return value;
   }
@@ -228,7 +223,7 @@ class DialogUtil {
         ]));
   }
 
-  ///带标题的对话框
+  /// 带标题的对话框
   static Future<T?> show<T>({
     BuildContext? context,
     required Widget Function(BuildContext) builder,
@@ -243,12 +238,18 @@ class DialogUtil {
   }) async {
     context ??= appDataProvider.context!;
     Widget child = builder(context);
-    if (title != null) {
-      child = Column(children: [
-        title,
-        Expanded(child: child),
-      ]);
-    }
+    child = Dialog(
+      child: Column(children: [
+        AppBarWidget(title: title, rightWidgets: [
+          IconButton(
+              onPressed: () {
+                Navigator.pop(context!);
+              },
+              icon: Icon(Icons.close))
+        ]),
+        Expanded(child: child)
+      ]),
+    );
     T? value = await showDialog<T>(
       context: context,
       builder: (BuildContext context) {
