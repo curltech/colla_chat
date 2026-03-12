@@ -1,13 +1,18 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/platform_carousel.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:kmeans_dominant_colors/kmeans_dominant_colors.dart';
+import 'package:image/image.dart' as img;
 
 class BackgroundImages {
   static const List<String> darkBackgroundImages = [
@@ -42,6 +47,8 @@ class BackgroundImages {
 
   final lightChildren = <Widget>[];
   final darkChildren = <Widget>[];
+  final lightColors = <Color>[];
+  final darkColors = <Color>[];
   int currentIndex = 0;
 
   BackgroundImages() {
@@ -60,6 +67,7 @@ class BackgroundImages {
       darkChildren.add(image);
     }
     FlutterNativeSplash.remove();
+    // extract();
   }
 
   Widget? currentBackgroundImage(BuildContext? context) {
@@ -74,6 +82,35 @@ class BackgroundImages {
     }
 
     return null;
+  }
+
+  Future<void> extract() async {
+    for (int i = 0; i < lightBackgroundImages.length; ++i) {
+      var color = await extractColors(lightBackgroundImages[i]);
+      lightColors.add(color);
+    }
+    for (int i = 0; i < darkBackgroundImages.length; ++i) {
+      var color = await extractColors(darkBackgroundImages[i]);
+      darkColors.add(color);
+    }
+  }
+
+  Future<Color> extractColors(String assetPath) async {
+    final ByteData data = await rootBundle.load(assetPath);
+    final Uint8List bytes = data.buffer.asUint8List();
+
+    final color = await compute((Uint8List bytes) {
+      final image = img.decodeImage(bytes);
+      if (image == null) {
+        throw Exception('Failed to decode image');
+      }
+      final List<Color> colors =
+          KMeansDominantColors.extract(image: image, count: 1);
+
+      return colors[0];
+    }, bytes);
+
+    return color;
   }
 }
 
@@ -90,11 +127,6 @@ class BackgroundWidget extends StatelessWidget {
 
   void _init() {
     int count = BackgroundImages.lightBackgroundImages.length;
-
-    ///在initState中调用context出错
-    // if (myself.getBrightness(context) == Brightness.dark) {
-    //   count = backgroundImages.darkBackgroundImages.length;
-    // }
     if (autoPlay) {
       Timer.periodic(const Duration(seconds: 60), (timer) {
         var random = Random.secure();
@@ -128,6 +160,11 @@ class BackgroundWidget extends StatelessWidget {
               int? oldIndex,
               CarouselPageChangedReason? reason}) {
             backgroundImages.currentIndex = index;
+            // Color color = backgroundImages.lightColors[index];
+            // if (myself.getBrightness(context) == Brightness.dark) {
+            //   color = backgroundImages.darkColors[index];
+            // }
+            // myself.primaryColor = color;
           },
           itemCount: children.length,
           itemBuilder: (BuildContext context, int index, {int? realIndex}) {
