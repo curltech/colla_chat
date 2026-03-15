@@ -197,7 +197,7 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
             : _videoController.player.pause(),
       ]);
 
-      _videoConfigs.clipsEditor.clips.first = VideoClip(
+      _videoConfigs.clipsEditor.clips.add(VideoClip(
         id: '001',
         title: 'My awesome video',
         // subtitle: 'Optional',
@@ -205,7 +205,7 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
         clip: EditorVideoClip.autoSource(
           file: filename,
         ),
-      );
+      ));
     }
 
     _thumbnails = await _videoRender!

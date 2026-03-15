@@ -88,15 +88,28 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
         width: 1.0,
       ),
       Expanded(
-          child: ScaleTransition(
-        scale: Tween<double>(begin: 0.50, end: 1.0).animate(CurvedAnimation(
+          child: SlideTransition(
+        position: Tween<Offset>(
+          begin: Offset(1.0, 0.0),
+          end: Offset(0.0, 0.0),
+        ).animate(CurvedAnimation(
           parent: AnimationController(
-            duration: const Duration(milliseconds: 900),
-            vsync: Navigator.of(context),
+            vsync: this,
+            duration: const Duration(milliseconds: 500),
           )..forward(),
           curve: Curves.easeInOut,
         )),
-        child: view,
+        child: FadeTransition(
+            opacity: Tween<double>(
+              begin: 0.0,
+              end: 1.0,
+            ).animate(
+              AnimationController(
+                vsync: this,
+                duration: const Duration(milliseconds: 2000),
+              )..forward(),
+            ),
+            child: view),
       ))
     ]);
   }
