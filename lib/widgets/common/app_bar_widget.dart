@@ -81,12 +81,13 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: false,
       toolbarHeight: toolbarHeight ?? appDataProvider.toolbarHeight,
       elevation: elevation,
-      backgroundColor: backgroundColor ?? myself.getBackgroundColor(context),
+      backgroundColor:
+          backgroundColor ?? myself.getBackgroundColor(context).withAlpha(0),
       foregroundColor: foregroundColor ?? myself.getForegroundColor(context),
       bottom: bottom,
     );
 
-    return appBar;
+    return appBar.asStyle();
   }
 
   Widget _buildTitleBar(BuildContext context) {

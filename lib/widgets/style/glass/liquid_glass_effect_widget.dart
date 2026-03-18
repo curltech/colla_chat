@@ -33,7 +33,7 @@ extension LiquidGlassEffectWidget<T extends Widget> on T {
     Color? shadowColor,
     Duration animationDuration = const Duration(milliseconds: 300),
     double scaleFactor = 1.0,
-    bool enableHoverEffect = true,
+    bool enableHoverEffect = false,
   }) {
     if (this is ElevatedButton) {
       return LiquidGlassElevatedButton(

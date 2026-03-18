@@ -89,7 +89,7 @@ class AppBarView extends StatelessWidget {
             rightWidgets: rightWidgets,
             bottom: bottom,
             isAppBar: isAppBar,
-          ).asStyle(),
+          ),
           Expanded(child: this.child),
         ]);
       },

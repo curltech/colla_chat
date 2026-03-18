@@ -243,18 +243,10 @@ class Myself with ChangeNotifier {
   }
 
   Color getBackgroundColor(BuildContext context) {
-    Brightness brightness = getBrightness(context);
-    if (brightness == Brightness.light) {
-      return primaryColor;
-    }
-    return primaryColor;
+    return primary;
   }
 
   Color getForegroundColor(BuildContext context) {
-    Brightness brightness = getBrightness(context);
-    if (brightness == Brightness.light) {
-      return primaryColor;
-    }
     return Colors.white;
   }
 
