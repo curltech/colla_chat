@@ -245,9 +245,17 @@ class Myself with ChangeNotifier {
   Color getBackgroundColor(BuildContext context) {
     Brightness brightness = getBrightness(context);
     if (brightness == Brightness.light) {
-      return Colors.white;
+      return primaryColor;
     }
-    return Colors.black;
+    return primaryColor;
+  }
+
+  Color getForegroundColor(BuildContext context) {
+    Brightness brightness = getBrightness(context);
+    if (brightness == Brightness.light) {
+      return primaryColor;
+    }
+    return Colors.white;
   }
 
   String get myPath {

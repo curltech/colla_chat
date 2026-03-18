@@ -9,6 +9,7 @@ import 'package:colla_chat/widgets/adaptive_scaffold/slot_layout.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
 
 ///横屏左边栏，用于指示当前主页面
@@ -200,7 +201,7 @@ class PrimaryNavigation {
             builder: (BuildContext context) {
               return Card(
                   elevation: 0.0,
-                  color: Colors.black54,
+                  color: myself.getBackgroundColor(context).withAlpha(0),
                   shape: const ContinuousRectangleBorder(),
                   margin: EdgeInsets.zero,
                   child: AdaptiveScaffold.standardNavigationRail(
@@ -210,24 +211,25 @@ class PrimaryNavigation {
                       indexWidgetProvider.currentMainIndex = index;
                     },
                     padding: const EdgeInsets.all(0.0),
-                    backgroundColor: Colors.black54,
+                    backgroundColor:
+                        myself.getBackgroundColor(context).withAlpha(0),
                     leading: _buildAppBar(context),
                     destinations: destinations,
                     selectedIconTheme: IconThemeData(
                       color: myself.primary,
                     ),
-                    unselectedIconTheme: const IconThemeData(
-                      color: Colors.white,
+                    unselectedIconTheme: IconThemeData(
+                      color: myself.getForegroundColor(context),
                     ),
                     selectedLabelTextStyle: TextStyle(
                         color: myself.primary,
                         fontSize: AppFontSize.mdFontSize,
                         fontWeight: FontWeight.bold),
-                    unSelectedLabelTextStyle: const TextStyle(
-                      color: Colors.white,
+                    unSelectedLabelTextStyle: TextStyle(
+                      color: myself.getForegroundColor(context),
                       fontSize: AppFontSize.smFontSize,
                     ),
-                  ));
+                  )).asStyle();
             }),
         appDataProvider.largeBreakpoint: SlotLayout.from(
             key: const Key('Primary Navigation Large'),
@@ -235,7 +237,7 @@ class PrimaryNavigation {
             builder: (BuildContext context) {
               return Card(
                   elevation: 0.0,
-                  color: Colors.black54,
+                  color: myself.getBackgroundColor(context).withAlpha(0),
                   shape: const ContinuousRectangleBorder(),
                   margin: EdgeInsets.zero,
                   child: AdaptiveScaffold.standardNavigationRail(
@@ -244,27 +246,30 @@ class PrimaryNavigation {
                     onDestinationSelected: (int index) {
                       indexWidgetProvider.currentMainIndex = index;
                     },
-                    padding: const EdgeInsets.all(0.0),
-                    backgroundColor: Colors.black54,
+                    padding: EdgeInsets.all(0.0),
+                    backgroundColor: myself
+                        .getBackgroundColor(context)
+                        .withAlpha(0)
+                        .withAlpha(0),
                     leading: _buildAppBar(context),
                     destinations: destinations,
                     extended: true,
                     trailing: trailingNavRail,
                     selectedIconTheme: IconThemeData(
-                      color: myself.primary,
+                      color: myself.getBackgroundColor(context),
                     ),
-                    unselectedIconTheme: const IconThemeData(
-                      color: Colors.white,
+                    unselectedIconTheme: IconThemeData(
+                      color: myself.getForegroundColor(context),
                     ),
                     selectedLabelTextStyle: TextStyle(
-                        color: myself.primary,
+                        color: myself.getBackgroundColor(context),
                         fontSize: AppFontSize.mdFontSize,
                         fontWeight: FontWeight.bold),
-                    unSelectedLabelTextStyle: const TextStyle(
-                      color: Colors.white,
+                    unSelectedLabelTextStyle: TextStyle(
+                      color: myself.getForegroundColor(context),
                       fontSize: AppFontSize.smFontSize,
                     ),
-                  ));
+                  )).asStyle();
             }),
       },
     );

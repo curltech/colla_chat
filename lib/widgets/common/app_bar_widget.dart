@@ -49,7 +49,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     return isAppBar ? _buildAppBar(context) : _buildTitleBar(context);
   }
 
-  AppBar _buildAppBar(BuildContext context) {
+  Widget _buildAppBar(BuildContext context) {
     var btns = <Widget>[];
 
     if (actions != null && actions!.isNotEmpty) {
@@ -81,8 +81,8 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: false,
       toolbarHeight: toolbarHeight ?? appDataProvider.toolbarHeight,
       elevation: elevation,
-      backgroundColor: backgroundColor ?? myself.primary,
-      foregroundColor: foregroundColor ?? Colors.white,
+      backgroundColor: backgroundColor ?? myself.getBackgroundColor(context),
+      foregroundColor: foregroundColor ?? myself.getForegroundColor(context),
       bottom: bottom,
     );
 
@@ -112,7 +112,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
           },
           icon: Icon(
             Icons.more_horiz,
-            color: foregroundColor,
+            color: myself.getForegroundColor(context),
           )));
     }
     return SizedBox(
@@ -121,18 +121,19 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
           elevation: 0,
           margin: const EdgeInsets.all(0),
           shape: ContinuousRectangleBorder(),
-          color: (backgroundColor ?? myself.primary).withAlpha(0),
+          color: myself.getBackgroundColor(context).withAlpha(0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: children,
           ),
-        )).asStyle(blur: 128);
+        ));
   }
 
   Widget? _buildBackButton(BuildContext context) {
     Widget? leadingButton = IconButton(
       tooltip: AppLocalizations.t('Back'),
-      icon: Icon(Icons.arrow_back_ios_new, color: foregroundColor),
+      icon: Icon(Icons.arrow_back_ios_new,
+          color: foregroundColor ?? myself.getForegroundColor(context)),
       onPressed: () async {
         if (leadingCallBack != null) {
           await leadingCallBack!.call();

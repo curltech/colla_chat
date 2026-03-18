@@ -80,11 +80,11 @@ extension LiquidGlassEffectWidget<T extends Widget> on T {
         child: LiquidGlassCard(
             key: key,
             borderRadius: borderRadius,
-            baseColor: baseColor ?? myself.primary.withAlpha(32),
+            baseColor: baseColor ?? myself.primary.withAlpha(16),
             blurAmount: blurAmount,
             padding: padding?.resolve(null) ?? EdgeInsets.all(0.0),
             onTap: onPressed,
-            borderColor: borderColor ?? myself.primary.withAlpha(32),
+            borderColor: borderColor ?? myself.primary.withAlpha(0),
             borderWidth: borderWidth,
             elevation: elevation,
             shadowColor: shadowColor ?? myself.secondary,

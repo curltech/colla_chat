@@ -5,6 +5,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
 
 ///工作区的标准视图，包裹了顶部栏AppBarWidget和一个包裹了child
@@ -50,7 +51,7 @@ class AppBarView extends StatelessWidget {
         Widget titleWidget = this.titleWidget ??
             AutoSizeText(
               AppLocalizations.t(title ?? ''),
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: myself.getForegroundColor(context)),
               softWrap: true,
               wrapWords: false,
               overflow: TextOverflow.visible,
@@ -78,7 +79,7 @@ class AppBarView extends StatelessWidget {
         }
         return Column(children: [
           AppBarWidget(
-            backgroundColor: myself.primary,
+            backgroundColor: myself.getBackgroundColor(context).withAlpha(0),
             withLeading: withLeading,
             leadingWidget: leadingWidget,
             leadingCallBack: leadingCallBack,
@@ -88,7 +89,7 @@ class AppBarView extends StatelessWidget {
             rightWidgets: rightWidgets,
             bottom: bottom,
             isAppBar: isAppBar,
-          ),
+          ).asStyle(),
           Expanded(child: this.child),
         ]);
       },
