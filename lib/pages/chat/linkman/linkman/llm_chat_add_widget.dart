@@ -15,7 +15,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 //联系人信息页面
 class LlmChatAddWidget extends StatelessWidget with DataTileMixin {
@@ -65,7 +65,9 @@ class LlmChatAddWidget extends StatelessWidget with DataTileMixin {
   Linkman? linkman;
 
   Widget _buildPlatformReactiveForm(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: linkmanController.currentIndex,
+        builder: (context, value, _) {
       Linkman? linkman = linkmanController.current;
       if (linkman != null) {
         platformReactiveFormController.values = JsonUtil.toJson(linkman);

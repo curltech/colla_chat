@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 /// 用floating实现android的画中画功能
 class AndroidFloatingPipController {
@@ -57,7 +57,7 @@ class AndroidFloatingPipWidget extends StatelessWidget {
   final AndroidFloatingPipController androidFloatingPipController =
       AndroidFloatingPipController();
   final Widget disabled;
-  final Rx<Widget> enabled = Rx<Widget>(nilBox);
+  final ValueNotifier<Widget> enabled = ValueNotifier<Widget>(nilBox);
 
   AndroidFloatingPipWidget({super.key, required this.disabled});
 
@@ -79,7 +79,9 @@ class AndroidFloatingPipWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return PiPSwitcher(
       childWhenDisabled: disabled,
-      childWhenEnabled: Obx(() {
+      childWhenEnabled: ValueListenableBuilder(
+        valueListenable: enabled,
+        builder: (context, value, _) {
         return enabled.value;
       }),
     );

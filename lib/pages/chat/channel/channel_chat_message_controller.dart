@@ -3,25 +3,26 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/channel_chat_message.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/date_util.dart';
-import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
+
 
 ///频道消息的消息控制器,自己订阅的,其他人发布的频道消息
 class ChannelChatMessageController extends DataMoreController<ChatMessage> {
-  final Rx<String?> _parentMessageId = Rx<String?>(null);
+  final ValueNotifier<String?> _parentMessageId = ValueNotifier<String?>(null);
 
   String? get parentMessageId {
     return _parentMessageId.value;
   }
 
   set parentMessageId(String? parentMessageId) {
-    _parentMessageId(parentMessageId);
+    _parentMessageId.value=parentMessageId;
   }
 
   ///访问数据库获取更老的消息
   @override
   Future<int> previous({int? limit}) async {
     List<ChatMessage> chatMessages = await channelChatMessageService
-        .findOthersByPeerId(offset: data.length, limit: limit);
+        .findOthersByPeerId(offset: data.value.length, limit: limit);
     if (chatMessages.isNotEmpty) {
       addAll(chatMessages);
     }
@@ -32,13 +33,13 @@ class ChannelChatMessageController extends DataMoreController<ChatMessage> {
   @override
   Future<int> latest({int? limit}) async {
     String? sendTime;
-    if (data.isNotEmpty) {
-      sendTime = data[0].sendTime;
+    if (data.value.isNotEmpty) {
+      sendTime = data.value[0].sendTime;
     }
     List<ChatMessage> chatMessages = await channelChatMessageService
         .findOthersByPeerId(sendTime: sendTime, limit: limit);
     if (chatMessages.isNotEmpty) {
-      data.insertAll(0, chatMessages);
+      data.value.insertAll(0, chatMessages);
     }
     return chatMessages.length;
   }
@@ -50,14 +51,14 @@ final ChannelChatMessageController channelChatMessageController =
 
 ///自己发布的频道消息,消息的接收者是空的,在发送的时候填充接收者
 class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
-  final Rx<String?> _parentMessageId = Rx<String?>(null);
+  final ValueNotifier<String?> _parentMessageId = ValueNotifier<String?>(null);
 
   String? get parentMessageId {
     return _parentMessageId.value;
   }
 
   set parentMessageId(String? parentMessageId) {
-    _parentMessageId(parentMessageId);
+    _parentMessageId.value=parentMessageId;
   }
 
   ///访问数据库获取更老的消息
@@ -65,7 +66,7 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
   Future<int> previous({String? status, int? limit}) async {
     List<ChatMessage>? chatMessages;
     chatMessages = await channelChatMessageService.findMyselfByPeerId(
-        status: status, offset: data.length, limit: limit);
+        status: status, offset: data.value.length, limit: limit);
     if (chatMessages.isNotEmpty) {
       addAll(chatMessages);
     }
@@ -76,13 +77,13 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
   @override
   Future<int> latest({String? status, int? limit}) async {
     String? sendTime;
-    if (data.isNotEmpty) {
-      sendTime = data[0].sendTime;
+    if (data.value.isNotEmpty) {
+      sendTime = data.value[0].sendTime;
     }
     List<ChatMessage>? chatMessages = await channelChatMessageService
         .findMyselfByPeerId(status: status, sendTime: sendTime, limit: limit);
     if (chatMessages.isNotEmpty) {
-      data.insertAll(0, chatMessages);
+      data.value.insertAll(0, chatMessages);
     }
     return chatMessages.length;
   }

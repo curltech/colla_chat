@@ -4,12 +4,10 @@ import 'package:colla_chat/entity/stock/day_line.dart';
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/entity/stock/share_group.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/stock/me/stock_line_chart_widget.dart';
 import 'package:colla_chat/pages/stock/stock_widget.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/share_group.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -21,23 +19,24 @@ import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 /// 存储在本地的自选股票的代码和分组
 class MyShareController {
-  final RxBool showLoading = false.obs;
+  final ValueNotifier<bool> showLoading = ValueNotifier<bool>(false);
 
   /// 自选股
-  final RxString subscription = ''.obs;
+  final ValueNotifier<String> subscription = ValueNotifier<String>('');
 
   /// 当前组
-  final RxString groupName = ShareGroupService.defaultGroupName.obs;
+  final ValueNotifier<String> groupName =
+      ValueNotifier<String>(ShareGroupService.defaultGroupName);
 
   /// 组的自选股
-  final RxMap<String, String> groupSubscription = <String, String>{}.obs;
+  final ValueNotifier<Map<String, String>> groupSubscription =
+      ValueNotifier<Map<String, String>>({});
 
   /// 加载数据的方式，true表示直接从网站加载，false表示从服务器加载，支持分批获取
-  final RxBool online = true.obs;
+  final ValueNotifier<bool> online = ValueNotifier<bool>(true);
 
   MyShareController();
 
@@ -67,7 +66,7 @@ class MyShareController {
   Future<void> add(Share share) async {
     await shareService.store(share);
     String tsCode = share.tsCode!;
-    if (!subscription.contains(tsCode)) {
+    if (!subscription.value.contains(tsCode)) {
       if (subscription.value.endsWith(',')) {
         subscription.value += tsCode;
       } else {
@@ -78,20 +77,20 @@ class MyShareController {
     }
     String defaultGroupName =
         AppLocalizations.t(ShareGroupService.defaultGroupName);
-    groupSubscription[defaultGroupName] = subscription.value;
+    groupSubscription.value[defaultGroupName] = subscription.value;
   }
 
   /// 删除股票，并从各各分组中删除
   Future<void> remove(String tsCode) async {
-    if (subscription.contains(',$tsCode')) {
-      subscription.value = subscription.replaceAll(',$tsCode', '');
+    if (subscription.value.contains(',$tsCode')) {
+      subscription.value = subscription.value.replaceAll(',$tsCode', '');
     }
-    if (subscription.contains(tsCode)) {
-      subscription.value = subscription.replaceAll(tsCode, '');
+    if (subscription.value.contains(tsCode)) {
+      subscription.value = subscription.value.replaceAll(tsCode, '');
     }
     await localSharedPreferences.save('subscription', subscription.value,
         encrypt: true);
-    for (String groupName in groupSubscription.keys) {
+    for (String groupName in groupSubscription.value.keys) {
       await removeMember(groupName, tsCode);
     }
   }
@@ -120,18 +119,18 @@ class MyShareController {
       myShareController.showLoading.value = false;
     }
 
-    this.groupSubscription.assignAll(groupSubscription);
+    this.groupSubscription.value = {}..addAll(groupSubscription);
   }
 
   /// 查询分组的股票
   Future<String?> findSubscription(String groupName) async {
-    String? subscription = groupSubscription[groupName];
+    String? subscription = groupSubscription.value[groupName];
     if (subscription == null) {
       String defaultGroupName =
           AppLocalizations.t(ShareGroupService.defaultGroupName);
       if (defaultGroupName == groupName) {
         subscription = myShareController.subscription.value;
-        groupSubscription[groupName] = subscription;
+        groupSubscription.value[groupName] = subscription;
       } else {
         try {
           myShareController.showLoading.value = true;
@@ -139,9 +138,9 @@ class MyShareController {
               .findOne(where: 'groupName=?', whereArgs: [groupName]);
           myShareController.showLoading.value = false;
           if (shareGroup != null) {
-            groupSubscription[groupName] = shareGroup.subscription;
+            groupSubscription.value[groupName] = shareGroup.subscription;
           } else {
-            groupSubscription[groupName] = '';
+            groupSubscription.value[groupName] = '';
           }
         } catch (e) {
           myShareController.showLoading.value = false;
@@ -156,7 +155,7 @@ class MyShareController {
     String defaultGroupName =
         AppLocalizations.t(ShareGroupService.defaultGroupName);
     if (defaultGroupName != groupName) {
-      groupSubscription.remove(groupName);
+      groupSubscription.value.remove(groupName);
       if (this.groupName.value == groupName) {
         this.groupName.value = defaultGroupName;
       }
@@ -166,7 +165,7 @@ class MyShareController {
 
   /// 将股票加入分组
   Future<bool> addMember(String groupName, List<String> tsCodes) async {
-    String? subscription = groupSubscription[groupName];
+    String? subscription = groupSubscription.value[groupName];
     subscription ??= '';
     bool result = false;
     for (String tsCode in tsCodes) {
@@ -176,7 +175,7 @@ class MyShareController {
         } else {
           subscription += ',$tsCode';
         }
-        groupSubscription[groupName] = subscription;
+        groupSubscription.value[groupName] = subscription;
         result = true;
       }
     }
@@ -197,7 +196,7 @@ class MyShareController {
     if (defaultGroupName == groupName) {
       return false;
     }
-    String? subscription = groupSubscription[groupName];
+    String? subscription = groupSubscription.value[groupName];
     if (subscription != null) {
       if (subscription.contains(',$tsCode')) {
         subscription = subscription.replaceAll(',$tsCode', '');
@@ -205,7 +204,7 @@ class MyShareController {
       if (subscription.contains(tsCode)) {
         subscription = subscription.replaceAll(tsCode, '');
       }
-      groupSubscription[groupName] = subscription;
+      groupSubscription.value[groupName] = subscription;
       ShareGroup shareGroup = ShareGroup(groupName, subscription: subscription);
       await shareGroupService.store(shareGroup);
 
@@ -216,7 +215,7 @@ class MyShareController {
 
   /// 能否增加股票到分组
   Future<bool> canBeAdd(String groupName, String tsCode) async {
-    String? subscription = groupSubscription[groupName];
+    String? subscription = groupSubscription.value[groupName];
     if (subscription != null && subscription.isNotEmpty) {
       return !subscription.contains(tsCode);
     }
@@ -276,11 +275,12 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
         builder: (context, child) {
           tabController?.dispose();
           tabController = TabController(
-              length: myShareController.groupSubscription.length, vsync: this);
+              length: myShareController.groupSubscription.value.length,
+              vsync: this);
           final List<Tab> tabs = <Tab>[];
           int index = 0;
           List<String> groupNames =
-              myShareController.groupSubscription.keys.toList();
+              myShareController.groupSubscription.value.keys.toList();
           for (int i = 0; i < groupNames.length; ++i) {
             String groupName = groupNames[i];
             tabs.add(Tab(
@@ -498,13 +498,15 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
       platformDataColumns: _buildDayLineDataColumns(),
       controller: dayLineController,
     );
-    return Obx(() {
-      if (!myShareController.showLoading.value) {
-        return table;
-      }
-      return Stack(
-          children: <Widget>[table, LoadingUtil.buildLoadingIndicator()]);
-    });
+    return ValueListenableBuilder(
+        valueListenable: myShareController.showLoading,
+        builder: (context, value, _) {
+          if (!myShareController.showLoading.value) {
+            return table;
+          }
+          return Stack(
+              children: <Widget>[table, LoadingUtil.buildLoadingIndicator()]);
+        });
   }
 
   List<ActionData> get actions {
@@ -537,7 +539,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
               title: 'Add group', content: 'Group name');
           if (groupName != null) {
             await shareGroupService.store(ShareGroup(groupName));
-            myShareController.groupSubscription[groupName] = '';
+            myShareController.groupSubscription.value[groupName] = '';
           }
         },
         icon: const Icon(Icons.group_add_outlined),

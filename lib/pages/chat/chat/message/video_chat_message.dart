@@ -50,7 +50,7 @@ class VideoChatMessage extends StatelessWidget {
   }
 
   Future<void> _join(BuildContext context) async {
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    ChatSummary? chatSummary = chatMessageController.chatSummary.value;
     if (chatSummary != null) {
       String? content = chatMessage.content;
       if (content != null) {

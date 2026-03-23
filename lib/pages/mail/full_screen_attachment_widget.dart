@@ -6,9 +6,9 @@ import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-final Rx<MediaProvider?> attachmentMediaProvider = Rx<MediaProvider?>(null);
+
+final ValueNotifier<MediaProvider?> attachmentMediaProvider = ValueNotifier<MediaProvider?>(null);
 
 class FullScreenAttachmentWidget extends StatelessWidget with DataTileMixin {
   const FullScreenAttachmentWidget({super.key});
@@ -45,7 +45,9 @@ class FullScreenAttachmentWidget extends StatelessWidget with DataTileMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: attachmentMediaProvider,
+        builder: (context, value, _) {
       MediaProvider? mediaProvider = attachmentMediaProvider.value;
       String? fileName = mediaProvider?.name;
       if (fileName != null) {

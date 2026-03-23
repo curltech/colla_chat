@@ -9,7 +9,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 /// 消息发送和接受展示的界面组件
 /// 此界面展示特定的目标对象的收到的消息，并且可以发送消息
@@ -40,7 +40,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     with TickerProviderStateMixin {
   FocusNode textFocusNode = FocusNode();
   late AnimationController animateController;
-  final RxBool securityTip = true.obs;
+  final ValueNotifier<bool> securityTip = ValueNotifier<bool>(true);
 
   @override
   void initState() {
@@ -116,10 +116,10 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   ///创建每一条消息
   Widget? _buildChatMessageItem(BuildContext context, int index) {
-    if (index < 0 || index >= chatMessageController.data.length) {
+    if (index < 0 || index >= chatMessageController.data.value.length) {
       return null;
     }
-    ChatMessage chatMessage = chatMessageController.data[index];
+    ChatMessage chatMessage = chatMessageController.data.value[index];
     Widget chatMessageItem = ChatMessageItem(
         key: UniqueKey(), chatMessage: chatMessage, index: index);
 
@@ -148,7 +148,9 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       //notificationPredicate: _notificationPredicate,
       child: Scrollbar(
           controller: widget.scrollController,
-          child: Obx(() {
+          child: ValueListenableBuilder(
+        valueListenable: chatMessageController.currentIndex,
+        builder: (context, value, _) {
             return ListView.builder(
               controller: widget.scrollController,
               padding: const EdgeInsets.all(8.0),
@@ -165,7 +167,9 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   @override
   Widget build(BuildContext context) {
     var chatMessageWidget = _buildChatMessageWidget(context);
-    var securityTipWidget = Obx(() {
+    var securityTipWidget = ValueListenableBuilder(
+        valueListenable: securityTip,
+        builder: (context, value, _) {
       if (securityTip.value) {
         return Row(children: [
           const SizedBox(

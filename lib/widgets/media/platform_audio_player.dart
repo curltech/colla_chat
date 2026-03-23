@@ -6,7 +6,7 @@ import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dar
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 /// 平台的单个音频媒体播放器组件
 class PlatformAudioPlayer extends StatelessWidget {

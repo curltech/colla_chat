@@ -6,7 +6,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:system_alert_window/system_alert_window.dart';
 
 class FlutterOverlayWindowWidget extends StatelessWidget with DataTileMixin {
@@ -78,7 +78,7 @@ class FlutterOverlayWindow extends StatelessWidget {
 
   late final FlutterFloatingHome flutterFloatingHome =
       FlutterFloatingHome(disabled: disabled);
-  final Rx<String?> floatingKey = Rx<String?>(null);
+  final ValueNotifier<String?> floatingKey = ValueNotifier<String?>(null);
 
   void show(BuildContext context) {
     if (platformParams.mobile) {

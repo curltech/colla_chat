@@ -66,7 +66,7 @@ class MediaFileWidgetState extends State<MediaFileWidget> {
   Widget _buildMediaPreviewData(BuildContext context) {
     List<Widget> chips = [];
     int i = 0;
-    for (XFile mediaFile in widget.mediaFileController.data) {
+    for (XFile mediaFile in widget.mediaFileController.data.value) {
       int index = i;
       String? mimeType = mediaFile.mimeType;
       var chip = GestureDetector(

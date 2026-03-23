@@ -20,7 +20,7 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:path/path.dart' as p;
 
 class PoemWidget extends StatelessWidget with DataTileMixin {
@@ -182,10 +182,10 @@ class PoemWidget extends StatelessWidget with DataTileMixin {
   final PlatformTextToSpeechWidget platformTextToSpeechWidget =
       PlatformTextToSpeechWidget();
 
-  final RxBool platformTextToSpeech = true.obs;
+  final ValueNotifier<bool> platformTextToSpeech = ValueNotifier<bool>(true);
 
   Future<void> _onRefresh(BuildContext context) async {
-    int length = poemController.data.length;
+    int length = poemController.data.value.length;
     Map<String, dynamic> values = platformReactiveFormController.values;
     _onSubmit(context, values, from: length);
   }
@@ -196,10 +196,11 @@ class PoemWidget extends StatelessWidget with DataTileMixin {
         height: 5,
       ),
       _buildPlatformReactiveForm(context),
-      Expanded(child: Obx(
-        () {
+      Expanded(child: ValueListenableBuilder(
+        valueListenable: poemController.currentIndex,
+        builder: (context, value, _) {
           List<DataTile> tiles = [];
-          RxList<Poem> poems = poemController.data;
+          List<Poem> poems = poemController.data.value;
           if (poems.isNotEmpty) {
             int i = 0;
             for (var poem in poems) {

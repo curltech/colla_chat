@@ -9,7 +9,6 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 //设置页面，带有回退回调函数
 class PeerClientListWidget extends StatelessWidget with DataTileMixin {
@@ -34,8 +33,6 @@ class PeerClientListWidget extends StatelessWidget with DataTileMixin {
 
   @override
   String get title => 'PeerClient';
-
-  
 
   List<DataTile> _buildPeerClientTileData() {
     List<PeerClient> peerClients = peerClientController.data.value;
@@ -81,7 +78,8 @@ class PeerClientListWidget extends StatelessWidget with DataTileMixin {
     await peerClientController.more();
   }
 
-  Future<bool?> _onTap(int index, String title, {String? subtitle, DataTile? group}) async {
+  Future<bool?> _onTap(int index, String title,
+      {String? subtitle, DataTile? group}) async {
     peerClientController.setCurrentIndex = index;
     return null;
   }
@@ -91,19 +89,24 @@ class PeerClientListWidget extends StatelessWidget with DataTileMixin {
     var peerClientView = RefreshIndicator(
         onRefresh: _onRefresh,
         //notificationPredicate: _notificationPredicate,
-        child: Obx(() {
-          var tiles = _buildPeerClientTileData();
-          return DataListView(
-            onTap: _onTap,
-            itemCount: tiles.length,
-            itemBuilder: (BuildContext context, int index) {
-              return tiles[index];
-            },
-          );
-        }));
+        child: ValueListenableBuilder(
+            valueListenable: peerClientController.currentIndex,
+            builder: (context, value, _) {
+              var tiles = _buildPeerClientTileData();
+              return DataListView(
+                onTap: _onTap,
+                itemCount: tiles.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return tiles[index];
+                },
+              );
+            }));
 
     var peerClientWidget = AppBarView(
-        title: title,helpPath: routeName, withLeading: withLeading, child: peerClientView);
+        title: title,
+        helpPath: routeName,
+        withLeading: withLeading,
+        child: peerClientView);
 
     return peerClientWidget;
   }

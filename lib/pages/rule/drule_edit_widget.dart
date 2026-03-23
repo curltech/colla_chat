@@ -12,7 +12,7 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 class DruleEditWidget extends StatelessWidget with DataTileMixin {
   @override
@@ -74,7 +74,9 @@ class DruleEditWidget extends StatelessWidget with DataTileMixin {
     for (var value in DataType.values) {
       options.add(Option(value.name, value.name));
     }
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: drulesController.currentIndex,
+        builder: (context, value, _) {
       Drule? drule = drulesController.current;
       if (drule == null) {
         return nilBox;

@@ -9,7 +9,7 @@ import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 class FullScreenChatMessageWidget extends StatelessWidget with DataTileMixin {
   FullScreenChatMessageWidget({super.key});
@@ -29,7 +29,7 @@ class FullScreenChatMessageWidget extends StatelessWidget with DataTileMixin {
   final PlatformCarouselController controller = PlatformCarouselController();
 
   Future<Widget> _buildMessageWidget(BuildContext context, int index) async {
-    ChatMessage chatMessage = chatMessageController.data[index];
+    ChatMessage chatMessage = chatMessageController.data.value[index];
     Widget child;
     MessageWidget messageWidget =
         MessageWidget(chatMessage, index, fullScreen: true);
@@ -39,7 +39,9 @@ class FullScreenChatMessageWidget extends StatelessWidget with DataTileMixin {
   }
 
   Widget _buildTitleWidget() {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: chatMessageController.currentIndex,
+        builder: (context, value, _) {
       ChatMessage? chatMessage = chatMessageController.current;
       var title = AppLocalizations.t(this.title);
       if (chatMessage != null) {

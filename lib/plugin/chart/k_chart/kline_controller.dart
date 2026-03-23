@@ -8,7 +8,7 @@ import 'package:colla_chat/service/stock/min_line.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/wmqy_line.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
 
 /// 某只股票的某种线型的数据控制器
 class KlineController extends DataListController<dynamic> {
@@ -26,9 +26,10 @@ class KlineController extends DataListController<dynamic> {
 
 class MultiKlineController extends DataListController<String> {
   /// 加载数据的方式，true表示直接从网站加载，false表示从服务器加载，支持分批获取
-  final RxBool online = true.obs;
+  final ValueNotifier<bool> online = ValueNotifier<bool>(true);
+
   /// 当前线型
-  final RxInt lineType = 101.obs;
+  final ValueNotifier<int> lineType = ValueNotifier<int>(101);
 
   /// 所有股票的所有线型的数据控制器集合，键值为股票代码和线型
   final Map<String, Map<int, KlineController>> klineControllers = {};
@@ -53,8 +54,8 @@ class MultiKlineController extends DataListController<String> {
     } else {
       return;
     }
-    if (!data.contains(tsCode)) {
-      data.add(tsCode);
+    if (!data.value.contains(tsCode)) {
+      data.value.add(tsCode);
     }
     if (current != tsCode || !klineControllers.containsKey(tsCode)) {
       if (!klineControllers.containsKey(tsCode)) {
@@ -85,7 +86,7 @@ class MultiKlineController extends DataListController<String> {
   String? remove(String tsCode) {
     if (klineControllers.containsKey(tsCode)) {
       klineControllers.remove(tsCode);
-      data.remove(tsCode);
+      data.value.remove(tsCode);
 
       return tsCode;
     }
@@ -95,7 +96,7 @@ class MultiKlineController extends DataListController<String> {
 
   /// 当前股票转为上一只股票
   Future<void> previous() async {
-    if (data.isEmpty) {
+    if (data.value.isEmpty) {
       setCurrentIndex = null;
     }
     if (this.currentIndex.value == null ||
@@ -104,8 +105,8 @@ class MultiKlineController extends DataListController<String> {
       setCurrentIndex = 0;
     }
     int currentIndex = this.currentIndex.value! - 1;
-    if (currentIndex >= 0 && currentIndex < data.length) {
-      String tsCode = data[currentIndex];
+    if (currentIndex >= 0 && currentIndex < data.value.length) {
+      String tsCode = data.value[currentIndex];
       if (!klineControllers.containsKey(tsCode)) {
         await put(tsCode);
       }
@@ -115,17 +116,17 @@ class MultiKlineController extends DataListController<String> {
 
   /// 当前股票转为下一只股票
   Future<void> next() async {
-    if (data.isEmpty) {
+    if (data.value.isEmpty) {
       setCurrentIndex = null;
     }
     if (this.currentIndex.value == null ||
-        this.currentIndex.value == data.length - 1 ||
-        this.currentIndex.value == data.length - 2) {
-      setCurrentIndex = data.length - 1;
+        this.currentIndex.value == data.value.length - 1 ||
+        this.currentIndex.value == data.value.length - 2) {
+      setCurrentIndex = data.value.length - 1;
     }
     int currentIndex = this.currentIndex.value! + 1;
-    if (currentIndex >= 0 && currentIndex < data.length) {
-      String tsCode = data[currentIndex];
+    if (currentIndex >= 0 && currentIndex < data.value.length) {
+      String tsCode = data.value[currentIndex];
       if (!klineControllers.containsKey(tsCode)) {
         await put(tsCode);
       }
@@ -135,7 +136,7 @@ class MultiKlineController extends DataListController<String> {
 
   /// 装载日线
   Future<void> loadDayLines({List<String>? tsCodes}) async {
-    tsCodes ??= data;
+    tsCodes ??= data.value;
     for (String tsCode in tsCodes) {
       if (tsCode.isEmpty) {
         continue;
@@ -165,7 +166,7 @@ class MultiKlineController extends DataListController<String> {
   }
 
   Future<List<DayLine>> findLatestDayLines({List<String>? tsCodes}) async {
-    tsCodes ??= data;
+    tsCodes ??= data.value;
     List<DayLine> dayLines = [];
     for (String tsCode in tsCodes) {
       if (tsCode.isEmpty) {
@@ -177,10 +178,10 @@ class MultiKlineController extends DataListController<String> {
         klineController = klineControllers[tsCode]?[101];
       }
       if (klineController != null) {
-        DayLine? dayLine = klineController.data.lastOrNull;
+        DayLine? dayLine = klineController.data.value.lastOrNull;
         if (dayLine == null || dayLine.tsCode != tsCode) {
           await loadDayLines(tsCodes: [tsCode]);
-          dayLine = klineController.data.lastOrNull;
+          dayLine = klineController.data.value.lastOrNull;
         }
         if (dayLine != null) {
           if (dayLine.tsCode != tsCode) {
@@ -218,8 +219,8 @@ class MultiKlineController extends DataListController<String> {
       ///在线获取
       if (online.value) {
         int? tradeDate;
-        if (klineController.data.isNotEmpty) {
-          Map map = JsonUtil.toJson(klineController.data[0]);
+        if (klineController.data.value.isNotEmpty) {
+          Map map = JsonUtil.toJson(klineController.data.value[0]);
           tradeDate = map['tradeDate'];
         }
         if (tradeDate != null) {
@@ -236,8 +237,8 @@ class MultiKlineController extends DataListController<String> {
       /// 日线
       if (online.value) {
         int? tradeDate;
-        if (klineController.data.isNotEmpty) {
-          Map map = JsonUtil.toJson(klineController.data[0]);
+        if (klineController.data.value.isNotEmpty) {
+          Map map = JsonUtil.toJson(klineController.data.value[0]);
           tradeDate = map['tradeDate'];
         }
         if (tradeDate != null) {
@@ -253,8 +254,8 @@ class MultiKlineController extends DataListController<String> {
       /// 其他的线，包括周线，月线等
       if (online.value) {
         int? tradeDate;
-        if (klineController.data.isNotEmpty) {
-          Map map = JsonUtil.toJson(klineController.data[0]);
+        if (klineController.data.value.isNotEmpty) {
+          Map map = JsonUtil.toJson(klineController.data.value[0]);
           tradeDate = map['tradeDate'];
         }
         if (tradeDate != null) {
@@ -294,7 +295,7 @@ class MultiKlineController extends DataListController<String> {
     if (klineController == null) {
       return;
     }
-    int length = klineController.data.length;
+    int length = klineController.data.value.length;
     int? count = klineController.count;
     // 判断是否有更多的数据可以加载
     if (count == null || length == 0 || length < count) {

@@ -4,9 +4,8 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-final Rx<String?> roomName = Rx<String?>(null);
+final ValueNotifier<String?> roomName = ValueNotifier<String?>(null);
 
 /// 创建参与者和管理参与者的界面
 class LiveKitSfuParticipantWidget extends StatelessWidget with DataTileMixin {
@@ -26,9 +25,8 @@ class LiveKitSfuParticipantWidget extends StatelessWidget with DataTileMixin {
   @override
   String get title => 'SfuParticipant';
 
-  
-
-  final RxList<DataTile> tileData = <DataTile>[].obs;
+  final ValueNotifier<List<DataTile>> tileData =
+      ValueNotifier<List<DataTile>>([]);
 
   Future<void> _init() async {
     if (roomName.value == null) {
@@ -67,12 +65,14 @@ class LiveKitSfuParticipantWidget extends StatelessWidget with DataTileMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      return AppBarView(
-          title: roomName.value,
-          helpPath: routeName,
-          withLeading: true,
-          child: _buildSearchRoomView(context));
-    });
+    return ValueListenableBuilder(
+        valueListenable: roomName,
+        builder: (context, value, _) {
+          return AppBarView(
+              title: roomName.value,
+              helpPath: routeName,
+              withLeading: true,
+              child: _buildSearchRoomView(context));
+        });
   }
 }

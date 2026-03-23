@@ -140,7 +140,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
 
   ///展示每一条消息
   Widget _buildChannelChatMessageItem(BuildContext context, int index) {
-    List<ChatMessage> chatMessages = myChannelChatMessageController.data;
+    List<ChatMessage> chatMessages = myChannelChatMessageController.data.value;
     ChatMessage chatMessage = chatMessages[index];
     String title = chatMessage.title!;
     String? thumbnail = chatMessage.thumbnail;
@@ -254,7 +254,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
           //消息组件渲染
           itemBuilder: _buildChannelChatMessageItem,
           //消息条目数
-          itemCount: myChannelChatMessageController.data.length,
+          itemCount: myChannelChatMessageController.data.value.length,
         ));
   }
 

@@ -15,12 +15,12 @@ import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:reactive_forms/reactive_forms.dart';
 
 class EventFilterController extends DataListController<EventFilter> {
-  final Rx<String?> _eventCode = Rx<String?>(null);
-  final Rx<String?> _eventName = Rx<String?>(null);
+  final ValueNotifier<String?> _eventCode = ValueNotifier<String?>(null);
+  final ValueNotifier<String?> _eventName = ValueNotifier<String?>(null);
 
   String? get eventCode {
     return _eventCode.value;
@@ -31,14 +31,14 @@ class EventFilterController extends DataListController<EventFilter> {
   }
 
   Future<void> setEventCode(String? eventCode, {String? eventName}) async {
-    _eventCode(eventCode);
-    _eventName(eventName);
+    _eventCode.value = eventCode;
+    _eventName.value = eventName;
     if (eventCode != null) {
       List<EventFilter> eventFilters = await eventFilterService
           .find(where: 'eventCode=?', whereArgs: [_eventCode.value!]);
       replaceAll(eventFilters);
     } else {
-      data.clear();
+      data.value.clear();
     }
   }
 }
@@ -126,7 +126,7 @@ class EventFilterWidget extends StatelessWidget with DataTileMixin {
   late final PlatformReactiveFormController platformReactiveFormController =
       PlatformReactiveFormController(eventFilterDataField);
   final PlatformCarouselController controller = PlatformCarouselController();
-  final RxInt index = 0.obs;
+  final ValueNotifier<int> index = ValueNotifier<int>(0);
 
   Widget _buildActionWidget(
       BuildContext context, int index, dynamic eventFilter) {
@@ -256,49 +256,52 @@ class EventFilterWidget extends StatelessWidget with DataTileMixin {
   }
 
   Widget _buildRightWidget(BuildContext context) {
-    return Obx(() {
-      List<Widget> rightWidgets = [];
-      if (index.value == 0) {
-        rightWidgets.addAll([
-          IconButton(
-            tooltip: AppLocalizations.t('Add'),
-            onPressed: () {
-              eventFilterController.setCurrentIndex = -1;
-              controller.move(1);
-            },
-            icon: const Icon(Icons.add_circle_outline),
-          ),
-          IconButton(
-            tooltip: AppLocalizations.t('Refresh'),
-            onPressed: () async {
-              if (eventFilterController.eventCode != null) {
-                List<EventFilter> value = await eventFilterService.find(
-                    where: 'eventCode=?',
-                    whereArgs: [eventFilterController.eventCode!]);
-                eventFilterController.replaceAll(value);
-              } else {
-                List<EventFilter> value = await eventFilterService.findAll();
-                eventFilterController.replaceAll(value);
-              }
-            },
-            icon: const Icon(Icons.refresh_outlined),
-          ),
-        ]);
-      }
-      if (index.value == 1) {
-        rightWidgets.addAll([
-          IconButton(
-            tooltip: AppLocalizations.t('List'),
-            onPressed: () {
-              eventFilterController.setCurrentIndex = -1;
-              controller.move(0);
-            },
-            icon: const Icon(Icons.list_alt_outlined),
-          ),
-        ]);
-      }
-      return Row(children: rightWidgets);
-    });
+    return ValueListenableBuilder(
+        valueListenable: eventFilterController.currentIndex,
+        builder: (context, value, _) {
+          List<Widget> rightWidgets = [];
+          if (index.value == 0) {
+            rightWidgets.addAll([
+              IconButton(
+                tooltip: AppLocalizations.t('Add'),
+                onPressed: () {
+                  eventFilterController.setCurrentIndex = -1;
+                  controller.move(1);
+                },
+                icon: const Icon(Icons.add_circle_outline),
+              ),
+              IconButton(
+                tooltip: AppLocalizations.t('Refresh'),
+                onPressed: () async {
+                  if (eventFilterController.eventCode != null) {
+                    List<EventFilter> value = await eventFilterService.find(
+                        where: 'eventCode=?',
+                        whereArgs: [eventFilterController.eventCode!]);
+                    eventFilterController.replaceAll(value);
+                  } else {
+                    List<EventFilter> value =
+                        await eventFilterService.findAll();
+                    eventFilterController.replaceAll(value);
+                  }
+                },
+                icon: const Icon(Icons.refresh_outlined),
+              ),
+            ]);
+          }
+          if (index.value == 1) {
+            rightWidgets.addAll([
+              IconButton(
+                tooltip: AppLocalizations.t('List'),
+                onPressed: () {
+                  eventFilterController.setCurrentIndex = -1;
+                  controller.move(0);
+                },
+                icon: const Icon(Icons.list_alt_outlined),
+              ),
+            ]);
+          }
+          return Row(children: rightWidgets);
+        });
   }
 
   @override
@@ -308,26 +311,28 @@ class EventFilterWidget extends StatelessWidget with DataTileMixin {
       helpPath: routeName,
       isAppBar: false,
       rightWidgets: [_buildRightWidget(context)],
-      child: Obx(() {
-        return PlatformCarouselWidget(
-          controller: controller,
-          itemCount: 2,
-          initialPage: index.value,
-          itemBuilder: (BuildContext context, int index, {int? realIndex}) {
-            Widget view = _buildEventFilterListView(context);
-            if (index == 1) {
-              view = _buildEventFilterEditView(context);
-            }
-            return view;
-          },
-          onPageChanged: (int index,
-              {PlatformSwiperDirection? direction,
-              int? oldIndex,
-              CarouselPageChangedReason? reason}) {
-            this.index.value = index;
-          },
-        );
-      }),
+      child: ValueListenableBuilder(
+          valueListenable: index,
+          builder: (context, value, _) {
+            return PlatformCarouselWidget(
+              controller: controller,
+              itemCount: 2,
+              initialPage: index.value,
+              itemBuilder: (BuildContext context, int index, {int? realIndex}) {
+                Widget view = _buildEventFilterListView(context);
+                if (index == 1) {
+                  view = _buildEventFilterEditView(context);
+                }
+                return view;
+              },
+              onPageChanged: (int index,
+                  {PlatformSwiperDirection? direction,
+                  int? oldIndex,
+                  CarouselPageChangedReason? reason}) {
+                this.index.value = index;
+              },
+            );
+          }),
     );
   }
 }

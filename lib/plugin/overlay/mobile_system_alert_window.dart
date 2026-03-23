@@ -8,7 +8,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:system_alert_window/system_alert_window.dart';
 
 /// 系统overlay组件的发送端口的名称
@@ -20,7 +20,7 @@ class MobileSystemAlertHome extends StatelessWidget {
   final Widget disabled;
   final ReceivePort receivePort = ReceivePort();
   late final SendPort? sendPort;
-  final RxBool isShowingWindow = false.obs;
+  final ValueNotifier<bool> isShowingWindow = ValueNotifier<bool>(false);
   final Function(dynamic data)? onReceived;
 
   MobileSystemAlertHome({super.key, required this.disabled, this.onReceived}) {
@@ -116,11 +116,11 @@ class MobileSystemAlertHome extends StatelessWidget {
 /// 移动版的系统警告窗口的overlay部分
 /// 支持向主组件发送消息和接收消息
 class MobileSystemAlertOverlay extends StatelessWidget {
-  final Rx<Widget> enabled = Rx<Widget>(nilBox);
+  final ValueNotifier<Widget> enabled = ValueNotifier<Widget>(nilBox);
   late final SendPort? sendPort;
 
   //系统级窗口的形状
-  final Rx<BoxShape> boxShape = BoxShape.rectangle.obs;
+  final ValueNotifier<BoxShape> boxShape = ValueNotifier<BoxShape>(BoxShape.rectangle);
 
   MobileSystemAlertOverlay({super.key}) {
     _init();
@@ -159,7 +159,9 @@ class MobileSystemAlertOverlay extends StatelessWidget {
   }
 
   Widget _buildEnabledWidget(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: boxShape,
+        builder: (context, value, _) {
       return Container(
         decoration: BoxDecoration(
           shape: boxShape.value,

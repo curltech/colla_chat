@@ -22,7 +22,7 @@ import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:record/record.dart';
 
 ///发送文本消息的输入框和按钮，
@@ -56,10 +56,10 @@ class TextMessageInputWidget extends StatelessWidget {
     return platformAudioRecorder;
   }
 
-  final RxBool voiceVisible = true.obs;
-  final RxBool sendVisible = false.obs;
-  final RxBool moreVisible = false.obs;
-  final RxBool voiceRecording = false.obs;
+  final ValueNotifier<bool> voiceVisible = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> sendVisible = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> moreVisible = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> voiceRecording = ValueNotifier<bool>(false);
 
   ///停止录音，把录音数据作为消息发送
   Future<void> _onStop(String filename) async {
@@ -88,7 +88,8 @@ class TextMessageInputWidget extends StatelessWidget {
   }
 
   List<ActionData> _buildTransportTypeSendAction() {
-    Rx<TransportType> transportType = chatMessageController.transportType;
+    ValueNotifier<TransportType> transportType =
+        chatMessageController.transportType;
     final List<ActionData> transportTypeActions = [
       ActionData(
           label: TransportType.webrtc.name,
@@ -165,7 +166,7 @@ class TextMessageInputWidget extends StatelessWidget {
       if (transportType == null) {
         return null;
       }
-      chatMessageController.transportType(transportType);
+      chatMessageController.transportType.value=transportType;
       _send(context);
     }
   }
@@ -190,22 +191,22 @@ class TextMessageInputWidget extends StatelessWidget {
   }
 
   void onEmojiPressed() {
-    var height = chatMessageViewController.emojiMessageInputHeight;
+    var height = chatMessageViewController.emojiMessageInputHeight.value;
     if (height == 0.0) {
-      chatMessageViewController.emojiMessageInputHeight =
+      chatMessageViewController.emojiMessageInputHeight.value =
           ChatMessageViewController.defaultEmojiMessageInputHeight;
     } else {
-      chatMessageViewController.emojiMessageInputHeight = 0.0;
+      chatMessageViewController.emojiMessageInputHeight.value = 0.0;
     }
   }
 
   void onMorePressed() {
     var height = chatMessageViewController.moreMessageInputHeight;
     if (height == 0.0) {
-      chatMessageViewController.moreMessageInputHeight =
+      chatMessageViewController.moreMessageInputHeight.value =
           ChatMessageViewController.defaultMoreMessageInputHeight;
     } else {
-      chatMessageViewController.moreMessageInputHeight = 0.0;
+      chatMessageViewController.moreMessageInputHeight.value = 0.0;
     }
   }
 
@@ -248,7 +249,7 @@ class TextMessageInputWidget extends StatelessWidget {
 
   ///接收到加密短信
   Future<void> _onActionReceiveSms() async {
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    ChatSummary? chatSummary = chatMessageController.chatSummary.value;
     if (chatSummary == null) {
       return;
     }
@@ -318,8 +319,9 @@ class TextMessageInputWidget extends StatelessWidget {
           Container(
               margin: EdgeInsets.symmetric(
                   horizontal: iconInset, vertical: iconInset),
-              child: Obx(
-                () {
+              child: ValueListenableBuilder(
+                valueListenable: voiceVisible,
+                builder: (context, value, _) {
                   return IconButton(
                     // key: UniqueKey(),
                     // tooltip: voiceVisible.value
@@ -372,24 +374,27 @@ class TextMessageInputWidget extends StatelessWidget {
 
   ///语音录音按钮和文本输入框
   Widget _buildMessageInputWidget(BuildContext context) {
-    return Obx(() {
-      List<Widget> children = [
-        voiceVisible.value
-            ? extendedTextMessageInputWidget
-            : platformAudioRecorder
-      ];
-      Widget? parentWidget = MessageWidget.buildParentChatMessageWidget();
-      if (parentWidget != null) {
-        children.add(const SizedBox(
-          height: 2,
-        ));
-        children.add(parentWidget);
-      }
-      return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 2.0),
-          alignment: Alignment.center,
-          child: Column(children: children));
-    });
+    return ValueListenableBuilder(
+        valueListenable: voiceVisible,
+        builder: (context, value, _) {
+          List<Widget> children = [
+            voiceVisible.value
+                ? extendedTextMessageInputWidget
+                : platformAudioRecorder
+          ];
+          Widget? parentWidget = MessageWidget.buildParentChatMessageWidget();
+          if (parentWidget != null) {
+            children.add(const SizedBox(
+              height: 2,
+            ));
+            children.add(parentWidget);
+          }
+          return Container(
+              margin:
+                  const EdgeInsets.symmetric(horizontal: 0.0, vertical: 2.0),
+              alignment: Alignment.center,
+              child: Column(children: children));
+        });
   }
 
   @override

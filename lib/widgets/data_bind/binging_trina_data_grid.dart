@@ -7,7 +7,6 @@ import 'package:colla_chat/tool/number_util.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:trina_grid/trina_grid.dart';
 
 class BindingTrinaDataGrid<T> extends StatelessWidget {
@@ -122,7 +121,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
 
   /// 过滤条件的多项选择框的行数据
   List<TrinaRow> _buildDataRows() {
-    List data = controller.data;
+    List data = controller.data.value;
     List<TrinaRow> rows = [];
     for (int index = 0; index < data.length; ++index) {
       dynamic d = data[index];
@@ -261,88 +260,91 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
 
   /// 过滤条件的多项选择框的表
   Widget _buildDataTable(BuildContext context) {
-    return Obx(() {
-      List<TrinaRow<dynamic>> rows = _buildDataRows();
-      return TrinaGrid(
-        key: UniqueKey(),
-        mode: TrinaGridMode.normal,
-        configuration: _buildTrinaGridConfiguration(context),
-        columns: _buildDataColumns(),
-        rows: rows,
-        onLoaded: (TrinaGridOnLoadedEvent event) {},
-        onChanged: (TrinaGridOnChangedEvent event) {
-          dynamic value = event.row.data;
-          int? index = event.row.sortIdx;
-          var fn = onChanged;
-          if (fn != null) {
-            fn(index, value);
-          }
-        },
-        rowWrapper: (context, rowWidget, rowData, stateManager) {
-          return InkWell(
-            onLongPress: () {
-              dynamic value = stateManager.currentRow?.data;
-              int? index = stateManager.currentRow?.sortIdx;
-              var fn = onLongPress;
-              if (fn != null && index != null) {
+    return ListenableBuilder(
+        listenable:
+        controller.listenable,
+        builder: (context, _) {
+          List<TrinaRow<dynamic>> rows = _buildDataRows();
+          return TrinaGrid(
+            key: UniqueKey(),
+            mode: TrinaGridMode.normal,
+            configuration: _buildTrinaGridConfiguration(context),
+            columns: _buildDataColumns(),
+            rows: rows,
+            onLoaded: (TrinaGridOnLoadedEvent event) {},
+            onChanged: (TrinaGridOnChangedEvent event) {
+              dynamic value = event.row.data;
+              int? index = event.row.sortIdx;
+              var fn = onChanged;
+              if (fn != null) {
                 fn(index, value);
               }
             },
-            child: rowWidget,
-          );
-        },
-        onSelected: (TrinaGridOnSelectedEvent event) {
-          List<dynamic> data = [];
-          List<TrinaRow<dynamic>>? selectedRows = event.selectedRows;
-          if (selectedRows != null && selectedRows.isNotEmpty) {
-            for (var row in selectedRows) {
-              dynamic d = row.data;
-              if (d != null) {
-                data.add(d);
+            rowWrapper: (context, rowWidget, rowData, stateManager) {
+              return InkWell(
+                onLongPress: () {
+                  dynamic value = stateManager.currentRow?.data;
+                  int? index = stateManager.currentRow?.sortIdx;
+                  var fn = onLongPress;
+                  if (fn != null && index != null) {
+                    fn(index, value);
+                  }
+                },
+                child: rowWidget,
+              );
+            },
+            onSelected: (TrinaGridOnSelectedEvent event) {
+              List<dynamic> data = [];
+              List<TrinaRow<dynamic>>? selectedRows = event.selectedRows;
+              if (selectedRows != null && selectedRows.isNotEmpty) {
+                for (var row in selectedRows) {
+                  dynamic d = row.data;
+                  if (d != null) {
+                    data.add(d);
+                  }
+                }
+              } else {
+                dynamic d = event.row?.data;
+                if (d != null) {
+                  data.add(d);
+                }
               }
-            }
-          } else {
-            dynamic d = event.row?.data;
-            if (d != null) {
-              data.add(d);
-            }
-          }
-          int? index = event.row?.sortIdx;
-          controller.setCurrentIndex = index;
-          var fn = onSelected;
-          if (fn != null && index != null) {
-            fn(index, data);
-          }
-        },
-        onRowChecked: (TrinaGridOnRowCheckedEvent event) {
-          dynamic value = event.row?.data;
-          int? index = event.row?.sortIdx;
-          bool? isChecked = event.isChecked;
-          if (value != null) {
-            EntityUtil.setChecked(value, isChecked);
-          } else {
-            for (var value in controller.data) {
-              EntityUtil.setChecked(value, isChecked);
-            }
-          }
-          var fn = onRowChecked;
-          if (fn != null && index != null) {
-            fn(index, isChecked!);
-          }
-        },
-        onRowDoubleTap: (TrinaGridOnRowDoubleTapEvent event) {
-          int index = event.row.sortIdx;
-          controller.setCurrentIndex = index;
-          var fn = onDoubleTap;
-          if (fn != null) {
-            fn(index);
-          }
-        },
-        onRowSecondaryTap: (TrinaGridOnRowSecondaryTapEvent event) {},
-        onRowsMoved: (TrinaGridOnRowsMovedEvent event) {},
-        columnMenuDelegate: TrinaColumnMenuDelegateDefault(),
-      ).asStyle();
-    });
+              int? index = event.row?.sortIdx;
+              controller.setCurrentIndex = index;
+              var fn = onSelected;
+              if (fn != null && index != null) {
+                fn(index, data);
+              }
+            },
+            onRowChecked: (TrinaGridOnRowCheckedEvent event) {
+              dynamic value = event.row?.data;
+              int? index = event.row?.sortIdx;
+              bool? isChecked = event.isChecked;
+              if (value != null) {
+                EntityUtil.setChecked(value, isChecked);
+              } else {
+                for (var value in controller.data.value) {
+                  EntityUtil.setChecked(value, isChecked);
+                }
+              }
+              var fn = onRowChecked;
+              if (fn != null && index != null) {
+                fn(index, isChecked!);
+              }
+            },
+            onRowDoubleTap: (TrinaGridOnRowDoubleTapEvent event) {
+              int index = event.row.sortIdx;
+              controller.setCurrentIndex = index;
+              var fn = onDoubleTap;
+              if (fn != null) {
+                fn(index);
+              }
+            },
+            onRowSecondaryTap: (TrinaGridOnRowSecondaryTapEvent event) {},
+            onRowsMoved: (TrinaGridOnRowsMovedEvent event) {},
+            columnMenuDelegate: TrinaColumnMenuDelegateDefault(),
+          ).asStyle();
+        });
   }
 
   @override

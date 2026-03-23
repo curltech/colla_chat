@@ -17,7 +17,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 ///面对面建群
 class FaceGroupAddWidget extends StatelessWidget with DataTileMixin {
@@ -26,11 +26,13 @@ class FaceGroupAddWidget extends StatelessWidget with DataTileMixin {
   late final Widget dataListView;
 
   FaceGroupAddWidget({super.key}) {
-    dataListView = Obx(() {
+    dataListView = ValueListenableBuilder(
+        valueListenable: controller.currentIndex,
+        builder: (context, value, _) {
       return DataListView(
         itemCount: controller.length,
         itemBuilder: (BuildContext context, int index) {
-          return controller.data[index];
+          return controller.data.value[index];
         },
       );
     });

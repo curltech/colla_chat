@@ -10,10 +10,11 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
+
 
 class RoomPool {
-  final RxMap<String, Room> rooms = <String, Room>{}.obs;
+  final ValueNotifier<Map<String, Room>> rooms = ValueNotifier<Map<String, Room>>({});
 
   StreamController<RoomEvent> roomEventStreamController =
       StreamController<RoomEvent>.broadcast();
@@ -23,7 +24,7 @@ class RoomPool {
   Future<Room> _createRoom(String name, List<String> peerIds) async {
     Room room = Room(name, peerIds: peerIds);
     await room.init();
-    rooms[name] = room;
+    rooms.value[name] = room;
 
     return room;
   }
@@ -31,7 +32,7 @@ class RoomPool {
   Future<void> send(ChatMessage chatMessage) async {}
 
   Room? get(String name) {
-    return rooms[name];
+    return rooms.value[name];
   }
 
   /// 完成后把room事件分发到其他参与者
@@ -83,8 +84,8 @@ class RoomPool {
         var json = JsonUtil.toJson(content);
         Room room = Room.fromJson(json);
         await room.init();
-        if (!rooms.containsKey(room.name)) {
-          rooms[room.name] = room;
+        if (!rooms.value.containsKey(room.name)) {
+          rooms.value[room.name] = room;
           roomController.room.value = room;
         }
         returnValue = room;

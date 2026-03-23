@@ -88,7 +88,7 @@ class DirectoryWidget extends StatelessWidget {
       String name = p.join(path, content);
       Directory directory = Directory(name);
       directory.createSync();
-      folderNode.children.add(FolderNode(
+      folderNode.children.value.add(FolderNode(
           Folder(PathUtil.basename(directory.path), directory: directory)));
     }
   }
@@ -107,7 +107,7 @@ class DirectoryWidget extends StatelessWidget {
         content: 'Do you confirm delete folder:${folder.name}?');
     if (confirm != null && confirm) {
       Directory directory = folder.directory;
-      folderNode.parent?.children.remove(folderNode);
+      folderNode.parent?.children.value.remove(folderNode);
       directory.deleteSync(recursive: true);
     }
   }
@@ -141,7 +141,7 @@ class DirectoryWidget extends StatelessWidget {
   }
 
   void _onToggleNodeExpansion(FolderNode node) {
-    if (node.children.isEmpty) {
+    if (node.children.value.isEmpty) {
       try {
         directoryController.findDirectory(node);
       } catch (e) {

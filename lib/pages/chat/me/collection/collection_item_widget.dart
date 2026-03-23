@@ -9,7 +9,7 @@ import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 class CollectionItemWidget extends StatelessWidget with DataTileMixin {
   CollectionItemWidget({super.key});
@@ -29,7 +29,7 @@ class CollectionItemWidget extends StatelessWidget with DataTileMixin {
   PlatformCarouselController controller = PlatformCarouselController();
 
   Future<Widget> _buildMessageWidget(BuildContext context, int index) async {
-    ChatMessage chatMessage = collectionChatMessageController.data[index];
+    ChatMessage chatMessage = collectionChatMessageController.data.value[index];
     Widget child;
     MessageWidget messageWidget =
         MessageWidget(chatMessage, index, fullScreen: true);
@@ -39,7 +39,9 @@ class CollectionItemWidget extends StatelessWidget with DataTileMixin {
   }
 
   Widget _buildTitleWidget() {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: collectionChatMessageController.currentIndex,
+        builder: (context, value, _) {
       ChatMessage? chatMessage = collectionChatMessageController.current;
       var title = AppLocalizations.t(this.title);
       if (chatMessage != null && chatMessage.title != null) {

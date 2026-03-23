@@ -16,7 +16,7 @@ import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:reactive_forms/reactive_forms.dart';
 
 ///自选股和分组的查询界面
@@ -42,7 +42,7 @@ class QPerformanceWidget extends StatelessWidget with DataTileMixin {
   final ExpansibleController expansibleController = ExpansibleController();
   final DataListController<QPerformance> qperformanceController =
       DataListController<QPerformance>();
-  final RxBool showLoading = false.obs;
+  final ValueNotifier<bool> showLoading = ValueNotifier<bool>(false);
 
   void _init() {
     searchDataField = [
@@ -391,7 +391,9 @@ class QPerformanceWidget extends StatelessWidget with DataTileMixin {
         controller: qperformanceController);
     return Stack(children: <Widget>[
       table,
-      Obx(() {
+      ValueListenableBuilder(
+        valueListenable: showLoading,
+        builder: (context, value, _) {
         if (showLoading.value) {
           return Container(
             width: double.infinity,

@@ -11,9 +11,10 @@ import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:get/get.dart';
+
 import 'package:visibility_detector/visibility_detector.dart';
 
 class LocalMediaStreamWidget extends StatelessWidget with DataTileMixin {
@@ -29,68 +30,84 @@ class LocalMediaStreamWidget extends StatelessWidget with DataTileMixin {
   @override
   String get title => 'LocalMediaStream';
 
-  
-
   LocalMediaStreamWidget({super.key}) {
     videoRenderer.initialize();
     MediaStreamUtil.enumerateDevices()
         .then((List<MediaDeviceInfo> mediaDevices) {
-      audioOutputDevices.assignAll(
-          mediaDevices.where((device) => device.kind == 'audiooutput'));
-      audioInputDevices.assignAll(
-          mediaDevices.where((device) => device.kind == 'audiointput'));
-      videoOutputDevices.assignAll(
-          mediaDevices.where((device) => device.kind == 'videooutput'));
-      videoInputDevices.assignAll(
-          mediaDevices.where((device) => device.kind == 'videoinput'));
+      audioOutputDevices.value = [
+        ...mediaDevices.where((device) => device.kind == 'audiooutput')
+      ];
+      audioInputDevices.value = [
+        ...mediaDevices.where((device) => device.kind == 'audiointput')
+      ];
+      videoOutputDevices.value = [
+        ...mediaDevices.where((device) => device.kind == 'videooutput')
+      ];
+      videoInputDevices.value = [
+        ...mediaDevices.where((device) => device.kind == 'videoinput')
+      ];
     });
 
     MediaStreamUtil.onDeviceChange((List<MediaDeviceInfo> mediaDevices) {
-      audioOutputDevices.assignAll(
-          mediaDevices.where((device) => device.kind == 'audiooutput'));
-      audioInputDevices.assignAll(
-          mediaDevices.where((device) => device.kind == 'audiointput'));
-      videoOutputDevices.assignAll(
-          mediaDevices.where((device) => device.kind == 'videooutput'));
-      videoInputDevices.assignAll(
-          mediaDevices.where((device) => device.kind == 'videoinput'));
+      audioOutputDevices.value = [
+        ...mediaDevices.where((device) => device.kind == 'audiooutput')
+      ];
+      audioInputDevices.value = [
+        ...mediaDevices.where((device) => device.kind == 'audiointput')
+      ];
+      videoOutputDevices.value = [
+        ...mediaDevices.where((device) => device.kind == 'videooutput')
+      ];
+      videoInputDevices.value = [
+        ...mediaDevices.where((device) => device.kind == 'videoinput')
+      ];
     });
   }
 
-  final RxList<MediaDeviceInfo> audioOutputDevices = <MediaDeviceInfo>[].obs;
-  final RxList<MediaDeviceInfo> audioInputDevices = <MediaDeviceInfo>[].obs;
-  final RxList<MediaDeviceInfo> videoOutputDevices = <MediaDeviceInfo>[].obs;
-  final RxList<MediaDeviceInfo> videoInputDevices = <MediaDeviceInfo>[].obs;
+  final ValueNotifier<List<MediaDeviceInfo>> audioOutputDevices =
+      ValueNotifier<List<MediaDeviceInfo>>([]);
+  final ValueNotifier<List<MediaDeviceInfo>> audioInputDevices =
+      ValueNotifier<List<MediaDeviceInfo>>([]);
+  final ValueNotifier<List<MediaDeviceInfo>> videoOutputDevices =
+      ValueNotifier<List<MediaDeviceInfo>>([]);
+  final ValueNotifier<List<MediaDeviceInfo>> videoInputDevices =
+      ValueNotifier<List<MediaDeviceInfo>>([]);
 
   final videoRenderer = RTCVideoRenderer();
 
-  final Rx<MediaStream?> mediaStream = Rx<MediaStream?>(null);
+  final ValueNotifier<MediaStream?> mediaStream =
+      ValueNotifier<MediaStream?>(null);
 
   //呼叫状态
-  final RxBool callStatus = false.obs;
+  final ValueNotifier<bool> callStatus = ValueNotifier<bool>(false);
 
-  final RxBool displayStatus = false.obs;
+  final ValueNotifier<bool> displayStatus = ValueNotifier<bool>(false);
 
-  final RxBool torchOn = false.obs;
+  final ValueNotifier<bool> torchOn = ValueNotifier<bool>(false);
 
-  final RxBool speakerOn = false.obs;
+  final ValueNotifier<bool> speakerOn = ValueNotifier<bool>(false);
 
-  final RxBool mute = false.obs;
+  final ValueNotifier<bool> mute = ValueNotifier<bool>(false);
 
-  final RxDouble volume = 1.0.obs;
+  final ValueNotifier<double> volume = ValueNotifier<double>(1);
 
-  final Rx<MediaRecorder?> mediaRecorder = Rx<MediaRecorder?>(null);
+  final ValueNotifier<MediaRecorder?> mediaRecorder =
+      ValueNotifier<MediaRecorder?>(null);
 
-  final RxInt selectedVideoFps = 30.obs;
+  final ValueNotifier<int> selectedVideoFps = ValueNotifier<int>(0);
 
-  final RxDouble selectedVideoWidth = 1280.0.obs;
+  final ValueNotifier<double> selectedVideoWidth = ValueNotifier<double>(1280);
 
-  final RxDouble selectedVideoHeight = 720.0.obs;
+  final ValueNotifier<double> selectedVideoHeight = ValueNotifier<double>(720);
 
-  final Rx<String?> selectedAudioInputDevice = Rx<String?>(null);
-  final Rx<String?> selectedAudioOutputDevice = Rx<String?>(null);
-  final Rx<String?> selectedVideoInputDevice = Rx<String?>(null);
-  final Rx<String?> selectedVideoOutputDevice = Rx<String?>(null);
+  final ValueNotifier<String?> selectedAudioInputDevice =
+      ValueNotifier<String?>(null);
+  final ValueNotifier<String?> selectedAudioOutputDevice =
+      ValueNotifier<String?>(null);
+  final ValueNotifier<String?> selectedVideoInputDevice =
+      ValueNotifier<String?>(null);
+  final ValueNotifier<String?> selectedVideoOutputDevice =
+      ValueNotifier<String?>(null);
 
   List<ActionData> _buildVideoActionData() {
     List<ActionData> actionData = [];
@@ -710,64 +727,66 @@ class LocalMediaStreamWidget extends StatelessWidget with DataTileMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      List<Widget>? rightWidgets = [];
-      if (callStatus.value || displayStatus.value) {
-        rightWidgets.add(IconButton(
-            tooltip: AppLocalizations.t('Hang up'),
-            onPressed: () {
-              _hangUp();
-            },
-            icon: const Icon(Icons.call_end)));
-      } else {
-        rightWidgets.add(IconButton(
-            tooltip: AppLocalizations.t('Make call'),
-            onPressed: () {
-              _makeCall();
-            },
-            icon: const Icon(Icons.phone)));
-        rightWidgets.add(IconButton(
-            tooltip: AppLocalizations.t('Make display'),
-            onPressed: () {
-              _makeDisplay(context);
-            },
-            icon: const Icon(Icons.monitor_outlined)));
-      }
-      rightWidgets.add(IconButton(
-          tooltip: AppLocalizations.t('Video setting'),
-          onPressed: () {
-            _showVideoSetting(context);
-          },
-          icon: const Icon(Icons.display_settings_outlined)));
+    return ListenableBuilder(
+        listenable: Listenable.merge([callStatus, displayStatus]),
+        builder: (context, _) {
+          List<Widget>? rightWidgets = [];
+          if (callStatus.value || displayStatus.value) {
+            rightWidgets.add(IconButton(
+                tooltip: AppLocalizations.t('Hang up'),
+                onPressed: () {
+                  _hangUp();
+                },
+                icon: const Icon(Icons.call_end)));
+          } else {
+            rightWidgets.add(IconButton(
+                tooltip: AppLocalizations.t('Make call'),
+                onPressed: () {
+                  _makeCall();
+                },
+                icon: const Icon(Icons.phone)));
+            rightWidgets.add(IconButton(
+                tooltip: AppLocalizations.t('Make display'),
+                onPressed: () {
+                  _makeDisplay(context);
+                },
+                icon: const Icon(Icons.monitor_outlined)));
+          }
+          rightWidgets.add(IconButton(
+              tooltip: AppLocalizations.t('Video setting'),
+              onPressed: () {
+                _showVideoSetting(context);
+              },
+              icon: const Icon(Icons.display_settings_outlined)));
 
-      var appBarView = AppBarView(
-          title: title,
-          helpPath: routeName,
-          withLeading: withLeading,
-          rightWidgets: rightWidgets,
-          child: GestureDetector(onLongPress: () {
-            _showVideoActionCard(context);
-          }, child: OrientationBuilder(
-            builder: (context, orientation) {
-              return Center(
-                  child: Container(
-                margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                decoration: const BoxDecoration(color: Colors.black),
-                child: VisibilityDetector(
-                  key: ObjectKey(videoRenderer),
-                  onVisibilityChanged: (VisibilityInfo info) {
-                    if (info.visibleFraction == 0) {
-                      _stopRecording();
-                      _hangUp();
-                    }
-                  },
-                  child: RTCVideoView(videoRenderer, mirror: false),
-                ),
-              ));
-            },
-          )));
+          var appBarView = AppBarView(
+              title: title,
+              helpPath: routeName,
+              withLeading: withLeading,
+              rightWidgets: rightWidgets,
+              child: GestureDetector(onLongPress: () {
+                _showVideoActionCard(context);
+              }, child: OrientationBuilder(
+                builder: (context, orientation) {
+                  return Center(
+                      child: Container(
+                    margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                    decoration: const BoxDecoration(color: Colors.black),
+                    child: VisibilityDetector(
+                      key: ObjectKey(videoRenderer),
+                      onVisibilityChanged: (VisibilityInfo info) {
+                        if (info.visibleFraction == 0) {
+                          _stopRecording();
+                          _hangUp();
+                        }
+                      },
+                      child: RTCVideoView(videoRenderer, mirror: false),
+                    ),
+                  ));
+                },
+              )));
 
-      return appBarView;
-    });
+          return appBarView;
+        });
   }
 }

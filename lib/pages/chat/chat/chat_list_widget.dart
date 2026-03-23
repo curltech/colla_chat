@@ -40,7 +40,7 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/webview/html_preview_widget.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 ///好友的汇总控制器，每当消息汇总表的数据有变化时更新控制器
 class LinkmanChatSummaryController extends DataListController<ChatSummary> {
@@ -118,8 +118,8 @@ class ChatListWidget extends StatefulWidget with DataTileMixin {
 class _ChatListWidgetState extends State<ChatListWidget>
     with SingleTickerProviderStateMixin {
   StreamSubscription<SocketStatus>? _socketStatusStreamSubscription;
-  final Rx<SocketStatus> _socketStatus =
-      Rx<SocketStatus>(SocketStatus.disconnected);
+  final ValueNotifier<SocketStatus> _socketStatus =
+      ValueNotifier<SocketStatus>(SocketStatus.disconnected);
   late final TabController _tabController =
       TabController(length: 3, vsync: this);
 
@@ -170,7 +170,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
   }
 
   void _updateConnectivity() {
-    List<ConnectivityResult> result = connectivityController.connectivityResult;
+    List<ConnectivityResult> result = connectivityController.connectivityResult.value;
     if (result.contains(ConnectivityResult.none)) {
     } else {
       _reconnect();
@@ -299,7 +299,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
   }
 
   Future<List<DataTile>> _buildLinkmanTileData() async {
-    RxList<ChatSummary> linkmenChatSummary = linkmanChatSummaryController.data;
+    List<ChatSummary> linkmenChatSummary = linkmanChatSummaryController.data.value;
     List<DataTile> tiles = [];
     if (linkmenChatSummary.isNotEmpty) {
       for (var chatSummary in linkmenChatSummary) {
@@ -371,10 +371,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
           chatSummaryController.setCurrentIndex = index;
           ChatSummary? current = chatSummaryController.current;
           if (linkman?.linkmanStatus == LinkmanStatus.G.name) {
-            llmChatMessageController.chatSummary = current;
+            llmChatMessageController.chatSummary.value = current;
             indexWidgetProvider.push('llm_chat_message');
           } else {
-            chatMessageController.chatSummary = current;
+            chatMessageController.chatSummary.value = current;
             indexWidgetProvider.push('chat_message');
           }
         });
@@ -401,7 +401,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
   }
 
   Future<List<DataTile>> _buildGroupTileData() async {
-    RxList<ChatSummary> groupChatSummary = groupChatSummaryController.data;
+    List<ChatSummary> groupChatSummary = groupChatSummaryController.data.value;
     List<DataTile> tiles = [];
     if (groupChatSummary.isNotEmpty) {
       for (var chatSummary in groupChatSummary) {
@@ -434,8 +434,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
   }
 
   Future<List<DataTile>> _buildConferenceTileData() async {
-    RxList<ChatSummary> conferenceChatSummary =
-        conferenceChatSummaryController.data;
+    List<ChatSummary> conferenceChatSummary =
+        conferenceChatSummaryController.data.value;
     List<DataTile> tiles = [];
     if (conferenceChatSummary.isNotEmpty) {
       for (var chatSummary in conferenceChatSummary) {
@@ -537,7 +537,9 @@ class _ChatListWidgetState extends State<ChatListWidget>
           );
         });
 
-    Widget linkmanView = Obx(() {
+    Widget linkmanView = ValueListenableBuilder(
+        valueListenable: linkmanChatSummaryController.currentIndex,
+        builder: (context, value, _) {
       return PlatformFutureBuilder(
         future: _buildLinkmanTileData(),
         builder: (BuildContext context, List<DataTile> tiles) {
@@ -551,7 +553,9 @@ class _ChatListWidgetState extends State<ChatListWidget>
       );
     });
 
-    Widget groupView = Obx(() {
+    Widget groupView = ValueListenableBuilder(
+        valueListenable: groupChatSummaryController.currentIndex,
+        builder: (context, value, _) {
       return PlatformFutureBuilder(
           future: _buildGroupTileData(),
           builder: (BuildContext context, List<DataTile> tiles) {
@@ -563,7 +567,9 @@ class _ChatListWidgetState extends State<ChatListWidget>
             );
           });
     });
-    Widget conferenceView = Obx(() {
+    Widget conferenceView = ValueListenableBuilder(
+        valueListenable: conferenceChatSummaryController.currentIndex,
+        builder: (context, value, _) {
       return PlatformFutureBuilder(
           future: _buildConferenceTileData(),
           builder: (BuildContext context, List<DataTile> tiles) {
@@ -589,7 +595,9 @@ class _ChatListWidgetState extends State<ChatListWidget>
   Widget build(BuildContext context) {
     String title = AppLocalizations.t(widget.title);
     List<Widget> rightWidgets = [];
-    var connectivityWidget = Obx(() {
+    var connectivityWidget = ValueListenableBuilder(
+        valueListenable: connectivityController.connectivityResult,
+        builder: (context, value, _) {
       ConnectivityResult connectivityResult = ConnectivityUtil.getMainResult(
           connectivityController.connectivityResult.value);
       return Tooltip(
@@ -613,7 +621,9 @@ class _ChatListWidgetState extends State<ChatListWidget>
       width: 10.0,
     ));
 
-    var wssWidget = Obx(() {
+    var wssWidget = ValueListenableBuilder(
+        valueListenable: _socketStatus,
+        builder: (context, value, _) {
       String address = AppLocalizations.t('Websocket status');
       WebSocketChannel? websocket = websocketPool.getDefault();
       if (websocket != null) {

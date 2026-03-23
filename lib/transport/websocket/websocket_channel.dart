@@ -10,7 +10,6 @@ import 'package:colla_chat/tool/connectivity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:web_socket_channel/web_socket_channel.dart'
     as web_socket_channel;
@@ -18,9 +17,9 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 class ConnectivityController {
   late StreamSubscription<List<ConnectivityResult>> subscription;
-  final RxList<ConnectivityResult> connectivityResult =
-      <ConnectivityResult>[].obs;
-  final RxBool connected = false.obs;
+  final ValueNotifier<List<ConnectivityResult>> connectivityResult =
+      ValueNotifier<List<ConnectivityResult>>([]);
+  final ValueNotifier<bool> connected = ValueNotifier<bool>(false);
 
   ConnectivityController() {
     subscription =
@@ -28,13 +27,13 @@ class ConnectivityController {
   }
 
   void _onConnectivityChanged(List<ConnectivityResult> result) {
-    connectivityResult(result);
+    connectivityResult.value = result;
     if (ConnectivityUtil.getMainResult(
-            connectivityController.connectivityResult) !=
+            connectivityController.connectivityResult.value) !=
         ConnectivityResult.none) {
-      connected(true);
+      connected.value = true;
     } else {
-      connected(false);
+      connected.value = false;
     }
   }
 

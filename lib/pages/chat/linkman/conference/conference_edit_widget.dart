@@ -29,9 +29,9 @@ import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:colla_chat/widgets/qrcode_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-Rx<Conference?> conferenceNotifier = Rx<Conference?>(null);
+ValueNotifier<Conference?> conferenceNotifier =
+    ValueNotifier<Conference?>(null);
 
 ///创建和修改群，填写群的基本信息，选择群成员和群主
 class ConferenceEditWidget extends StatelessWidget with DataTileMixin {
@@ -136,7 +136,8 @@ class ConferenceEditWidget extends StatelessWidget with DataTileMixin {
   final OptionController conferenceOwnerController = OptionController();
 
   //选择的会议成员
-  final RxList<String> conferenceMembers = RxList<String>([]);
+  final ValueNotifier<List<String>> conferenceMembers =
+      ValueNotifier<List<String>>([]);
 
   Conference _initConference() {
     Conference? current = conferenceNotifier.value;
@@ -213,22 +214,24 @@ class ConferenceEditWidget extends StatelessWidget with DataTileMixin {
 
   //会议成员显示和编辑界面，从所有的联系人中选择会议成员
   Widget _buildConferenceMembersWidget(BuildContext context) {
-    var selector = Obx(() {
-      return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 0.0),
-          child: LinkmanGroupSearchWidget(
-            key: UniqueKey(),
-            selectType: SelectType.chipMultiSelectField,
-            onSelected: (List<String>? selected) async {
-              if (selected != null) {
-                conferenceMembers.value = selected;
-                await _buildConferenceOwnerOptions();
-              }
-            },
-            selected: conferenceMembers.value,
-            includeGroup: false,
-          ));
-    });
+    var selector = ValueListenableBuilder(
+        valueListenable: conferenceMembers,
+        builder: (context, value, _) {
+          return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 0.0),
+              child: LinkmanGroupSearchWidget(
+                key: UniqueKey(),
+                selectType: SelectType.chipMultiSelectField,
+                onSelected: (List<String>? selected) async {
+                  if (selected != null) {
+                    conferenceMembers.value = selected;
+                    await _buildConferenceOwnerOptions();
+                  }
+                },
+                selected: conferenceMembers.value,
+                includeGroup: false,
+              ));
+        });
 
     return selector;
   }
@@ -348,44 +351,46 @@ class ConferenceEditWidget extends StatelessWidget with DataTileMixin {
     ];
     ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
-    var formInputWidget = Obx(() {
-      var conference = conferenceNotifier.value;
-      if (conference == null) {
-        return nilBox;
-      }
-      platformReactiveFormController.values = JsonUtil.toJson(conference);
-      List<FormButton> formButtons = [
-        FormButton(
-            label: 'Ok',
-            onTap: (Map<String, dynamic> values) async {
-              Conference? conference = await _onOk(context, values);
-              if (conference != null) {
-                DialogUtil.info(
-                    content: AppLocalizations.t('Built conference ') +
-                        conference.name);
-              }
-            })
-      ];
-      if (conference.conferenceOwnerPeerId == myself.peerId) {
-        formButtons.add(FormButton(
-            label: 'Qrcode',
-            onTap: (Map<String, dynamic> values) async {
-              await _qrcode(context);
-            }));
-        formButtons.add(FormButton(
-          onTap: (Map<String, dynamic> values) {
-            _resend(context);
-          },
-          label: AppLocalizations.t('Resend'),
-        ));
-      }
-      return PlatformReactiveForm(
-        spacing: 5.0,
-        height: appDataProvider.portraitSize.height * 0.6,
-        platformReactiveFormController: platformReactiveFormController,
-        formButtons: formButtons,
-      );
-    });
+    var formInputWidget = ValueListenableBuilder(
+        valueListenable: conferenceNotifier,
+        builder: (context, value, _) {
+          var conference = conferenceNotifier.value;
+          if (conference == null) {
+            return nilBox;
+          }
+          platformReactiveFormController.values = JsonUtil.toJson(conference);
+          List<FormButton> formButtons = [
+            FormButton(
+                label: 'Ok',
+                onTap: (Map<String, dynamic> values) async {
+                  Conference? conference = await _onOk(context, values);
+                  if (conference != null) {
+                    DialogUtil.info(
+                        content: AppLocalizations.t('Built conference ') +
+                            conference.name);
+                  }
+                })
+          ];
+          if (conference.conferenceOwnerPeerId == myself.peerId) {
+            formButtons.add(FormButton(
+                label: 'Qrcode',
+                onTap: (Map<String, dynamic> values) async {
+                  await _qrcode(context);
+                }));
+            formButtons.add(FormButton(
+              onTap: (Map<String, dynamic> values) {
+                _resend(context);
+              },
+              label: AppLocalizations.t('Resend'),
+            ));
+          }
+          return PlatformReactiveForm(
+            spacing: 5.0,
+            height: appDataProvider.portraitSize.height * 0.6,
+            platformReactiveFormController: platformReactiveFormController,
+            formButtons: formButtons,
+          );
+        });
     children.add(formInputWidget);
 
     return Container(

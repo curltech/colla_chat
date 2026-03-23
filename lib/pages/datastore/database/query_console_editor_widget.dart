@@ -12,7 +12,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_highlight/themes/idea.dart';
-import 'package:get/get.dart';
+
 import 'package:highlight/languages/sql.dart';
 
 final codeController = CodeController(
@@ -55,8 +55,10 @@ class QueryConsoleEditorWidget extends StatelessWidget with DataTileMixin {
   final QueryResultController queryResultController = QueryResultController();
 
   Widget _buildQueryResultListView(BuildContext context) {
-    return Obx(() {
-      Map<String, dynamic>? data = queryResultController.data.firstOrNull;
+    return ValueListenableBuilder(
+        valueListenable: queryResultController.currentIndex,
+        builder: (context, value, _) {
+      Map<String, dynamic>? data = queryResultController.data.value.firstOrNull;
       if (data == null) {
         return Center(child: Text('No data'));
       }

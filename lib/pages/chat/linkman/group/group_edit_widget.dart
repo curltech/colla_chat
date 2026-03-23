@@ -27,9 +27,9 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-final Rx<Group?> groupNotifier = Rx<Group?>(null);
+
+final ValueNotifier<Group?> groupNotifier = ValueNotifier<Group?>(null);
 
 ///创建和修改群，填写群的基本信息，选择群成员和群主
 class GroupEditWidget extends StatelessWidget with DataTileMixin {
@@ -77,10 +77,10 @@ class GroupEditWidget extends StatelessWidget with DataTileMixin {
   final OptionController groupOwnerController = OptionController();
 
   //已经选择的群成员
-  final RxList<String> groupMembers = RxList<String>([]);
+  final ValueNotifier<List<String>> groupMembers = ValueNotifier<List<String>>([]);
 
   //当前群的头像
-  final Rx<String?> groupAvatar = Rx<String?>(null);
+  final ValueNotifier<String?> groupAvatar = ValueNotifier<String?>(null);
 
   void _initGroup() {
     Group? current = groupNotifier.value;
@@ -150,7 +150,9 @@ class GroupEditWidget extends StatelessWidget with DataTileMixin {
 
   //群成员显示和编辑界面
   Widget _buildGroupMembersWidget(BuildContext context) {
-    var selector = Obx(() {
+    var selector = ValueListenableBuilder(
+        valueListenable: groupMembers,
+        builder: (context, value, _) {
       return Container(
           padding: const EdgeInsets.symmetric(horizontal: 0.0),
           child: LinkmanGroupSearchWidget(
@@ -216,7 +218,9 @@ class GroupEditWidget extends StatelessWidget with DataTileMixin {
   }
 
   Widget _buildAvatarWidget(BuildContext context) {
-    var avatarWidget = Obx(() {
+    var avatarWidget = ValueListenableBuilder(
+        valueListenable: groupNotifier,
+        builder: (context, value, _) {
       Group? current = groupNotifier.value;
       if (current == null) {
         return nilBox;

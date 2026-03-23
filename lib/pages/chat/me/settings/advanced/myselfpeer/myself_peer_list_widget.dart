@@ -26,7 +26,7 @@ class MyselfPeerListWidget extends StatelessWidget with DataTileMixin {
 
   List<DataTile> _buildMyselfPeerTileData() {
     List<DataTile> tiles = [];
-    List<MyselfPeer> myselfPeers = myselfPeerController.data;
+    List<MyselfPeer> myselfPeers = myselfPeerController.data.value;
     if (myselfPeers.isNotEmpty) {
       int i = 0;
       for (var myselfPeer in myselfPeers) {

@@ -37,7 +37,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 import 'package:screenshot_callback/screenshot_callback.dart';
@@ -79,11 +79,11 @@ class ChatMessageView extends StatelessWidget
   @override
   String get title => 'ChatMessage';
 
-  final Rx<RTCPeerConnectionState?> _peerConnectionState =
-      Rx<RTCPeerConnectionState?>(null);
-  final Rx<RTCDataChannelState?> _dataChannelState =
-      Rx<RTCDataChannelState?>(null);
-  final Rx<bool?> _initiator = Rx<bool?>(null);
+  final ValueNotifier<RTCPeerConnectionState?> _peerConnectionState =
+      ValueNotifier<RTCPeerConnectionState?>(null);
+  final ValueNotifier<RTCDataChannelState?> _dataChannelState =
+      ValueNotifier<RTCDataChannelState?>(null);
+  final ValueNotifier<bool?> _initiator = ValueNotifier<bool?>(null);
   StreamSubscription<WebrtcEvent>? connectionStateStreamSubscription;
   StreamSubscription<WebrtcEvent>? dataChannelStateStreamSubscription;
   StreamSubscription<WebrtcEvent>? signalingStateStreamSubscription;
@@ -169,7 +169,7 @@ class ChatMessageView extends StatelessWidget
   ///如果ChatGPT，则设置
   Future<void> _createPeerConnection() async {
     await websocketPool.connect();
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    ChatSummary? chatSummary = chatMessageController.chatSummary.value;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return;
@@ -187,7 +187,7 @@ class ChatMessageView extends StatelessWidget
 
   ///更新为已读状态
   Future<void> _buildReadStatus() async {
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    ChatSummary? chatSummary = chatMessageController.chatSummary.value;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return;
@@ -220,7 +220,7 @@ class ChatMessageView extends StatelessWidget
   }
 
   Future<void> _createDataChannel() async {
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    ChatSummary? chatSummary = chatMessageController.chatSummary.value;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return;
@@ -236,7 +236,7 @@ class ChatMessageView extends StatelessWidget
   }
 
   Future<void> _disconnectPeerConnection() async {
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    ChatSummary? chatSummary = chatMessageController.chatSummary.value;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return;
@@ -367,7 +367,7 @@ class ChatMessageView extends StatelessWidget
   }
 
   Future<void> _updatePeerConnectionState(WebrtcEvent event) async {
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    ChatSummary? chatSummary = chatMessageController.chatSummary.value;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return;
@@ -479,17 +479,23 @@ class ChatMessageView extends StatelessWidget
           child: ListenableBuilder(
             listenable: appDataProvider,
             builder: (BuildContext context, Widget? child) {
-              return Obx(() {
-                var height = chatMessageViewController.chatMessageHeight;
-                return Column(children: <Widget>[
-                  SizedBox(height: height, child: chatMessageWidget),
-                  Divider(
-                    color: Colors.white.withAlpha(AppOpacity.xlOpacity),
-                    height: 1.0,
-                  ),
-                  chatMessageInputWidget
-                ]);
-              });
+              return ListenableBuilder(
+                  listenable: Listenable.merge([
+                    chatMessageViewController.chatMessageInputHeight,
+                    chatMessageViewController.emojiMessageInputHeight,
+                    chatMessageViewController.moreMessageInputHeight
+                  ]),
+                  builder: (context, _) {
+                    var height = chatMessageViewController.chatMessageHeight;
+                    return Column(children: <Widget>[
+                      SizedBox(height: height, child: chatMessageWidget),
+                      Divider(
+                        color: Colors.white.withAlpha(AppOpacity.xlOpacity),
+                        height: 1.0,
+                      ),
+                      chatMessageInputWidget
+                    ]);
+                  });
             },
           ),
         ));
@@ -602,7 +608,7 @@ class ChatMessageView extends StatelessWidget
     if (partyType == PartyType.group.name) {
       rightWidgets.add(IconButton(
         onPressed: () async {
-          ChatSummary? chatSummary = chatMessageController.chatSummary;
+          ChatSummary? chatSummary = chatMessageController.chatSummary.value;
           if (chatSummary != null) {
             String? partyType = chatSummary.partyType;
             String? groupId = chatSummary.peerId;
@@ -622,7 +628,7 @@ class ChatMessageView extends StatelessWidget
     if (partyType == PartyType.conference.name) {
       rightWidgets.add(IconButton(
         onPressed: () async {
-          ChatSummary? chatSummary = chatMessageController.chatSummary;
+          ChatSummary? chatSummary = chatMessageController.chatSummary.value;
           if (chatSummary != null) {
             String? partyType = chatSummary.partyType;
             String? messageId = chatSummary.messageId;
@@ -652,9 +658,9 @@ class ChatMessageView extends StatelessWidget
   Widget build(BuildContext context) {
     Widget chatMessageWidget = _buildChatMessageWidget(context);
     Widget appBarView = ListenableBuilder(
-        listenable: chatMessageController.getChatSummary(),
+        listenable: chatMessageController.chatSummary,
         builder: (BuildContext context, Widget? child) {
-          ChatSummary? chatSummary = chatMessageController.chatSummary;
+          ChatSummary? chatSummary = chatMessageController.chatSummary.value;
           if (chatSummary != null) {
             _updateChatSummary();
             String name = chatSummary.name!;

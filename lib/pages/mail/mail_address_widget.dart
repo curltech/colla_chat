@@ -20,7 +20,7 @@ import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 ///邮件地址子视图
 class MailAddressWidget extends StatelessWidget with DataTileMixin {
@@ -53,13 +53,13 @@ class MailAddressWidget extends StatelessWidget with DataTileMixin {
     return 'Mail';
   }
 
-  final RxInt index = 0.obs;
+  final ValueNotifier<int> index = ValueNotifier<int>(0);
   final PlatformCarouselController controller = PlatformCarouselController();
 
   Future<bool?> _onTap(int index, String title,
       {String? subtitle, DataTile? group}) async {
     int i = 0;
-    for (MailAddress emailAddress in mailAddressController.data) {
+    for (MailAddress emailAddress in mailAddressController.data.value) {
       if (emailAddress.email == group!.title) {
         mailAddressController.setCurrentIndex = i;
         break;
@@ -75,9 +75,9 @@ class MailAddressWidget extends StatelessWidget with DataTileMixin {
   Widget _buildMailAddressWidget(BuildContext context) {
     Map<DataTile, List<DataTile>> mailAddressTileData = {};
     var mailAddresses = mailAddressController.data;
-    if (mailAddresses.isNotEmpty) {
+    if (mailAddresses.value.isNotEmpty) {
       int i = 0;
-      for (var mailAddress in mailAddresses) {
+      for (var mailAddress in mailAddresses.value) {
         DataTile groupTile = DataTile(
             title: mailAddress.email,
             subtitle: mailAddress.name,
@@ -100,7 +100,7 @@ class MailAddressWidget extends StatelessWidget with DataTileMixin {
             mailboxController.getMailboxNames(mailAddress.email);
 
         if (mailboxNames != null && mailboxNames.isNotEmpty) {
-          String? currentMailboxName = mailboxController.currentMailboxName;
+          String? currentMailboxName = mailboxController.currentMailboxName.value;
           for (var mailboxName in mailboxNames) {
             Icon icon = Icon(mailboxController.findDirectoryIcon(mailboxName));
             enough_mail.Mailbox? mailbox =
@@ -133,7 +133,7 @@ class MailAddressWidget extends StatelessWidget with DataTileMixin {
   String getMailboxName() {
     MailAddress? current = mailAddressController.current;
     String email = current?.email ?? AppLocalizations.t('No address');
-    String? name = mailboxController.currentMailboxName;
+    String? name = mailboxController.currentMailboxName.value;
     if (name == null) {
       return email;
     } else {

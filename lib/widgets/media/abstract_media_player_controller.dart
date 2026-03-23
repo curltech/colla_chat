@@ -381,8 +381,8 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
 
   Widget buildPlaylistController() {
     List<Widget> children = [];
-    if (playlistController.currentIndex?.value != null &&
-        playlistController.currentIndex!.value! > 0) {
+    if (playlistController.currentIndex != null &&
+        playlistController.currentIndex! > 0) {
       children.add(
         IconButton(
             hoverColor: myself.primary,
@@ -404,7 +404,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
             )),
       );
     }
-    int? currentIndex = playlistController.currentIndex?.value;
+    int? currentIndex = playlistController.currentIndex;
     if (currentIndex != null &&
         currentIndex >= 0 &&
         currentIndex < playlistController.length!) {

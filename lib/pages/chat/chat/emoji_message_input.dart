@@ -24,7 +24,7 @@ class EmojiMessageInputWidget extends StatelessWidget {
   ///构造自定义的emoji的选择组件
   Widget _buildEmojiWidget(BuildContext context) {
     return UnicodeEmojiPicker(
-        height: chatMessageViewController.emojiMessageInputHeight,
+        height: chatMessageViewController.emojiMessageInputHeight.value,
         onTap: onTap!);
   }
 

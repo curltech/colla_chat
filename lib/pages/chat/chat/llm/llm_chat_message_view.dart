@@ -17,7 +17,6 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-import 'package:get/state_manager.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 import 'package:screenshot_callback/screenshot_callback.dart';
@@ -64,15 +63,13 @@ class LlmChatMessageView extends StatelessWidget with DataTileMixin {
   @override
   String get title => 'LlmChatMessage';
 
-  
-
   double visibleFraction = 0.0;
   NoScreenshot? noScreenshot;
   ScreenshotCallback? screenshotCallback;
 
   ///更新为已读状态
   Future<void> _buildReadStatus() async {
-    var chatSummary = llmChatMessageController.chatSummary;
+    var chatSummary = llmChatMessageController.chatSummary.value;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return;
@@ -128,50 +125,62 @@ class LlmChatMessageView extends StatelessWidget with DataTileMixin {
 
   ///创建消息显示面板，包含消息的输入框
   Widget _buildChatMessageWidget(BuildContext context) {
-    final Widget chatMessageView = Obx(() {
-      var height = chatMessageViewController.chatMessageHeight;
-      Widget chatMessageWidget =
-          SizedBox(height: height, child: llmChatMessageWidget);
-      return VisibilityDetector(
-          key: UniqueKey(),
-          onVisibilityChanged: (VisibilityInfo visibilityInfo) {
-            if (visibleFraction == 0.0 && visibilityInfo.visibleFraction > 0) {}
-            visibleFraction = visibilityInfo.visibleFraction;
-          },
-          child: KeyboardActions(
-              autoScroll: true,
-              config: _buildKeyboardActionsConfig(context),
-              child: Column(children: <Widget>[
-                chatMessageWidget,
-                Divider(
-                  color: Colors.white.withAlpha(AppOpacity.xlOpacity),
-                  height: 1.0,
-                ),
-                llmChatMessageInputWidget
-              ])));
-    });
+    final Widget chatMessageView = ListenableBuilder(
+        listenable: Listenable.merge([
+          chatMessageViewController.chatMessageInputHeight,
+          chatMessageViewController.emojiMessageInputHeight,
+          chatMessageViewController.moreMessageInputHeight,
+        ]),
+        builder: (context, _) {
+          var height = chatMessageViewController.chatMessageHeight;
+          Widget chatMessageWidget =
+              SizedBox(height: height, child: llmChatMessageWidget);
+          return VisibilityDetector(
+              key: UniqueKey(),
+              onVisibilityChanged: (VisibilityInfo visibilityInfo) {
+                if (visibleFraction == 0.0 &&
+                    visibilityInfo.visibleFraction > 0) {}
+                visibleFraction = visibilityInfo.visibleFraction;
+              },
+              child: KeyboardActions(
+                  autoScroll: true,
+                  config: _buildKeyboardActionsConfig(context),
+                  child: Column(children: <Widget>[
+                    chatMessageWidget,
+                    Divider(
+                      color: Colors.white.withAlpha(AppOpacity.xlOpacity),
+                      height: 1.0,
+                    ),
+                    llmChatMessageInputWidget
+                  ])));
+        });
 
     return chatMessageView;
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget appBarView = Obx(() {
-      _buildReadStatus();
-      Widget chatMessageWidget = _buildChatMessageWidget(context);
-      var chatSummary = llmChatMessageController.chatSummary;
-      if (chatSummary != null) {
-        String name = chatSummary.name!;
-        String title = AppLocalizations.t(name);
-        return AppBarView(
-            title: title, helpPath: routeName,withLeading: withLeading, child: chatMessageWidget);
-      }
-      return AppBarView(
-          title: AppLocalizations.t('No current chatSummary'),
-          helpPath: routeName,
-          withLeading: withLeading,
-          child: chatMessageWidget);
-    });
+    Widget appBarView = ValueListenableBuilder(
+        valueListenable: llmChatMessageController.chatSummary,
+        builder: (context, value, _) {
+          _buildReadStatus();
+          Widget chatMessageWidget = _buildChatMessageWidget(context);
+          var chatSummary = llmChatMessageController.chatSummary.value;
+          if (chatSummary != null) {
+            String name = chatSummary.name!;
+            String title = AppLocalizations.t(name);
+            return AppBarView(
+                title: title,
+                helpPath: routeName,
+                withLeading: withLeading,
+                child: chatMessageWidget);
+          }
+          return AppBarView(
+              title: AppLocalizations.t('No current chatSummary'),
+              helpPath: routeName,
+              withLeading: withLeading,
+              child: chatMessageWidget);
+        });
 
     return appBarView;
   }

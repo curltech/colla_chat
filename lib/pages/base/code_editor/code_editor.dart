@@ -3,12 +3,12 @@ import 'package:colla_chat/pages/base/code_editor/code_find_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:re_editor/re_editor.dart';
 import 'package:re_highlight/languages/json.dart';
 import 'package:re_highlight/styles/atom-one-light.dart';
 
-final RxString codeContent = ''.obs;
+final ValueNotifier<String> codeContent = ValueNotifier<String>('');
 
 /// 代码编辑器，可用于json
 class CodeEditorWidget extends StatelessWidget with DataTileMixin {
@@ -34,7 +34,9 @@ class CodeEditorWidget extends StatelessWidget with DataTileMixin {
       title: title,
       helpPath: routeName,
       withLeading: withLeading,
-      child: Obx(() {
+      child: ValueListenableBuilder(
+        valueListenable: codeContent,
+        builder: (context, value, _) {
         return CodeEditor(
           style: CodeEditorStyle(
             codeTheme: CodeHighlightTheme(

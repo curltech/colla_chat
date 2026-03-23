@@ -11,7 +11,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 class DataIndexEditWidget extends StatelessWidget with DataTileMixin {
   @override
@@ -60,7 +60,9 @@ class DataIndexEditWidget extends StatelessWidget with DataTileMixin {
 
   //DataIndex信息编辑界面
   Widget _buildPlatformReactiveForm(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: dataSourceController.currentIndex,
+        builder: (context, value, _) {
       data_source.DataIndexNode? dataIndexNode =
           dataSourceController.getDataIndexNode();
       if (dataIndexNode != null) {

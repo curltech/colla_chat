@@ -11,7 +11,6 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 ///邮件列表子视图
 class MailListWidget extends StatelessWidget {
@@ -190,7 +189,8 @@ class MailListWidget extends StatelessWidget {
     return tile;
   }
 
-  Future<Null> _onTap(int index, String title, {String? subtitle, DataTile? group}) async {
+  Future<Null> _onTap(int index, String title,
+      {String? subtitle, DataTile? group}) async {
     mailMimeMessageController.currentMailIndex.value = index;
     MailMessage? mailMessage = mailMimeMessageController.currentMailMessage;
     if (mailMessage == null) {
@@ -242,11 +242,13 @@ class MailListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: mailMimeMessageController.currentMailIndex,
+      listenable: mailMimeMessageController.addressMailMessages,
       builder: (BuildContext context, Widget? child) {
-        return Obx(() {
-          return _buildMailListWidget(context);
-        });
+        return ValueListenableBuilder(
+            valueListenable: mailMimeMessageController.currentMailIndex,
+            builder: (context, value, _) {
+              return _buildMailListWidget(context);
+            });
       },
     );
   }

@@ -20,7 +20,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_highlight/themes/idea.dart';
-import 'package:get/get.dart';
+
 import 'package:highlight/languages/sql.dart';
 import 'package:tab_container/tab_container.dart';
 
@@ -78,7 +78,9 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
 
   /// DataTableNode信息编辑界面
   Widget _buildPlatformReactiveForm(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: dataSourceController.currentIndex,
+        builder: (context, value, _) {
       data_source.DataTableNode? dataTableNode =
           dataSourceController.getDataTableNode();
       if (dataTableNode == null) {
@@ -370,10 +372,12 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   }
 
   Widget _buildDataIndexesWidget(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: dataTableIndexController.currentIndex,
+        builder: (context, value, _) {
       final List<DataTile> tiles = [];
-      for (int i = 0; i < dataTableIndexController.data.length; ++i) {
-        DataIndex dataIndex = dataTableIndexController.data[i];
+      for (int i = 0; i < dataTableIndexController.data.value.length; ++i) {
+        DataIndex dataIndex = dataTableIndexController.data.value[i];
         String titleTail = '';
         if (dataIndex.isUnique != null && dataIndex.isUnique!) {
           titleTail = 'Unique';

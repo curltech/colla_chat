@@ -9,7 +9,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 /// 创建房间和管理房间的界面
 class LiveKitSfuRoomWidget extends StatelessWidget with DataTileMixin {
@@ -29,7 +29,7 @@ class LiveKitSfuRoomWidget extends StatelessWidget with DataTileMixin {
 
   
 
-  final Rx<List<DataTile>> tileData = Rx<List<DataTile>>([]);
+  final ValueNotifier<List<DataTile>> tileData = ValueNotifier<List<DataTile>>([]);
 
   Future<void> _init() async {
     LiveKitManageRoom liveKitManageRoom = await conferenceService.listSfuRoom();
@@ -114,7 +114,9 @@ class LiveKitSfuRoomWidget extends StatelessWidget with DataTileMixin {
   }
 
   Widget _buildSearchRoomView(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: tileData,
+        builder: (context, value, _) {
       return DataListView(
         itemCount: tileData.value.length,
         itemBuilder: (BuildContext context, int index) {

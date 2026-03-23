@@ -143,7 +143,7 @@ class DataSourceWidget extends StatelessWidget with DataTileMixin {
       }
       if (name == 'columns') {
         DataTableNode dataTableNode = node.parent as DataTableNode;
-        if (node.children.isEmpty) {
+        if (node.children.value.isEmpty) {
           dataSourceController.updateColumnNodes(
             dataSourceNode: dataSourceNode,
             dataTableNode: dataTableNode,
@@ -151,7 +151,7 @@ class DataSourceWidget extends StatelessWidget with DataTileMixin {
         }
       } else if (name == 'indexes') {
         DataTableNode dataTableNode = node.parent as DataTableNode;
-        if (node.children.isEmpty) {
+        if (node.children.value.isEmpty) {
           dataSourceController.updateIndexNodes(
             dataSourceNode: dataSourceNode,
             dataTableNode: dataTableNode,

@@ -263,8 +263,8 @@ class GlobalChatMessage {
     //由于此处刷新了消息控制器，所以对非系统消息，不能同时监听chatMessageController和globalChatMessageController
     //否则会出现消息的重复
     if (chatMessage.messageType != ChatMessageType.system.name &&
-        chatMessageController.chatSummary != null) {
-      var peerId = chatMessageController.chatSummary!.peerId;
+        chatMessageController.chatSummary.value != null) {
+      var peerId = chatMessageController.chatSummary.value!.peerId;
       if (chatMessage.senderPeerId == peerId || chatMessage.groupId == peerId) {
         chatMessageController.latest();
       }

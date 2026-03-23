@@ -11,7 +11,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:webrtc_interface/webrtc_interface.dart';
 
 final DataListController<Linkman> groupLinkmanController =
@@ -32,8 +32,6 @@ class LinkmanWebrtcConnectionWidget extends StatelessWidget with DataTileMixin {
 
   @override
   String get title => 'Linkman webrtc connection';
-
-  
 
   final ValueNotifier<List<DataTile>> tileData =
       ValueNotifier<List<DataTile>>([]);
@@ -56,7 +54,7 @@ class LinkmanWebrtcConnectionWidget extends StatelessWidget with DataTileMixin {
   }
 
   Future<List<DataTile>> _buildConnectionTileData(BuildContext context) async {
-    RxList<Linkman> linkmen = groupLinkmanController.data;
+    List<Linkman> linkmen = groupLinkmanController.data.value;
     List<DataTile> tiles = [];
     if (linkmen.isNotEmpty) {
       for (var linkman in linkmen) {
@@ -93,19 +91,21 @@ class LinkmanWebrtcConnectionWidget extends StatelessWidget with DataTileMixin {
   }
 
   Widget _buildConnectionListView(BuildContext context) {
-    var connectionView = Obx(() {
-      return PlatformFutureBuilder(
-        future: _buildConnectionTileData(context),
-        builder: (BuildContext context, List<DataTile> tileData) {
-          return DataListView(
-            itemCount: tileData.length,
-            itemBuilder: (BuildContext context, int index) {
-              return tileData[index];
+    var connectionView = ValueListenableBuilder(
+        valueListenable: groupLinkmanController.currentIndex,
+        builder: (context, value, _) {
+          return PlatformFutureBuilder(
+            future: _buildConnectionTileData(context),
+            builder: (BuildContext context, List<DataTile> tileData) {
+              return DataListView(
+                itemCount: tileData.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return tileData[index];
+                },
+              );
             },
           );
-        },
-      );
-    });
+        });
 
     return connectionView;
   }

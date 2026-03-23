@@ -26,7 +26,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
 import 'package:enough_mail/highlevel.dart' as enough_mail;
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:mimecon/mimecon.dart';
 
 class PlatformAttachmentInfo {
@@ -68,10 +68,10 @@ class NewMailWidget extends StatelessWidget with DataTileMixin {
   String get title => 'New mail';
 
   //已经选择的收件人
-  final RxList<String> receipts = RxList([]);
+  final ValueNotifier<List<String>> receipts = ValueNotifier<List<String>>([]);
 
-  final RxList<PlatformAttachmentInfo> attachmentInfos =
-      RxList<PlatformAttachmentInfo>([]);
+  final ValueNotifier<List<PlatformAttachmentInfo>> attachmentInfos =
+      ValueNotifier<List<PlatformAttachmentInfo>>([]);
 
   final TextEditingController subjectController = TextEditingController();
 
@@ -80,21 +80,23 @@ class NewMailWidget extends StatelessWidget with DataTileMixin {
 
   //收件人，联系人显示和选择界面
   Widget _buildReceiptsWidget(BuildContext context) {
-    var selector = Obx(() {
-      return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 0.0),
-          child: LinkmanGroupSearchWidget(
-            key: UniqueKey(),
-            selectType: SelectType.chipMultiSelectField,
-            onSelected: (List<String>? selected) async {
-              if (selected != null) {
-                receipts.value = selected;
-              }
-            },
-            selected: receipts.value,
-            includeGroup: false,
-          ));
-    });
+    var selector = ValueListenableBuilder(
+        valueListenable: receipts,
+        builder: (context, value, _) {
+          return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 0.0),
+              child: LinkmanGroupSearchWidget(
+                key: UniqueKey(),
+                selectType: SelectType.chipMultiSelectField,
+                onSelected: (List<String>? selected) async {
+                  if (selected != null) {
+                    receipts.value = selected;
+                  }
+                },
+                selected: receipts.value,
+                includeGroup: false,
+              ));
+        });
 
     return selector;
   }
@@ -223,19 +225,22 @@ class NewMailWidget extends StatelessWidget with DataTileMixin {
     return Container(
         alignment: Alignment.centerLeft,
         color: myself.getBackgroundColor(context).withOpacity(0.6),
-        child: Obx(() {
-          return PlatformFutureBuilder(
-              future: _buildAttachmentChips(context, attachmentInfos),
-              builder: (BuildContext context, List<Widget>? chips) {
-                return Container(
-                    alignment: Alignment.centerLeft,
-                    color: myself.getBackgroundColor(context).withOpacity(0.6),
-                    child: Wrap(
-                      direction: Axis.horizontal,
-                      children: chips!,
-                    ));
-              });
-        }));
+        child: ValueListenableBuilder(
+            valueListenable: attachmentInfos,
+            builder: (context, value, _) {
+              return PlatformFutureBuilder(
+                  future: _buildAttachmentChips(context, attachmentInfos.value),
+                  builder: (BuildContext context, List<Widget>? chips) {
+                    return Container(
+                        alignment: Alignment.centerLeft,
+                        color:
+                            myself.getBackgroundColor(context).withOpacity(0.6),
+                        child: Wrap(
+                          direction: Axis.horizontal,
+                          children: chips!,
+                        ));
+                  });
+            }));
   }
 
   /// 发送前的准备，准备数据和地址，加密

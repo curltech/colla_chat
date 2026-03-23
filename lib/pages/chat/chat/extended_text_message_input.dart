@@ -119,7 +119,7 @@ class ExtendedTextMessageInputWidget extends StatelessWidget {
   }
 
   Future<void> _selectGroupLinkman() async {
-    var chatSummary = chatMessageController.chatSummary;
+    var chatSummary = chatMessageController.chatSummary.value;
     if (chatSummary != null) {
       if (chatSummary.partyType == PartyType.group.name) {
         var groupId = chatSummary.peerId;

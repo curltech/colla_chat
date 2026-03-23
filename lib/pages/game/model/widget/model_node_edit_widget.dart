@@ -21,7 +21,7 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 class ModelNodeEditWidget extends StatelessWidget with DataTileMixin {
   final AttributeEditWidget attributeEditWidget = AttributeEditWidget();
@@ -75,7 +75,7 @@ class ModelNodeEditWidget extends StatelessWidget with DataTileMixin {
 
   PlatformReactiveFormController? platformReactiveFormController;
 
-  final Rx<String?> content = Rx<String?>(null);
+  final ValueNotifier<String?> content = ValueNotifier<String?>(null);
 
   Future<void> _pickAvatar(BuildContext context) async {
     Uint8List? avatar = await ImageUtil.pickAvatar(context: context);
@@ -106,7 +106,9 @@ class ModelNodeEditWidget extends StatelessWidget with DataTileMixin {
     if (project.meta &&
         (modelNode!.nodeType == NodeType.image.name ||
             modelNode!.nodeType == NodeType.shape.name)) {
-      tails.add(Obx(() {
+      tails.add(ValueListenableBuilder(
+        valueListenable: content,
+        builder: (context, value, _) {
         return ListTile(
           title: Text(AppLocalizations.t('Image')),
           trailing: content.value != null

@@ -19,7 +19,7 @@ import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dar
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:icons_plus/icons_plus.dart';
 import 'package:record/record.dart';
 
@@ -43,7 +43,7 @@ class LlmTextMessageInputWidget extends StatelessWidget {
   }
 
   final BlueFireAudioPlayer audioPlayer = globalBlueFireAudioPlayer;
-  final RxBool voiceVisible = true.obs;
+  final ValueNotifier<bool> voiceVisible = ValueNotifier<bool>(true);
 
   ///发送文本消息
   Future<void> onSendPressed() async {
@@ -63,17 +63,19 @@ class LlmTextMessageInputWidget extends StatelessWidget {
   }
 
   void onEmojiPressed() {
-    var height = chatMessageViewController.emojiMessageInputHeight;
+    var height = chatMessageViewController.emojiMessageInputHeight.value;
     if (height == 0.0) {
-      chatMessageViewController.emojiMessageInputHeight =
+      chatMessageViewController.emojiMessageInputHeight.value =
           ChatMessageViewController.defaultEmojiMessageInputHeight;
     } else {
-      chatMessageViewController.emojiMessageInputHeight = 0.0;
+      chatMessageViewController.emojiMessageInputHeight.value = 0.0;
     }
   }
 
   Widget _buildLlmActionButton(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: llmChatMessageController.llmAction,
+        builder: (context, value, _) {
       LlmAction llmAction = llmChatMessageController.llmAction.value;
       List<bool> isSelected = [];
       for (var ele in LlmAction.values) {
@@ -163,7 +165,9 @@ class LlmTextMessageInputWidget extends StatelessWidget {
   }
 
   Widget _buildLlmLanguageButton(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: llmChatMessageController.llmLanguage,
+        builder: (context, value, _) {
       LlmLanguage llmLanguage = llmChatMessageController.llmLanguage.value;
       List<bool> isSelected = [];
       for (var ele in LlmLanguage.values) {
@@ -192,7 +196,9 @@ class LlmTextMessageInputWidget extends StatelessWidget {
   }
 
   Widget _buildTargetLlmLanguageButton(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: llmChatMessageController.targetLlmLanguage,
+        builder: (context, value, _) {
       LlmLanguage llmLanguage =
           llmChatMessageController.targetLlmLanguage.value;
       List<bool> isSelected = [];
@@ -406,8 +412,9 @@ class LlmTextMessageInputWidget extends StatelessWidget {
           Container(
             margin: EdgeInsets.symmetric(
                 horizontal: iconInset, vertical: iconInset),
-            child: Obx(
-              () {
+            child: ValueListenableBuilder(
+              valueListenable: voiceVisible,
+              builder: (context, value, _) {
                 return IconButton(
                   // key: UniqueKey(),
                   // tooltip: voiceVisible.value
@@ -461,8 +468,9 @@ class LlmTextMessageInputWidget extends StatelessWidget {
 
   ///语音录音按钮和文本输入框
   Widget _buildMessageInputWidget(BuildContext context) {
-    return Obx(
-      () {
+    return ValueListenableBuilder(
+      valueListenable: voiceVisible,
+      builder: (context, value, _) {
         return Container(
             margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 2.0),
             alignment: Alignment.center,

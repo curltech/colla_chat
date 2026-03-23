@@ -18,7 +18,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 class AttributeEditWidget extends StatelessWidget with DataTileMixin {
   @override
@@ -37,9 +37,9 @@ class AttributeEditWidget extends StatelessWidget with DataTileMixin {
     return modelProjectController.selectedSrcModelNode.value;
   }
 
-  final Rx<List<Attribute>?> attributes = Rx<List<Attribute>?>(null);
+  final ValueNotifier<List<Attribute>?> attributes = ValueNotifier<List<Attribute>?>(null);
 
-  final Rx<Attribute?> attribute = Rx<Attribute?>(null);
+  final ValueNotifier<Attribute?> attribute = ValueNotifier<Attribute?>(null);
 
   AttributeEditWidget({super.key});
 
@@ -57,7 +57,9 @@ class AttributeEditWidget extends StatelessWidget with DataTileMixin {
   PlatformReactiveFormController? platformReactiveFormController;
 
   Widget _buildAttributesWidget(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: attributes,
+        builder: (context, value, _) {
       if (attributes.value != null && attributes.value!.isNotEmpty) {
         List<DataTile> tiles = [];
         for (var attribute in attributes.value!) {
@@ -100,7 +102,9 @@ class AttributeEditWidget extends StatelessWidget with DataTileMixin {
         options: options));
     platformReactiveFormController =
         PlatformReactiveFormController(attributeDataFields);
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: attribute,
+        builder: (context, value, _) {
       if (attribute.value == null) {
         return nilBox;
       }

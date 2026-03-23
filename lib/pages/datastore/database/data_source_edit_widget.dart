@@ -13,7 +13,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 class DataSourceEditWidget extends StatelessWidget with DataTileMixin {
   DataSourceEditWidget({super.key});
@@ -30,7 +30,7 @@ class DataSourceEditWidget extends StatelessWidget with DataTileMixin {
   @override
   String get title => 'DataSourceEdit';
 
-  final Rx<String?> sourceType = Rx<String?>(null);
+  final ValueNotifier<String?> sourceType = ValueNotifier<String?>(null);
 
   List<PlatformDataField> buildDataSourceDataFields() {
     DataSource? dataSource = dataSourceController.current?.value as DataSource?;
@@ -113,7 +113,9 @@ class DataSourceEditWidget extends StatelessWidget with DataTileMixin {
 
   //DataSourceNode信息编辑界面
   Widget _buildPlatformReactiveForm(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: dataSourceController.currentIndex,
+        builder: (context, value, _) {
       DataSource? dataSource =
           dataSourceController.current?.value as DataSource?;
       List<PlatformDataField> dataSourceDataFields =
@@ -167,7 +169,7 @@ class DataSourceEditWidget extends StatelessWidget with DataTileMixin {
     DataSource? dataSource = dataSourceController.current?.value as DataSource?;
     if (dataSource == null) {
       dataSource = current;
-      if (!dataSourceController.data.contains(dataSource)) {
+      if (!dataSourceController.data.value.contains(dataSource)) {
         dataSourceController.addDataSource(dataSource);
       }
     } else {

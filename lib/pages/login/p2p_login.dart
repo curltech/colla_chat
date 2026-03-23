@@ -15,7 +15,7 @@ import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:get/get.dart';
+
 import 'package:window_manager/window_manager.dart';
 
 /// 远程登录页面，一个Scaffold，IndexStack下的远程登录组件，注册组件和配置组件
@@ -36,12 +36,12 @@ class P2pLogin extends StatelessWidget with WindowListener {
     init();
   }
 
-  final RxInt index = 0.obs;
+  final ValueNotifier<int> index = ValueNotifier<int>(0);
 
   void init() async {
     windowManager.addListener(this);
     await myselfPeerController.init();
-    List<MyselfPeer> myselfPeers = myselfPeerController.data;
+    List<MyselfPeer> myselfPeers = myselfPeerController.data.value;
     if (myselfPeers.isEmpty) {
       index.value = 1;
     }
@@ -57,7 +57,9 @@ class P2pLogin extends StatelessWidget with WindowListener {
   }
 
   Widget _buildRightWidget(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: index,
+        builder: (context, value, _) {
       List<Widget> rightWidgets = [];
       if (index.value != 0) {
         rightWidgets.addAll([
@@ -120,7 +122,9 @@ class P2pLogin extends StatelessWidget with WindowListener {
     var workspace = ListenableBuilder(
       listenable: appDataProvider,
       builder: (BuildContext context, Widget? child) {
-        var pageView = Obx(() {
+        var pageView = ValueListenableBuilder(
+        valueListenable: index,
+        builder: (context, value, _) {
           return PlatformCarouselWidget(
             controller: controller,
             itemCount: _children.length,
@@ -131,7 +135,7 @@ class P2pLogin extends StatelessWidget with WindowListener {
                 {PlatformSwiperDirection? direction,
                 int? oldIndex,
                 CarouselPageChangedReason? reason}) {
-              this.index(index);
+              this.index.value=index;
             },
             initialPage: index.value,
           );

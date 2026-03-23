@@ -6,13 +6,14 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/widgets/data_bind/tree_view.dart';
-import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
 
 import 'file_node.dart';
 
 class DirectoryController extends DataListController<FolderNode> {
   late final TreeViewController treeViewController;
-  Rx<FolderNode?> currentNode = Rx<FolderNode?>(null);
+  final ValueNotifier<FolderNode?> currentNode =
+      ValueNotifier<FolderNode?>(null);
 
   DirectoryController() {
     init();
@@ -109,7 +110,7 @@ class DirectoryController extends DataListController<FolderNode> {
           FolderNode node = FolderNode(Folder(
               PathUtil.basename(fileSystemEntity.path),
               directory: fileSystemEntity as io.Directory));
-          folderNode.children.add(node);
+          folderNode.children.value.add(node);
         }
       }
     } else {

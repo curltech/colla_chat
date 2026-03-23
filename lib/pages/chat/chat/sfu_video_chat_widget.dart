@@ -58,7 +58,7 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
       conferenceChatMessageController =
       ValueNotifier<ConferenceChatMessageController?>(
           liveKitConferenceClientPool.conferenceChatMessageController);
-  ChatSummary chatSummary = chatMessageController.chatSummary!;
+  ChatSummary chatSummary = chatMessageController.chatSummary.value!;
   PlatformCarouselController controller = PlatformCarouselController();
   ValueNotifier<int> index = ValueNotifier<int>(0);
 

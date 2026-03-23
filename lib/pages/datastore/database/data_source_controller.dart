@@ -13,18 +13,19 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/tree_view.dart';
-import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
+
 
 class DataSourceController extends DataListController<DataSourceNode> {
   TreeViewController? treeViewController;
-  final Rx<DataTableNode?> currentDataTableNode = Rx<DataTableNode?>(null);
-  final Rx<ExplorableNode?> currentNode = Rx<ExplorableNode?>(null);
+  final ValueNotifier<DataTableNode?> currentDataTableNode = ValueNotifier<DataTableNode?>(null);
+  final ValueNotifier<ExplorableNode?> currentNode = ValueNotifier<ExplorableNode?>(null);
 
   DataSourceController();
 
   @override
   set current(DataSourceNode? element) {
-    for (var ele in data) {
+    for (var ele in data.value) {
       ele.isCurrent.value = false;
     }
     element?.isCurrent.value = true;
@@ -115,7 +116,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
       if (dataSource!.name == 'colla_chat') {
         return;
       }
-      data.remove(dataSourceNode);
+      data.value.remove(dataSourceNode);
     } else {
       dataSource = current?.value as data_source.DataSource?;
       if (dataSource!.name == 'colla_chat') {

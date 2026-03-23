@@ -3,7 +3,6 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_json_view/flutter_json_view.dart';
-import 'package:get/get.dart';
 
 class JsonViewerWidget extends StatelessWidget with DataTileMixin {
   JsonViewerWidget({super.key});
@@ -20,19 +19,19 @@ class JsonViewerWidget extends StatelessWidget with DataTileMixin {
   @override
   String get title => 'Json viewer';
 
-  
-
   @override
   Widget build(BuildContext context) {
     return AppBarView(
       title: title,
       helpPath: routeName,
       withLeading: withLeading,
-      child: Obx(() {
-        return JsonView.string(
-          jsonContent.value,
-        );
-      }),
+      child: ValueListenableBuilder(
+          valueListenable: jsonContent,
+          builder: (context, value, _) {
+            return JsonView.string(
+              jsonContent.value,
+            );
+          }),
     );
   }
 }

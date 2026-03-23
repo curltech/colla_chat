@@ -8,7 +8,6 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 /// 运行后台批处理，刷新数据，针对所有的股票
 class RefreshStockWidget extends StatelessWidget with DataTileMixin {
@@ -28,11 +27,11 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
 
   final TextEditingController _startDateTextController =
       TextEditingController();
-  final RxList<DataTile> tileData = <DataTile>[].obs;
+  final ValueNotifier<List<DataTile>> tileData =
+      ValueNotifier<List<DataTile>>([]);
 
   void _initTileData(BuildContext context) {
-    tileData.clear();
-    tileData.addAll([
+    tileData.value = [
       DataTile(
           title: '调度',
           subtitle: '获取数据，汇总，计算评分',
@@ -43,6 +42,7 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
               return;
             }
             stockLineService.schedule();
+            return null;
           }),
       DataTile(
           title: '所有股票今天日线',
@@ -60,6 +60,7 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
             } else {
               stockLineService.refreshTodayLine();
             }
+            return null;
           }),
       DataTile(
           title: '分钟线',
@@ -71,6 +72,7 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
               return;
             }
             stockLineService.refreshMinLine();
+            return null;
           }),
       DataTile(
           title: '所有股票今天分钟线',
@@ -82,6 +84,7 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
               return;
             }
             stockLineService.refreshTodayMinLine();
+            return null;
           }),
       DataTile(
           title: '季度业绩汇总',
@@ -93,6 +96,7 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
               return;
             }
             stockLineService.refreshQPerformance();
+            return null;
           }),
       DataTile(
           title: '季度业绩统计汇总',
@@ -104,6 +108,7 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
               return;
             }
             stockLineService.refreshQStat();
+            return null;
           }),
       DataTile(
           title: '季度业绩评分汇总',
@@ -115,6 +120,7 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
               return;
             }
             stockLineService.refreshStatScore();
+            return null;
           }),
       DataTile(
           title: '季度业绩分位评分汇总',
@@ -126,6 +132,7 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
               return;
             }
             stockLineService.createScorePercentile();
+            return null;
           }),
       DataTile(
           title: '日线统计',
@@ -140,6 +147,7 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
               int startDate = int.parse(_startDateTextController.text);
               stockLineService.refreshStat(startDate: startDate);
             }
+            return null;
           }),
       DataTile(
           title: '过去1,3,5日线均线',
@@ -154,6 +162,7 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
               int startDate = int.parse(_startDateTextController.text);
               stockLineService.refreshBeforeMa(startDate: startDate);
             }
+            return null;
           }),
       DataTile(
           title: '计算所有股票的买卖点事件',
@@ -165,6 +174,7 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
               return;
             }
             stockLineService.refreshEventCond();
+            return null;
           }),
       DataTile(
           title: '更新股票信息',
@@ -176,6 +186,7 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
               return;
             }
             stockLineService.updateShares();
+            return null;
           }),
       DataTile(
           title: '创建模型数据文件',
@@ -190,8 +201,9 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
               int startDate = int.parse(_startDateTextController.text);
               stockLineService.writeAllFile(startDate: startDate);
             }
-          }),
-    ]);
+            return null;
+          })
+    ];
   }
 
   Widget _buildRefreshStockView(BuildContext context) {
@@ -205,14 +217,16 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
                 labelText: AppLocalizations.t('startDate'))),
       ),
       Expanded(
-        child: Obx(() {
-          return DataListView(
-            itemCount: tileData.length,
-            itemBuilder: (BuildContext context, int index) {
-              return tileData[index];
-            },
-          );
-        }),
+        child: ValueListenableBuilder(
+            valueListenable: tileData,
+            builder: (context, value, _) {
+              return DataListView(
+                itemCount: tileData.value.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return tileData.value[index];
+                },
+              );
+            }),
       ),
     ]);
   }
@@ -221,8 +235,6 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
   Widget build(BuildContext context) {
     _initTileData(context);
     return AppBarView(
-        title: title,
-        isAppBar: false,
-        child: _buildRefreshStockView(context));
+        title: title, isAppBar: false, child: _buildRefreshStockView(context));
   }
 }

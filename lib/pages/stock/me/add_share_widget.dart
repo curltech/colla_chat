@@ -14,7 +14,6 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 /// 加自选股和分组的查询界面
 class AddShareWidget extends StatelessWidget with DataTileMixin {
@@ -35,14 +34,15 @@ class AddShareWidget extends StatelessWidget with DataTileMixin {
   final TextEditingController searchTextController = TextEditingController();
 
   /// 增加自选股的查询结果
-  final RxList<Share> shares = <Share>[].obs;
-  final RxList<DataTile> tileData = <DataTile>[].obs;
+  final ValueNotifier<List<Share>> shares = ValueNotifier<List<Share>>([]);
+  final ValueNotifier<List<DataTile>> tileData =
+      ValueNotifier<List<DataTile>>([]);
 
   /// 将linkman和group数据转换从列表显示数据
   Future<List<DataTile>> _buildShareTileData() async {
     List<DataTile> tiles = [];
-    if (shares.isNotEmpty) {
-      for (var share in shares) {
+    if (shares.value.isNotEmpty) {
+      for (var share in shares.value) {
         var name = share.name;
         var tsCode = share.tsCode;
         DataTile tile = DataTile(
@@ -126,14 +126,17 @@ class AddShareWidget extends StatelessWidget with DataTileMixin {
                   ),
                 )),
           )),
-      Expanded(child: Obx(() {
-        return DataListView(
-          itemCount: tileData.length,
-          itemBuilder: (BuildContext context, int index) {
-            return tileData[index];
-          },
-        );
-      })),
+      Expanded(
+          child: ValueListenableBuilder(
+              valueListenable: tileData,
+              builder: (context, value, _) {
+                return DataListView(
+                  itemCount: tileData.value.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return tileData.value[index];
+                  },
+                );
+              })),
     ]);
   }
 

@@ -41,7 +41,7 @@ class SfuLocalVideoWidget extends StatefulWidget {
 
 class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   /// 当前的视频会议的消息汇总（也就是知道会议目标是谁，比如是linkman，group还是conference）必须存在
-  ChatSummary chatSummary = chatMessageController.chatSummary!;
+  ChatSummary chatSummary = chatMessageController.chatSummary.value!;
 
   //控制面板的可见性，包括视频功能按钮和呼叫按钮
   ValueNotifier<bool> controlPanelVisible = ValueNotifier<bool>(true);

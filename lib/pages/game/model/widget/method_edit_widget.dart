@@ -18,7 +18,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 class MethodEditWidget extends StatelessWidget with DataTileMixin {
   @override
@@ -33,9 +33,9 @@ class MethodEditWidget extends StatelessWidget with DataTileMixin {
   @override
   String get title => 'MethodEdit';
 
-  final Rx<List<Method>?> methods = Rx<List<Method>?>(null);
+  final ValueNotifier<List<Method>?> methods = ValueNotifier<List<Method>?>(null);
 
-  final Rx<Method?> method = Rx<Method?>(null);
+  final ValueNotifier<Method?> method = ValueNotifier<Method?>(null);
 
   MethodEditWidget({super.key});
 
@@ -57,7 +57,9 @@ class MethodEditWidget extends StatelessWidget with DataTileMixin {
   PlatformReactiveFormController? platformReactiveFormController;
 
   Widget _buildMethodsWidget(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: methods,
+        builder: (context, value, _) {
       if (methods.value != null && methods.value!.isNotEmpty) {
         List<DataTile> tiles = [];
         for (var method in methods.value!) {
@@ -98,7 +100,9 @@ class MethodEditWidget extends StatelessWidget with DataTileMixin {
         options: options));
     platformReactiveFormController =
         PlatformReactiveFormController(methodDataFields);
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: method,
+        builder: (context, value, _) {
       if (method.value == null) {
         return nilBox;
       }

@@ -12,8 +12,8 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
   }
 
   PeerEndpoint? get defaultPeerEndpoint {
-    if (data.isNotEmpty && _defaultIndex > -1 && _defaultIndex < data.length) {
-      return data[_defaultIndex];
+    if (data.value.isNotEmpty && _defaultIndex > -1 && _defaultIndex < data.value.length) {
+      return data.value[_defaultIndex];
     }
     return null;
   }
@@ -23,16 +23,16 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
   }
 
   set defaultIndex(int? defaultIndex) {
-    if (data.isNotEmpty &&
+    if (data.value.isNotEmpty &&
         defaultIndex != null &&
         defaultIndex > -1 &&
-        defaultIndex < data.length) {
+        defaultIndex < data.value.length) {
       _defaultIndex = defaultIndex;
     }
   }
 
   Future<void> init() async {
-    data.clear();
+    data.value.clear();
     for (var peerEndpoint in nodeAddressOptions.values) {
       peerEndpointService.store(peerEndpoint);
       add(peerEndpoint);
@@ -50,13 +50,13 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
 
   PeerEndpoint? find({String? peerId, String? address}) {
     if (peerId != null) {
-      for (var peerEndpoint in data) {
+      for (var peerEndpoint in data.value) {
         if (peerEndpoint.peerId == peerId) {
           return peerEndpoint;
         }
       }
     } else if (address != null) {
-      for (var peerEndpoint in data) {
+      for (var peerEndpoint in data.value) {
         if (peerEndpoint.wsConnectAddress == address) {
           return peerEndpoint;
         }

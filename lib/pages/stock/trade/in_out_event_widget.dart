@@ -18,13 +18,13 @@ import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:reactive_forms/reactive_forms.dart';
 
 /// 日线数据列表控制器
 class InoutEventController extends DataListController<DayLine> {
-  final Rx<String?> _eventCode = Rx<String?>(null);
-  final Rx<String?> _eventName = Rx<String?>(null);
+  final ValueNotifier<String?> _eventCode = ValueNotifier<String?>(null);
+  final ValueNotifier<String?> _eventName = ValueNotifier<String?>(null);
 
   /// 当前事件代码
   String? get eventCode {
@@ -37,9 +37,9 @@ class InoutEventController extends DataListController<DayLine> {
 
   /// 设置当前事件代码
   void setEventCode(String? eventCode, {String? eventName}) {
-    _eventCode(eventCode);
-    _eventName(eventName);
-    data.clear();
+    _eventCode.value = eventCode;
+    _eventName.value = eventName;
+    data.value.clear();
   }
 }
 
@@ -200,7 +200,8 @@ class InoutEventWidget extends StatelessWidget with DataTileMixin {
     return platformReactiveForm;
   }
 
-  Future<void> _onSubmit(BuildContext context, Map<String, dynamic> values) async {
+  Future<void> _onSubmit(
+      BuildContext context, Map<String, dynamic> values) async {
     String? eventCode = values['eventCode'];
     String? tsCode = values['tsCode'];
     int? tradeDate = values['tradeDate'];
@@ -224,7 +225,8 @@ class InoutEventWidget extends StatelessWidget with DataTileMixin {
     );
   }
 
-  Future<void> refresh({String? eventCode, String? tsCode, int? tradeDate}) async {
+  Future<void> refresh(
+      {String? eventCode, String? tsCode, int? tradeDate}) async {
     eventCode ??= inoutEventController.eventCode;
     if (eventCode == null) {
       return;

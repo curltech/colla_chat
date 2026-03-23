@@ -17,7 +17,6 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 /// 每条消息展示组件，我接收的消息展示在左边，我发送的消息展示在右边
 class ChatMessageItem extends StatelessWidget {
@@ -33,7 +32,7 @@ class ChatMessageItem extends StatelessWidget {
     _buildDeleteTimer();
   }
 
-  final RxInt leftDeleteTime = 0.obs;
+  final ValueNotifier<int> leftDeleteTime = ValueNotifier<int>(0);
   Timer? timer;
 
   Future<void> _buildDeleteTimer() async {
@@ -53,7 +52,7 @@ class ChatMessageItem extends StatelessWidget {
         //延时删除
         timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
           leftDeleteTime.value--;
-          if (leftDeleteTime <= 0) {
+          if (leftDeleteTime.value <= 0) {
             if (this.timer != null) {
               this.timer!.cancel();
               this.timer = null;
@@ -178,15 +177,18 @@ class ChatMessageItem extends StatelessWidget {
     var sendTime = chatMessage.sendTime;
     sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
     //${chatMessage.id}:${chatMessage.senderName}
-    Widget title =
-        AutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
+    Widget title = AutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
     // AutoSizeText('${chatMessage.id}:${chatMessage.senderName}');
     if (timer != null) {
       title = Row(
         children: [
           title,
           const Icon(Icons.timer_sharp),
-          Obx(() => AutoSizeText('$leftDeleteTime')),
+          ValueListenableBuilder(
+              valueListenable: leftDeleteTime,
+              builder: (context, value, _) {
+                return AutoSizeText('$leftDeleteTime');
+              }),
         ],
       );
     }
@@ -220,14 +222,17 @@ class ChatMessageItem extends StatelessWidget {
       int? id = chatMessage.id;
       sendTime = '$id:$sendTime';
     }
-    Widget title =
-        AutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
+    Widget title = AutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
     if (timer != null) {
       title = Row(
         children: [
           title,
           const Icon(Icons.timer_sharp),
-          Obx(() => AutoSizeText('$leftDeleteTime')),
+          ValueListenableBuilder(
+              valueListenable: leftDeleteTime,
+              builder: (context, value, _) {
+                return AutoSizeText('$leftDeleteTime');
+              }),
         ],
       );
     }
@@ -275,14 +280,17 @@ class ChatMessageItem extends StatelessWidget {
       int? id = chatMessage.id;
       sendTime = '$id:$sendTime';
     }
-    Widget title =
-        AutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
+    Widget title = AutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
     if (timer != null) {
       title = Row(
         children: [
           title,
           const Icon(Icons.timer_sharp),
-          Obx(() => AutoSizeText('$leftDeleteTime')),
+          ValueListenableBuilder(
+              valueListenable: leftDeleteTime,
+              builder: (context, value, _) {
+                return AutoSizeText('$leftDeleteTime');
+              }),
         ],
       );
     }

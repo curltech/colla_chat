@@ -348,7 +348,7 @@ class _IndexViewState extends State<IndexView>
       if (current != 'chat_message') {
         _showChatMessageBanner(context);
       } else {
-        ChatSummary? chatSummary = chatMessageController.chatSummary;
+        ChatSummary? chatSummary = chatMessageController.chatSummary.value;
         if (chatSummary == null) {
           _showChatMessageBanner(context);
         } else {
@@ -632,7 +632,7 @@ class _IndexViewState extends State<IndexView>
                     ChatSummary? current = await chatSummaryService
                         .findCachedOneByPeerId(receivePeerId);
                     if (current != null) {
-                      chatMessageController.chatSummary = current;
+                      chatMessageController.chatSummary.value = current;
                       indexWidgetProvider.push('chat_message');
                       if (type == SharedMediaType.TEXT ||
                           type == SharedMediaType.URL) {

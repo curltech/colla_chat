@@ -331,7 +331,7 @@ class MessageWidget {
         break;
       case 'Refer':
         String? messageId = chatMessage.messageId;
-        chatMessageController.parentMessageId = messageId;
+        chatMessageController.parentMessageId.value = messageId;
         break;
       case 'Share':
         await _share(context);
@@ -834,7 +834,7 @@ class MessageWidget {
   }) {
     int maxLength = 30;
     if (!readOnly) {
-      parentMessageId = chatMessageController.parentMessageId;
+      parentMessageId = chatMessageController.parentMessageId.value;
     }
     if (parentMessageId == null) {
       return null;
@@ -879,7 +879,7 @@ class MessageWidget {
                             color: myself.primary,
                           ),
                           onTap: () {
-                            chatMessageController.parentMessageId = null;
+                            chatMessageController.parentMessageId.value = null;
                           },
                         )
                 ])));

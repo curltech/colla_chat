@@ -14,7 +14,6 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:get/state_manager.dart';
 import 'package:pro_image_editor/core/enums/editor_mode.dart';
 import 'package:pro_image_editor/core/models/editor_callbacks/pro_image_editor_callbacks.dart';
 import 'package:pro_image_editor/features/main_editor/main_editor.dart';
@@ -48,7 +47,7 @@ class VideoEditorWidget extends StatelessWidget with DataTileMixin {
   final DataListController<String> imageFileController =
       DataListController<String>();
   final ScrollController scrollController = ScrollController();
-  final RxInt displayPosition = 0.obs;
+  final ValueNotifier<int> displayPosition = ValueNotifier<int>(0);
 
   void _onScroll() {
     double offset = scrollController.offset;
@@ -102,7 +101,7 @@ class VideoEditorWidget extends StatelessWidget with DataTileMixin {
   }
 
   void _delete() {
-    List<String> filenames = imageFileController.data;
+    List<String> filenames = imageFileController.data.value;
     for (var filename in filenames) {
       File(filename).delete();
     }
@@ -137,8 +136,9 @@ class VideoEditorWidget extends StatelessWidget with DataTileMixin {
   }
 
   Widget _buildSeekBar(BuildContext context) {
-    Widget seekBar = Obx(
-      () {
+    Widget seekBar = ValueListenableBuilder(
+      valueListenable: displayPosition,
+      builder: (context, value, _) {
         return Slider(
           value:
               displayPosition.value < 0 ? 0 : displayPosition.value.toDouble(),
@@ -151,7 +151,7 @@ class VideoEditorWidget extends StatelessWidget with DataTileMixin {
           secondaryActiveColor: myself.primary,
           thumbColor: myself.primary,
           onChanged: (double value) {
-            displayPosition(value.toInt());
+            displayPosition.value=value.toInt();
             _splitImageFiles();
           },
         );
@@ -166,10 +166,12 @@ class VideoEditorWidget extends StatelessWidget with DataTileMixin {
   }
 
   Widget _buildImageSlide(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: imageFileController.currentIndex,
+        builder: (context, value, _) {
       List<Widget> children = [];
       String? current = imageFileController.current;
-      for (String imageFile in imageFileController.data) {
+      for (String imageFile in imageFileController.data.value) {
         Widget image = InkWell(
           child: Container(
               decoration: current == imageFile
@@ -202,7 +204,9 @@ class VideoEditorWidget extends StatelessWidget with DataTileMixin {
 
   Widget _buildVideoEditor(BuildContext context) {
     Widget mediaView = Column(children: [
-      Expanded(child: Obx(() {
+      Expanded(child: ValueListenableBuilder(
+        valueListenable: imageFileController.currentIndex,
+        builder: (context, value, _) {
         String? filename = imageFileController.current;
         if (filename == null) {
           return nilBox;
@@ -226,7 +230,7 @@ class VideoEditorWidget extends StatelessWidget with DataTileMixin {
       })),
       _buildSeekBar(context),
       ListenableBuilder(
-          listenable: playlistController.currentIndex!,
+          listenable: playlistController.currentController,
           builder: (BuildContext context, Widget? child) {
             return _buildImageSlide(context);
           }),

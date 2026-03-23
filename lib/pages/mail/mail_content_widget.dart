@@ -23,7 +23,7 @@ import 'package:colla_chat/widgets/webview/platform_webview.dart';
 import 'package:enough_mail/highlevel.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:mimecon/mimecon.dart';
 
 ///邮件内容子视图
@@ -72,7 +72,7 @@ class MailContentWidget extends StatelessWidget with DataTileMixin {
         mimeMessage = mimeMessages.first;
         mailMessageService.storeMimeMessage(
             mailAddressController.current!.email,
-            mailboxController.currentMailbox!,
+            mailboxController.currentMailbox.value!,
             mimeMessage,
             FetchPreference.full,
             force: true);
@@ -165,7 +165,9 @@ class MailContentWidget extends StatelessWidget with DataTileMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: mailMimeMessageController.currentMailIndex,
+        builder: (context, value, _) {
       Widget mimeMessageViewer = PlatformFutureBuilder(
           future: _buildMimeMessage(),
           builder: (BuildContext context,

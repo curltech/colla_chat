@@ -7,7 +7,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 final DataListController<Drule> drulesController = DataListController<Drule>();
 
@@ -77,7 +77,9 @@ class DruleListWidget extends StatelessWidget with DataTileMixin {
 
   @override
   Widget build(BuildContext context) {
-    var druleList = Obx(() {
+    var druleList = ValueListenableBuilder(
+        valueListenable: drulesController.data,
+        builder: (context, value, _) {
       var tiles = _buildDrulesTileData();
       return DataListView(
         onTap: _onTap,

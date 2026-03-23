@@ -81,7 +81,7 @@ class HttpClientPool {
   DioHttpClient? _default;
 
   HttpClientPool() {
-    var peerEndpoints = peerEndpointController.data;
+    var peerEndpoints = peerEndpointController.data.value;
     if (peerEndpoints.isNotEmpty) {
       int i = 0;
       for (var peerEndpoint in peerEndpoints) {

@@ -53,7 +53,7 @@ class LocalVideoWidget extends StatefulWidget {
 }
 
 class _LocalVideoWidgetState extends State<LocalVideoWidget> {
-  ChatSummary chatSummary = chatMessageController.chatSummary!;
+  ChatSummary chatSummary = chatMessageController.chatSummary.value!;
 
   //控制面板的可见性，包括视频功能按钮和呼叫按钮
   ValueNotifier<bool> controlPanelVisible = ValueNotifier<bool>(true);

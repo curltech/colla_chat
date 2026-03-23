@@ -19,7 +19,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 ///p2p网络节点搜索增加
 class P2pLinkmanAddWidget extends StatelessWidget with DataTileMixin {
@@ -46,11 +46,13 @@ class P2pLinkmanAddWidget extends StatelessWidget with DataTileMixin {
   StreamSubscription<ChainMessage>? chainMessageListen;
 
   void _init() {
-    dataListView = Obx(() {
+    dataListView = ValueListenableBuilder(
+        valueListenable: tileDataController.currentIndex,
+        builder: (context, value, _) {
       return DataListView(
         itemCount: tileDataController.length,
         itemBuilder: (BuildContext context, int index) {
-          return tileDataController.data[index];
+          return tileDataController.data.value[index];
         },
       );
     });

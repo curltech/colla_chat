@@ -15,7 +15,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 //定位器列表
 class PeerEndpointListWidget extends StatelessWidget with DataTileMixin {
@@ -143,7 +143,7 @@ class PeerEndpointListWidget extends StatelessWidget with DataTileMixin {
   }
 
   List<DataTile> _buildTileData() {
-    var peerEndpoints = peerEndpointController.data;
+    var peerEndpoints = peerEndpointController.data.value;
     List<DataTile> tiles = [];
     if (peerEndpoints.isNotEmpty) {
       int i = 0;
@@ -210,7 +210,9 @@ class PeerEndpointListWidget extends StatelessWidget with DataTileMixin {
 
   @override
   Widget build(BuildContext context) {
-    Widget dataListView = Obx(() {
+    Widget dataListView = ValueListenableBuilder(
+        valueListenable: peerEndpointController.currentIndex,
+        builder: (context, value, _) {
       var tiles = _buildTileData();
       var dataListView = DataListView(
         onTap: _onTap,

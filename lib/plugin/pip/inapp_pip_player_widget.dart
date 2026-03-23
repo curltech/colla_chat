@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pip_player/models/pip_settings.dart';
 import 'package:flutter_pip_player/pip_controller.dart';
 import 'package:flutter_pip_player/pip_player.dart';
-import 'package:get/get.dart';
+
 
 /// flutter_pip_player实现的应用内的模拟画中画功能
 /// enabled是pip生效的时候显示的组件
 class InAppPipPlayerWidget extends StatelessWidget {
-  final Rx<Widget> enabled = Rx<Widget>(nilBox);
-  final RxBool isPlaying = false.obs;
+  final ValueNotifier<Widget> enabled = ValueNotifier<Widget>(nilBox);
+  final ValueNotifier<bool> isPlaying = ValueNotifier<bool>(false);
 
   InAppPipPlayerWidget({super.key});
 
@@ -35,7 +35,9 @@ class InAppPipPlayerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return PipPlayer(
       controller: pipController,
-      content: Obx(() {
+      content: ValueListenableBuilder(
+        valueListenable: enabled,
+        builder: (context, value, _) {
         return enabled.value;
       }),
       onReelsDown: () {

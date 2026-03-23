@@ -27,7 +27,7 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:colla_chat/constant/base.dart';
 
 /// 元模型建模器
@@ -379,7 +379,9 @@ class MetaModellerWidget extends StatelessWidget with DataTileMixin {
   }
 
   Widget _buildToolPanelWidget(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: modelProjectController.project,
+        builder: (context, value, _) {
       List<Widget> btns = [];
       Project? project = modelProjectController.project.value;
       if (project != null) {
@@ -506,7 +508,7 @@ class MetaModellerWidget extends StatelessWidget with DataTileMixin {
 
   Future<void> _viewMetaProject() async {
     Project? metaProject = modelProjectController
-        .metaProjects[modelProjectController.currentMetaId.value];
+        .metaProjects.value[modelProjectController.currentMetaId.value];
     if (metaProject != null) {
       String content = JsonUtil.toJsonString(metaProject);
       jsonContent.value = content;
@@ -614,7 +616,7 @@ class MetaModellerWidget extends StatelessWidget with DataTileMixin {
 
   List<Widget> _buildMetaProjectButtons() {
     Project? metaProject = modelProjectController
-        .metaProjects[modelProjectController.currentMetaId.value];
+        .metaProjects.value[modelProjectController.currentMetaId.value];
     Project? project = modelProjectController.project.value;
     List<Widget> btns = [];
 
@@ -638,7 +640,7 @@ class MetaModellerWidget extends StatelessWidget with DataTileMixin {
         ),
       );
     }
-    if (modelProjectController.metaProjects.isNotEmpty) {
+    if (modelProjectController.metaProjects.value.isNotEmpty) {
       btns.add(IconButton(
         onPressed: () {
           _selectMetaProject();
@@ -666,7 +668,7 @@ class MetaModellerWidget extends StatelessWidget with DataTileMixin {
           modelProjectController.currentProject.value,
       modelProjectController.project.value ==
           modelProjectController
-              .metaProjects[modelProjectController.currentMetaId.value],
+              .metaProjects.value[modelProjectController.currentMetaId.value],
     ];
     return ToggleButtons(
       borderRadius: borderRadius,
@@ -681,7 +683,7 @@ class MetaModellerWidget extends StatelessWidget with DataTileMixin {
               modelProjectController.currentProject.value;
         } else if (newIndex == 1) {
           modelProjectController.project.value = modelProjectController
-              .metaProjects[modelProjectController.currentMetaId.value];
+              .metaProjects.value[modelProjectController.currentMetaId.value];
         }
       },
       children: <Widget>[
@@ -697,7 +699,9 @@ class MetaModellerWidget extends StatelessWidget with DataTileMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: modelProjectController.metaProjects,
+        builder: (context, value, _) {
       Project? metaProject = modelProjectController
           .metaProjects.value[modelProjectController.currentMetaId.value];
       Project? project = modelProjectController.project.value;

@@ -35,7 +35,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 class LinkmanController extends DataListController<Linkman> {
   Future<void> changeLinkmanStatus(
@@ -44,7 +44,7 @@ class LinkmanController extends DataListController<Linkman> {
     await linkmanService.update({'id': id, 'linkmanStatus': status.name});
     linkmanService.linkmen.remove(linkman.peerId);
     linkman.linkmanStatus = status.name;
-    data.assignAll(data);
+    data.value=[...data.value];
   }
 
   Future<void> changeSubscriptStatus(
@@ -53,7 +53,7 @@ class LinkmanController extends DataListController<Linkman> {
     await linkmanService.update({'id': id, 'subscriptStatus': status.name});
     linkmanService.linkmen.remove(linkman.peerId);
     linkman.subscriptStatus = status.name;
-    data.assignAll(data);
+    data.value=[...data.value];
   }
 }
 
@@ -233,7 +233,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
 
   //将linkman和group数据转换从列表显示数据
   List<DataTile> _buildLinkmanTileData() {
-    var linkmen = linkmanController.data;
+    var linkmen = linkmanController.data.value;
     List<DataTile> tiles = [];
     if (linkmen.isNotEmpty) {
       for (var linkman in linkmen) {
@@ -332,7 +332,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               ChatSummary? chatSummary =
                   await chatSummaryService.findOneByPeerId(linkman.peerId);
               chatSummary ??= await chatSummaryService.upsertByLinkman(linkman);
-              chatMessageController.chatSummary = chatSummary;
+              chatMessageController.chatSummary.value = chatSummary;
               indexWidgetProvider.push('chat_message');
             });
         slideActions.add(chatSlideAction);
@@ -474,7 +474,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   }
 
   List<DataTile> _buildGroupTileData() {
-    var groups = groupController.data;
+    var groups = groupController.data.value;
     List<DataTile> tiles = [];
     if (groups.isNotEmpty) {
       for (var group in groups) {
@@ -561,7 +561,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               ChatSummary? chatSummary =
                   await chatSummaryService.findOneByPeerId(group.peerId);
               chatSummary ??= await chatSummaryService.upsertByGroup(group);
-              chatMessageController.chatSummary = chatSummary;
+              chatMessageController.chatSummary.value = chatSummary;
               indexWidgetProvider.push('chat_message');
             });
         endSlideActions.add(chatSlideAction);
@@ -574,7 +574,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   }
 
   List<DataTile> _buildConferenceTileData() {
-    List<Conference> conferences = conferenceController.data;
+    List<Conference> conferences = conferenceController.data.value;
     List<DataTile> tiles = [];
     if (conferences.isNotEmpty) {
       for (var conference in conferences) {
@@ -637,7 +637,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                   .findOneByPeerId(conference.conferenceId);
               chatSummary ??=
                   await chatSummaryService.upsertByConference(conference);
-              chatMessageController.chatSummary = chatSummary;
+              chatMessageController.chatSummary.value = chatSummary;
               indexWidgetProvider.push('chat_message');
             });
         endSlideActions.add(chatSlideAction);
@@ -730,7 +730,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     );
     var linkmanView = Column(children: [
       _buildLinkmanSearchTextField(context),
-      Expanded(child: Obx(() {
+      Expanded(child: ValueListenableBuilder(
+        valueListenable: linkmanController.currentIndex,
+        builder: (context, value, _) {
         List<DataTile> tiles = _buildLinkmanTileData();
         return DataListView(
           itemCount: tiles.length,
@@ -744,7 +746,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
 
     var groupView = Column(children: [
       _buildGroupSearchTextField(context),
-      Expanded(child: Obx(() {
+      Expanded(child: ValueListenableBuilder(
+        valueListenable: groupController.currentIndex,
+        builder: (context, value, _) {
         List<DataTile> tiles = _buildGroupTileData();
         return DataListView(
           itemCount: tiles.length,
@@ -758,7 +762,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
 
     var conferenceView = Column(children: [
       _buildConferenceSearchTextField(context),
-      Expanded(child: Obx(() {
+      Expanded(child: ValueListenableBuilder(
+        valueListenable: conferenceController.currentIndex,
+        builder: (context, value, _) {
         List<DataTile> tiles = _buildConferenceTileData();
         return DataListView(
           itemCount: tiles.length,

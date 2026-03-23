@@ -67,7 +67,7 @@ class MoreMessageInput extends StatelessWidget {
           tooltip: 'Take a picture',
           icon: const Icon(Icons.camera))
     ]);
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    ChatSummary? chatSummary = chatMessageController.chatSummary.value;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return actionData;
@@ -185,7 +185,7 @@ class MoreMessageInput extends StatelessWidget {
           _buildOption(1800),
         ]);
     deleteTime = deleteTime ?? 0;
-    chatMessageController.deleteTime = deleteTime;
+    chatMessageController.deleteTime.value = deleteTime;
   }
 
   Option _buildOption(int deleteTime) {
@@ -195,7 +195,7 @@ class MoreMessageInput extends StatelessWidget {
 
   ///视频通话
   Future<void> _onActionVideoChat() async {
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    ChatSummary? chatSummary = chatMessageController.chatSummary.value;
     String? partyType = chatSummary?.partyType;
     if (partyType == PartyType.linkman.name) {
       chatMessageController.current = null;
@@ -220,7 +220,7 @@ class MoreMessageInput extends StatelessWidget {
   }
 
   Future<void> _onActionSfuVideoChat() async {
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    ChatSummary? chatSummary = chatMessageController.chatSummary.value;
     String? partyType = chatSummary?.partyType;
     if (partyType == PartyType.linkman.name) {
       chatMessageController.current = null;
@@ -503,7 +503,7 @@ class MoreMessageInput extends StatelessWidget {
             return DataActionCard(
               actions: actionData,
               width: appDataProvider.secondaryBodyWidth,
-              height: chatMessageViewController.moreMessageInputHeight,
+              height: chatMessageViewController.moreMessageInputHeight.value,
               onPressed: (int index, String name, {String? value}) {
                 _onAction(context, index, name, value: value);
               },

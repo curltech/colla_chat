@@ -27,7 +27,7 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:reactive_forms/reactive_forms.dart';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
@@ -117,7 +117,7 @@ class P2pLoginWidget extends StatelessWidget {
 
   DataTile? _buildMyselfPeerTile(int index) {
     DataTile? tileData;
-    List<MyselfPeer> myselfPeers = myselfPeerController.data;
+    List<MyselfPeer> myselfPeers = myselfPeerController.data.value;
     if (myselfPeers.isNotEmpty) {
       MyselfPeer myselfPeer = myselfPeers[index];
       tileData = DataTile(
@@ -174,20 +174,22 @@ class P2pLoginWidget extends StatelessWidget {
       const SizedBox(
         height: 5.0,
       ),
-      Obx(() {
-        return DataListView(
-          onTap: (int index, String title,
-              {DataTile? group, String? subtitle}) async {
-            myselfPeerController.setCurrentIndex = index;
-            Navigator.pop(context);
-            return null;
-          },
-          itemCount: myselfPeerController.data.length,
-          itemBuilder: (BuildContext context, int index) {
-            return _buildMyselfPeerTile(index);
-          },
-        );
-      })
+      ValueListenableBuilder(
+          valueListenable: myselfPeerController.data,
+          builder: (context, value, _) {
+            return DataListView(
+              onTap: (int index, String title,
+                  {DataTile? group, String? subtitle}) async {
+                myselfPeerController.setCurrentIndex = index;
+                Navigator.pop(context);
+                return null;
+              },
+              itemCount: myselfPeerController.data.value.length,
+              itemBuilder: (BuildContext context, int index) {
+                return _buildMyselfPeerTile(index);
+              },
+            );
+          })
     ]));
   }
 

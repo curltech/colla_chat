@@ -16,7 +16,6 @@ import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:enough_mail/discover.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 /// 自动邮件发现视图，一个card下的录入框和按钮组合
 class AutoDiscoverWidget extends StatelessWidget with DataTileMixin {
@@ -40,12 +39,12 @@ class AutoDiscoverWidget extends StatelessWidget with DataTileMixin {
 
   late final PlatformReactiveFormController platformReactiveFormController;
 
-  final Rx<EmailServiceProvider?> emailServiceProvider =
-      Rx<EmailServiceProvider?>(null);
+  final ValueNotifier<EmailServiceProvider?> emailServiceProvider =
+      ValueNotifier<EmailServiceProvider?>(null);
   final TextEditingController emailServiceProviderController =
       TextEditingController();
-  final RxList<Option<String>> emailServiceProviderOptions =
-      RxList<Option<String>>([]);
+  final ValueNotifier<List<Option<String>>> emailServiceProviderOptions =
+      ValueNotifier<List<Option<String>>>([]);
 
   void _updateEmailServiceProviderOptions() {
     List<Option<String>> items = [];
@@ -270,22 +269,25 @@ class AutoDiscoverWidget extends StatelessWidget with DataTileMixin {
           ),
           //_buildEmailServiceProviderSelector(context),
           _buildPlatformReactiveForm(context),
-          Expanded(child: Obx(() {
-            if (emailServiceProvider.value != null) {
-              return Card(
-                  elevation: 0.0,
-                  margin: EdgeInsets.zero,
-                  shape: const ContinuousRectangleBorder(),
-                  child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 5.0, horizontal: 15.0),
-                      child: ListView(
-                        children: clientConfigWidget(
-                            emailServiceProvider.value!.clientConfig),
-                      )));
-            }
-            return nilBox;
-          }))
+          Expanded(
+              child: ValueListenableBuilder(
+                  valueListenable: emailServiceProvider,
+                  builder: (context, value, _) {
+                    if (emailServiceProvider.value != null) {
+                      return Card(
+                          elevation: 0.0,
+                          margin: EdgeInsets.zero,
+                          shape: const ContinuousRectangleBorder(),
+                          child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5.0, horizontal: 15.0),
+                              child: ListView(
+                                children: clientConfigWidget(
+                                    emailServiceProvider.value!.clientConfig),
+                              )));
+                    }
+                    return nilBox;
+                  }))
         ]));
 
     return appBarView;

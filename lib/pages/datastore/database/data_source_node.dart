@@ -156,7 +156,7 @@ class DataSourceNode extends ExplorableNode {
   DataSourceNode(DataSource super.dataSource) {
     FolderNode folderNode = FolderNode(Folder('tables'));
     folderNode.parent = this;
-    children.add(folderNode);
+    children.value.add(folderNode);
   }
 
   @override
@@ -170,7 +170,7 @@ class DataSourceNode extends ExplorableNode {
   }
 
   FolderNode? getTableFolderNode() {
-    return children.firstOrNull as FolderNode?;
+    return children.value.firstOrNull as FolderNode?;
   }
 
   List<DataTableNode>? getDataTableNodes() {
@@ -178,7 +178,7 @@ class DataSourceNode extends ExplorableNode {
     if (folderNode == null) {
       return null;
     }
-    return folderNode.children.map((node) => node as DataTableNode).toList();
+    return folderNode.children.value.map((node) => node as DataTableNode).toList();
   }
 
   DataTableNode? getDataTableNode(String tableName) {
@@ -201,7 +201,7 @@ class DataSourceNode extends ExplorableNode {
     }
     DataTableNode dataTableNode = DataTableNode(dataTable);
     dataTableNode.parent = folderNode;
-    folderNode.children.add(dataTableNode);
+    folderNode.children.value.add(dataTableNode);
 
     return dataTableNode;
   }
@@ -211,7 +211,7 @@ class DataSourceNode extends ExplorableNode {
     if (folderNode == null) {
       return false;
     }
-    return folderNode.children.remove(dataTableNode);
+    return folderNode.children.value.remove(dataTableNode);
   }
 }
 
@@ -219,11 +219,11 @@ class DataTableNode extends ExplorableNode {
   DataTableNode(DataTable super.dataTable) {
     FolderNode columnFolderNode = FolderNode(Folder('columns'));
     columnFolderNode.parent = this;
-    children.add(columnFolderNode);
+    children.value.add(columnFolderNode);
 
     FolderNode indexFolderNode = FolderNode(Folder('indexes'));
     indexFolderNode.parent = this;
-    children.add(indexFolderNode);
+    children.value.add(indexFolderNode);
   }
 
   @override
@@ -232,11 +232,11 @@ class DataTableNode extends ExplorableNode {
   }
 
   FolderNode? getColumnFolderNode() {
-    return children.firstOrNull as FolderNode?;
+    return children.value.firstOrNull as FolderNode?;
   }
 
   FolderNode? getIndexFolderNode() {
-    return children.lastOrNull as FolderNode?;
+    return children.value.lastOrNull as FolderNode?;
   }
 
   List<DataColumnNode>? getDataColumnNodes() {
@@ -294,7 +294,7 @@ class DataTableNode extends ExplorableNode {
     for (DataColumn dataColumn in dataColumns) {
       DataColumnNode dataColumnNode = DataColumnNode(dataColumn);
       dataColumnNode.parent = folderNode;
-      folderNode.children.add(dataColumnNode);
+      folderNode.children.value.add(dataColumnNode);
       dataColumnNodes.add(dataColumnNode);
     }
     return dataColumnNodes;
@@ -306,9 +306,9 @@ class DataTableNode extends ExplorableNode {
       return;
     }
     if (dataColumnNode == null) {
-      folderNode.children.clear();
+      folderNode.children.value.clear();
     } else {
-      folderNode.children
+      folderNode.children.value
           .removeWhere((item) => item.value.name == dataColumnNode.value.name);
     }
   }
@@ -322,7 +322,7 @@ class DataTableNode extends ExplorableNode {
     for (DataIndex dataIndex in dataIndexes) {
       DataIndexNode dataIndexNode = DataIndexNode(dataIndex);
       dataIndexNode.parent = folderNode;
-      folderNode.children.add(dataIndexNode);
+      folderNode.children.value.add(dataIndexNode);
       dataIndexNodes.add(dataIndexNode);
     }
 
@@ -335,9 +335,9 @@ class DataTableNode extends ExplorableNode {
       return false;
     }
     if (dataIndexNode == null) {
-      folderNode.children.clear();
+      folderNode.children.value.clear();
     } else {
-      folderNode.children
+      folderNode.children.value
           .removeWhere((item) => item.value.name == dataIndexNode.value.name);
     }
 

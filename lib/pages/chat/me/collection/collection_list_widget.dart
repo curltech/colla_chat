@@ -10,7 +10,6 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 //收藏的清单组件
 class CollectionListWidget extends StatefulWidget {
@@ -141,7 +140,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
 
   ///创建每一条收藏消息
   Widget _buildCollectionItem(BuildContext context, int index) {
-    List<ChatMessage> messages = collectionChatMessageController.data;
+    List<ChatMessage> messages = collectionChatMessageController.data.value;
     ChatMessage chatMessage = messages[index];
     Widget chatMessageItem = DataListTile(
       index: index,
@@ -169,25 +168,27 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
 
   ///创建收藏信息的列表
   Widget _buildCollectionWidget(BuildContext context) {
-    return Obx(() {
-      return Column(children: <Widget>[
-        Flexible(
-          //使用列表渲染消息
-          child: RefreshIndicator(
-              onRefresh: _onRefresh,
-              //notificationPredicate: _notificationPredicate,
-              child: ListView.builder(
-                controller: widget.scrollController,
-                padding: const EdgeInsets.all(8.0),
-                reverse: false,
-                //消息组件渲染
-                itemBuilder: _buildCollectionItem,
-                //消息条目数
-                itemCount: collectionChatMessageController.length,
-              )),
-        ),
-      ]);
-    });
+    return ValueListenableBuilder(
+        valueListenable: collectionChatMessageController.currentIndex,
+        builder: (context, value, _) {
+          return Column(children: <Widget>[
+            Flexible(
+              //使用列表渲染消息
+              child: RefreshIndicator(
+                  onRefresh: _onRefresh,
+                  //notificationPredicate: _notificationPredicate,
+                  child: ListView.builder(
+                    controller: widget.scrollController,
+                    padding: const EdgeInsets.all(8.0),
+                    reverse: false,
+                    //消息组件渲染
+                    itemBuilder: _buildCollectionItem,
+                    //消息条目数
+                    itemCount: collectionChatMessageController.length,
+                  )),
+            ),
+          ]);
+        });
   }
 
   @override

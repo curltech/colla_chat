@@ -315,7 +315,7 @@ class ConferenceChatMessageController with ChangeNotifier {
       //立即接听
       if (receiptType == MessageReceiptType.accepted) {
         //设置当前消息，转入视频会议界面
-        chatMessageController.chatSummary = _chatSummary;
+        chatMessageController.chatSummary.value = _chatSummary;
         chatMessageController.current = _chatMessage;
         indexWidgetProvider.push('chat_message');
         indexWidgetProvider.push('video_chat');
@@ -326,7 +326,7 @@ class ConferenceChatMessageController with ChangeNotifier {
       //立即接听
       if (receiptType == MessageReceiptType.accepted) {
         //设置当前消息，转入视频会议界面
-        chatMessageController.chatSummary = _chatSummary;
+        chatMessageController.chatSummary.value = _chatSummary;
         chatMessageController.current = _chatMessage;
         indexWidgetProvider.push('chat_message');
         if (_conference!.sfu) {
@@ -337,7 +337,7 @@ class ConferenceChatMessageController with ChangeNotifier {
         await join();
         return;
       } else if (receiptType == MessageReceiptType.received) {
-        chatMessageController.chatSummary = _chatSummary;
+        chatMessageController.chatSummary.value = _chatSummary;
         chatMessageController.current = _chatMessage;
         indexWidgetProvider.push('chat_message');
       }

@@ -50,7 +50,7 @@ class VideoChatDragOverlay {
       if (conferenceChatMessageController != null) {
         ChatSummary? chatSummary = conferenceChatMessageController.chatSummary;
         if (chatSummary != null) {
-          chatMessageController.chatSummary = chatSummary;
+          chatMessageController.chatSummary.value = chatSummary;
         }
       }
       if (target != null) {
@@ -126,7 +126,7 @@ class VideoChatWidget extends StatefulWidget with DataTileMixin {
 }
 
 class _VideoChatWidgetState extends State<VideoChatWidget> {
-  ChatSummary chatSummary = chatMessageController.chatSummary!;
+  ChatSummary chatSummary = chatMessageController.chatSummary.value!;
   PlatformCarouselController controller = PlatformCarouselController();
   ValueNotifier<int> index = ValueNotifier<int>(0);
 

@@ -127,7 +127,7 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
 
   ///创建每一条消息
   Widget _buildChannelChatMessageItem(BuildContext context, int index) {
-    List<ChatMessage> chatMessages = channelChatMessageController.data;
+    List<ChatMessage> chatMessages = channelChatMessageController.data.value;
     ChatMessage chatMessage = chatMessages[index];
     Widget chatMessageItem =
         ChannelChatMessageItem(key: UniqueKey(), chatMessage: chatMessage);
@@ -162,7 +162,7 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
           //消息组件渲染
           itemBuilder: _buildChannelChatMessageItem,
           //消息条目数
-          itemCount: channelChatMessageController.data.length,
+          itemCount: channelChatMessageController.data.value.length,
         ));
   }
 

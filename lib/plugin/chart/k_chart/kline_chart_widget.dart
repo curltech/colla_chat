@@ -4,13 +4,12 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
-import 'package:get/state_manager.dart';
 import 'package:interactive_chart/interactive_chart.dart';
 
 class KlineChartWidget extends StatelessWidget {
   KlineChartWidget({super.key});
 
-  Rx<List<CandleData>> candles = Rx<List<CandleData>>([]);
+  ValueNotifier<List<CandleData>> candles = ValueNotifier<List<CandleData>>([]);
 
   void _computeTrendLines() {
     final ma7 = CandleData.computeMA(candles.value, 7);
@@ -64,7 +63,7 @@ class KlineChartWidget extends StatelessWidget {
           volume: volume.toDouble());
       candles.add(candle);
     }
-    this.candles.value.assignAll(candles);
+    this.candles.value = [...candles];
   }
 
   ChartStyle _buildChartStyle(BuildContext context) {
@@ -96,8 +95,9 @@ class KlineChartWidget extends StatelessWidget {
 
   Widget _buildInteractiveChart(BuildContext context) {
     final ChartStyle style = _buildChartStyle(context);
-    return Obx(
-      () {
+    return ValueListenableBuilder(
+      valueListenable: candles,
+      builder: (context, value, _) {
         if (candles.value.isEmpty) {
           return nilBox;
         }
@@ -127,13 +127,16 @@ class KlineChartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      KlineController? klineController = multiKlineController.klineController;
-      if (klineController != null) {
-        List<dynamic> data = klineController.data.value;
-        _buildCandles(data);
-      }
-      return _buildInteractiveChart(context);
-    });
+    return ListenableBuilder(
+        listenable: multiKlineController.klineController!.listenable,
+        builder: (context, _) {
+          KlineController? klineController =
+              multiKlineController.klineController;
+          if (klineController != null) {
+            List<dynamic> data = klineController.data.value;
+            _buildCandles(data);
+          }
+          return _buildInteractiveChart(context);
+        });
   }
 }

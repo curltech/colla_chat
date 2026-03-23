@@ -4,7 +4,7 @@ import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 /// 带有播放列表平台的媒体播放器组件
 class PlaylistMediaPlayer extends StatelessWidget {
@@ -16,7 +16,7 @@ class PlaylistMediaPlayer extends StatelessWidget {
     onSelected: _onSelected,
     playlistController: playlistController,
   );
-  final RxInt index = 0.obs;
+  final ValueNotifier<int> index = ValueNotifier<int>(0);
 
   PlaylistMediaPlayer(
       {super.key, required this.player, required this.playlistController});

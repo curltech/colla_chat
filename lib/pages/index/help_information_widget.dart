@@ -5,13 +5,13 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+
 import 'package:gpt_markdown/gpt_markdown.dart';
 
 class HelpInformationController {
-  RxString title = ''.obs;
+  final ValueNotifier<String> title = ValueNotifier<String>('');
   String _helpPath = '';
-  RxString information = ''.obs;
+  final ValueNotifier<String> information = ValueNotifier<String>('');
 
   String get helpPath {
     return _helpPath;
@@ -61,15 +61,20 @@ class HelpInformationWidget extends StatelessWidget with DataTileMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      String information = helpInformationController.information.value;
-      return AppBarView(
-          title:
-              '${AppLocalizations.t(helpInformationController.title.value)} ${AppLocalizations.t('help')}',
-          withLeading: true,
-          child: Container(
-              color: Colors.white.withAlpha(0),
-              child: GptMarkdown(information)));
-    });
+    return ListenableBuilder(
+        listenable: Listenable.merge([
+          helpInformationController.information,
+          helpInformationController.title
+        ]),
+        builder: (context, _) {
+          String information = helpInformationController.information.value;
+          return AppBarView(
+              title:
+                  '${AppLocalizations.t(helpInformationController.title.value)} ${AppLocalizations.t('help')}',
+              withLeading: true,
+              child: Container(
+                  color: Colors.white.withAlpha(0),
+                  child: GptMarkdown(information)));
+        });
   }
 }

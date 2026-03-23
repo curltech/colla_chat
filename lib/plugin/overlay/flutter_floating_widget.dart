@@ -6,11 +6,11 @@ import 'package:flutter_floating/floating/assist/floating_edge_type.dart';
 import 'package:flutter_floating/floating/assist/fposition.dart';
 import 'package:flutter_floating/floating/assist/snap_stop_type.dart';
 import 'package:flutter_floating/floating/floating_overlay.dart';
-import 'package:get/get.dart';
+
 
 /// 应用级的悬浮窗控制器
 class FlutterFloatingController {
-  final Rx<String?> current = Rx<String?>(null);
+  final ValueNotifier<String?> current = ValueNotifier<String?>(null);
 
   String createFloating(
     Widget child, {
@@ -151,10 +151,10 @@ class FlutterFloatingHome extends StatelessWidget {
 
 /// 应用级overlay窗口的overlay部分
 class FlutterFloatingOverlay extends StatelessWidget {
-  final Rx<Widget> enabled = Rx<Widget>(nilBox);
+  final ValueNotifier<Widget> enabled = ValueNotifier<Widget>(nilBox);
 
   //系统级窗口的形状
-  final Rx<BoxShape> boxShape = BoxShape.rectangle.obs;
+  final ValueNotifier<BoxShape> boxShape = ValueNotifier<BoxShape>(BoxShape.rectangle);
 
   FlutterFloatingOverlay({super.key});
 
@@ -167,7 +167,9 @@ class FlutterFloatingOverlay extends StatelessWidget {
   }
 
   Widget _buildEnabledWidget(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: boxShape,
+        builder: (context, value, _) {
       return Container(
         decoration: BoxDecoration(
           shape: boxShape.value,

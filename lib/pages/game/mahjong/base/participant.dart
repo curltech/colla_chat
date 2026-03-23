@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room_event.dart';
 import 'package:flame/components.dart';
-import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
+
 
 /// 参与者
 class Participant {
@@ -19,7 +20,7 @@ class Participant {
   Room? room;
 
   //积分
-  final RxInt score = 0.obs;
+  final ValueNotifier<int> score = ValueNotifier<int>(0);
 
   /// 记录重要的事件
   final List<RoomEvent> roomEvents = [];

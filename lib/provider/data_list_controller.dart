@@ -4,7 +4,6 @@ import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/pagination_util.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class SortColumn {
   final int index;
@@ -56,13 +55,15 @@ class FindCondition {
 ///基础的数组数据控制器
 class DataListController<T> {
   Key key = UniqueKey();
-  final RxList<T> data = <T>[].obs;
-  final Rx<int?> currentIndex = Rx<int?>(null);
-  final Rx<FindCondition> findCondition = Rx<FindCondition>(FindCondition());
+  final ValueNotifier<List<T>> data = ValueNotifier<List<T>>([]);
+  final ValueNotifier<int?> currentIndex = ValueNotifier<int?>(null);
+  final ValueNotifier<FindCondition> findCondition =
+      ValueNotifier<FindCondition>(FindCondition());
+  late final Listenable listenable = Listenable.merge([data, currentIndex]);
 
   DataListController({List<T>? data, int? currentIndex}) {
     if (data != null && data.isNotEmpty) {
-      this.data.addAll(data);
+      this.data.value.addAll(data);
       if (currentIndex == null) {
         this.currentIndex.value = 0;
       } else {
@@ -78,9 +79,9 @@ class DataListController<T> {
   T? get current {
     if (currentIndex.value != -1 &&
         currentIndex.value != null &&
-        currentIndex.value! < data.length &&
-        data.isNotEmpty) {
-      return data[currentIndex.value!];
+        currentIndex.value! < data.value.length &&
+        data.value.isNotEmpty) {
+      return data.value[currentIndex.value!];
     }
     return null;
   }
@@ -89,13 +90,13 @@ class DataListController<T> {
     if (element == null) {
       setCurrentIndex = null;
     } else {
-      setCurrentIndex = data.indexOf(element);
+      setCurrentIndex = data.value.indexOf(element);
     }
   }
 
   ///设置当前数据索引
   set setCurrentIndex(int? index) {
-    if (index == null || index > data.length - 1) {
+    if (index == null || index > data.value.length - 1) {
       currentIndex.value = null;
       return;
     }
@@ -106,44 +107,44 @@ class DataListController<T> {
 
   void addAll(List<T> ds) {
     if (ds.isNotEmpty) {
-      data.addAll(ds);
-      currentIndex.value = data.length - 1;
+      data.value.addAll(ds);
+      currentIndex.value = data.value.length - 1;
     }
   }
 
   void add(T d) {
-    data.add(d);
-    currentIndex.value = data.length - 1;
+    data.value.add(d);
+    currentIndex.value = data.value.length - 1;
   }
 
   T? get(int index) {
-    if (index >= 0 && index < data.length) {
-      return data[index];
+    if (index >= 0 && index < data.value.length) {
+      return data.value[index];
     }
 
     return null;
   }
 
   void insert(int index, T d) {
-    if (index >= 0 && index <= data.length) {
-      data.insert(index, d);
+    if (index >= 0 && index <= data.value.length) {
+      data.value.insert(index, d);
       currentIndex.value = index;
     }
   }
 
   void insertAll(int index, List<T> ds) {
-    if (index >= 0 && index <= data.length) {
-      data.insertAll(index, ds);
+    if (index >= 0 && index <= data.value.length) {
+      data.value.insertAll(index, ds);
       currentIndex.value = index;
     }
   }
 
   T? delete({int? index}) {
     index = index ?? currentIndex.value;
-    if (index != null && index < data.length) {
-      T t = data.removeAt(index);
-      if (data.isEmpty) {
-        currentIndex(null);
+    if (index != null && index < data.value.length) {
+      T t = data.value.removeAt(index);
+      if (data.value.isEmpty) {
+        currentIndex.value = null;
       } else if (index == 0) {
         currentIndex.value = 0;
       } else {
@@ -156,7 +157,7 @@ class DataListController<T> {
   }
 
   T? remove(T t) {
-    int index = data.indexOf(t);
+    int index = data.value.indexOf(t);
     if (index == -1) {
       return null;
     }
@@ -166,39 +167,42 @@ class DataListController<T> {
 
   void update(T d, {int? index}) {
     index = index ?? currentIndex.value;
-    if (index != null && index < data.length) {
-      data[index] = d;
+    if (index != null && index < data.value.length) {
+      data.value[index] = d;
+      data.value = [...data.value];
     }
   }
 
   void clear() {
-    if (data.isNotEmpty) {
-      data.clear();
+    if (data.value.isNotEmpty) {
+      data.value.clear();
       currentIndex.value = null;
     }
   }
 
   ///替换了当前的对象
   void replace(T d) {
-    if (currentIndex.value != null && data.isNotEmpty) {
-      data[currentIndex.value!] = d;
+    if (currentIndex.value != null && data.value.isNotEmpty) {
+      data.value[currentIndex.value!] = d;
+      data.value = [...data.value];
     }
   }
 
   void replaceAll(List<T> ds) {
-    data.assignAll(ds);
+    data.value = [...ds];
     if (ds.isNotEmpty) {
-      currentIndex.value = data.length - 1;
+      currentIndex.value = data.value.length - 1;
     }
   }
 
   void move(int initialIndex, int finalIndex) {
-    var mediaSource = data[initialIndex];
-    data[initialIndex] = data[finalIndex];
-    data[finalIndex] = mediaSource;
+    var mediaSource = data.value[initialIndex];
+    data.value[initialIndex] = data.value[finalIndex];
+    data.value[finalIndex] = mediaSource;
+    data.value = [...data.value];
   }
 
-  int get length => data.length;
+  int get length => data.value.length;
 
   /// 获取数据的方法，子类可以覆盖
   FutureOr<void> findData() async {}
@@ -216,7 +220,7 @@ class DataListController<T> {
   /// 已有数据的排序
   void sort<S>(Comparable<S>? Function(T t) getFieldValue, int columnIndex,
       String columnName, bool ascending) {
-    data.sort((T a, T b) {
+    data.value.sort((T a, T b) {
       Comparable<S>? av = getFieldValue(a);
       Comparable<S>? bv = getFieldValue(b);
       if (ascending) {
@@ -246,7 +250,7 @@ class DataListController<T> {
 
   List<T> get selected {
     List<T> selectedData = [];
-    for (var t in data) {
+    for (var t in data.value) {
       bool? selected = EntityUtil.getSelected(t);
       if (selected != null && selected) {
         selectedData.add(t);
@@ -257,20 +261,22 @@ class DataListController<T> {
   }
 
   void selectAll() {
-    for (var t in data) {
+    for (var t in data.value) {
       EntityUtil.setSelected(t, true);
     }
+    data.value = [...data.value];
   }
 
   void unselectAll() {
-    for (var t in data) {
+    for (var t in data.value) {
       EntityUtil.setSelected(t, false);
     }
+    data.value = [...data.value];
   }
 
   List<T> get checked {
     List<T> checkedData = [];
-    for (var t in data) {
+    for (var t in data.value) {
       bool? checked = EntityUtil.getChecked(t);
       if (checked != null && checked) {
         checkedData.add(t);
@@ -281,15 +287,17 @@ class DataListController<T> {
   }
 
   void checkAll() {
-    for (var t in data) {
+    for (var t in data.value) {
       EntityUtil.setChecked(t, true);
     }
+    data.value = [...data.value];
   }
 
   void uncheckAll() {
-    for (var t in data) {
+    for (var t in data.value) {
       EntityUtil.setChecked(t, false);
     }
+    data.value = [...data.value];
   }
 }
 

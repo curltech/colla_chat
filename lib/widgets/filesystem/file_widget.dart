@@ -14,7 +14,6 @@ import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:mimecon/mimecon.dart';
 import 'package:path/path.dart' as p;
 
@@ -33,7 +32,7 @@ class FileWidget extends StatelessWidget {
 
   final DataListController<File> fileController = DataListController<File>();
 
-  final RxBool gridMode = false.obs;
+  final ValueNotifier<bool> gridMode = ValueNotifier<bool>(false);
 
   final TextEditingController searchTextController = TextEditingController();
 
@@ -170,7 +169,7 @@ class FileWidget extends StatelessWidget {
     if (confirm != null && confirm) {
       for (File file in files) {
         file.file.delete();
-        fileController.data.remove(file);
+        fileController.data.value.remove(file);
       }
     }
   }
@@ -210,55 +209,59 @@ class FileWidget extends StatelessWidget {
   }
 
   Widget _buildFilePathWidget(BuildContext context) {
-    return Obx(() {
-      File? file = fileController.current;
-      String? path = file?.file.path;
+    return ValueListenableBuilder(
+        valueListenable: fileController.currentIndex,
+        builder: (context, value, _) {
+          File? file = fileController.current;
+          String? path = file?.file.path;
 
-      return AutoSizeText(path ?? '');
-    });
+          return AutoSizeText(path ?? '');
+        });
   }
 
   Widget _buildFileWrapWidget(BuildContext context) {
-    return Obx(() {
-      List<Widget> children = [];
-      for (File file in fileController.data) {
-        children.add(InkWell(
-            onLongPress: () {
-              _onLongPress(context, file);
-            },
-            onTap: () {
-              fileController.current = file;
-            },
-            child: Container(
-                width: 100,
-                height: 120,
-                color: file == fileController.current
-                    ? myself.secondary.withAlpha(50)
-                    : null,
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      file.icon,
-                      Expanded(
-                          child: AutoSizeText(
-                        file.name,
-                        style: TextStyle(
-                            color: file == fileController.current
-                                ? Colors.white
-                                : null),
-                      ))
-                    ]))));
-      }
-      return SingleChildScrollView(
-          // padding: EdgeInsets.zero,
-          child: Wrap(
-        spacing: 10.0,
-        // alignment: WrapAlignment.center,
-        // runAlignment: WrapAlignment.center,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: children,
-      ));
-    });
+    return ValueListenableBuilder(
+        valueListenable: fileController.data,
+        builder: (context, value, _) {
+          List<Widget> children = [];
+          for (File file in fileController.data.value) {
+            children.add(InkWell(
+                onLongPress: () {
+                  _onLongPress(context, file);
+                },
+                onTap: () {
+                  fileController.current = file;
+                },
+                child: Container(
+                    width: 100,
+                    height: 120,
+                    color: file == fileController.current
+                        ? myself.secondary.withAlpha(50)
+                        : null,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          file.icon,
+                          Expanded(
+                              child: AutoSizeText(
+                            file.name,
+                            style: TextStyle(
+                                color: file == fileController.current
+                                    ? Colors.white
+                                    : null),
+                          ))
+                        ]))));
+          }
+          return SingleChildScrollView(
+              // padding: EdgeInsets.zero,
+              child: Wrap(
+            spacing: 10.0,
+            // alignment: WrapAlignment.center,
+            // runAlignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: children,
+          ));
+        });
   }
 
   Widget _buildFileTableWidget(BuildContext context) {
@@ -304,11 +307,11 @@ class FileWidget extends StatelessWidget {
       controller: fileController,
       fixedLeftColumns: 0,
       onLongPress: (int index, dynamic value) {
-        File file = fileController.data[index];
+        File file = fileController.data.value[index];
         _onLongPress(context, file);
       },
       onDoubleTap: (int index) {
-        File file = fileController.data[index];
+        File file = fileController.data.value[index];
         fileController.current = file;
       },
     );
@@ -319,14 +322,16 @@ class FileWidget extends StatelessWidget {
     List<Widget> rightWidgets = [
       IconButton(
         color: myself.primary,
-        icon: Obx(() {
-          return Icon(
-            gridMode.isTrue ? Icons.list : Icons.grid_on,
-            color: Colors.white,
-          );
-        }),
+        icon: ValueListenableBuilder(
+            valueListenable: gridMode,
+            builder: (context, value, _) {
+              return Icon(
+                gridMode.value ? Icons.list : Icons.grid_on,
+                color: Colors.white,
+              );
+            }),
         onPressed: () {
-          gridMode(!gridMode.value);
+          gridMode.value = !gridMode.value;
         },
         tooltip: AppLocalizations.t('Toggle grid mode'),
       )
@@ -345,7 +350,7 @@ class FileWidget extends StatelessWidget {
             ),
             child: _buildSearchTextWidget(context)),
         Expanded(
-          child: gridMode.isTrue
+          child: gridMode.value
               ? _buildFileWrapWidget(context)
               : _buildFileTableWidget(context),
         )

@@ -7,30 +7,37 @@ import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+
 import 'package:path/path.dart' as p;
 
 class ModelProjectController {
   /// 元模型
-  final RxMap<String, Project> metaProjects = <String, Project>{}.obs;
-  final RxString currentMetaId = RxString(Project.baseMetaId);
+  final ValueNotifier<Map<String, Project>> metaProjects =
+      ValueNotifier<Map<String, Project>>({});
+  final ValueNotifier<String> currentMetaId =
+      ValueNotifier<String>(Project.baseMetaId);
 
   /// 当前模型
-  final Rx<Project?> currentProject = Rx<Project?>(null);
+  final ValueNotifier<Project?> currentProject = ValueNotifier<Project?>(null);
 
   /// 当前展示模型
-  final Rx<Project?> project = Rx<Project?>(null);
+  final ValueNotifier<Project?> project = ValueNotifier<Project?>(null);
 
   /// 当前模型的文件名
-  final Rx<String?> filename = Rx<String?>(null);
-  final Rx<String?> currentSubjectName = Rx<String?>(null);
-  final Rx<ModelNode?> selectedSrcModelNode = Rx<ModelNode?>(null);
-  final Rx<ModelNode?> selectedDstModelNode = Rx<ModelNode?>(null);
-  final Rx<NodeRelationship?> selectedRelationship =
-      Rx<NodeRelationship?>(null);
-  final RxBool canAddSubject = false.obs;
-  final Rx<ModelNode?> canAddModelNode = Rx<ModelNode?>(null);
+  final ValueNotifier<String?> filename = ValueNotifier<String?>(null);
+  final ValueNotifier<String?> currentSubjectName =
+      ValueNotifier<String?>(null);
+  final ValueNotifier<ModelNode?> selectedSrcModelNode =
+      ValueNotifier<ModelNode?>(null);
+  final ValueNotifier<ModelNode?> selectedDstModelNode =
+      ValueNotifier<ModelNode?>(null);
+  final ValueNotifier<NodeRelationship?> selectedRelationship =
+      ValueNotifier<NodeRelationship?>(null);
+  final ValueNotifier<bool> canAddSubject = ValueNotifier<bool>(false);
+  final ValueNotifier<ModelNode?> canAddModelNode =
+      ValueNotifier<ModelNode?>(null);
   final ModelNode typeModelNode = ModelNode(
       name: 'type',
       nodeType: NodeType.type.name,
@@ -136,7 +143,7 @@ class ModelProjectController {
 
     metaProject.subjects = {subject.name: subject};
 
-    metaProjects[metaProject.id] = metaProject;
+    metaProjects.value[metaProject.id] = metaProject;
   }
 
   Subject? getCurrentSubject() {
@@ -157,7 +164,7 @@ class ModelProjectController {
   }
 
   ModelNode? getMetaModelNode(String id) {
-    Project? metaProject = metaProjects[currentMetaId.value];
+    Project? metaProject = metaProjects.value[currentMetaId.value];
     if (metaProject != null) {
       for (Subject subject in metaProject.subjects.values) {
         return subject.modelNodes[id];
@@ -195,9 +202,9 @@ class ModelProjectController {
     List<ModelNode>? modelNodes;
     Project? metaProject;
     if (project.value == null) {
-      metaProject = metaProjects[Project.baseMetaId];
+      metaProject = metaProjects.value[Project.baseMetaId];
     } else {
-      metaProject = metaProjects[project.value!.metaId];
+      metaProject = metaProjects.value[project.value!.metaId];
     }
     if (metaProject == null) {
       return null;
@@ -218,9 +225,9 @@ class ModelProjectController {
     Set<RelationshipType>? relationshipTypes;
     Project? metaProject;
     if (project.value == null) {
-      metaProject = metaProjects[Project.baseMetaId];
+      metaProject = metaProjects.value[Project.baseMetaId];
     } else {
-      metaProject = metaProjects[project.value!.metaId];
+      metaProject = metaProjects.value[project.value!.metaId];
     }
     if (metaProject == null) {
       return null;
@@ -264,7 +271,7 @@ class ModelProjectController {
       metaProject.meta = true;
     }
 
-    metaProjects[metaProject.id] = metaProject;
+    metaProjects.value[metaProject.id] = metaProject;
   }
 
   /// 注册元模型，覆盖原来加载的
@@ -282,7 +289,7 @@ class ModelProjectController {
     }
     file.writeAsStringSync(content);
 
-    metaProjects[metaProject.id] = metaProject;
+    metaProjects.value[metaProject.id] = metaProject;
   }
 
   /// 根据metaId打开应用目录下已经注册的元模型项目
@@ -307,14 +314,14 @@ class ModelProjectController {
     Map<String, dynamic> json = JsonUtil.toJson(content);
     Project project = Project.fromJson(json);
     String metaId = project.metaId;
-    if (!metaProjects.containsKey(metaId)) {
+    if (!metaProjects.value.containsKey(metaId)) {
       Project? metaProject =
           await modelProjectController.openMetaProject(metaId);
 
       if (metaProject == null) {
         throw 'meta project is not exist';
       }
-      metaProjects[metaId] = metaProject;
+      metaProjects.value[metaId] = metaProject;
     }
 
     currentMetaId.value = metaId;

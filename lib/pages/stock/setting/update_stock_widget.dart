@@ -8,7 +8,6 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 /// 运行后台批处理，更新数据，支持单个股票的数据更新
 class UpdateStockWidget extends StatelessWidget with DataTileMixin {
@@ -29,11 +28,11 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
   final TextEditingController _startDateTextController =
       TextEditingController();
   final TextEditingController _tsCodeTextController = TextEditingController();
-  final RxList<DataTile> tileData = <DataTile>[].obs;
+  final ValueNotifier<List<DataTile>> tileData =
+      ValueNotifier<List<DataTile>>([]);
 
   void _initTileData(BuildContext context) {
-    tileData.clear();
-    tileData.addAll([
+    tileData.value=[
       DataTile(
           title: '预测',
           subtitle: '获取预测数据',
@@ -46,6 +45,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
             if (_tsCodeTextController.text.isNotEmpty) {
               stockLineService.getUpdateForecast(_tsCodeTextController.text);
             }
+            return null;
           }),
       DataTile(
           title: '快报',
@@ -59,6 +59,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
             if (_tsCodeTextController.text.isNotEmpty) {
               stockLineService.getUpdateExpress(_tsCodeTextController.text);
             }
+            return null;
           }),
       DataTile(
           title: '业绩',
@@ -72,6 +73,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
             if (_tsCodeTextController.text.isNotEmpty) {
               stockLineService.getUpdatePerformance(_tsCodeTextController.text);
             }
+            return null;
           }),
       DataTile(
           title: '日线',
@@ -99,6 +101,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
               stockLineService.getUpdateTodayLine(_tsCodeTextController.text,
                   int.parse(_startDateTextController.text));
             }
+            return null;
           }),
       DataTile(
           title: '分钟线',
@@ -252,7 +255,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
                   int.parse(_startDateTextController.text));
             }
           }),
-    ]);
+    ];
   }
 
   Widget _buildUpdateStockView(BuildContext context) {
@@ -272,14 +275,16 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
               decoration: buildInputDecoration(
                   labelText: AppLocalizations.t('startDate')))),
       Expanded(
-        child: Obx(() {
-          return DataListView(
-            itemCount: tileData.length,
-            itemBuilder: (BuildContext context, int index) {
-              return tileData[index];
-            },
-          );
-        }),
+        child: ValueListenableBuilder(
+            valueListenable: tileData,
+            builder: (context, value, _) {
+              return DataListView(
+                itemCount: tileData.value.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return tileData.value[index];
+                },
+              );
+            }),
       ),
     ]);
   }

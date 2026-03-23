@@ -23,7 +23,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 /// 18m麻将游戏
 class Majiang18mWidget extends StatelessWidget with DataTileMixin {
@@ -44,7 +44,7 @@ class Majiang18mWidget extends StatelessWidget with DataTileMixin {
   @override
   String get title => 'Mahjong 18m';
 
-  final RxBool fullscreen = false.obs;
+  final ValueNotifier<bool> fullscreen = ValueNotifier<bool>(false);
 
   final TextEditingController textEditingController = TextEditingController();
   final List<String> peerIds = [myself.peerId!];
@@ -272,7 +272,9 @@ class Majiang18mWidget extends StatelessWidget with DataTileMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
+    return ValueListenableBuilder(
+        valueListenable: roomController.room,
+        builder: (context, value, _) {
       return AppBarView(
           title: title,
           helpPath: routeName,

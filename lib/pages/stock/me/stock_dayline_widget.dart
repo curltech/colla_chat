@@ -16,7 +16,7 @@ import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:reactive_forms/reactive_forms.dart';
 
 /// 查询满足条件的日线数据
@@ -40,7 +40,7 @@ class DayLineWidget extends StatelessWidget with DataTileMixin {
   late final PlatformReactiveFormController searchController;
   final DataListController<DayLine> dayLineController =
       DataListController<DayLine>();
-  final RxBool showLoading = false.obs;
+  final ValueNotifier<bool> showLoading = ValueNotifier<bool>(false);
   final ExpansibleController expansibleController = ExpansibleController();
 
   void _init() {
@@ -314,7 +314,9 @@ class DayLineWidget extends StatelessWidget with DataTileMixin {
         controller: dayLineController);
     return Stack(children: <Widget>[
       table,
-      Obx(() {
+      ValueListenableBuilder(
+        valueListenable: showLoading,
+        builder: (context, value, _) {
         if (showLoading.value) {
           return Container(
             width: double.infinity,

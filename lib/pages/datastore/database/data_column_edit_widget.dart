@@ -13,7 +13,6 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class DataColumnEditWidget extends StatelessWidget with DataTileMixin {
   @override
@@ -81,23 +80,25 @@ class DataColumnEditWidget extends StatelessWidget with DataTileMixin {
 
   //DataSourceNode信息编辑界面
   Widget _buildPlatformReactiveForm(BuildContext context) {
-    return Obx(() {
-      data_source.DataColumnNode? dataColumnNode =
-          dataSourceController.getDataColumnNode();
-      if (dataColumnNode != null) {
-        platformReactiveFormController.values =
-            JsonUtil.toJson(dataColumnNode.value);
-      }
-      var platformReactiveForm = PlatformReactiveForm(
-        spacing: 15.0,
-        onSubmit: (Map<String, dynamic> values) {
-          _onSubmit(values);
-        },
-        platformReactiveFormController: platformReactiveFormController,
-      );
+    return ValueListenableBuilder(
+        valueListenable: dataSourceController.currentIndex,
+        builder: (context, value, _) {
+          data_source.DataColumnNode? dataColumnNode =
+              dataSourceController.getDataColumnNode();
+          if (dataColumnNode != null) {
+            platformReactiveFormController.values =
+                JsonUtil.toJson(dataColumnNode.value);
+          }
+          var platformReactiveForm = PlatformReactiveForm(
+            spacing: 15.0,
+            onSubmit: (Map<String, dynamic> values) {
+              _onSubmit(values);
+            },
+            platformReactiveFormController: platformReactiveFormController,
+          );
 
-      return platformReactiveForm;
-    });
+          return platformReactiveForm;
+        });
   }
 
   data_source.DataColumn? _onSubmit(Map<String, dynamic> values) {

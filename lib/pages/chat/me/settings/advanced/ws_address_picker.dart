@@ -27,7 +27,7 @@ class WsAddressPicker extends StatelessWidget {
       }
       _wsConnectAddressController.text = _wsConnectAddress;
     }
-    var peerEndpoints = peerEndpointController.data;
+    var peerEndpoints = peerEndpointController.data.value;
     List<Option<String>> addressOptions = [];
     for (var peerEndpoint in peerEndpoints) {
       Option<String> option =
@@ -50,7 +50,7 @@ class WsAddressPicker extends StatelessWidget {
           optionController: OptionController(options: addressOptions),
           onChanged: (selected) {
             if (selected != null) {
-              var peerEndpoints = peerEndpointController.data;
+              var peerEndpoints = peerEndpointController.data.value;
               int i = 0;
               for (var peerEndpoint in peerEndpoints) {
                 if (peerEndpoint.peerId == selected) {

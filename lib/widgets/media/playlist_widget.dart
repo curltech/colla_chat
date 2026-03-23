@@ -21,52 +21,51 @@ import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class PlaylistController {
-  final ValueNotifier<String> currentControllerName =
-      ValueNotifier<String>('/');
-  late final MediaSourceController rootMediaSourceController =
-      MediaSourceController(currentControllerName.value);
+  final MediaSourceController rootMediaSourceController =
+      MediaSourceController('/');
+  late final ValueNotifier<MediaSourceController> currentController =
+      ValueNotifier<MediaSourceController>(rootMediaSourceController);
+
   late final Map<String, MediaSourceController> mediaSourceControllers = {
     rootMediaSourceController.path: rootMediaSourceController
   };
 
+  late Listenable currentNotifier = Listenable.merge(
+      [currentController, currentController.value.currentIndex]);
+
   PlaylistController();
 
-  MediaSourceController? get currentController {
-    return mediaSourceControllers[currentControllerName.value];
-  }
-
   PlatformMediaSource? get current {
-    return currentController?.current;
+    return currentController.value.current;
   }
 
-  Rx<int?>? get currentIndex {
-    return currentController?.currentIndex;
+  int? get currentIndex {
+    return currentController.value.currentIndex.value;
   }
 
   int? get length {
-    return currentController?.length;
+    return currentController.value.length;
   }
 
   Future<void> previous() async {
-    if (currentIndex?.value == null || currentIndex?.value == 0) {
+    if (currentIndex == null || currentIndex == 0) {
       return;
     }
-    currentController?.setCurrentIndex = currentIndex!.value! - 1;
+    currentController.value.setCurrentIndex = currentIndex! - 1;
   }
 
   Future<void> next() async {
-    if (currentIndex?.value == null ||
-        currentIndex!.value! >= currentController!.length - 1) {
+    if (currentIndex == null ||
+        currentIndex! >= currentController.value.length - 1) {
       return;
     }
-    currentController?.setCurrentIndex = currentIndex!.value! + 1;
+    currentController.value.setCurrentIndex = currentIndex! + 1;
   }
 
   set setCurrentIndex(int? index) {
-    currentController?.setCurrentIndex = index;
+    currentController.value.setCurrentIndex = index;
   }
 
   void enter(PlatformMediaSource mediaSource) async {
@@ -87,14 +86,14 @@ class PlaylistController {
             }
             controller = MediaSourceController(mediaSource.filename);
             await controller.addMediaFile(
-                filename: currentController!.path, title: '..');
+                filename: currentController.value.path, title: '..');
             await controller.addMediaFiles(filenames: filenames);
             mediaSourceControllers[mediaSource.filename] = controller;
           }
         }
       }
       if (controller != null) {
-        currentControllerName.value = mediaSource.filename;
+        currentController.value = controller;
       }
     }
   }
@@ -247,7 +246,8 @@ class MediaSourceController extends DataListController<PlatformMediaSource> {
   }
 
   Future<void> next() async {
-    if (currentIndex.value == null || currentIndex.value! >= data.length - 1) {
+    if (currentIndex.value == null ||
+        currentIndex.value! >= data.value.length - 1) {
       return;
     }
     setCurrentIndex = currentIndex.value! + 1;
@@ -258,7 +258,7 @@ class MediaSourceController extends DataListController<PlatformMediaSource> {
       String? title,
       String? messageId,
       Widget? thumbnail}) async {
-    for (var mediaSource in data) {
+    for (var mediaSource in data.value) {
       var name = mediaSource.filename;
       if (name == filename) {
         return mediaSource;
@@ -295,7 +295,7 @@ class MediaSourceController extends DataListController<PlatformMediaSource> {
 
   Future<PlatformMediaSource?> insertMediaFile(int index,
       {required String filename}) async {
-    for (var mediaSource in data) {
+    for (var mediaSource in data.value) {
       var name = mediaSource.filename;
       if (name == filename) {
         return null;
@@ -372,11 +372,20 @@ class PlaylistWidget extends StatelessWidget {
   final PlaylistController playlistController;
   final DataListGridController dataListGridController =
       DataListGridController();
+  late final ValueNotifier<MediaSourceController> currentController;
 
   PlaylistWidget(
       {super.key, this.onSelected, required this.playlistController}) {
-    playlistController.currentControllerName.addListener(_update);
-    playlistController.currentIndex!.addListener(_update);
+    currentController = ValueNotifier<MediaSourceController>(
+        playlistController.rootMediaSourceController);
+    playlistController.currentController.addListener(_updateController);
+  }
+
+  void _updateController() {
+    currentController.value.listenable.removeListener(_update);
+    currentController.value = playlistController.currentController.value;
+    currentController.value.listenable.addListener(_update);
+    _update();
   }
 
   void _update() {
@@ -385,7 +394,7 @@ class PlaylistWidget extends StatelessWidget {
 
   void _buildDataTiles() {
     List<PlatformMediaSource> mediaSources =
-        playlistController.currentController!.data;
+        playlistController.currentController.value.data.value;
     List<DataTile> dataTiles = [];
     for (var mediaSource in mediaSources) {
       var filename = mediaSource.filename;
@@ -406,13 +415,13 @@ class PlaylistWidget extends StatelessWidget {
         selected: selected,
         onTap: (int index, String title, {String? subtitle}) async {
           PlatformMediaSource mediaSource =
-              playlistController.currentController!.data[index];
+              playlistController.currentController.value.data.value[index];
           if (mediaSource.mediaSourceType == MediaSourceType.directory) {
-            playlistController.currentController!.setCurrentIndex = index;
+            playlistController.currentController.value.setCurrentIndex = index;
             playlistController.enter(mediaSource);
           }
           if (mediaSource.mediaSourceType == MediaSourceType.file) {
-            playlistController.currentController!.setCurrentIndex = index;
+            playlistController.currentController.value.setCurrentIndex = index;
           }
 
           return null;
@@ -421,7 +430,7 @@ class PlaylistWidget extends StatelessWidget {
       dataTiles.add(tile);
     }
 
-    dataListGridController.data.assignAll(dataTiles);
+    dataListGridController.data.value = [...dataTiles];
   }
 
   Future<dynamic> showActionCard(BuildContext context) async {

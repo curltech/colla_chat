@@ -1,7 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
@@ -9,23 +8,24 @@ import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class DataListGridController extends DataListController<DataTile> {
-  final RxBool gridMode = false.obs;
+  final ValueNotifier<bool> gridMode = ValueNotifier<bool>(false);
 
   //播放列表按钮
   ActionData get toggleActionData {
     return ActionData(
-      label: gridMode.isTrue ? 'List' : 'Grid',
-      icon: Obx(() {
-        return Icon(
-          gridMode.isTrue ? Icons.list : Icons.grid_on,
-          color: myself.primary,
-        );
-      }),
+      label: gridMode.value ? 'List' : 'Grid',
+      icon: ValueListenableBuilder(
+          valueListenable: gridMode,
+          builder: (context, value, _) {
+            return Icon(
+              gridMode.value ? Icons.list : Icons.grid_on,
+              color: myself.primary,
+            );
+          }),
       onTap: (int index, String label, {String? value}) {
-        gridMode(!gridMode.value);
+        gridMode.value = !gridMode.value;
       },
       tooltip: AppLocalizations.t('Toggle grid mode'),
     );
@@ -79,74 +79,73 @@ class DataListGridView extends StatelessWidget {
   }
 
   Widget _buildThumbnailView(BuildContext context) {
-    return Obx(() {
-      if (dataListGridController.data.isEmpty) {
-        return nilBox;
-      }
+    return ListenableBuilder(
+        listenable: Listenable.merge([
+          dataListGridController.gridMode,
+          dataListGridController.data,
+          dataListGridController.currentIndex
+        ]),
+        builder: (context, _) {
+          if (dataListGridController.data.value.isEmpty) {
+            return nilBox;
+          }
 
-      if (dataListGridController.gridMode.isTrue) {
-        return ListenableBuilder(
-            listenable: dataListGridController.currentIndex,
-            builder: (BuildContext context, Widget? child) {
-              return LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                // constraints.maxWidth, constraints.maxHeight
-                int crossAxisCount = (constraints.maxWidth / 250).floor();
-                return GridView.builder(
-                    itemCount: dataListGridController.data.length,
-                    //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        //横轴元素个数
-                        crossAxisCount: crossAxisCount,
-                        //纵轴间距
-                        mainAxisSpacing: 2.0,
-                        //横轴间距
-                        crossAxisSpacing: 2.0,
-                        //子组件宽高长度比例
-                        childAspectRatio: 1),
-                    itemBuilder: (BuildContext context, int index) {
-                      return InkWell(
-                          child: _buildThumbnailWidget(
-                              context, dataListGridController.data[index]),
-                          onTap: () {
-                            dataListGridController.current?.selected = false;
-                            dataListGridController.data[index].selected = true;
-                            dataListGridController.setCurrentIndex = index;
-                            String title =
-                                dataListGridController.data[index].title;
-                            if (onSelected != null) {
-                              onSelected!(index,
-                                  dataListGridController.data[index].title);
-                            }
-                            dataListGridController.data[index].onTap
-                                ?.call(index, title);
-                          });
-                    });
-              });
+          if (dataListGridController.gridMode.value) {
+            return LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+              // constraints.maxWidth, constraints.maxHeight
+              int crossAxisCount = (constraints.maxWidth / 250).floor();
+              return GridView.builder(
+                  itemCount: dataListGridController.data.value.length,
+                  //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      //横轴元素个数
+                      crossAxisCount: crossAxisCount,
+                      //纵轴间距
+                      mainAxisSpacing: 2.0,
+                      //横轴间距
+                      crossAxisSpacing: 2.0,
+                      //子组件宽高长度比例
+                      childAspectRatio: 1),
+                  itemBuilder: (BuildContext context, int index) {
+                    return InkWell(
+                        child: _buildThumbnailWidget(
+                            context, dataListGridController.data.value[index]),
+                        onTap: () {
+                          dataListGridController.current?.selected = false;
+                          dataListGridController.data.value[index].selected =
+                              true;
+                          dataListGridController.setCurrentIndex = index;
+                          String title =
+                              dataListGridController.data.value[index].title;
+                          if (onSelected != null) {
+                            onSelected!(index,
+                                dataListGridController.data.value[index].title);
+                          }
+                          dataListGridController.data.value[index].onTap
+                              ?.call(index, title);
+                        });
+                  });
             });
-      } else {
-        return ListenableBuilder(
-            listenable: dataListGridController.currentIndex,
-            builder: (BuildContext context, Widget? child) {
-              return DataListView(
-                onTap: (int index, String title,
-                    {DataTile? group, String? subtitle}) async {
-                  dataListGridController.current?.selected = false;
-                  dataListGridController.data[index].selected = true;
-                  dataListGridController.setCurrentIndex = index;
-                  if (onSelected != null) {
-                    onSelected!(index, title);
-                  }
-                  return null;
-                },
-                itemCount: dataListGridController.data.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return dataListGridController.data[index];
-                },
-              );
-            });
-      }
-    });
+          } else {
+            return DataListView(
+              onTap: (int index, String title,
+                  {DataTile? group, String? subtitle}) async {
+                dataListGridController.current?.selected = false;
+                dataListGridController.data.value[index].selected = true;
+                dataListGridController.setCurrentIndex = index;
+                if (onSelected != null) {
+                  onSelected!(index, title);
+                }
+                return null;
+              },
+              itemCount: dataListGridController.data.value.length,
+              itemBuilder: (BuildContext context, int index) {
+                return dataListGridController.data.value[index];
+              },
+            );
+          }
+        });
   }
 
   @override

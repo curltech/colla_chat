@@ -2,11 +2,10 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:flex_color_picker/flex_color_picker.dart' as flex;
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class ColorPicker extends StatelessWidget {
   String label;
-  Rx<Color> color = Rx<Color>(myself.primaryColor);
+  ValueNotifier<Color> color = ValueNotifier<Color>(myself.primaryColor);
   Function(Color color)? onColorChanged;
 
   ColorPicker(
@@ -70,8 +69,9 @@ class ColorPicker extends StatelessWidget {
 
   //颜色选择界面
   Widget _buildColorPicker(BuildContext context) {
-    return Obx(
-      () {
+    return ValueListenableBuilder(
+      valueListenable: color,
+      builder: (context, value, _) {
         Widget indicator = flex.ColorIndicator(
           width: 32,
           height: 32,

@@ -28,7 +28,7 @@ class PeerClientController extends DataListController<PeerClient> {
   }
 
   Future<void> more({int? limit}) async {
-    var offset = data.length;
+    var offset = data.value.length;
     limit = limit ?? defaultLimit;
     List<PeerClient> peerClients = await _findPage(offset, limit);
     addAll(peerClients);

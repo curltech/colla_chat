@@ -8,7 +8,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 ///客户端
 class PeerClientEditWidget extends StatelessWidget with DataTileMixin {
@@ -121,7 +121,9 @@ class PeerClientEditWidget extends StatelessWidget with DataTileMixin {
       PlatformReactiveFormController(peerClientColumnField);
 
   Widget _buildPlatformReactiveForm(BuildContext context) {
-    var formInputWidget = Obx(() {
+    var formInputWidget = ValueListenableBuilder(
+        valueListenable: peerClientController.currentIndex,
+        builder: (context, value, _) {
       PeerClient? peerClient = peerClientController.current;
       if (peerClient != null) {
         platformReactiveFormController.values = JsonUtil.toJson(peerClient);

@@ -9,7 +9,6 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class PoemContentWidget extends StatelessWidget {
   final DataListController<Poem> poemController;
@@ -17,7 +16,7 @@ class PoemContentWidget extends StatelessWidget {
   final PlatformTextToSpeechWidget platformTextToSpeechWidget =
       PlatformTextToSpeechWidget();
 
-  final RxBool platformTextToSpeech = true.obs;
+  final ValueNotifier<bool> platformTextToSpeech = ValueNotifier<bool>(true);
 
   PoemContentWidget({super.key, required this.poemController});
 
@@ -50,8 +49,9 @@ class PoemContentWidget extends StatelessWidget {
   }
 
   Widget _buildPoemContent(BuildContext context) {
-    return Obx(
-      () {
+    return ValueListenableBuilder(
+      valueListenable: poemController.currentIndex,
+      builder: (context, value, _) {
         Poem? poem = poemController.current;
         if (poem != null && poem.paragraphs != null) {
           List<String> titles = poem.title.split('。');

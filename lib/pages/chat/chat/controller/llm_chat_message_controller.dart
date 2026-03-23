@@ -11,7 +11,6 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/ollama/dart_ollama_client.dart';
 import 'package:flutter/foundation.dart';
-import 'package:get/state_manager.dart';
 
 enum LlmAction { chat, translate, extract, image, audio }
 
@@ -19,16 +18,19 @@ enum LlmLanguage { English, Chinese, French, German, Spanish, Japanese, Korean }
 
 class LlmChatMessageController extends ChatMessageController {
   DartOllamaClient? dartOllamaClient;
-  Rx<LlmAction> llmAction = LlmAction.chat.obs;
-  Rx<LlmLanguage> llmLanguage = LlmLanguage.English.obs;
-  Rx<LlmLanguage> targetLlmLanguage = LlmLanguage.English.obs;
+  final ValueNotifier<LlmAction> llmAction =
+      ValueNotifier<LlmAction>(LlmAction.chat);
+  final ValueNotifier<LlmLanguage> llmLanguage =
+      ValueNotifier<LlmLanguage>(LlmLanguage.English);
+  final ValueNotifier<LlmLanguage> targetLlmLanguage =
+      ValueNotifier<LlmLanguage>(LlmLanguage.English);
 
   LlmChatMessageController();
 
   ///更新chatSummary，清空原数据，查询新数据
   @override
-  set chatSummary(ChatSummary? chatSummary) {
-    super.chatSummary = chatSummary;
+  setChatSummary(ChatSummary? chatSummary) {
+    super.chatSummary.value = chatSummary;
 
     if (chatSummary != null) {
       var peerId = chatSummary.peerId;
@@ -47,7 +49,7 @@ class LlmChatMessageController extends ChatMessageController {
   }
 
   Future<void> llmChatAction(String content) async {
-    var chatSummary = this.chatSummary;
+    var chatSummary = this.chatSummary.value;
     if (chatSummary == null) {
       return;
     }
@@ -84,7 +86,7 @@ class LlmChatMessageController extends ChatMessageController {
 
   Future<void> onChatCompletion(String? chatResponse) async {
     ChatMessage chatMessage = buildLlmChatMessage(chatResponse,
-        senderPeerId: chatSummary!.peerId, senderName: chatSummary!.name);
+        senderPeerId: chatSummary.value!.peerId, senderName: chatSummary.value!.name);
     await chatMessageService.store(chatMessage);
     latest();
   }
@@ -127,7 +129,7 @@ class LlmChatMessageController extends ChatMessageController {
     chatMessage.mimeType = mimeType.name;
     chatMessage.status = MessageStatus.received.name;
     chatMessage.transportType = TransportType.llm.name;
-    chatMessage.deleteTime = deleteTime;
+    chatMessage.deleteTime = deleteTime.value;
     chatMessage.parentMessageId = parentMessageId;
     chatMessage.id = null;
 
@@ -137,8 +139,8 @@ class LlmChatMessageController extends ChatMessageController {
   Future<void> onImageCompletion(String url) async {
     Uint8List content = await ImageUtil.loadUrlImage(url);
     ChatMessage chatMessage = buildLlmChatMessage(content,
-        senderPeerId: chatSummary!.peerId,
-        senderName: chatSummary!.name,
+        senderPeerId: chatSummary.value!.peerId,
+        senderName: chatSummary.value!.name,
         contentType: ChatMessageContentType.image,
         mimeType: ChatMessageMimeType.png);
     await chatMessageService.store(chatMessage);

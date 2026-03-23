@@ -14,7 +14,7 @@ import 'package:colla_chat/pages/game/mahjong/base/waste_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/number_util.dart';
-import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
 
 /// 每一轮的参与者
 class RoundParticipant {
@@ -26,7 +26,7 @@ class RoundParticipant {
   final Round round;
 
   // 是否胡牌状态
-  final RxBool isWin = false.obs;
+  final ValueNotifier<bool> isWin = ValueNotifier<bool>(false);
 
   // 手牌，每个参与者只能看到自己的手牌
   final HandPile handPile = HandPile();
@@ -35,8 +35,8 @@ class RoundParticipant {
   final WastePile wastePile = WastePile();
 
   /// 参与者等待处理的行为
-  final RxMap<RoomEventAction, Set<int>> outstandingActions =
-      RxMap<RoomEventAction, Set<int>>({});
+  final ValueNotifier<Map<RoomEventAction, Set<int>>> outstandingActions =
+      ValueNotifier<Map<RoomEventAction, Set<int>>>({});
 
   /// 杠牌的记录，用于计分
   final Map<RoomEventAction, Set<RoomEvent>> earnedActions =
@@ -57,7 +57,7 @@ class RoundParticipant {
   }
 
   void clear() {
-    outstandingActions.clear();
+    outstandingActions.value.clear();
     earnedActions.clear();
     packer = null;
   }
@@ -75,15 +75,16 @@ class RoundParticipant {
   }
 
   void addOutstandingAction(RoomEventAction outstandingAction, List<int> vs) {
-    Set<int>? values = outstandingActions[outstandingAction];
+    Set<int>? values = outstandingActions.value[outstandingAction];
     if (values == null) {
       values = {};
-      outstandingActions[outstandingAction] = values;
+      outstandingActions.value[outstandingAction] = values;
     }
     values.addAll(vs);
   }
 
-  void addEarnedAction(RoomEventAction earnedAction, List<RoomEvent> roomEvents) {
+  void addEarnedAction(
+      RoomEventAction earnedAction, List<RoomEvent> roomEvents) {
     Set<RoomEvent>? values = earnedActions[earnedAction];
     if (values == null) {
       values = {};
@@ -127,7 +128,7 @@ class RoundParticipant {
       mahjongFlameGame.reload();
     }
 
-    return outstandingActions;
+    return outstandingActions.value;
   }
 
   /// 打牌，owner打出牌card，对其他人检查打的牌是否能够胡牌，杠牌和碰牌，返回检查的结果
@@ -161,9 +162,9 @@ class RoundParticipant {
   /// 检查行为状态，既包括摸牌检查，也包含打牌检查，还包含机器人自动处理
   Map<RoomEventAction, Set<int>> check(int owner, Tile tile,
       {DealTileType? dealTileType}) {
-    outstandingActions.clear();
+    outstandingActions.value.clear();
     if (tile == unknownTile) {
-      return outstandingActions;
+      return outstandingActions.value;
     }
     round.roomEvents.add(RoomEvent(
       round.room.name,
@@ -233,7 +234,8 @@ class RoundParticipant {
   }
 
   /// 当机器参与者有未决的行为时，自动采取行为
-  Future<void> robotCheck(int owner, Tile tile, {DealTileType? dealTileType}) async {
+  Future<void> robotCheck(int owner, Tile tile,
+      {DealTileType? dealTileType}) async {
     Room room = round.room;
     RoomEvent robotCheckEvent = RoomEvent(
       round.room.name,
@@ -332,7 +334,7 @@ class RoundParticipant {
         }
       }
     }
-    this.outstandingActions.clear();
+    this.outstandingActions.value.clear();
 
     return;
   }
@@ -342,7 +344,7 @@ class RoundParticipant {
     if (index != owner) {
       return;
     }
-    outstandingActions.clear();
+    outstandingActions.value.clear();
   }
 
   /// 碰牌,owner碰pos位置，sender打出的card牌
@@ -354,7 +356,7 @@ class RoundParticipant {
     if (typePile != null && handPile.touchPiles.length == 4) {
       packer = discardParticipant;
     }
-    outstandingActions.clear();
+    outstandingActions.value.clear();
 
     return typePile;
   }
@@ -435,7 +437,7 @@ class RoundParticipant {
   /// 胡牌，owner胡participantState中的可胡的牌形,pos表示可胡牌形数组的位置
   WinType? win(int owner, int win) {
     if (index == owner) {
-      Set<int>? wins = outstandingActions[RoomEventAction.win];
+      Set<int>? wins = outstandingActions.value[RoomEventAction.win];
       if (wins != null && wins.isNotEmpty) {
         WinType? winType = NumberUtil.toEnum(WinType.values, win);
         if (winType != null) {
@@ -452,7 +454,7 @@ class RoundParticipant {
   /// 抢杠胡牌，owner抢src的明杠牌card胡牌
   WinType? rob(int owner, int pos, Tile tile, int src) {
     if (index == owner) {
-      Set<int>? wins = outstandingActions[RoomEventAction.win];
+      Set<int>? wins = outstandingActions.value[RoomEventAction.win];
       if (wins != null && wins.isNotEmpty) {
         if (wins.contains(pos)) {
           WinType? winType = NumberUtil.toEnum(WinType.values, pos);
@@ -833,7 +835,7 @@ class RoundParticipant {
       return;
     }
     if (participant.robot) {
-      if (outstandingActions.isNotEmpty) {
+      if (outstandingActions.value.isNotEmpty) {
         logger.e(
             'participant:$index is robot, but outstandingActions is not empty');
       } else {
