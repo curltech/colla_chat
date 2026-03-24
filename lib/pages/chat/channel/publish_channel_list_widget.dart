@@ -206,7 +206,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
                 await DialogUtil.confirm(content: 'Do you confirm delete?');
             if (confirm != null && confirm) {
               await chatMessageService.remove(chatMessage);
-              myChannelChatMessageController.delete(index: index);
+              myChannelChatMessageController.removeAt(index: index);
             }
           },
           backgroundColor: Colors.amber,

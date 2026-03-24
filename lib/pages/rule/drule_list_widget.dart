@@ -50,7 +50,7 @@ class DruleListWidget extends StatelessWidget with DataTileMixin {
             prefix: Icons.remove,
             onTap: (int index, String label, {String? subtitle}) async {
               drulesController.setCurrentIndex = index;
-              drulesController.delete(index: index);
+              drulesController.removeAt(index: index);
             });
         slideActions.add(deleteSlideAction);
         DataTile editSlideAction = DataTile(
@@ -78,7 +78,7 @@ class DruleListWidget extends StatelessWidget with DataTileMixin {
   @override
   Widget build(BuildContext context) {
     var druleList = ValueListenableBuilder(
-        valueListenable: drulesController.data,
+        valueListenable: drulesController.data.listenable,
         builder: (context, value, _) {
       var tiles = _buildDrulesTileData();
       return DataListView(

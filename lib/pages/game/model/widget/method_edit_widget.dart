@@ -7,6 +7,7 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
@@ -33,7 +34,7 @@ class MethodEditWidget extends StatelessWidget with DataTileMixin {
   @override
   String get title => 'MethodEdit';
 
-  final ValueNotifier<List<Method>?> methods = ValueNotifier<List<Method>?>(null);
+  final ListNotifier<Method> methods = ListNotifier<Method>(null);
 
   final ValueNotifier<Method?> method = ValueNotifier<Method?>(null);
 
@@ -58,7 +59,7 @@ class MethodEditWidget extends StatelessWidget with DataTileMixin {
 
   Widget _buildMethodsWidget(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: methods,
+        valueListenable: methods.listenable,
         builder: (context, value, _) {
       if (methods.value != null && methods.value!.isNotEmpty) {
         List<DataTile> tiles = [];

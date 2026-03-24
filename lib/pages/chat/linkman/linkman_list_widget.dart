@@ -290,7 +290,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               linkmanService.removeByPeerId(linkman.peerId);
               await chatSummaryService.removeChatSummary(linkman.peerId);
               chatMessageService.removeByLinkman(linkman.peerId);
-              linkmanController.delete();
+              linkmanController.removeAt();
               if (mounted) {
                 DialogUtil.info(
                     content:
@@ -510,7 +510,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                   .delete(where: 'groupId=?', whereArgs: [peerId]);
               await chatSummaryService.removeChatSummary(peerId);
               chatMessageService.removeByGroup(peerId);
-              groupController.delete(index: index);
+              groupController.removeAt(index: index);
               if (mounted) {
                 DialogUtil.info(
                     content:
@@ -536,7 +536,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                     .delete(where: 'groupId=?', whereArgs: [peerId]);
                 await chatSummaryService.removeChatSummary(peerId);
                 chatMessageService.removeByGroup(peerId);
-                groupController.delete(index: index);
+                groupController.removeAt(index: index);
                 if (mounted) {
                   DialogUtil.info(
                       content:
@@ -618,7 +618,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                   .delete(where: 'groupId=?', whereArgs: [conferenceId]);
               await chatSummaryService.removeChatSummary(conferenceId);
               chatMessageService.removeByGroup(conferenceId);
-              conferenceController.delete(index: index);
+              conferenceController.removeAt(index: index);
               if (mounted) {
                 DialogUtil.info(
                     content:

@@ -123,7 +123,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
         return;
       }
     }
-    delete();
+    removeAt();
     save();
   }
 

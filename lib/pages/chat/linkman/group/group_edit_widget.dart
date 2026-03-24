@@ -17,6 +17,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -77,7 +78,7 @@ class GroupEditWidget extends StatelessWidget with DataTileMixin {
   final OptionController groupOwnerController = OptionController();
 
   //已经选择的群成员
-  final ValueNotifier<List<String>> groupMembers = ValueNotifier<List<String>>([]);
+  final ListNotifier<String> groupMembers = ListNotifier<String>([]);
 
   //当前群的头像
   final ValueNotifier<String?> groupAvatar = ValueNotifier<String?>(null);
@@ -151,7 +152,7 @@ class GroupEditWidget extends StatelessWidget with DataTileMixin {
   //群成员显示和编辑界面
   Widget _buildGroupMembersWidget(BuildContext context) {
     var selector = ValueListenableBuilder(
-        valueListenable: groupMembers,
+        valueListenable: groupMembers.listenable,
         builder: (context, value, _) {
       return Container(
           padding: const EdgeInsets.symmetric(horizontal: 0.0),

@@ -2,6 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
@@ -12,8 +13,8 @@ class WsAddressPicker extends StatelessWidget {
     _init();
   }
 
-  ValueNotifier<List<Option<String>>> addressOptions =
-      ValueNotifier<List<Option<String>>>([]);
+  final ListNotifier<Option<String>> addressOptions =
+      ListNotifier<Option<String>>([]);
   String _wsConnectAddress = '';
   final TextEditingController _wsConnectAddressController =
       TextEditingController();
@@ -43,7 +44,7 @@ class WsAddressPicker extends StatelessWidget {
   //群主选择界面
   Widget _buildSelectWidget(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: addressOptions,
+      valueListenable: addressOptions.listenable,
       builder: (BuildContext context, addressOptions, Widget? child) {
         return CustomSingleSelectField(
           title: 'Address',

@@ -6,6 +6,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -64,14 +65,14 @@ class LocalMediaStreamWidget extends StatelessWidget with DataTileMixin {
     });
   }
 
-  final ValueNotifier<List<MediaDeviceInfo>> audioOutputDevices =
-      ValueNotifier<List<MediaDeviceInfo>>([]);
-  final ValueNotifier<List<MediaDeviceInfo>> audioInputDevices =
-      ValueNotifier<List<MediaDeviceInfo>>([]);
-  final ValueNotifier<List<MediaDeviceInfo>> videoOutputDevices =
-      ValueNotifier<List<MediaDeviceInfo>>([]);
-  final ValueNotifier<List<MediaDeviceInfo>> videoInputDevices =
-      ValueNotifier<List<MediaDeviceInfo>>([]);
+  final ListNotifier<MediaDeviceInfo> audioOutputDevices =
+      ListNotifier<MediaDeviceInfo>([]);
+  final ListNotifier<MediaDeviceInfo> audioInputDevices =
+      ListNotifier<MediaDeviceInfo>([]);
+  final ListNotifier<MediaDeviceInfo> videoOutputDevices =
+      ListNotifier<MediaDeviceInfo>([]);
+  final ListNotifier<MediaDeviceInfo> videoInputDevices =
+      ListNotifier<MediaDeviceInfo>([]);
 
   final videoRenderer = RTCVideoRenderer();
 

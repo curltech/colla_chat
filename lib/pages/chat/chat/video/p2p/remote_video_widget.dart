@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -28,8 +29,8 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   ValueNotifier<int> videoViewCount = ValueNotifier<int>(0);
 
   //视频功能按钮对应的数据
-  ValueNotifier<List<ActionData>> actionData =
-      ValueNotifier<List<ActionData>>([]);
+  ListNotifier<ActionData> actionData =
+      ListNotifier<ActionData>([]);
 
   //控制面板可见性的计时器
   Timer? _hideControlPanelTimer;
@@ -104,7 +105,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
       margin: const EdgeInsets.all(0.0),
       padding: const EdgeInsets.only(bottom: 0.0),
       child: ValueListenableBuilder<List<ActionData>>(
-          valueListenable: actionData,
+          valueListenable: actionData.listenable,
           builder: (context, value, child) {
             return DataActionCard(
               actions: value,

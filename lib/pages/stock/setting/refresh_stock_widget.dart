@@ -2,6 +2,7 @@ import 'package:auto_size_text_field/auto_size_text_field.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/service/stock/stock_line.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -27,8 +28,8 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
 
   final TextEditingController _startDateTextController =
       TextEditingController();
-  final ValueNotifier<List<DataTile>> tileData =
-      ValueNotifier<List<DataTile>>([]);
+  final ListNotifier<DataTile> tileData =
+      ListNotifier<DataTile>([]);
 
   void _initTileData(BuildContext context) {
     tileData.value = [
@@ -218,7 +219,7 @@ class RefreshStockWidget extends StatelessWidget with DataTileMixin {
       ),
       Expanded(
         child: ValueListenableBuilder(
-            valueListenable: tileData,
+            valueListenable: tileData.listenable,
             builder: (context, value, _) {
               return DataListView(
                 itemCount: tileData.value.length,

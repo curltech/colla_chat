@@ -55,7 +55,7 @@ class PeerClientListWidget extends StatelessWidget with DataTileMixin {
             onTap: (int index, String label, {String? subtitle}) async {
               peerClientController.setCurrentIndex = index;
               peerClientService.delete(entity: peerClient);
-              peerClientController.delete();
+              peerClientController.removeAt();
             });
         slideActions.add(deleteSlideAction);
         DataTile editSlideAction = DataTile(

@@ -8,6 +8,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/connectivity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
@@ -17,8 +18,8 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 class ConnectivityController {
   late StreamSubscription<List<ConnectivityResult>> subscription;
-  final ValueNotifier<List<ConnectivityResult>> connectivityResult =
-      ValueNotifier<List<ConnectivityResult>>([]);
+  final ListNotifier<ConnectivityResult> connectivityResult =
+      ListNotifier<ConnectivityResult>([]);
   final ValueNotifier<bool> connected = ValueNotifier<bool>(false);
 
   ConnectivityController() {

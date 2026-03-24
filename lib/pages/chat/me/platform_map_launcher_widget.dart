@@ -2,6 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -13,8 +14,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:map_launcher/map_launcher.dart';
 
 class PlatformMapLauncherWidget extends StatelessWidget with DataTileMixin {
-  ValueNotifier<List<AvailableMap>> maps =
-      ValueNotifier<List<AvailableMap>>([]);
+  final ListNotifier<AvailableMap> maps =
+      ListNotifier<AvailableMap>([]);
 
   PlatformMapLauncherWidget({super.key}) {
     _init();
@@ -67,7 +68,7 @@ class PlatformMapLauncherWidget extends StatelessWidget with DataTileMixin {
   Widget buildMapLauncher(BuildContext context) {
     if (platformParams.mobile) {
       return ValueListenableBuilder(
-          valueListenable: maps,
+          valueListenable: maps.listenable,
           builder:
               (BuildContext context, List<AvailableMap> maps, Widget? child) {
             return DataListView(

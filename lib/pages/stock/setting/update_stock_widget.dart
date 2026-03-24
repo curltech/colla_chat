@@ -2,6 +2,7 @@ import 'package:auto_size_text_field/auto_size_text_field.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/service/stock/stock_line.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -28,8 +29,8 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
   final TextEditingController _startDateTextController =
       TextEditingController();
   final TextEditingController _tsCodeTextController = TextEditingController();
-  final ValueNotifier<List<DataTile>> tileData =
-      ValueNotifier<List<DataTile>>([]);
+  final ListNotifier<DataTile> tileData =
+      ListNotifier<DataTile>([]);
 
   void _initTileData(BuildContext context) {
     tileData.value=[
@@ -87,6 +88,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
             if (_tsCodeTextController.text.isNotEmpty) {
               stockLineService.getUpdateDayLine(_tsCodeTextController.text);
             }
+            return null;
           }),
       DataTile(
           title: '今天日线',
@@ -115,6 +117,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
             if (_tsCodeTextController.text.isNotEmpty) {
               stockLineService.getUpdateMinLine(_tsCodeTextController.text);
             }
+            return null;
           }),
       DataTile(
           title: '单只股票今天分钟线',
@@ -129,6 +132,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
               stockLineService
                   .getUpdateTodayMinLine(_tsCodeTextController.text);
             }
+            return null;
           }),
       DataTile(
           title: '周月季年线',
@@ -142,6 +146,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
             if (_tsCodeTextController.text.isNotEmpty) {
               stockLineService.getUpdateWmqyLine(_tsCodeTextController.text);
             }
+            return null;
           }),
       DataTile(
           title: '单只季度业绩汇总',
@@ -156,6 +161,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
               stockLineService
                   .getUpdateWmqyQPerformance(_tsCodeTextController.text);
             }
+            return null;
           }),
       DataTile(
           title: '单只季度业绩最新价汇总',
@@ -170,6 +176,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
               stockLineService
                   .getUpdateDayQPerformance(_tsCodeTextController.text);
             }
+            return null;
           }),
       DataTile(
           title: '单只季度业绩统计汇总',
@@ -183,6 +190,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
             if (_tsCodeTextController.text.isNotEmpty) {
               stockLineService.getUpdateQStat(_tsCodeTextController.text);
             }
+            return null;
           }),
       DataTile(
           title: '单只季度业绩评分汇总',
@@ -196,6 +204,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
             if (_tsCodeTextController.text.isNotEmpty) {
               stockLineService.getUpdateStatScore(_tsCodeTextController.text);
             }
+            return null;
           }),
       DataTile(
           title: '单只日线统计',
@@ -211,6 +220,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
               stockLineService.updateStat(_tsCodeTextController.text,
                   int.parse(_startDateTextController.text));
             }
+            return null;
           }),
       DataTile(
           title: '单只过去1,3,5日线均线',
@@ -226,6 +236,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
               stockLineService.updateBeforeMa(_tsCodeTextController.text,
                   int.parse(_startDateTextController.text));
             }
+            return null;
           }),
       DataTile(
           title: '计算单只股票的买卖点事件',
@@ -239,6 +250,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
             if (_tsCodeTextController.text.isNotEmpty) {
               stockLineService.getUpdateEventCond(_tsCodeTextController.text);
             }
+            return null;
           }),
       DataTile(
           title: '创建模型数据文件',
@@ -254,6 +266,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
               stockLineService.writeFile(_tsCodeTextController.text,
                   int.parse(_startDateTextController.text));
             }
+            return null;
           }),
     ];
   }
@@ -276,7 +289,7 @@ class UpdateStockWidget extends StatelessWidget with DataTileMixin {
                   labelText: AppLocalizations.t('startDate')))),
       Expanded(
         child: ValueListenableBuilder(
-            valueListenable: tileData,
+            valueListenable: tileData.listenable,
             builder: (context, value, _) {
               return DataListView(
                 itemCount: tileData.value.length,

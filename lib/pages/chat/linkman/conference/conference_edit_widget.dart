@@ -18,6 +18,7 @@ import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
@@ -136,8 +137,8 @@ class ConferenceEditWidget extends StatelessWidget with DataTileMixin {
   final OptionController conferenceOwnerController = OptionController();
 
   //选择的会议成员
-  final ValueNotifier<List<String>> conferenceMembers =
-      ValueNotifier<List<String>>([]);
+  final ListNotifier<String> conferenceMembers =
+      ListNotifier<String>([]);
 
   Conference _initConference() {
     Conference? current = conferenceNotifier.value;
@@ -215,7 +216,7 @@ class ConferenceEditWidget extends StatelessWidget with DataTileMixin {
   //会议成员显示和编辑界面，从所有的联系人中选择会议成员
   Widget _buildConferenceMembersWidget(BuildContext context) {
     var selector = ValueListenableBuilder(
-        valueListenable: conferenceMembers,
+        valueListenable: conferenceMembers.listenable,
         builder: (context, value, _) {
           return Container(
               padding: const EdgeInsets.symmetric(horizontal: 0.0),

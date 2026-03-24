@@ -8,6 +8,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -34,9 +35,9 @@ class AddShareWidget extends StatelessWidget with DataTileMixin {
   final TextEditingController searchTextController = TextEditingController();
 
   /// 增加自选股的查询结果
-  final ValueNotifier<List<Share>> shares = ValueNotifier<List<Share>>([]);
-  final ValueNotifier<List<DataTile>> tileData =
-      ValueNotifier<List<DataTile>>([]);
+  final ListNotifier<Share> shares = ListNotifier<Share>([]);
+  final ListNotifier<DataTile> tileData =
+      ListNotifier<DataTile>([]);
 
   /// 将linkman和group数据转换从列表显示数据
   Future<List<DataTile>> _buildShareTileData() async {
@@ -128,7 +129,7 @@ class AddShareWidget extends StatelessWidget with DataTileMixin {
           )),
       Expanded(
           child: ValueListenableBuilder(
-              valueListenable: tileData,
+              valueListenable: tileData.listenable,
               builder: (context, value, _) {
                 return DataListView(
                   itemCount: tileData.value.length,

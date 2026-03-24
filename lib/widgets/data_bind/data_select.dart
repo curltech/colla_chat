@@ -2,6 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -158,8 +159,8 @@ class DataListSingleSelect extends StatefulWidget {
 
 class _DataListSingleSelectState extends State<DataListSingleSelect> {
   final TextEditingController textController = TextEditingController();
-  ValueNotifier<List<Option<String>>> options =
-      ValueNotifier<List<Option<String>>>(<Option<String>>[]);
+  ListNotifier<Option<String>> options =
+      ListNotifier<Option<String>>(<Option<String>>[]);
 
   @override
   void initState() {
@@ -255,7 +256,7 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
 
   Widget _buildDataListView(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: options,
+        valueListenable: options.listenable,
         builder: (BuildContext context, List<Option<String>> options,
             Widget? child) {
           return ListView.builder(
@@ -436,8 +437,8 @@ class CustomMultiSelect extends StatefulWidget {
 class _CustomMultiSelectState extends State<CustomMultiSelect> {
   final TextEditingController textController = TextEditingController();
 
-  ValueNotifier<List<Option<String>>> options =
-      ValueNotifier<List<Option<String>>>(<Option<String>>[]);
+  ListNotifier<Option<String>> options =
+      ListNotifier<Option<String>>(<Option<String>>[]);
 
   @override
   void initState() {
@@ -491,7 +492,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
   //对话框界面的数据必须使用本地数据，不能使用控制器数据，否则边选择数据边改了
   Widget _buildChipView(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: options,
+        valueListenable: options.listenable,
         builder: (BuildContext context, List<Option<String>> options,
             Widget? child) {
           List<Widget> chips = [];
@@ -533,7 +534,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
   //对话框界面的数据必须使用本地数据，不能使用控制器数据，否则边选择数据边改了
   Widget _buildDataListView(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: options,
+        valueListenable: options.listenable,
         builder: (BuildContext context, List<Option<String>> options,
             Widget? child) {
           return ListView.builder(

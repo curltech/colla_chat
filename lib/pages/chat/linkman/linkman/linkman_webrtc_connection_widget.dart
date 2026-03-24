@@ -2,6 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -33,8 +34,8 @@ class LinkmanWebrtcConnectionWidget extends StatelessWidget with DataTileMixin {
   @override
   String get title => 'Linkman webrtc connection';
 
-  final ValueNotifier<List<DataTile>> tileData =
-      ValueNotifier<List<DataTile>>([]);
+  final ListNotifier<DataTile> tileData =
+      ListNotifier<DataTile>([]);
 
   Widget _buildBadge(int connectionNum, {Widget? avatarImage}) {
     var badge = avatarImage ?? AppImage.mdAppImage;

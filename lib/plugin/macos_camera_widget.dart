@@ -13,6 +13,7 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:cross_file/cross_file.dart';
@@ -42,8 +43,8 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
 
   VideoPlayerController? videoController;
   VoidCallback? videoPlayerListener;
-  ValueNotifier<List<CameraMacOSDevice>> videoDevices =
-      ValueNotifier<List<CameraMacOSDevice>>([]);
+  ListNotifier<CameraMacOSDevice> videoDevices =
+      ListNotifier<CameraMacOSDevice>([]);
   int selectedVideoIndex = -1;
 
   List<CameraMacOSDevice> audioDevices = [];
@@ -101,7 +102,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
   ///当视频设备识别后，显示预览界面
   ValueListenableBuilder<List<CameraMacOSDevice>> _buildPreviewWidget() {
     return ValueListenableBuilder(
-        valueListenable: videoDevices,
+        valueListenable: videoDevices.listenable,
         builder: (BuildContext context, List<CameraMacOSDevice> videoDevices,
             Widget? child) {
           if (videoDevices.isNotEmpty) {

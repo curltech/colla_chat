@@ -392,7 +392,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
           chatSummaryController.setCurrentIndex = index;
           await chatSummaryService.removeChatSummary(peerId);
           chatMessageService.removeByLinkman(peerId);
-          chatSummaryController.delete();
+          chatSummaryController.removeAt();
         });
     slideActions.add(deleteSlideAction);
     tile.slideActions = slideActions;
@@ -596,7 +596,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
     String title = AppLocalizations.t(widget.title);
     List<Widget> rightWidgets = [];
     var connectivityWidget = ValueListenableBuilder(
-        valueListenable: connectivityController.connectivityResult,
+        valueListenable: connectivityController.connectivityResult.listenable,
         builder: (context, value, _) {
       ConnectivityResult connectivityResult = ConnectivityUtil.getMainResult(
           connectivityController.connectivityResult.value);

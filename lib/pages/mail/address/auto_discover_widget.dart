@@ -6,6 +6,7 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -43,8 +44,8 @@ class AutoDiscoverWidget extends StatelessWidget with DataTileMixin {
       ValueNotifier<EmailServiceProvider?>(null);
   final TextEditingController emailServiceProviderController =
       TextEditingController();
-  final ValueNotifier<List<Option<String>>> emailServiceProviderOptions =
-      ValueNotifier<List<Option<String>>>([]);
+  final ListNotifier<Option<String>> emailServiceProviderOptions =
+      ListNotifier<Option<String>>([]);
 
   void _updateEmailServiceProviderOptions() {
     List<Option<String>> items = [];
@@ -62,7 +63,7 @@ class AutoDiscoverWidget extends StatelessWidget with DataTileMixin {
 
   Widget _buildEmailServiceProviderSelector(BuildContext context) {
     Widget emailServiceProvider = ValueListenableBuilder(
-        valueListenable: emailServiceProviderOptions,
+        valueListenable: emailServiceProviderOptions.listenable,
         builder: (BuildContext buildContext, List<Option<String>> options,
             Widget? child) {
           Widget? prefix;

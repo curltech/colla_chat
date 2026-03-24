@@ -700,7 +700,7 @@ class MetaModellerWidget extends StatelessWidget with DataTileMixin {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: modelProjectController.metaProjects,
+        valueListenable: modelProjectController.metaProjects.listenable,
         builder: (context, value, _) {
       Project? metaProject = modelProjectController
           .metaProjects.value[modelProjectController.currentMetaId.value];

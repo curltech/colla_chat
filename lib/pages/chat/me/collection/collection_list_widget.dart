@@ -125,7 +125,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
         prefix: Icons.bookmark_remove,
         onTap: (int index, String label, {String? subtitle}) async {
           await chatMessageService.remove(chatMessage);
-          collectionChatMessageController.delete();
+          collectionChatMessageController.removeAt();
         });
     slideActions.add(deleteSlideAction);
     tile.slideActions = slideActions;

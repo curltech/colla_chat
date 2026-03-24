@@ -7,6 +7,7 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
@@ -37,7 +38,7 @@ class AttributeEditWidget extends StatelessWidget with DataTileMixin {
     return modelProjectController.selectedSrcModelNode.value;
   }
 
-  final ValueNotifier<List<Attribute>?> attributes = ValueNotifier<List<Attribute>?>(null);
+  final ListNotifier<Attribute> attributes = ListNotifier<Attribute>(null);
 
   final ValueNotifier<Attribute?> attribute = ValueNotifier<Attribute?>(null);
 
@@ -58,7 +59,7 @@ class AttributeEditWidget extends StatelessWidget with DataTileMixin {
 
   Widget _buildAttributesWidget(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: attributes,
+        valueListenable: attributes.listenable,
         builder: (context, value, _) {
       if (attributes.value != null && attributes.value!.isNotEmpty) {
         List<DataTile> tiles = [];

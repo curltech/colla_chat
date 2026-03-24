@@ -127,7 +127,7 @@ class PlatformVideoPlayer extends StatelessWidget {
         while (mediaSource == null ||
             mediaSource.mediaSourceType != MediaSourceType.file) {
           mediaSource = playlistController
-              .currentController.value.data.value[currentIndex + i];
+              .currentController.value.data[currentIndex + i];
           ++i;
           mediaPlayerController.playMediaSource(mediaSource);
           if (currentIndex + i >= length) {

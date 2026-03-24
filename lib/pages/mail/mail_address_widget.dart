@@ -87,7 +87,7 @@ class MailAddressWidget extends StatelessWidget with DataTileMixin {
                 int? id = mailAddress.id;
                 if (id != null) {
                   mailAddressService.delete(where: 'id=?', whereArgs: [id]);
-                  mailAddressController.delete(index: index);
+                  mailAddressController.removeAt(index: index);
                   emailClientPool.close(email: mailAddress.email);
                 }
               },

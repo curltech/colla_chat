@@ -16,6 +16,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -68,10 +69,10 @@ class NewMailWidget extends StatelessWidget with DataTileMixin {
   String get title => 'New mail';
 
   //已经选择的收件人
-  final ValueNotifier<List<String>> receipts = ValueNotifier<List<String>>([]);
+  final ListNotifier<String> receipts = ListNotifier<String>([]);
 
-  final ValueNotifier<List<PlatformAttachmentInfo>> attachmentInfos =
-      ValueNotifier<List<PlatformAttachmentInfo>>([]);
+  final ListNotifier<PlatformAttachmentInfo> attachmentInfos =
+      ListNotifier<PlatformAttachmentInfo>([]);
 
   final TextEditingController subjectController = TextEditingController();
 
@@ -81,7 +82,7 @@ class NewMailWidget extends StatelessWidget with DataTileMixin {
   //收件人，联系人显示和选择界面
   Widget _buildReceiptsWidget(BuildContext context) {
     var selector = ValueListenableBuilder(
-        valueListenable: receipts,
+        valueListenable: receipts.listenable,
         builder: (context, value, _) {
           return Container(
               padding: const EdgeInsets.symmetric(horizontal: 0.0),
@@ -226,7 +227,7 @@ class NewMailWidget extends StatelessWidget with DataTileMixin {
         alignment: Alignment.centerLeft,
         color: myself.getBackgroundColor(context).withOpacity(0.6),
         child: ValueListenableBuilder(
-            valueListenable: attachmentInfos,
+            valueListenable: attachmentInfos.listenable,
             builder: (context, value, _) {
               return PlatformFutureBuilder(
                   future: _buildAttachmentChips(context, attachmentInfos.value),

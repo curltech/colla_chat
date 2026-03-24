@@ -13,6 +13,7 @@ import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/waste_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/tool/number_util.dart';
 import 'package:flutter/foundation.dart';
 
@@ -35,8 +36,8 @@ class RoundParticipant {
   final WastePile wastePile = WastePile();
 
   /// 参与者等待处理的行为
-  final ValueNotifier<Map<RoomEventAction, Set<int>>> outstandingActions =
-      ValueNotifier<Map<RoomEventAction, Set<int>>>({});
+  final MapNotifier<RoomEventAction, Set<int>> outstandingActions =
+      MapNotifier<RoomEventAction, Set<int>>({});
 
   /// 杠牌的记录，用于计分
   final Map<RoomEventAction, Set<RoomEvent>> earnedActions =

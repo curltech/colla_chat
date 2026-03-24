@@ -10,11 +10,11 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:flutter/foundation.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 
 
 class RoomPool {
-  final ValueNotifier<Map<String, Room>> rooms = ValueNotifier<Map<String, Room>>({});
+  final MapNotifier<String, Room> rooms = MapNotifier<String, Room>({});
 
   StreamController<RoomEvent> roomEventStreamController =
       StreamController<RoomEvent>.broadcast();

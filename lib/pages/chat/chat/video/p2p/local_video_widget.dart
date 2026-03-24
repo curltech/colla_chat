@@ -16,6 +16,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -62,8 +63,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ValueNotifier<int> videoViewCount = ValueNotifier<int>(0);
 
   //视频功能按钮对应的数据
-  ValueNotifier<List<ActionData>> actionData =
-      ValueNotifier<List<ActionData>>([]);
+  ListNotifier<ActionData> actionData =
+      ListNotifier<ActionData>([]);
 
   //呼叫状态
   ValueNotifier<VideoChatStatus> videoChatStatus =
@@ -557,7 +558,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       margin: const EdgeInsets.all(0.0),
       padding: const EdgeInsets.only(bottom: 0.0),
       child: ValueListenableBuilder<List<ActionData>>(
-          valueListenable: actionData,
+          valueListenable: actionData.listenable,
           builder: (context, value, child) {
             return DataActionCard(
               actions: value,

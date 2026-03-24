@@ -242,7 +242,7 @@ class MailListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: mailMimeMessageController.addressMailMessages,
+      listenable: mailMimeMessageController.addressMailMessages.listenable,
       builder: (BuildContext context, Widget? child) {
         return ValueListenableBuilder(
             valueListenable: mailMimeMessageController.currentMailIndex,

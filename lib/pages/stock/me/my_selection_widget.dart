@@ -11,6 +11,7 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/share_group.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -32,8 +33,8 @@ class MyShareController {
       ValueNotifier<String>(ShareGroupService.defaultGroupName);
 
   /// 组的自选股
-  final ValueNotifier<Map<String, String>> groupSubscription =
-      ValueNotifier<Map<String, String>>({});
+  final MapNotifier<String, String> groupSubscription =
+      MapNotifier<String, String>({});
 
   /// 加载数据的方式，true表示直接从网站加载，false表示从服务器加载，支持分批获取
   final ValueNotifier<bool> online = ValueNotifier<bool>(true);
@@ -77,7 +78,7 @@ class MyShareController {
     }
     String defaultGroupName =
         AppLocalizations.t(ShareGroupService.defaultGroupName);
-    groupSubscription.value[defaultGroupName] = subscription.value;
+    groupSubscription[defaultGroupName] = subscription.value;
   }
 
   /// 删除股票，并从各各分组中删除
@@ -271,7 +272,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
 
   Widget _buildShareGroupWidget(BuildContext context) {
     final tabBar = ListenableBuilder(
-        listenable: myShareController.groupSubscription,
+        listenable: myShareController.groupSubscription.listenable,
         builder: (context, child) {
           tabController?.dispose();
           tabController = TabController(

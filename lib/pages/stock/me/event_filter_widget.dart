@@ -138,7 +138,7 @@ class EventFilterWidget extends StatelessWidget with DataTileMixin {
                 content: 'Do you confirm to delete event filter?');
             if (confirm == true) {
               eventFilterService.delete(entity: eventFilter);
-              eventFilterController.delete(index: index);
+              eventFilterController.removeAt(index: index);
             }
           },
           icon: const Icon(

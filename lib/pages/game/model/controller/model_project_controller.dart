@@ -6,6 +6,7 @@ import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -14,8 +15,8 @@ import 'package:path/path.dart' as p;
 
 class ModelProjectController {
   /// 元模型
-  final ValueNotifier<Map<String, Project>> metaProjects =
-      ValueNotifier<Map<String, Project>>({});
+  final MapNotifier<String, Project> metaProjects =
+      MapNotifier<String, Project>({});
   final ValueNotifier<String> currentMetaId =
       ValueNotifier<String>(Project.baseMetaId);
 

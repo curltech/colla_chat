@@ -221,7 +221,7 @@ class FileWidget extends StatelessWidget {
 
   Widget _buildFileWrapWidget(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: fileController.data,
+        valueListenable: fileController.data.listenable,
         builder: (context, value, _) {
           List<Widget> children = [];
           for (File file in fileController.data.value) {

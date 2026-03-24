@@ -1,4 +1,5 @@
 import 'package:colla_chat/service/chat/conference.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -25,8 +26,8 @@ class LiveKitSfuParticipantWidget extends StatelessWidget with DataTileMixin {
   @override
   String get title => 'SfuParticipant';
 
-  final ValueNotifier<List<DataTile>> tileData =
-      ValueNotifier<List<DataTile>>([]);
+  final ListNotifier<DataTile> tileData =
+      ListNotifier<DataTile>([]);
 
   Future<void> _init() async {
     if (roomName.value == null) {

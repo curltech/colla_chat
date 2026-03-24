@@ -134,7 +134,7 @@ class DruleEditWidget extends StatelessWidget with DataTileMixin {
     bool? success = await DialogUtil.confirm(
         content: 'Do you confirm to delete this drule:${drule.name}');
     if (success != null && success) {
-      drulesController.delete();
+      drulesController.removeAt();
     }
   }
 

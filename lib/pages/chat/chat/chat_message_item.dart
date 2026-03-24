@@ -57,7 +57,7 @@ class ChatMessageItem extends StatelessWidget {
               this.timer!.cancel();
               this.timer = null;
               chatMessageService.delete(entity: chatMessage);
-              chatMessageController.delete(index: index);
+              chatMessageController.removeAt(index: index);
               logger.w(
                   'Timer.periodic delete chatMessage id: ${chatMessage.id}, leftDeleteTime:${leftDeleteTime.value}');
             }
@@ -65,7 +65,7 @@ class ChatMessageItem extends StatelessWidget {
         });
       } else {
         chatMessageService.delete(entity: chatMessage);
-        chatMessageController.delete(index: index);
+        chatMessageController.removeAt(index: index);
         logger.w(
             '_buildDeleteTimer delete chatMessage id: ${chatMessage.id}, leftDeleteTime:${leftDeleteTime.value}');
       }

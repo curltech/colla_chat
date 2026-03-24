@@ -155,7 +155,7 @@ class P2pLoginWidget extends StatelessWidget {
                 .delete(where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
             myselfPeerService
                 .delete(where: 'peerId=?', whereArgs: [myselfPeer.peerId]);
-            myselfPeerController.delete(index: index);
+            myselfPeerController.removeAt(index: index);
           },
           icon: const Icon(Icons.clear),
         ),
@@ -175,7 +175,7 @@ class P2pLoginWidget extends StatelessWidget {
         height: 5.0,
       ),
       ValueListenableBuilder(
-          valueListenable: myselfPeerController.data,
+          valueListenable: myselfPeerController.data.listenable,
           builder: (context, value, _) {
             return DataListView(
               onTap: (int index, String title,

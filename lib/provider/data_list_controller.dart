@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/tool/entity_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/tool/pagination_util.dart';
 import 'package:flutter/material.dart';
 
@@ -55,15 +56,16 @@ class FindCondition {
 ///基础的数组数据控制器
 class DataListController<T> {
   Key key = UniqueKey();
-  final ValueNotifier<List<T>> data = ValueNotifier<List<T>>([]);
+  final ListNotifier<T> data = ListNotifier<T>([]);
   final ValueNotifier<int?> currentIndex = ValueNotifier<int?>(null);
   final ValueNotifier<FindCondition> findCondition =
       ValueNotifier<FindCondition>(FindCondition());
-  late final Listenable listenable = Listenable.merge([data, currentIndex]);
+  late final Listenable listenable =
+      Listenable.merge([data.listenable, currentIndex]);
 
   DataListController({List<T>? data, int? currentIndex}) {
     if (data != null && data.isNotEmpty) {
-      this.data.value.addAll(data);
+      this.data.addAll(data);
       if (currentIndex == null) {
         this.currentIndex.value = 0;
       } else {
@@ -79,9 +81,9 @@ class DataListController<T> {
   T? get current {
     if (currentIndex.value != -1 &&
         currentIndex.value != null &&
-        currentIndex.value! < data.value.length &&
-        data.value.isNotEmpty) {
-      return data.value[currentIndex.value!];
+        currentIndex.value! < data.length &&
+        data.isNotEmpty) {
+      return data[currentIndex.value!];
     }
     return null;
   }
@@ -90,13 +92,13 @@ class DataListController<T> {
     if (element == null) {
       setCurrentIndex = null;
     } else {
-      setCurrentIndex = data.value.indexOf(element);
+      setCurrentIndex = data.indexOf(element);
     }
   }
 
   ///设置当前数据索引
   set setCurrentIndex(int? index) {
-    if (index == null || index > data.value.length - 1) {
+    if (index == null || index > data.length - 1) {
       currentIndex.value = null;
       return;
     }
@@ -107,43 +109,43 @@ class DataListController<T> {
 
   void addAll(List<T> ds) {
     if (ds.isNotEmpty) {
-      data.value.addAll(ds);
-      currentIndex.value = data.value.length - 1;
+      data.addAll(ds);
+      currentIndex.value = data.length - 1;
     }
   }
 
   void add(T d) {
     data.value.add(d);
-    currentIndex.value = data.value.length - 1;
+    currentIndex.value = data.length - 1;
   }
 
   T? get(int index) {
-    if (index >= 0 && index < data.value.length) {
-      return data.value[index];
+    if (index >= 0 && index < data.length) {
+      return data[index];
     }
 
     return null;
   }
 
   void insert(int index, T d) {
-    if (index >= 0 && index <= data.value.length) {
-      data.value.insert(index, d);
+    if (index >= 0 && index <= data.length) {
+      data.insert(index, d);
       currentIndex.value = index;
     }
   }
 
   void insertAll(int index, List<T> ds) {
-    if (index >= 0 && index <= data.value.length) {
-      data.value.insertAll(index, ds);
+    if (index >= 0 && index <= data.length) {
+      data.insertAll(index, ds);
       currentIndex.value = index;
     }
   }
 
-  T? delete({int? index}) {
+  T? removeAt({int? index}) {
     index = index ?? currentIndex.value;
-    if (index != null && index < data.value.length) {
-      T t = data.value.removeAt(index);
-      if (data.value.isEmpty) {
+    if (index != null && index < data.length) {
+      T t = data.removeAt(index);
+      if (data.isEmpty) {
         currentIndex.value = null;
       } else if (index == 0) {
         currentIndex.value = 0;
@@ -157,52 +159,55 @@ class DataListController<T> {
   }
 
   T? remove(T t) {
-    int index = data.value.indexOf(t);
+    int index = data.indexOf(t);
     if (index == -1) {
       return null;
     }
 
-    return delete(index: index);
+    return removeAt(index: index);
+  }
+
+  void operator []=(int index, T item) {
+    if (index >= 0 && index < data.length) {
+      data[index] = item;
+    }
   }
 
   void update(T d, {int? index}) {
     index = index ?? currentIndex.value;
-    if (index != null && index < data.value.length) {
-      data.value[index] = d;
-      data.value = [...data.value];
+    if (index != null && index >= 0 && index < data.length) {
+      data[index] = d;
     }
   }
 
   void clear() {
-    if (data.value.isNotEmpty) {
-      data.value.clear();
+    if (data.isNotEmpty) {
+      data.clear();
       currentIndex.value = null;
     }
   }
 
   ///替换了当前的对象
   void replace(T d) {
-    if (currentIndex.value != null && data.value.isNotEmpty) {
-      data.value[currentIndex.value!] = d;
-      data.value = [...data.value];
+    if (currentIndex.value != null && data.isNotEmpty) {
+      data[currentIndex.value!] = d;
     }
   }
 
   void replaceAll(List<T> ds) {
-    data.value = [...ds];
+    data.value = ds;
     if (ds.isNotEmpty) {
-      currentIndex.value = data.value.length - 1;
+      currentIndex.value = data.length - 1;
     }
   }
 
   void move(int initialIndex, int finalIndex) {
-    var mediaSource = data.value[initialIndex];
-    data.value[initialIndex] = data.value[finalIndex];
-    data.value[finalIndex] = mediaSource;
-    data.value = [...data.value];
+    var mediaSource = data[initialIndex];
+    data[initialIndex] = data[finalIndex];
+    data[finalIndex] = mediaSource;
   }
 
-  int get length => data.value.length;
+  int get length => data.length;
 
   /// 获取数据的方法，子类可以覆盖
   FutureOr<void> findData() async {}
@@ -220,7 +225,7 @@ class DataListController<T> {
   /// 已有数据的排序
   void sort<S>(Comparable<S>? Function(T t) getFieldValue, int columnIndex,
       String columnName, bool ascending) {
-    data.value.sort((T a, T b) {
+    data.sort((T a, T b) {
       Comparable<S>? av = getFieldValue(a);
       Comparable<S>? bv = getFieldValue(b);
       if (ascending) {

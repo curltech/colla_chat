@@ -32,7 +32,7 @@ class PlaylistController {
     rootMediaSourceController.path: rootMediaSourceController
   };
 
-  late Listenable currentNotifier = Listenable.merge(
+  late final Listenable currentNotifier = Listenable.merge(
       [currentController, currentController.value.currentIndex]);
 
   PlaylistController();
@@ -110,7 +110,7 @@ class PlaylistController {
 
   Future<void> removeFromCollect(int index) async {
     PlatformMediaSource? mediaSource =
-        rootMediaSourceController.delete(index: index);
+        rootMediaSourceController.removeAt(index: index);
     var messageId = mediaSource?.messageId;
     if (messageId != null) {
       chatMessageService.delete(where: 'messageId=?', whereArgs: [messageId]);
@@ -486,7 +486,7 @@ class PlaylistWidget extends StatelessWidget {
           var currentIndex =
               playlistController.rootMediaSourceController.currentIndex;
           playlistController.rootMediaSourceController
-              .delete(index: currentIndex.value);
+              .removeAt(index: currentIndex.value);
         },
         tooltip: AppLocalizations.t('Remove video file'),
       ),

@@ -2,6 +2,7 @@ import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 import 'package:interactive_chart/interactive_chart.dart';
@@ -9,7 +10,7 @@ import 'package:interactive_chart/interactive_chart.dart';
 class KlineChartWidget extends StatelessWidget {
   KlineChartWidget({super.key});
 
-  ValueNotifier<List<CandleData>> candles = ValueNotifier<List<CandleData>>([]);
+  ListNotifier<CandleData> candles = ListNotifier<CandleData>([]);
 
   void _computeTrendLines() {
     final ma7 = CandleData.computeMA(candles.value, 7);
@@ -96,7 +97,7 @@ class KlineChartWidget extends StatelessWidget {
   Widget _buildInteractiveChart(BuildContext context) {
     final ChartStyle style = _buildChartStyle(context);
     return ValueListenableBuilder(
-      valueListenable: candles,
+      valueListenable: candles.listenable,
       builder: (context, value, _) {
         if (candles.value.isEmpty) {
           return nilBox;

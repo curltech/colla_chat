@@ -6,6 +6,7 @@ import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
@@ -17,8 +18,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class PersonalInfoWidget extends StatelessWidget with DataTileMixin {
-  final ValueNotifier<List<DataTile>> personalInfoTileData =
-      ValueNotifier<List<DataTile>>([]);
+  final ListNotifier<DataTile> personalInfoTileData =
+      ListNotifier<DataTile>([]);
 
   final MyselfQrcodeWidget qrcodeWidget = MyselfQrcodeWidget();
 
@@ -184,7 +185,7 @@ class PersonalInfoWidget extends StatelessWidget with DataTileMixin {
       withLeading: withLeading,
       child: Column(children: [
         ValueListenableBuilder(
-            valueListenable: personalInfoTileData,
+            valueListenable: personalInfoTileData.listenable,
             builder: (BuildContext context, List<DataTile> personalInfoTileData,
                 Widget? child) {
               return DataListView(

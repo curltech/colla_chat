@@ -1,3 +1,4 @@
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:flutter/material.dart';
 
 abstract class Explorable {
@@ -31,8 +32,8 @@ class ExplorableNode {
   ExplorableNode? parent;
   int originalIndex = 0;
 
-  final ValueNotifier<List<ExplorableNode>> children =
-      ValueNotifier<List<ExplorableNode>>([]);
+  final ListNotifier<ExplorableNode> children =
+      ListNotifier<ExplorableNode>([]);
   final ValueNotifier<bool> hidden = ValueNotifier<bool>(false);
   final ValueNotifier<bool> canBeExpanded = ValueNotifier<bool>(true);
   final ValueNotifier<bool> isExpanded = ValueNotifier<bool>(false);
@@ -464,7 +465,7 @@ class TreeView extends StatelessWidget {
   /// 构建树的每个节点的子树
   Widget _buildChildrenTreeNode(ExplorableNode node) {
     return ListenableBuilder(
-        listenable: Listenable.merge([node.isExpanded, node.children]),
+        listenable: Listenable.merge([node.isExpanded, node.children.listenable]),
         builder: (context, _) {
           return TweenAnimationBuilder<double>(
             duration: const Duration(milliseconds: 200),

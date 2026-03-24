@@ -4,6 +4,7 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -29,7 +30,7 @@ class LiveKitSfuRoomWidget extends StatelessWidget with DataTileMixin {
 
   
 
-  final ValueNotifier<List<DataTile>> tileData = ValueNotifier<List<DataTile>>([]);
+  final ListNotifier<DataTile> tileData = ListNotifier<DataTile>([]);
 
   Future<void> _init() async {
     LiveKitManageRoom liveKitManageRoom = await conferenceService.listSfuRoom();
@@ -115,7 +116,7 @@ class LiveKitSfuRoomWidget extends StatelessWidget with DataTileMixin {
 
   Widget _buildSearchRoomView(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: tileData,
+        valueListenable: tileData.listenable,
         builder: (context, value, _) {
       return DataListView(
         itemCount: tileData.value.length,

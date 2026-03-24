@@ -82,7 +82,7 @@ class DataListGridView extends StatelessWidget {
     return ListenableBuilder(
         listenable: Listenable.merge([
           dataListGridController.gridMode,
-          dataListGridController.data,
+          dataListGridController.data.listenable,
           dataListGridController.currentIndex
         ]),
         builder: (context, _) {

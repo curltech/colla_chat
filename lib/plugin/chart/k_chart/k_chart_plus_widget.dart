@@ -5,14 +5,15 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 
 import 'package:k_chart_plus/k_chart_plus.dart';
 
 class KChartPlusController {
-  final ValueNotifier<List<KLineEntity>> klines =
-      ValueNotifier<List<KLineEntity>>([]);
+  final ListNotifier<KLineEntity> klines =
+      ListNotifier<KLineEntity>([]);
   final ValueNotifier<bool> showLoading = ValueNotifier<bool>(false);
   final ValueNotifier<bool> showVol = ValueNotifier<bool>(true);
   final ValueNotifier<bool> hideGrid = ValueNotifier<bool>(false);
@@ -33,8 +34,8 @@ class KChartPlusController {
     WRIndicator(),
     CCIIndicator(),
   ];
-  final ValueNotifier<List<MainIndicator>> mainIndicators =
-      ValueNotifier<List<MainIndicator>>([
+  final ListNotifier<MainIndicator> mainIndicators =
+      ListNotifier<MainIndicator>([
     MAIndicator(
       calcParams: [
         5,
@@ -54,18 +55,18 @@ class KChartPlusController {
     BOLLIndicator(),
     SARIndicator(),
   ]);
-  final ValueNotifier<List<SecondaryIndicator>> secondaryIndicators =
-      ValueNotifier<List<SecondaryIndicator>>([
+  final ListNotifier<SecondaryIndicator> secondaryIndicators =
+      ListNotifier<SecondaryIndicator>([
     MACDIndicator(),
     KDJIndicator(),
     RSIIndicator(),
     WRIndicator(),
     CCIIndicator(),
   ]);
-  final ValueNotifier<List<DepthEntity>> bids =
-      ValueNotifier<List<DepthEntity>>([]);
-  final ValueNotifier<List<DepthEntity>> asks =
-      ValueNotifier<List<DepthEntity>>([]);
+  final ListNotifier<DepthEntity> bids =
+      ListNotifier<DepthEntity>([]);
+  final ListNotifier<DepthEntity> asks =
+      ListNotifier<DepthEntity>([]);
   final KChartStyle chartStyle = KChartStyle();
   final KChartColors lightChartColors = KChartColors(
     dnColor: const Color(0xFF14AD8F),
@@ -378,7 +379,7 @@ class KChartPlusWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: kChartPlusController.klines,
+        valueListenable: kChartPlusController.klines.listenable,
         builder: (context, value, _) {
           if (kChartPlusController.klines.value.isEmpty) {
             return nilBox;

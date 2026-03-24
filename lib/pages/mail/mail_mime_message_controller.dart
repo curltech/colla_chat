@@ -11,6 +11,7 @@ import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/service/mail/mail_message.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:enough_mail/enough_mail.dart';
@@ -109,9 +110,9 @@ final MailAddressController mailAddressController = MailAddressController();
 
 class MailboxController {
   ///邮件地址，邮箱名称和邮箱的映射
-  final ValueNotifier<Map<String, Map<String, enough_mail.Mailbox>>>
+  final MapNotifier<String, Map<String, enough_mail.Mailbox>>
       addressMailboxes =
-      ValueNotifier<Map<String, Map<String, enough_mail.Mailbox>>>({});
+      MapNotifier<String, Map<String, enough_mail.Mailbox>>({});
   final ValueNotifier<String?> currentMailboxName =
       ValueNotifier<String?>(null);
 
@@ -239,9 +240,9 @@ class MailMimeMessageController {
   Lock lock = Lock();
 
   ///邮件地址，邮箱名称和邮件列表的映射
-  final ValueNotifier<Map<String, Map<String, List<MailMessage>>>>
+  final MapNotifier<String, Map<String, List<MailMessage>>>
       addressMailMessages =
-      ValueNotifier<Map<String, Map<String, List<MailMessage>>>>({});
+      MapNotifier<String, Map<String, List<MailMessage>>>({});
 
   ///当前的邮件
   final ValueNotifier<int?> currentMailIndex = ValueNotifier<int?>(null);
