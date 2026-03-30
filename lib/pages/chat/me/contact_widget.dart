@@ -24,8 +24,6 @@ class ContactWidget extends StatelessWidget with DataTileMixin {
   @override
   String get title => 'Contact';
 
-  
-
   Future<List<Contact>?> loadContacts() async {
     try {
       await ContactUtil.requestPermission();
@@ -47,7 +45,7 @@ class ContactWidget extends StatelessWidget with DataTileMixin {
       for (Contact contact in contacts) {
         final phones = contact.phones.map((e) => e.number).join(', ');
         final emails = contact.emails.map((e) => e.address).join(', ');
-        final name = contact.name.first + contact.name.last;
+        final name = contact.name?.first ?? '${contact.name?.last}' ?? '';
         DataTile tile = DataTile(title: name, subtitle: phones);
         _tileData.add(tile);
       }

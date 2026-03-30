@@ -15,21 +15,21 @@ class DartOllamaClient {
   List<int>? _context;
 
   DartOllamaClient({
-    String? baseUrl,
-    Map<String, String>? headers,
-    Map<String, dynamic>? queryParams,
+    required this.baseUrl,
+    Map<String, String> headers = const {},
+    Map<String, String> queryParams = const {},
     http.Client? client,
   }) {
     _client = OllamaClient(
-        baseUrl: baseUrl,
-        headers: headers,
-        queryParams: queryParams,
-        client: client);
-    this.baseUrl = _client.baseUrl!;
+        config: OllamaConfig(
+            baseUrl: baseUrl,
+            defaultHeaders: headers,
+            defaultQueryParams: queryParams),
+        httpClient: client);
   }
 
   void close() {
-    _client.endSession();
+    _client.close();
   }
 
   Future<String?> prompt(
@@ -38,16 +38,15 @@ class DartOllamaClient {
     String? system,
     String? template,
     List<int>? context,
-    RequestOptions? options,
-    GenerateCompletionRequestFormat? format,
+    ModelOptions? options,
+    ResponseFormat? format,
     bool? raw,
     bool stream = false,
-    int? keepAlive,
+    KeepAlive? keepAlive,
   }) async {
     context = context ?? _context;
-    final GenerateCompletionResponse generated =
-        await _client.generateCompletion(
-      request: GenerateCompletionRequest(
+    final GenerateResponse generated = await _client.completions.generate(
+      request: GenerateRequest(
           model: _model,
           prompt: prompt,
           images: images,
@@ -71,16 +70,16 @@ class DartOllamaClient {
     String? system,
     String? template,
     List<int>? context,
-    RequestOptions? options,
-    GenerateCompletionRequestFormat? format,
+    ModelOptions? options,
+    ResponseFormat? format,
     bool? raw,
     bool stream = false,
-    int? keepAlive,
+    KeepAlive? keepAlive,
   }) async {
     context = context ?? _context;
-    final Stream<GenerateCompletionResponse> completionStream =
-        _client.generateCompletionStream(
-      request: GenerateCompletionRequest(
+    final Stream<GenerateStreamEvent> completionStream =
+        _client.completions.generateStream(
+      request: GenerateRequest(
           model: _model,
           prompt: prompt,
           images: images,
@@ -95,7 +94,7 @@ class DartOllamaClient {
     );
     String text = '';
     await for (final res in completionStream) {
-      _context = res.context;
+      // _context = res.context;
       text += res.response?.trim() ?? '';
     }
 
@@ -104,20 +103,20 @@ class DartOllamaClient {
 
   Future<String?> chat(
     List<String> contents, {
-    GenerateChatCompletionRequestFormat? format,
-    RequestOptions? options,
+    ResponseFormat? format,
+    ModelOptions? options,
     bool stream = false,
-    int? keepAlive,
+    KeepAlive? keepAlive,
   }) async {
-    List<Message> messages = [];
+    List<ChatMessage> messages = [];
     for (String content in contents) {
-      messages.add(Message(
+      messages.add(ChatMessage(
         role: MessageRole.user,
         content: content,
       ));
     }
-    final generated = await _client.generateChatCompletion(
-      request: GenerateChatCompletionRequest(
+    final generated = await _client.chat.create(
+      request: ChatRequest(
           model: _model,
           messages: messages,
           format: format,
@@ -125,26 +124,25 @@ class DartOllamaClient {
           stream: stream,
           keepAlive: keepAlive),
     );
-    return generated.message.content;
+    return generated.message?.content;
   }
 
   Future<String> chatStream(
     List<String> contents, {
-    GenerateChatCompletionRequestFormat? format,
-    RequestOptions? options,
+    ResponseFormat? format,
+    ModelOptions? options,
     bool stream = false,
-    int? keepAlive,
+    KeepAlive? keepAlive,
   }) async {
-    List<Message> messages = [];
+    List<ChatMessage> messages = [];
     for (String content in contents) {
-      messages.add(Message(
+      messages.add(ChatMessage(
         role: MessageRole.user,
         content: content,
       ));
     }
-    final Stream<GenerateChatCompletionResponse> completionStream =
-        _client.generateChatCompletionStream(
-      request: GenerateChatCompletionRequest(
+    final Stream<ChatStreamEvent> completionStream = _client.chat.createStream(
+      request: ChatRequest(
           model: _model,
           messages: messages,
           format: format,
@@ -154,44 +152,51 @@ class DartOllamaClient {
     );
     String text = '';
     await for (final res in completionStream) {
-      text += (res.message.content ?? '').trim();
+      text += (res.message?.content ?? '').trim();
     }
     return text;
   }
 
   Future<List<double>?> embedding(
-    String prompt, {
-    RequestOptions? options,
+    EmbedInput input, {
+    ModelOptions? options,
+    KeepAlive? keepAlive,
   }) async {
-    final generated = await _client.generateEmbedding(
-      request: GenerateEmbeddingRequest(
-        model: _model,
-        prompt: prompt,
-      ),
+    final generated = await _client.embeddings.create(
+      request: EmbedRequest(
+          model: _model, input: input, keepAlive: keepAlive, options: options),
     );
     return generated.embedding;
   }
 
-  Future<CreateModelStatus?> createModel(
-    String model,
-    String modelfile, {
+  Future<String?> createModel(
+    String model, {
+    Map<String, dynamic>? parameters,
+    List<ChatMessage>? messages,
     bool stream = false,
   }) async {
-    final CreateModelResponse res = await _client.createModel(
-      request: CreateModelRequest(
-          model: model, modelfile: modelfile, stream: stream),
+    final StatusResponse res = await _client.models.create(
+      request: CreateRequest(
+          model: model,
+          messages: messages,
+          parameters: parameters,
+          stream: stream),
     );
     return res.status;
   }
 
-  Future<List<CreateModelStatus?>> createModelStream(
-      String model, String modelfile,
-      {bool stream = false}) async {
-    final modelStream = _client.createModelStream(
-      request: CreateModelRequest(
-          model: model, modelfile: modelfile, stream: stream),
+  Future<List<String?>> createModelStream(String model,
+      {Map<String, dynamic>? parameters,
+      List<ChatMessage>? messages,
+      bool stream = false}) async {
+    final modelStream = _client.models.createStream(
+      request: CreateRequest(
+          model: model,
+          messages: messages,
+          parameters: parameters,
+          stream: stream),
     );
-    List<CreateModelStatus?> status = [];
+    List<String?> status = [];
     await for (final res in modelStream) {
       status.add(res.status);
     }
@@ -199,43 +204,41 @@ class DartOllamaClient {
     return status;
   }
 
-  Future<List<Model>?> listModels() async {
-    final ModelsResponse res = await _client.listModels();
+  Future<List<ModelSummary>?> listModels() async {
+    final ListResponse res = await _client.models.list();
 
     return res.models;
   }
 
-  Future<ModelInfo> showModelInfo(String model) async {
-    final res = await _client.showModelInfo(
-      request: ModelInfoRequest(model: model),
+  Future<ShowResponse> showModelInfo(String model) async {
+    final res = await _client.models.show(
+      request: ShowRequest(model: model),
     );
 
     return res;
   }
 
-  Future<PullModelStatus?> pullModel(
+  Future<String?> pullModel(
     String model, {
     bool insecure = false,
     bool stream = false,
   }) async {
-    final PullModelResponse res = await _client.pullModel(
-      request:
-          PullModelRequest(model: model, insecure: insecure, stream: stream),
+    final StatusResponse res = await _client.models.pull(
+      request: PullRequest(model: model, insecure: insecure, stream: stream),
     );
 
     return res.status;
   }
 
-  Future<List<PullModelStatus?>> pullModelStream(
+  Future<List<String?>> pullModelStream(
     String model, {
     bool insecure = false,
     bool stream = false,
   }) async {
-    final modelStream = _client.pullModelStream(
-      request:
-          PullModelRequest(model: model, insecure: insecure, stream: stream),
+    final modelStream = _client.models.pullStream(
+      request: PullRequest(model: model, insecure: insecure, stream: stream),
     );
-    List<PullModelStatus?> status = [];
+    List<String?> status = [];
     await for (final res in modelStream) {
       status.add(res.status);
     }
@@ -248,9 +251,8 @@ class DartOllamaClient {
     bool insecure = false,
     bool stream = false,
   }) async {
-    final PushModelResponse res = await _client.pushModel(
-      request:
-          PushModelRequest(model: model, insecure: insecure, stream: stream),
+    final StatusResponse res = await _client.models.push(
+      request: PushRequest(model: model, insecure: insecure, stream: stream),
     );
 
     return res.status;
@@ -261,9 +263,8 @@ class DartOllamaClient {
     bool insecure = false,
     bool stream = false,
   }) async {
-    final modelStream = _client.pushModelStream(
-      request:
-          PushModelRequest(model: model, insecure: insecure, stream: stream),
+    final modelStream = _client.models.pushStream(
+      request: PushRequest(model: model, insecure: insecure, stream: stream),
     );
     List<String?> status = [];
     await for (final res in modelStream) {
@@ -271,12 +272,6 @@ class DartOllamaClient {
     }
 
     return status;
-  }
-
-  Future<void> checkBlob(String digest) async {
-    await _client.checkBlob(
-      digest: digest,
-    );
   }
 }
 

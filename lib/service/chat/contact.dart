@@ -30,20 +30,23 @@ class ContactService extends PeerPartyService<Contact> {
     var mobileContactMap = {};
     if (mobileContacts.isNotEmpty) {
       for (var mobileContact in mobileContacts) {
-        Contact contact =
-            Contact('', mobileContact.name.last + mobileContact.name.first);
+        Contact contact = Contact('',
+            mobileContact.name?.last ?? '${mobileContact.name?.first}' ?? '');
         contact.formattedName = contact.name.toString();
         //contact.pyFormattedName = pinyinUtil.getPinyin(contact.formattedName);
         if (mobileContact.phones.isNotEmpty) {
           for (var phoneNumber in mobileContact.phones) {
-            if (phoneNumber.isPrimary) {
+            bool? isPrimary = phoneNumber.isPrimary;
+            if (isPrimary != null && isPrimary) {
               contact.mobile = phoneNumber.normalizedNumber;
               break;
             }
           }
           if (contact.mobile == null) {
             var mobile = mobileContact.phones[0].normalizedNumber;
-            contact.mobile = await formatMobile(mobile);
+            if (mobile != null) {
+              contact.mobile = await formatMobile(mobile);
+            }
           }
         }
         mobileContactMap[contact.mobile] = contact;

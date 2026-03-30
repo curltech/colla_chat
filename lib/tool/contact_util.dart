@@ -2,75 +2,61 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 
 class ContactUtil {
   ///请求权限
-  static Future<bool> requestPermission() async {
-    return await FlutterContacts.requestPermission();
+  static Future<PermissionStatus> requestPermission() async {
+    return await FlutterContacts.permissions.request(PermissionType.readWrite);
   }
 
   ///获取所有电话联系人
-  static Future<List<Contact>> getContacts(
-      {bool withProperties = true, bool withPhoto = true}) async {
-    return await FlutterContacts.getContacts(
-        withProperties: withProperties, withPhoto: withPhoto);
+  static Future<List<Contact>> getContacts() async {
+    return await FlutterContacts.getAll(properties: ContactProperties.all);
   }
 
   ///通过id获取联系人
-  static Future<Contact?> getContact(
-    String id, {
-    bool withProperties = true,
-    bool withThumbnail = true,
-    bool withPhoto = true,
-    bool withGroups = false,
-    bool withAccounts = false,
-    bool deduplicateProperties = true,
-  }) async {
-    return await FlutterContacts.getContact(
+  static Future<Contact?> getContact(String id) async {
+    return await FlutterContacts.get(
       id,
-      withProperties: withProperties,
-      withThumbnail: withThumbnail,
-      withPhoto: withPhoto,
-      withGroups: withGroups,
-      withAccounts: withAccounts,
-      deduplicateProperties: deduplicateProperties,
+      properties: ContactProperties.all,
     );
   }
 
   ///打开外部联系人视图
-  static Future<void>? openExternalView(String id) async {
-    return await FlutterContacts.openExternalView(id);
+  static Future<void>? showViewer(String id) async {
+    return await FlutterContacts.native.showViewer(id);
   }
 
   ///打开外部联系人编辑视图
-  static Future<Contact?> openExternalEdit(String id) async {
-    return await FlutterContacts.openExternalEdit(id);
+  static Future<String?> showEditor(String id) async {
+    return await FlutterContacts.native.showEditor(id);
   }
 
   ///打开外部选择联系人视图
-  static Future<Contact?> openExternalPick() async {
-    final contact = await FlutterContacts.openExternalPick();
+  static Future<String?> showPicker() async {
+    final contact = await FlutterContacts.native.showPicker();
+
     return contact;
   }
 
   ///打开外部联系人增加视图
-  static Future<Contact?> openExternalInsert() async {
-    final contact = await FlutterContacts.openExternalInsert();
+  static Future<String?> showCreator() async {
+    final contact = await FlutterContacts.native.showCreator();
+
     return contact;
   }
 
   ///联系人修改监听器
-  static void addListener(void Function() fn) {
-    // Listen to contact database changes
-    FlutterContacts.addListener(fn);
+  static void addListener(void Function(void) fn) {
+    FlutterContacts.onDatabaseChange.listen(fn);
   }
 
   static Future<void> insert(Contact contact) async {
-    await contact.insert();
+    await FlutterContacts.create(contact);
   }
 
   static Future<void> update(Contact contact) async {
-    await contact.update();
+    await FlutterContacts.update(contact);
   }
 
-  static Future<void> delete(Contact contact) async {
-    await contact.delete();
+  static Future<void> delete(String id) async {
+    await FlutterContacts.delete(id);
   }
 }

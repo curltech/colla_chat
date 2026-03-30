@@ -81,7 +81,6 @@ class LocalNotificationsService {
             windows: initializationSettingsWindows);
     // 初始化，定义通知的响应函数，包括通知选择本身和通知的按钮
     await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
       //用户选择或者点击了通知
       onDidReceiveNotificationResponse:
           (NotificationResponse notificationResponse) {
@@ -95,6 +94,7 @@ class LocalNotificationsService {
       },
       // 应用处于后台时，点击通知的响应函数
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
+      settings: initializationSettings,
     );
   }
 
@@ -176,8 +176,12 @@ class LocalNotificationsService {
       this.id++;
       id = this.id;
     }
-    await flutterLocalNotificationsPlugin
-        .show(id, title, body, notificationDetails, payload: payload);
+    await flutterLocalNotificationsPlugin.show(
+        title: title,
+        body: body,
+        notificationDetails: notificationDetails,
+        payload: payload,
+        id: id);
   }
 }
 
