@@ -90,7 +90,7 @@ dependencies:
   flutter_local_notifications: ^21.0.0
   alarm: ^5.1.1
   stacked_notification_cards: ^0.1.0-dev.6
-  toastification: ^3.0.3
+  toastification: ^3.2.0
   cupertino_icons: ^1.0.8 #CupertinoIcons.heart_fill
   # Icon(AntDesign.gitlab_fill),Icon(Bootstrap.google),Icon(BoxIcons.bxl_apple),Brand(Brands.icons8)
   # Icon(Clarity.map_outline_badged),Icon(EvaIcons.clipboard),Flag(Flags.india),Icon(FontAwesome.stripe_brand)
