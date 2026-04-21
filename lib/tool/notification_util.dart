@@ -249,7 +249,6 @@ class NotificationUtil {
     Duration? animationDuration,
     Duration? autoCloseDuration,
     OverlayState? overlayState,
-    DismissDirection? dismissDirection,
     ToastificationCallbacks callbacks = const ToastificationCallbacks(),
   }) {
     ToastificationItem item = toastification.showCustom(
@@ -260,7 +259,6 @@ class NotificationUtil {
       animationBuilder: animationBuilder,
       animationDuration: animationDuration,
       direction: direction,
-      dismissDirection: dismissDirection,
       callbacks: callbacks,
       builder: builder,
     );
