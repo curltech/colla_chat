@@ -12,7 +12,6 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
-import 'package:event_bus/event_bus.dart';
 import 'package:synchronized/synchronized.dart';
 
 class EmailMessageUtil {
@@ -749,8 +748,9 @@ class EmailClient {
           enough_mail.MailClient.defaultPollingDuration]) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null) {
-      mailClient.eventBus.on<MailLoadEvent>().listen((event) {
-        callback(event.message);
+      mailClient.eventStream.listen((event) {
+        event.eventType;
+        //callback(event.mailClient);
       });
       await mailClient.startPolling(duration);
       return true;
@@ -851,7 +851,6 @@ class EmailClient {
 
   ///采用imap配置和协议连接
   Future<void> imapConnect({
-    EventBus? bus,
     bool isLogEnabled = false,
     String? logName,
     Duration? defaultWriteTimeout,
@@ -859,7 +858,6 @@ class EmailClient {
     bool Function(X509Certificate)? onBadCertificate,
   }) async {
     final client = enough_mail.ImapClient(
-        bus: bus,
         isLogEnabled: isLogEnabled,
         logName: logName,
         defaultWriteTimeout: defaultWriteTimeout,
