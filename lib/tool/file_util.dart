@@ -261,8 +261,8 @@ class FileUtil {
   ///保存文件对话框，适用于Linux, macOS & Windows平台
   static Future<String?> saveFilePicker({
     String? dialogTitle,
-    String? fileName,
-    Uint8List? bytes,
+    required String fileName,
+    required Uint8List bytes,
     String? initialDirectory,
     FileType type = FileType.any,
     List<String>? allowedExtensions,

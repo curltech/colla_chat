@@ -490,7 +490,7 @@ dependency_overrides:
   sprintf: ^7.0.0
   flex_color_picker: ^3.8.0
   permission_handler: ^12.0.1
-  file_picker: ^11.0.2
+  file_picker: ^12.0.0-beta.5
   sms_autofill: ^2.4.1
   choice: ^2.3.2
   shared_preferences: ^2.5.5
