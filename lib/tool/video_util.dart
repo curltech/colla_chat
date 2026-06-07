@@ -71,7 +71,7 @@ class VideoUtil {
 
   ///支持ANDROID，IOS，MACOS，WINDOWS
   static Future<Uint8List?> videoThumbnailData({
-    String? videoFile,
+    required String srcFile,
     List<int>? data,
     int width = 1024,
     int height = 768,
@@ -80,9 +80,9 @@ class VideoUtil {
   }) async {
     String thumbnailPath = await FileUtil.getTempFilename();
     await videoThumbnailFile(
-        videoFile: videoFile,
+        srcFile: srcFile,
         data: data,
-        thumbnailPath: thumbnailPath,
+        destFile: thumbnailPath,
         width: width,
         height: height,
         format: format,
@@ -96,24 +96,18 @@ class VideoUtil {
   /// FcNativeVideoThumbnail实现
   /// 支持ANDROID，IOS，MACOS，WINDOWS
   static Future<void> videoThumbnailFile({
-    required String thumbnailPath,
-    String? videoFile,
+    required String destFile,
+    required String srcFile,
     List<int>? data,
     int width = 1024,
     int height = 768,
     String? format,
     int quality = 10,
   }) async {
-    if (videoFile == null && data == null) {
-      throw 'videoFile and data can not be empty in same time';
-    }
-    if (videoFile == null && data != null) {
-      videoFile = await FileUtil.writeTempFileAsBytes(data);
-    }
     final plugin = FcNativeVideoThumbnail();
-    await plugin.getVideoThumbnail(
-        srcFile: videoFile!,
-        destFile: thumbnailPath,
+    await plugin.saveThumbnailToFile(
+        srcFile: srcFile,
+        destFile: destFile,
         width: width,
         height: height,
         format: format,
@@ -147,25 +141,25 @@ class VideoUtil {
   /// mobile使用VideoCompress
   /// ANDROID,IOS,MACOS,WINDOWS
   static Future<Uint8List?> getByteThumbnail({
-    String? videoFile,
+    String? srcFile,
     List<int>? data,
     int quality = 10,
     int position = 100,
   }) async {
     if (platformParams.windows) {
       final thumbnail =
-          await videoThumbnailData(videoFile: videoFile, quality: quality);
+          await videoThumbnailData(srcFile: srcFile!, quality: quality);
 
       return thumbnail;
     }
     if (platformParams.mobile || platformParams.macos) {
-      if (videoFile == null && data == null) {
+      if (srcFile == null && data == null) {
         throw 'videoFile and data can not be empty in same time';
       }
-      if (videoFile == null && data != null) {
-        videoFile = await FileUtil.writeTempFileAsBytes(data);
+      if (srcFile == null && data != null) {
+        srcFile = await FileUtil.writeTempFileAsBytes(data);
       }
-      final thumbnail = await VideoCompress.getByteThumbnail(videoFile!,
+      final thumbnail = await VideoCompress.getByteThumbnail(srcFile!,
           quality: quality, // default(100)
           position: position // default(-1)
           );
@@ -178,30 +172,29 @@ class VideoUtil {
   /// 获取视频缩略图的临时文件
   /// ANDROID,IOS,MACOS,WINDOWS
   static Future<File?> getFileThumbnail({
-    String? videoFile,
+    String? srcFile,
     List<int>? data,
     int quality = 10,
     int position = -1,
   }) async {
-    if (platformParams.windows) {
+    if (srcFile != null && platformParams.windows) {
       String thumbnailPath = await FileUtil.getTempFilename();
       await videoThumbnailFile(
-          thumbnailPath: thumbnailPath, videoFile: videoFile, quality: quality);
+          destFile: thumbnailPath, srcFile: srcFile, quality: quality);
 
       return File(thumbnailPath);
     }
     if (platformParams.mobile || platformParams.macos) {
-      if (videoFile == null && data == null) {
-        throw 'videoFile and data can not be empty in same time';
+      if (srcFile == null && data == null) {
+        throw 'srcFile and data can not be empty in same time';
       }
-      if (videoFile == null && data != null) {
-        videoFile = await FileUtil.writeTempFileAsBytes(data);
+      if (data != null) {
+        srcFile = await FileUtil.writeTempFileAsBytes(data);
       }
-      final File thumbnailFile =
-          await VideoCompress.getFileThumbnail(videoFile!,
-              quality: quality, // default(100)
-              position: position // default(-1)
-              );
+      final File thumbnailFile = await VideoCompress.getFileThumbnail(srcFile!,
+          quality: quality, // default(100)
+          position: position // default(-1)
+          );
 
       return thumbnailFile;
     }

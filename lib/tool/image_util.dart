@@ -208,13 +208,13 @@ class ImageUtil {
     int quality = 100,
     String? fileExtension,
     required String fileName,
-    String androidRelativePath = "Pictures",
+    String albumPath = "Pictures",
     required bool skipIfExists,
   }) async {
     final result = await SaverGallery.saveImage(imageBytes,
         quality: quality,
         fileName: fileName,
-        androidRelativePath: androidRelativePath,
+        albumPath: albumPath,
         skipIfExists: skipIfExists);
     return result;
   }
@@ -223,13 +223,13 @@ class ImageUtil {
   static Future<dynamic> saveFileGallery({
     required String filePath,
     required String fileName,
-    String androidRelativePath = "Download",
+    String albumPath = "Download",
     required bool skipIfExists,
   }) async {
     final result = await SaverGallery.saveFile(
         filePath: filePath,
         fileName: fileName,
-        androidRelativePath: androidRelativePath,
+        albumPath: albumPath,
         skipIfExists: skipIfExists);
     return result;
   }

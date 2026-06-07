@@ -189,7 +189,7 @@ class PlatformMediaSource {
                     Uint8List? data;
                     if (filename.endsWith('mp4') || filename.endsWith('3gp')) {
                       data =
-                          await VideoUtil.getByteThumbnail(videoFile: filename);
+                          await VideoUtil.getByteThumbnail(srcFile: filename);
                     } else {
                       data = await FFMpegUtil.thumbnail(videoFile: filename);
                     }

@@ -131,7 +131,7 @@ class PlaylistController {
       return;
     }
     Uint8List? thumbnail =
-        await VideoUtil.getByteThumbnail(videoFile: filename);
+        await VideoUtil.getByteThumbnail(srcFile: filename);
     String fileType = rootMediaSourceController.fileType.name;
     ChatMessageContentType? contentType =
         StringUtil.enumFromString(ChatMessageContentType.values, fileType);

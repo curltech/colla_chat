@@ -1107,7 +1107,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           if (chatMessage.thumbnail == null &&
               (contentType == ChatMessageContentType.video.name)) {
             Uint8List? data =
-                await VideoUtil.getByteThumbnail(videoFile: filename);
+                await VideoUtil.getByteThumbnail(srcFile: filename);
             if (data != null) {
               String base64 = CryptoUtil.encodeBase64(data);
               chatMessage.thumbnail = ImageUtil.base64Img(base64);

@@ -27,22 +27,43 @@ environment:
 # dependencies can be manually updated by changing the version numbers below to
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
+flutter:
+  config:
+    enable-swift-package-manager: false
+  uses-material-design: true
+  generate: true
+  assets:
+    - packages/openpgp/web/assets/worker.js
+        - packages/openpgp/web/assets/wasm_exec.js
+        - packages/openpgp/web/assets/openpgp.wasm
+        - assets/wasm/sqlite3.wasm
+        - assets/locale/
+        - assets/icon/
+        - assets/image/
+        - assets/image/bg/
+        - assets/image/email/
+        - assets/image/mahjong/
+        - assets/image/mahjong/tile/
+        - assets/image/poker/
+        - assets/media/
+        - assets/model/
+        - assets/markdown/
 dependencies:
   flutter:
     sdk: flutter
   # 尝试使用的功能
   get: ^5.0.0-release-candidate-9.3.2
-  bonsoir: ^6.0.1
+  bonsoir: ^7.1.1
   process_runner: ^4.2.4
-  network_tools: ^6.0.5
-  network_tools_flutter: ^3.0.3
+  #  network_tools: ^6.0.5 #依赖get_it
+  #  network_tools_flutter: ^3.0.3
   # 系统功能，获取系统信息和操作，需要调用插件才能完成
   flutter_background: ^1.3.1  #android,后台运行，可以保持网络连接
   flutter_foreground_service: ^0.4.1 #android,后台运行，可以保持网络连接，和flutter_background功能一样
   flutter_foreground_task: ^9.2.1
   flutter_background_service: ^5.0.10
   flutter_background_executor: ^1.0.0
-  upgrader: ^12.3.0
+  upgrader: ^13.5.0
   path_provider: ^2.0.11
   url_launcher: ^6.1.11 #打开系统浏览器
   open_filex: ^4.6.0 #打开文件,
@@ -58,7 +79,7 @@ dependencies:
   screen_brightness: ^2.1.7
   orientation: ^1.2.0 # 控制屏幕旋转
   geocoding: ^4.0.0
-  network_info_plus: ^7.0.0
+  network_info_plus: ^8.1.0
   beamer: ^1.4.1+1
   flutter_contacts: ^2.0.1
   fluttercontactpicker_plus: ^5.1.1
@@ -87,7 +108,7 @@ dependencies:
 
   #界面
   bubble: ^1.2.1
-  flutter_local_notifications: ^21.0.0
+  flutter_local_notifications: ^22.0.0
   alarm: ^5.1.1
   stacked_notification_cards: ^0.1.0-dev.6
   toastification: ^3.2.0
@@ -111,7 +132,7 @@ dependencies:
   fluro: ^2.0.3
   flutter_multi_formatter: ^2.13.7
   chips_choice: ^3.0.0
-  validation_pro: ^3.0.0
+  validation_pro: ^4.0.0
   flutter_pw_validator: ^1.6.0 #FlutterPwValidator放在TextFormField下面显示校验结果
   fzregex: ^2.1.1 #静态方法：Fzregex.hasMatch
   regexpattern: ^2.5.0
@@ -126,7 +147,7 @@ dependencies:
   liquid_glass_effect: ^1.0.1
   liquid_glass_ui_design: ^1.0.5
   liquid_glass_renderer: ^0.2.0-dev.4
-  liquid_glass_widgets: ^0.4.1-dev.2
+  liquid_glass_widgets: ^0.15.0
   adaptive_platform_ui: ^0.1.100
   oc_liquid_glass: ^0.2.1
   #flui: 0.9.2
@@ -136,7 +157,7 @@ dependencies:
   calendar_view: ^2.0.0
   easy_image_viewer: ^1.5.1
   tab_container: ^3.5.3
-  file_saver: ^0.3.1
+  file_saver: ^0.4.0
   material_neumorphic: ^1.2.1
   extended_text: ^15.0.0 #文本扩展显示
   extended_text_field: ^16.0.2 #文字表情混入
@@ -183,7 +204,7 @@ dependencies:
   contextmenu_plus: ^1.0.1
   star_menu: ^4.0.1
   sliding_up_panel2: ^3.3.0+1
-  flutter_floating_bottom_bar: ^1.4.0
+  flutter_floating_bottom_bar: ^2.0.0
   focused_menu: ^1.0.5
   floating_action_bubble: ^1.1.4
   expandable: ^5.0.1
@@ -201,7 +222,7 @@ dependencies:
   flutter_animate: ^4.2.0
   auto_animated: ^3.1.0 #对滚动视图内的元素定义动画
   animations: ^2.1.2
-  animate_do: ^4.2.0
+  animate_do: ^5.1.0
   animated_text_kit: ^4.3.0
   loading_indicator: ^3.1.1
   loading_animation_widget: ^1.2.0+4
@@ -227,7 +248,7 @@ dependencies:
   flutter_json_view: ^1.1.5
   flutter_code_editor: ^0.3.5
   json_editor_flutter: ^1.4.2
-  re_editor: ^0.8.0
+  re_editor: ^0.9.0
   flutter_highlight: ^0.7.0
   highlight: ^0.7.0
   re_highlight: ^0.0.3
@@ -277,7 +298,7 @@ dependencies:
   flutter_pip_player: ^0.1.0
 #  native_video_player: ^3.0.0-dev.4
   #  native_video_player: ^1.3.1
-  fvp: ^0.35.2
+  fvp: ^0.37.2
   fl_video: ^1.4.0  #video_Player control panel
   better_player_plus: ^1.1.5
   awesome_video_player: ^1.0.5
@@ -301,7 +322,7 @@ dependencies:
   pro_video_editor: ^1.10.0 #mobile,macos
   video_editor_2: ^3.1.1 #mobile
   video_compress: ^3.1.3
-  fc_native_video_thumbnail: ^0.17.2
+  fc_native_video_thumbnail: ^3.0.1
   image_editor: ^1.6.0
   image: ^4.5.3 #所有平台，装载，保存，管理图像
   flutter_luban: ^0.1.15
@@ -343,7 +364,7 @@ dependencies:
   #系统
   system_resources: ^1.6.0
 dependency_overrides:
-  liquid_glass_easy: ^1.1.1
+  liquid_glass_easy: ^2.0.1
   pretty_qr_code: ^3.6.0
   insta_assets_picker: ^3.4.0
   livekit_client: ^2.6.2 #livekit sfu server flutter client
@@ -415,7 +436,7 @@ dependency_overrides:
   reactive_animated_toggle_switch: ^0.0.4
   uuid: ^4.3.1
   meta: ^1.11.0
-  xml: ^6.6.1
+  xml: ^7.0.1
   fluttertoast: ^9.0.0
   pointer_interceptor: ^0.10.1
   js: ^0.7.1
@@ -429,13 +450,13 @@ dependency_overrides:
   #  websocket_universal: ^1.2.5
   flutter_math_fork: ^0.7.4
   math_expressions: ^3.1.0
-  share_plus: ^12.0.1
+  share_plus: ^13.1.0
   sensors_plus: ^7.0.0
   photo_view: ^0.15.0
   extended_image: ^10.0.1 #所有平台，官方软件，管理图像
   extended_image_library: ^5.0.1
-  device_info_plus: ^12.2.0
-  package_info_plus: ^9.0.0
+  device_info_plus: ^13.1.0
+  package_info_plus: ^10.1.0
   flutter_keyboard_visibility: ^6.0.0
   pointycastle: ^4.0.0
   geolocator: ^14.0.0
@@ -469,7 +490,7 @@ dependency_overrides:
   sprintf: ^7.0.0
   flex_color_picker: ^3.8.0
   permission_handler: ^12.0.1
-  file_picker: ^10.3.10
+  file_picker: ^11.0.2
   sms_autofill: ^2.4.1
   choice: ^2.3.2
   shared_preferences: ^2.5.5
@@ -508,7 +529,7 @@ dependency_overrides:
   #      path: packages/pdfx
   pdf: ^3.11.3 #所有平台，创建pdf
   audio_session: ^0.2.0
-  record: ^6.2.0
+  record: ^7.0.0
   # record_darwin: 1.2.2
   secure_application: ^4.1.0
   visibility_detector: ^0.4.0+2 #组建可见性的大小发生变化
@@ -524,7 +545,7 @@ dependency_overrides:
   flutter_quill: ^11.5.0
   flutter_quill_extensions: ^11.0.0
   flutter_quill_delta_from_html: ^1.5.3
-  saver_gallery: ^4.1.0
+  saver_gallery: ^5.1.0
   gal: ^2.3.0
   flutter_lints: ^6.0.0
   html_editor_enhanced: ^2.7.1
@@ -590,54 +611,3 @@ flutter_native_splash:
   background_image: "assets/image/splash_bg.png"
   image: assets/image/splash.png
 # The following section is specific to Flutter packages.
-flutter:
-
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
-  uses-material-design: true
-  generate: true
-
-  # To add assets to your application, add an assets section, like this:
-  assets:
-    - packages/openpgp/web/assets/worker.js
-    - packages/openpgp/web/assets/wasm_exec.js
-    - packages/openpgp/web/assets/openpgp.wasm
-    - assets/wasm/sqlite3.wasm
-    - assets/locale/
-    - assets/icon/
-    - assets/image/
-    - assets/image/bg/
-    - assets/image/email/
-    - assets/image/mahjong/
-    - assets/image/mahjong/tile/
-    - assets/image/poker/
-    - assets/media/
-    - assets/model/
-    - assets/markdown/
-
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/assets-and-images/#resolution-aware
-
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/assets-and-images/#from-packages
-
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/custom-fonts/#from-packages

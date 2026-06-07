@@ -30,7 +30,7 @@ class ContactUtil {
   }
 
   ///打开外部选择联系人视图
-  static Future<String?> showPicker() async {
+  static Future<Contact?> showPicker() async {
     final contact = await FlutterContacts.native.showPicker();
 
     return contact;

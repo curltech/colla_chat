@@ -169,7 +169,7 @@ class FileUtil {
       initialDirectory = dir.path;
     }
     List<XFile> xfiles = [];
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.pickFiles(
       dialogTitle: dialogTitle,
       initialDirectory: initialDirectory,
       type: type,
@@ -250,7 +250,7 @@ class FileUtil {
     bool lockParentWindow = false,
     String? initialDirectory,
   }) async {
-    String? selectedDirectory = await FilePicker.platform.getDirectoryPath(
+    String? selectedDirectory = await FilePicker.getDirectoryPath(
         dialogTitle: dialogTitle,
         lockParentWindow: lockParentWindow,
         initialDirectory: initialDirectory);
@@ -268,7 +268,7 @@ class FileUtil {
     List<String>? allowedExtensions,
     bool lockParentWindow = false,
   }) async {
-    String? outputFile = await FilePicker.platform.saveFile(
+    String? outputFile = await FilePicker.saveFile(
         dialogTitle: dialogTitle,
         fileName: fileName,
         initialDirectory: initialDirectory,

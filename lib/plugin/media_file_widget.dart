@@ -48,7 +48,7 @@ class MediaFileWidgetState extends State<MediaFileWidget> {
     }
     if (mimeType == ChatMessageMimeType.mp4.name) {
       return PlatformFutureBuilder(
-        future: VideoUtil.getByteThumbnail(videoFile: mediaFile.path),
+        future: VideoUtil.getByteThumbnail(srcFile: mediaFile.path),
         builder: (BuildContext context, Uint8List? data) {
           return ImageUtil.buildMemoryImageWidget(
             data!,
