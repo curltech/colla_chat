@@ -31,7 +31,7 @@ class ProVideoRender {
       Uint8List? overlayImageBytes,
       double? playbackSpeed,
       int? bitrate,
-      List<List<double>> colorMatrixList = const [],
+      List<pro.ColorFilter> colorFilters = const [],
       int? cropWidth,
       int? cropHeight,
       int? cropX,
@@ -68,22 +68,27 @@ class ProVideoRender {
         originalAudioVolume -= volumeBalance;
       }
     }
+    pro.VideoComposition? composition = pro.VideoComposition(layers: []);
+    List<pro.VideoSegment>? videoSegments = [
+      pro.VideoSegment(
+        video: editorVideo,
+        playbackSpeed: playbackSpeed,
+      ),
+    ];
     var data = pro.VideoRenderData(
       id: taskId,
-      video: editorVideo,
+      videoSegments: videoSegments,
       outputFormat: pro.VideoOutputFormat.mp4,
+      composition: composition,
       // 输出是否包含音频
       enableAudio: enableAudio,
-      // 放置图像
-      imageBytes: overlayImageBytes,
       // 视频播放速度
-      playbackSpeed: playbackSpeed,
       // 视频字节率
       bitrate: bitrate,
       // 视频模糊
       blur: blur,
       // 视频过滤
-      colorMatrixList: colorMatrixList,
+      colorFilters: colorFilters,
       // 视频截取功能
       startTime:
           startTimeMs != null ? Duration(milliseconds: startTimeMs) : null,
@@ -100,10 +105,6 @@ class ProVideoRender {
           scaleX: scaleX,
           scaleY: scaleY),
       qualityConfig: qualityConfig,
-      videoSegments: videoSegments,
-      customAudioPath: customAudioPath,
-      originalAudioVolume: originalAudioVolume,
-      customAudioVolume: customAudioVolume,
     );
     StreamBuilder streamBuilder =
         getProgressStreamBuilder(taskId, onProgress: onProgress);

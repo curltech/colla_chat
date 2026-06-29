@@ -13,6 +13,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:pro_video_editor/core/models/video/color_filter_model.dart' as pro;
 import 'package:pro_video_editor/core/models/video/video_metadata_model.dart';
 
 /// 视频渲染处理界面，包括旋转，裁剪
@@ -83,7 +84,7 @@ class VideoRendererWidget extends StatelessWidget with DataTileMixin {
     Uint8List? overlayImageBytes,
     double? playbackSpeed,
     int? bitrate,
-    List<List<double>> colorMatrixList = const [],
+    List<pro.ColorFilter> colorFilters = const [],
     int? cropWidth,
     int? cropHeight,
     int? cropX,
@@ -105,7 +106,7 @@ class VideoRendererWidget extends StatelessWidget with DataTileMixin {
         overlayImageBytes: overlayImageBytes,
         playbackSpeed: playbackSpeed,
         bitrate: bitrate,
-        colorMatrixList: colorMatrixList,
+        colorFilters: colorFilters,
         cropWidth: cropWidth,
         cropHeight: cropHeight,
         cropX: cropX,

@@ -263,7 +263,7 @@ class ProVideoEditorWidget extends StatelessWidget with DataTileMixin {
     _outputVideoFile = await _videoRender!.render(
       blur: parameters.blur,
       enableAudio: _proVideoController?.isAudioEnabled ?? true,
-      colorMatrixList: parameters.colorFilters,
+      // colorFilters: parameters.colorFilters,
       startTimeMs: parameters.startTime?.inMilliseconds,
       endTimeMs: parameters.endTime?.inMilliseconds,
       cropWidth: parameters.cropWidth,

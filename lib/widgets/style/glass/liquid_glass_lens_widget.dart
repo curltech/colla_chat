@@ -3,49 +3,90 @@ import 'package:liquid_glass_easy/liquid_glass_easy.dart';
 
 /// ios 26样式的玻璃效果组件
 /// 把组件变成透镜
+/// LiquidGlassButton — refracts the content behind it. Anywhere on Impeller; on Skia place it inside a LiquidGlassView (frosted fallback without one).
+/// LiquidGlassSlider — jelly thumb that refracts the track as it moves. Self-contained: it owns its background, so it works anywhere on both Impeller and Skia — no LiquidGlassView needed.
+/// LiquidGlassToggle — refracts its own track. Self-contained, so it works anywhere on both Impeller and Skia — no LiquidGlassView needed.
+/// LiquidGlassAppBar — refracts the content behind it. Anywhere on Impeller; needs a LiquidGlassView on Skia.
+/// LiquidGlassBottomNavBar — refracts the content behind it. On Skia, use it inside a LiquidGlassScaffold (which provides the LiquidGlassView). To place it anywhere on Impeller, use the LiquidGlassBottomNavBar.withImpeller(...) constructor.
+/// LiquidGlassTabBar — refracts the content behind it. Anywhere on Impeller; needs a LiquidGlassView on Skia.
+/// LiquidGlassScaffold — a Scaffold-style layout that owns the glass pipeline (its own LiquidGlassView), so its child lenses refract the body anywhere on both engines.
+/// LiquidGlassDraggable — a drag wrapper for any lens; inherits whatever the lens it wraps requires.
+/// LiquidGlassJelly — the squash/stretch physics as a reusable widget; inherits whatever the content it wraps requires.
 extension LiquidGlassLensWidget<T extends Widget> on T {
-  LiquidGlass asLiquidGlassLens(
-    LiquidGlassController lensController, {
+  Widget asLiquidGlassLens({
     Key? key,
     double height = double.infinity,
     double width = double.infinity,
-    LiquidGlassAlignPosition position =
-        const LiquidGlassAlignPosition(alignment: Alignment.center),
-    double magnification = 1,
-    bool enableInnerRadiusTransparent = false,
-    double distortion = 0.2,
-    double distortionWidth = 30,
-    double diagonalFlip = 0,
-    bool draggable = false,
-    LiquidGlassShape shape = const RoundedRectangleShape(),
+    LiquidGlassCornerStyle cornerStyle =
+        LiquidGlassCornerStyle.continuousRoundedRectangle,
+    double cornerRadius = 50.0,
+    LiquidGlassClipQuality clipQuality =
+        LiquidGlassClipQuality.roundedRectangle,
+    double borderWidth = 1.0,
+    Color? borderColor,
+    double lightIntensity = 1.0,
+    Color lightColor = const Color(0xB2FFFFFF),
+    double lightDirection = 0.0,
+    LiquidGlassLightMode lightMode = LiquidGlassLightMode.edge,
+    LiquidGlassBorderType borderType = const OpticalBorder(),
+    double saturation = 1.0,
     LiquidGlassBlur blur = const LiquidGlassBlur(),
-    bool visibility = true,
     Color color = Colors.transparent,
-    bool outOfBoundaries = false,
+    bool enableInnerRadiusTransparent = false,
+    double distortion = 0.1,
+    double distortionWidth = 30,
+    double magnification = 1,
+    double chromaticAberration = 0.003,
+    LiquidGlassRefractionMode refractionMode =
+        LiquidGlassRefractionMode.shapeRefraction,
+    LiquidGlassRefractionType? refractionType,
+    double diagonalFlip = 0,
+    bool? useImpellerBackdrop,
+    bool visibility = true,
     EdgeInsetsGeometry padding = const EdgeInsets.all(0),
   }) {
-    return LiquidGlass(
-      controller: lensController,
-      position: position,
-      width: width,
-      height: height,
-      magnification: magnification,
+    LiquidGlassShape shape = LiquidGlassShape(
+      cornerStyle: cornerStyle,
+      cornerRadius: cornerRadius,
+      clipQuality: clipQuality,
+      borderWidth: borderWidth,
+      borderColor: borderColor,
+      lightIntensity: lightIntensity,
+      lightColor: lightColor,
+      lightDirection: lightDirection,
+      lightMode: lightMode,
+      borderType: borderType,
+    );
+    LiquidGlassAppearance appearance = LiquidGlassAppearance(
+      saturation: saturation,
+      blur: blur,
+      color: color,
       enableInnerRadiusTransparent: enableInnerRadiusTransparent,
-      diagonalFlip: diagonalFlip,
+    );
+    LiquidGlassRefraction refraction = LiquidGlassRefraction(
       distortion: distortion,
       distortionWidth: distortionWidth,
-      draggable: draggable,
-      outOfBoundaries: outOfBoundaries,
-      color: color,
-      blur: blur,
-      shape: shape,
-      visibility: visibility,
-      child: Padding(
-          padding: padding,
-          child: Center(
-            child: this,
-          )),
+      magnification: magnification,
+      chromaticAberration: chromaticAberration,
+      refractionMode: refractionMode,
+      refractionType: refractionType,
+      diagonalFlip: diagonalFlip,
     );
+    LiquidGlassStyle style = LiquidGlassStyle(
+        shape: shape, appearance: appearance, refraction: refraction);
+    return SizedBox(
+        width: width,
+        height: height,
+        child: LiquidGlassLens(
+          style: style,
+          visibility: visibility,
+          useImpellerBackdrop: useImpellerBackdrop,
+          child: Padding(
+              padding: padding,
+              child: Center(
+                child: this,
+              )),
+        ));
   }
 }
 
@@ -56,8 +97,6 @@ class LiquidGlassLensContainer extends StatelessWidget {
   final LiquidGlassController lensController = LiquidGlassController();
 
   final Widget backgroundWidget;
-
-  final List<Widget> children;
 
   final double? height;
 
@@ -71,7 +110,7 @@ class LiquidGlassLensContainer extends StatelessWidget {
 
   final LiquidGlassRefreshRate refreshRate;
 
-  final List<LiquidGlass> lenses = [];
+  final Widget child;
 
   LiquidGlassLensContainer(
       {super.key,
@@ -81,12 +120,8 @@ class LiquidGlassLensContainer extends StatelessWidget {
       this.useSync = true,
       this.realTimeCapture = true,
       this.refreshRate = LiquidGlassRefreshRate.deviceRefreshRate,
-      required this.children,
-      required this.backgroundWidget}) {
-    for (var child in children) {
-      lenses.add(child.asLiquidGlassLens(lensController));
-    }
-  }
+      required this.backgroundWidget,
+      required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +135,6 @@ class LiquidGlassLensContainer extends StatelessWidget {
             useSync: useSync,
             realTimeCapture: realTimeCapture,
             refreshRate: refreshRate,
-            children: lenses));
+            child: child.asLiquidGlassLens()));
   }
 }

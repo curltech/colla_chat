@@ -122,7 +122,7 @@ extension PlatformStyleWidget<T extends Widget> on T {
           height: height,
           width: width,
           backgroundWidget: backgroundWidget ?? Container(),
-          children: [this],
+          child: this,
         );
       case PlatformStyle.neumorphic:
         child = asNeumorphicStyle(
