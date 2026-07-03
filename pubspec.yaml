@@ -119,7 +119,7 @@ dependencies:
   # Icon(MingCute.knife_line),Icon(OctIcons.code_of_conduct),Icon(PixelArtIcons.gif),Icon(TeenyIcons.google_play_store)
   # Icon(ZondIcons.shield)
   icons_plus: ^5.0.0
-  simple_icons: ^14.6.1 #icon: Icon(SimpleIcons.github)
+  simple_icons: ^16.23.0 #icon: Icon(SimpleIcons.github)
   fluttericon: ^2.0.0 #Icon(Typicons.attention), Icon(Fontelico.emo_wink), Icon(Linecons.globe)
   unicons: ^3.0.0 #Icon(UniconsLine.camera),Icon(UniconsSolid.airplay)
   flutter_animated_icons: ^1.0.1
@@ -138,7 +138,7 @@ dependencies:
   regexpattern: ^2.5.0
   phone_form_field: ^10.0.17 #支持所有平台，电话号码的录入字段
   mobile_number: ^3.0.0 #仅支持android，获取电话号码，ios无此功能
-  phone_numbers_parser: ^9.0.20 #支持所有的平台
+  phone_numbers_parser: ^9.0.24 #支持所有的平台
   badges: ^3.1.2
   extended_list: ^3.0.0
   glass_kit: ^4.0.2
@@ -147,7 +147,7 @@ dependencies:
   liquid_glass_effect: ^1.0.1
   liquid_glass_ui_design: ^1.0.5
   liquid_glass_renderer: ^0.2.0-dev.4
-  liquid_glass_widgets: ^0.19.1
+  liquid_glass_widgets: ^0.19.6
   adaptive_platform_ui: ^0.1.100
   oc_liquid_glass: ^0.2.1
   #flui: 0.9.2
@@ -160,7 +160,6 @@ dependencies:
   file_saver: ^0.4.0
   material_neumorphic: ^1.2.1
   extended_text: ^15.0.0 #文本扩展显示
-  extended_text_field: ^16.0.2 #文字表情混入
   extended_text_library: ^12.0.1
   extended_masked_text: ^3.0.1
   # fl_chart: ^1.0.0
@@ -255,7 +254,7 @@ dependencies:
   provider: ^6.0.1 #状态管理
   easy_refresh: ^3.3.2+1
   percent_indicator: ^4.2.5
-  flutter_sharing_intent: ^1.1.1
+  flutter_sharing_intent: ^2.0.4
   date_format: ^2.0.6
   omni_datetime_picker: ^2.3.1
   toggle_switch: ^2.3.0
@@ -282,7 +281,7 @@ dependencies:
   #  ffmpeg_kit_flutter_minimal: ^6.0.8
   ffmpeg_kit_flutter_new: ^4.1.0
   photo_view: ^0.15.0 #图片显示
-  pro_image_editor: ^12.0.0
+  pro_image_editor: ^12.11.1
   audioplayers: ^6.6.0 #音频处理,所有平台
   audioplayers_platform_interface: ^7.1.1
   audioplayers_windows: ^4.3.0
@@ -298,7 +297,7 @@ dependencies:
   flutter_pip_player: ^0.1.0
 #  native_video_player: ^3.0.0-dev.4
   #  native_video_player: ^1.3.1
-  fvp: ^0.37.2
+  fvp: ^0.37.3
   fl_video: ^1.4.0  #video_Player control panel
   better_player_plus: ^1.1.5
   awesome_video_player: ^1.0.5
@@ -319,7 +318,7 @@ dependencies:
   flutter_image_compress: ^2.4.0
   video_thumbnail: ^0.5.6
   easy_video_editor: ^0.1.2 #mobile
-  pro_video_editor: ^2.1.1 #mobile,macos
+  pro_video_editor: ^2.2.2 #mobile,macos
   video_editor_2: ^3.1.1 #mobile
   video_compress: ^3.1.3
   fc_native_video_thumbnail: ^3.0.1
@@ -332,7 +331,7 @@ dependencies:
 
   #应用
   i18n_extension: ^15.1.0
-  kat_html_editor: ^0.0.5
+#  kat_html_editor: ^0.0.5
   #  quill_html_editor: ^2.2.8
   #  quill_html_editor_v2: ^2.2.10 ios下编译错误
   appflowy_editor: ^6.2.0
@@ -369,7 +368,7 @@ dependency_overrides:
   insta_assets_picker: ^3.4.0
   livekit_client: ^2.6.2 #livekit sfu server flutter client
   dart_jsonwebtoken: ^3.3.1
-  wechat_assets_picker: ^10.1.1 #移动平台，选择图像，视频等媒体并展示
+  wechat_assets_picker: ^10.1.2 #移动平台，选择图像，视频等媒体并展示
   langchain: ^0.8.0+1
   langchain_ollama: ^0.4.0+1
   langchain_openai: ^0.8.0+1
@@ -388,7 +387,7 @@ dependency_overrides:
   battery_plus: ^7.0.0
   freezed_annotation: ^3.1.0
   reactive_forms: ^18.2.2
-  reactive_advanced_switch: ^2.1.1
+#  reactive_advanced_switch: ^2.1.1
   reactive_file_picker: ^4.0.1
   reactive_image_picker: ^8.0.1
   reactive_segmented_control: ^2.0.2
@@ -402,7 +401,7 @@ dependency_overrides:
   reactive_extended_text_field: ^5.0.1
   reactive_pinput: ^5.0.1
   reactive_cupertino_switch: ^4.0.0
-  reactive_pin_code_fields: ^2.0.2
+#  reactive_pin_code_fields: ^2.0.2
   pin_code_fields: ^9.3.0
   reactive_sliding_segmented: ^2.0.2
   reactive_cupertino_slider: ^2.0.2
@@ -425,7 +424,7 @@ dependency_overrides:
   reactive_fancy_password_field: ^2.1.2
   reactive_toggle_switch: ^2.1.1
   reactive_language_picker: ^2.0.2
-  reactive_fluent_ui: ^3.0.0
+#  reactive_fluent_ui: ^3.0.0
   reactive_cart_stepper: ^2.1.1
   reactive_flutter_native_text_input: ^2.0.2
   reactive_languagetool_textfield: ^0.0.3
@@ -490,7 +489,7 @@ dependency_overrides:
   sprintf: ^7.0.0
   flex_color_picker: ^3.8.0
   permission_handler: ^12.0.1
-  file_picker: ^12.0.0-beta.5
+  file_picker: ^12.0.0-beta.7
   sms_autofill: ^2.4.1
   choice: ^2.3.2
   shared_preferences: ^2.5.5
@@ -505,7 +504,7 @@ dependency_overrides:
   just_audio_background: ^0.0.1-beta.11
   camera_linux: ^0.0.8
   google_fonts: ^8.0.2
-  material_design_icons_flutter: ^7.0.7296
+#  material_design_icons_flutter: ^7.0.7296
   full_picker: ^2.1.5
   image_cropper: ^12.1.1
   light_compressor: ^2.2.0
@@ -542,13 +541,15 @@ dependency_overrides:
   flutter_slider_drawer: ^3.0.2
   flutter_zoom_drawer: ^3.2.0
   lottie: ^3.1.2
-  flutter_quill: ^11.5.0
+  flutter_quill: #^11.5.1
+    git: https://github.com/singerdmx/flutter-quill/
   flutter_quill_extensions: ^11.0.0
   flutter_quill_delta_from_html: ^1.5.3
   saver_gallery: ^5.1.0
   gal: ^2.3.0
   flutter_lints: ^6.0.0
-  html_editor_enhanced: ^2.7.1
+#  html_editor_enhanced: ^2.7.1
+  html_editor_plus: ^0.0.7
   lints: ^6.0.0
   archive: ^4.0.1
   screen_retriever: ^0.2.0
@@ -570,10 +571,12 @@ dependency_overrides:
     git: https://github.com/Enough-Software/enough_mail_html.git
   enough_html_editor: #^0.0.5
     git: https://github.com/Enough-Software/enough_html_editor.git
-  enough_platform_widgets: ^1.0.0
-  #    git: https://github.com/Enough-Software/enough_platform_widgets
+  enough_platform_widgets:
+      git: https://github.com/Enough-Software/enough_platform_widgets
   enough_mail_flutter: #^2.1.0 #ios崩溃
     git: https://github.com/Enough-Software/enough_mail_flutter.git
+  extended_text_field: #^16.0.2 #文字表情混入
+    git: https://github.com/fluttercandies/extended_text_field
 dev_dependencies:
   flutter_test:
     sdk: flutter

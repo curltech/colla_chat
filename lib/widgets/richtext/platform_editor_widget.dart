@@ -8,8 +8,7 @@ import 'package:dart_quill_delta/src/delta/delta.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:html_editor_enhanced/html_editor.dart';
-import 'package:kat_html_editor/kat_html_editor.dart';
+import 'package:html_editor_plus/html_editor.dart';
 
 class PlatformEditorController with ChangeNotifier {
   dynamic originalController;
@@ -20,10 +19,10 @@ class PlatformEditorController with ChangeNotifier {
       QuillController controller = originalController as QuillController;
       Delta delta = controller.document.toDelta();
       return DocumentUtil.deltaToJson(delta);
-    } else if (originalController is QuillEditorController) {
-      QuillEditorController controller =
-          originalController as QuillEditorController;
-      return await controller.getText();
+    } else if (originalController is QuillController) {
+      QuillController controller =
+          originalController as QuillController;
+      return controller.getPlainText();
     } else if (originalController is HtmlEditorController) {
       HtmlEditorController controller =
           originalController as HtmlEditorController;
@@ -40,10 +39,10 @@ class PlatformEditorController with ChangeNotifier {
       QuillController controller = originalController as QuillController;
       Delta delta = controller.document.toDelta();
       return DocumentUtil.deltaToHtml(delta);
-    } else if (originalController is QuillEditorController) {
-      QuillEditorController controller =
-          originalController as QuillEditorController;
-      return await controller.getText();
+    } else if (originalController is QuillController) {
+      QuillController controller =
+          originalController as QuillController;
+      return controller.getPlainText();
     } else if (originalController is HtmlEditorController) {
       HtmlEditorController controller =
           originalController as HtmlEditorController;

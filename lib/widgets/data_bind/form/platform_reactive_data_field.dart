@@ -17,7 +17,7 @@ import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/tog
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/wechat/selected_asset_view.dart';
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/wechat/selected_assets_list_view.dart';
 import 'package:flutter/material.dart';
-import 'package:reactive_advanced_switch/reactive_advanced_switch.dart';
+// import 'package:reactive_advanced_switch/reactive_advanced_switch.dart';
 import 'package:reactive_cart_stepper/reactive_cart_stepper.dart';
 import 'package:reactive_color_picker/reactive_color_picker.dart';
 import 'package:reactive_contact_picker/reactive_contact_picker.dart';
@@ -54,8 +54,8 @@ import 'package:reactive_cupertino_text_field/reactive_cupertino_text_field.dart
 import 'package:reactive_flutter_rating_bar/reactive_flutter_rating_bar.dart';
 import 'package:reactive_input_decorator/reactive_input_decorator.dart';
 import 'package:reactive_animated_toggle_switch/reactive_animated_toggle_switch.dart';
-import 'package:reactive_pin_code_fields/reactive_pin_code_fields.dart';
-import 'package:reactive_fluent_ui/reactive_fluent_ui.dart' as fui;
+// import 'package:reactive_pin_code_fields/reactive_pin_code_fields.dart';
+// import 'package:reactive_fluent_ui/reactive_fluent_ui.dart' as fui;
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class PlatformReactiveDataField<T> extends StatelessWidget {
@@ -286,29 +286,29 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return nativeTextInput;
   }
 
-  Widget _buildFluentTextFormBox(BuildContext context) {
-    var name = platformDataField.name;
-    Widget fluentTextFormBox = fui.ReactiveFluentTextFormBox<String>(
-        formControlName: name,
-        validationMessages:
-            _buildValidationMessages(platformDataField.validationMessages),
-        keyboardType: platformDataField.textInputType,
-        readOnly: platformDataField.readOnly,
-        obscureText: platformDataField.inputType == InputType.password,
-        inputFormatters: platformDataField.inputFormatters,
-        autofocus: platformDataField.autofocus,
-        prefix: platformDataField.prefix,
-        suffix: platformDataField.suffix,
-        maxLines: platformDataField.inputType == InputType.password
-            ? 1
-            : platformDataField.maxLines,
-        minLines: platformDataField.minLines,
-        onEditingComplete: () {
-          platformDataField.onEditingComplete?.call();
-        });
-
-    return fluentTextFormBox;
-  }
+  // Widget _buildFluentTextFormBox(BuildContext context) {
+  //   var name = platformDataField.name;
+  //   Widget fluentTextFormBox = fui.ReactiveFluentTextFormBox<String>(
+  //       formControlName: name,
+  //       validationMessages:
+  //           _buildValidationMessages(platformDataField.validationMessages),
+  //       keyboardType: platformDataField.textInputType,
+  //       readOnly: platformDataField.readOnly,
+  //       obscureText: platformDataField.inputType == InputType.password,
+  //       inputFormatters: platformDataField.inputFormatters,
+  //       autofocus: platformDataField.autofocus,
+  //       prefix: platformDataField.prefix,
+  //       suffix: platformDataField.suffix,
+  //       maxLines: platformDataField.inputType == InputType.password
+  //           ? 1
+  //           : platformDataField.maxLines,
+  //       minLines: platformDataField.minLines,
+  //       onEditingComplete: () {
+  //         platformDataField.onEditingComplete?.call();
+  //       });
+  //
+  //   return fluentTextFormBox;
+  // }
 
   Widget _buildCodeTextField(BuildContext context) {
     var name = platformDataField.name;
@@ -414,35 +414,35 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     );
   }
 
-  Widget _buildFluentToggleSwitch(BuildContext context) {
-    var name = platformDataField.name;
-    var label = platformDataField.label;
-    var options = platformDataField.options ?? [];
-
-    List<Widget> children = [];
-    var prefixIcon = _buildPrefixWidget();
-    if (prefixIcon != null) {
-      children.add(const SizedBox(
-        width: 10.0,
-      ));
-      children.add(prefixIcon);
-      children.add(const SizedBox(
-        width: 15.0,
-      ));
-    }
-    children.add(Text(AppLocalizations.t(label)));
-    var fluentToggleSwitch = fui.ReactiveFluentToggleSwitch<bool>(
-      formControlName: name,
-      validationMessages:
-          _buildValidationMessages(platformDataField.validationMessages),
-      focusNode: focusNode,
-      autofocus: platformDataField.autofocus,
-    );
-    children.add(Expanded(child: fluentToggleSwitch));
-    return Row(
-      children: children,
-    );
-  }
+  // Widget _buildFluentToggleSwitch(BuildContext context) {
+  //   var name = platformDataField.name;
+  //   var label = platformDataField.label;
+  //   var options = platformDataField.options ?? [];
+  //
+  //   List<Widget> children = [];
+  //   var prefixIcon = _buildPrefixWidget();
+  //   if (prefixIcon != null) {
+  //     children.add(const SizedBox(
+  //       width: 10.0,
+  //     ));
+  //     children.add(prefixIcon);
+  //     children.add(const SizedBox(
+  //       width: 15.0,
+  //     ));
+  //   }
+  //   children.add(Text(AppLocalizations.t(label)));
+  //   var fluentToggleSwitch = fui.ReactiveFluentToggleSwitch<bool>(
+  //     formControlName: name,
+  //     validationMessages:
+  //         _buildValidationMessages(platformDataField.validationMessages),
+  //     focusNode: focusNode,
+  //     autofocus: platformDataField.autofocus,
+  //   );
+  //   children.add(Expanded(child: fluentToggleSwitch));
+  //   return Row(
+  //     children: children,
+  //   );
+  // }
 
   ///多个字符串选择一个，对应的字段是字符串
   Widget _buildToggleSwitch(BuildContext context) {
@@ -619,13 +619,14 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     InputDecoration decoration = _buildInputDecoration(platformDataField);
     var switcher = Transform.scale(
         scale: 0.8,
-        child: ReactiveAdvancedSwitch<bool>(
-          formControlName: name,
-          decoration: decoration,
-          validationMessages:
-              _buildValidationMessages(platformDataField.validationMessages),
-          activeColor: myself.primary,
-          inactiveColor: Colors.grey,
+        child: Switch(
+          // formControlName: name,
+          // decoration: decoration,
+          // validationMessages:
+          //     _buildValidationMessages(platformDataField.validationMessages),
+          // activeColor: myself.primary,
+          // inactiveColor: Colors.grey,
+          value: true, onChanged: (bool value) {  },
         ));
     children.add(switcher);
 
@@ -661,19 +662,19 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
   }
 
   /// FluentSlider
-  Widget _buildFluentSlider(BuildContext context) {
-    var name = platformDataField.name;
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget fluentSlider = fui.ReactiveFluentSlider<double>(
-      formControlName: name,
-      validationMessages:
-          _buildValidationMessages(platformDataField.validationMessages),
-      min: platformDataField.params?['min'],
-      max: platformDataField.params?['max'],
-    );
-
-    return fluentSlider;
-  }
+  // Widget _buildFluentSlider(BuildContext context) {
+  //   var name = platformDataField.name;
+  //   InputDecoration decoration = _buildInputDecoration(platformDataField);
+  //   Widget fluentSlider = fui.ReactiveFluentSlider<double>(
+  //     formControlName: name,
+  //     validationMessages:
+  //         _buildValidationMessages(platformDataField.validationMessages),
+  //     min: platformDataField.params?['min'],
+  //     max: platformDataField.params?['max'],
+  //   );
+  //
+  //   return fluentSlider;
+  // }
 
   Widget _buildCupertinoSwitch(BuildContext context) {
     var name = platformDataField.name;
@@ -904,63 +905,63 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return datePicker;
   }
 
-  Widget _buildFluentDatePicker(BuildContext context) {
-    var name = platformDataField.name;
-    List<Widget> children = [];
-    var prefixIcon = platformDataField.prefixIcon;
-    if (prefixIcon != null) {
-      children.add(prefixIcon);
-      children.add(const SizedBox(
-        width: 15.0,
-      ));
-    }
-    var label = platformDataField.label;
-    if (prefixIcon != null) {
-      children.add(Text(AppLocalizations.t(label)));
-      children.add(const SizedBox(
-        width: 20.0,
-      ));
-    }
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget datePicker = fui.ReactiveFluentDatePicker<DateTime>(
-        formControlName: name,
-        validationMessages:
-            _buildValidationMessages(platformDataField.validationMessages),
-        focusNode: focusNode,
-        autofocus: platformDataField.autofocus,
-        locale: myself.locale);
+  // Widget _buildFluentDatePicker(BuildContext context) {
+  //   var name = platformDataField.name;
+  //   List<Widget> children = [];
+  //   var prefixIcon = platformDataField.prefixIcon;
+  //   if (prefixIcon != null) {
+  //     children.add(prefixIcon);
+  //     children.add(const SizedBox(
+  //       width: 15.0,
+  //     ));
+  //   }
+  //   var label = platformDataField.label;
+  //   if (prefixIcon != null) {
+  //     children.add(Text(AppLocalizations.t(label)));
+  //     children.add(const SizedBox(
+  //       width: 20.0,
+  //     ));
+  //   }
+  //   InputDecoration decoration = _buildInputDecoration(platformDataField);
+  //   Widget datePicker = fui.ReactiveFluentDatePicker<DateTime>(
+  //       formControlName: name,
+  //       validationMessages:
+  //           _buildValidationMessages(platformDataField.validationMessages),
+  //       focusNode: focusNode,
+  //       autofocus: platformDataField.autofocus,
+  //       locale: myself.locale);
+  //
+  //   return datePicker;
+  // }
 
-    return datePicker;
-  }
-
-  Widget _buildFluentTimePicker(BuildContext context) {
-    var name = platformDataField.name;
-    List<Widget> children = [];
-    var prefixIcon = platformDataField.prefixIcon;
-    if (prefixIcon != null) {
-      children.add(prefixIcon);
-      children.add(const SizedBox(
-        width: 15.0,
-      ));
-    }
-    var label = platformDataField.label;
-    if (prefixIcon != null) {
-      children.add(Text(AppLocalizations.t(label)));
-      children.add(const SizedBox(
-        width: 20.0,
-      ));
-    }
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget timePicker = fui.ReactiveFluentTimePicker<DateTime>(
-      formControlName: name,
-      validationMessages:
-          _buildValidationMessages(platformDataField.validationMessages),
-      autofocus: platformDataField.autofocus,
-      locale: myself.locale,
-    );
-
-    return timePicker;
-  }
+  // Widget _buildFluentTimePicker(BuildContext context) {
+  //   var name = platformDataField.name;
+  //   List<Widget> children = [];
+  //   var prefixIcon = platformDataField.prefixIcon;
+  //   if (prefixIcon != null) {
+  //     children.add(prefixIcon);
+  //     children.add(const SizedBox(
+  //       width: 15.0,
+  //     ));
+  //   }
+  //   var label = platformDataField.label;
+  //   if (prefixIcon != null) {
+  //     children.add(Text(AppLocalizations.t(label)));
+  //     children.add(const SizedBox(
+  //       width: 20.0,
+  //     ));
+  //   }
+  //   InputDecoration decoration = _buildInputDecoration(platformDataField);
+  //   Widget timePicker = fui.ReactiveFluentTimePicker<DateTime>(
+  //     formControlName: name,
+  //     validationMessages:
+  //         _buildValidationMessages(platformDataField.validationMessages),
+  //     autofocus: platformDataField.autofocus,
+  //     locale: myself.locale,
+  //   );
+  //
+  //   return timePicker;
+  // }
 
   /// 返回值是DateTimeRange
   Widget _buildDateRangePicker(BuildContext context) {
@@ -1135,58 +1136,58 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return rawAutocomplete;
   }
 
-  Widget _buildFluentAutoSuggestBox(BuildContext context) {
-    var name = platformDataField.name;
-    var options = platformDataField.options;
-    List<fui.AutoSuggestBoxItem<String>> items = [];
-    if (options != null && options.isNotEmpty) {
-      for (var i = 0; i < options.length; ++i) {
-        var option = options[i];
-        var item = fui.AutoSuggestBoxItem<String>(
-            value: option.value.toString(), label: option.label);
-        items.add(item);
-      }
-    }
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget fluentAutoSuggestBox =
-        fui.ReactiveFluentAutoSuggestBox<String, String>(
-      formControlName: name,
-      validationMessages:
-          _buildValidationMessages(platformDataField.validationMessages),
-      autofocus: platformDataField.autofocus,
-      inputFormatters: platformDataField.inputFormatters,
-      items: items,
-    );
-
-    return fluentAutoSuggestBox;
-  }
-
-  Widget _buildFluentComboBox(BuildContext context) {
-    var name = platformDataField.name;
-    var options = platformDataField.options;
-    List<fui.ComboBoxItem<String>> items = [];
-    if (options != null && options.isNotEmpty) {
-      for (var i = 0; i < options.length; ++i) {
-        var option = options[i];
-        var item = fui.ComboBoxItem<String>(
-          value: option.value.toString(),
-          child: Text(option.label),
-        );
-        items.add(item);
-      }
-    }
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget fluentComboBox = fui.ReactiveFluentComboBox<String, String>(
-      formControlName: name,
-      validationMessages:
-          _buildValidationMessages(platformDataField.validationMessages),
-      autofocus: platformDataField.autofocus,
-      focusNode: focusNode,
-      items: items,
-    );
-
-    return fluentComboBox;
-  }
+  // Widget _buildFluentAutoSuggestBox(BuildContext context) {
+  //   var name = platformDataField.name;
+  //   var options = platformDataField.options;
+  //   List<fui.AutoSuggestBoxItem<String>> items = [];
+  //   if (options != null && options.isNotEmpty) {
+  //     for (var i = 0; i < options.length; ++i) {
+  //       var option = options[i];
+  //       var item = fui.AutoSuggestBoxItem<String>(
+  //           value: option.value.toString(), label: option.label);
+  //       items.add(item);
+  //     }
+  //   }
+  //   InputDecoration decoration = _buildInputDecoration(platformDataField);
+  //   Widget fluentAutoSuggestBox =
+  //       fui.ReactiveFluentAutoSuggestBox<String, String>(
+  //     formControlName: name,
+  //     validationMessages:
+  //         _buildValidationMessages(platformDataField.validationMessages),
+  //     autofocus: platformDataField.autofocus,
+  //     inputFormatters: platformDataField.inputFormatters,
+  //     items: items,
+  //   );
+  //
+  //   return fluentAutoSuggestBox;
+  // }
+  //
+  // Widget _buildFluentComboBox(BuildContext context) {
+  //   var name = platformDataField.name;
+  //   var options = platformDataField.options;
+  //   List<fui.ComboBoxItem<String>> items = [];
+  //   if (options != null && options.isNotEmpty) {
+  //     for (var i = 0; i < options.length; ++i) {
+  //       var option = options[i];
+  //       var item = fui.ComboBoxItem<String>(
+  //         value: option.value.toString(),
+  //         child: Text(option.label),
+  //       );
+  //       items.add(item);
+  //     }
+  //   }
+  //   InputDecoration decoration = _buildInputDecoration(platformDataField);
+  //   Widget fluentComboBox = fui.ReactiveFluentComboBox<String, String>(
+  //     formControlName: name,
+  //     validationMessages:
+  //         _buildValidationMessages(platformDataField.validationMessages),
+  //     autofocus: platformDataField.autofocus,
+  //     focusNode: focusNode,
+  //     items: items,
+  //   );
+  //
+  //   return fluentComboBox;
+  // }
 
   Widget _buildMonthPicker(BuildContext context) {
     var name = platformDataField.name;
@@ -1482,23 +1483,23 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     return inputDecorator;
   }
 
-  Widget _buildPinCode(BuildContext context) {
-    var name = platformDataField.name;
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
-    Widget pinCodeTextField = ReactivePinCodeTextField(
-      formControlName: name,
-      validationMessages:
-          _buildValidationMessages(platformDataField.validationMessages),
-      autofocus: platformDataField.autofocus,
-      focusNode: focusNode,
-      readOnly: platformDataField.readOnly,
-      length: platformDataField.length!,
-      onCompleted: (value) {},
-      onSubmitted: (value) {},
-    );
-
-    return pinCodeTextField;
-  }
+  // Widget _buildPinCode(BuildContext context) {
+  //   var name = platformDataField.name;
+  //   InputDecoration decoration = _buildInputDecoration(platformDataField);
+  //   Widget pinCodeTextField = ReactivePinCodeTextField(
+  //     formControlName: name,
+  //     validationMessages:
+  //         _buildValidationMessages(platformDataField.validationMessages),
+  //     autofocus: platformDataField.autofocus,
+  //     focusNode: focusNode,
+  //     readOnly: platformDataField.readOnly,
+  //     length: platformDataField.length!,
+  //     onCompleted: (value) {},
+  //     onSubmitted: (value) {},
+  //   );
+  //
+  //   return pinCodeTextField;
+  // }
 
   Widget _buildLanguagePicker(BuildContext context) {
     var name = platformDataField.name;
@@ -1726,7 +1727,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
         dataFieldWidget = _buildCupertinoSwitch(context);
         break;
       case InputType.pinCode:
-        dataFieldWidget = _buildPinCode(context);
+        // dataFieldWidget = _buildPinCode(context);
         break;
       case InputType.cupertinoSlidingSegmentedControl:
         dataFieldWidget = _buildSlidingSegmentedControl(context);

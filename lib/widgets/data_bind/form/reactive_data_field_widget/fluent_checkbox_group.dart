@@ -3,7 +3,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
 import 'package:reactive_forms/reactive_forms.dart';
-import 'package:reactive_fluent_ui/reactive_fluent_ui.dart' as fui;
+// import 'package:reactive_fluent_ui/reactive_fluent_ui.dart' as fui;
 
 class ReactiveFluentCheckboxGroup<T> extends ReactiveFormField<T, Set<T>> {
   ReactiveFluentCheckboxGroup({
@@ -42,10 +42,10 @@ class ReactiveFluentCheckboxGroup<T> extends ReactiveFormField<T, Set<T>> {
             value ??= {};
             for (var i = 0; i < options.length; ++i) {
               var option = options[i];
-              var checkbox = fui.ReactiveFluentCheckBox<bool>(
+              var checkbox = Checkbox(
                 focusNode: focusNode,
                 autofocus: autofocus,
-                semanticLabel: semanticLabel,
+                semanticLabel: semanticLabel, value: null, onChanged: (bool? value) {  },
               );
               var row = SizedBox(
                   width: width,
