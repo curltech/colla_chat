@@ -34,20 +34,20 @@ flutter:
   generate: true
   assets:
     - packages/openpgp/web/assets/worker.js
-        - packages/openpgp/web/assets/wasm_exec.js
-        - packages/openpgp/web/assets/openpgp.wasm
-        - assets/wasm/sqlite3.wasm
-        - assets/locale/
-        - assets/icon/
-        - assets/image/
-        - assets/image/bg/
-        - assets/image/email/
-        - assets/image/mahjong/
-        - assets/image/mahjong/tile/
-        - assets/image/poker/
-        - assets/media/
-        - assets/model/
-        - assets/markdown/
+    - packages/openpgp/web/assets/wasm_exec.js
+    - packages/openpgp/web/assets/openpgp.wasm
+    - assets/wasm/sqlite3.wasm
+    - assets/locale/
+    - assets/icon/
+    - assets/image/
+    - assets/image/bg/
+    - assets/image/email/
+    - assets/image/mahjong/
+    - assets/image/mahjong/tile/
+    - assets/image/poker/
+    - assets/media/
+    - assets/model/
+    - assets/markdown/
 dependencies:
   flutter:
     sdk: flutter
@@ -146,7 +146,7 @@ dependencies:
   glassmorphic_ui_kit: ^1.1.6
   liquid_glass_effect: ^1.0.1
   liquid_glass_ui_design: ^1.0.5
-  liquid_glass_renderer: ^0.2.0-dev.4
+#  liquid_glass_renderer: ^0.2.0-dev.4
   liquid_glass_widgets: ^0.19.6
   adaptive_platform_ui: ^0.1.100
   oc_liquid_glass: ^0.2.1
