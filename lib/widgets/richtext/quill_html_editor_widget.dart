@@ -1,9 +1,13 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
+import 'package:flutter_quill_delta_from_html/flutter_quill_delta_from_html.dart';
 
 ///quill_html_editor一样的实现，用于移动和web
 ///缺省的最小高度200
@@ -30,71 +34,78 @@ class QuillHtmlEditorWidget extends StatefulWidget {
 }
 
 class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
+  final FocusNode _focusNode = FocusNode();
+  late Document _doc;
   final QuillController _controller = () {
     return QuillController.basic(
         config: QuillControllerConfig(
-          clipboardConfig: QuillClipboardConfig(
-            enableExternalRichPaste: true,
-            onImagePaste: (imageBytes) async {
-              if (kIsWeb) {
-                // Dart IO is unsupported on the web.
-                return null;
-              }
-              // Save the image somewhere and return the image URL that will be
-              // stored in the Quill Delta JSON (the document).
-              final newFileName =
-                  'image-file-${DateTime.now().toIso8601String()}.png';
-              final newPath = path.join(
-                io.Directory.systemTemp.path,
-                newFileName,
-              );
-              final file = await io.File(
-                newPath,
-              ).writeAsBytes(imageBytes, flush: true);
-              return file.path;
-            },
-          ),
-        ));
+      clipboardConfig: QuillClipboardConfig(
+        enableExternalRichPaste: true,
+        onImagePaste: (imageBytes) async {
+          if (platformParams.web) {
+            return null;
+          }
+          String? filename =
+              await FileUtil.writeTempFileAsBytes(imageBytes, extension: 'png');
+
+          return filename;
+        },
+      ),
+    ));
   }();
-  final FocusNode _editorFocusNode = FocusNode();
-  final ScrollController _editorScrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _controller.document = Document.fromJson(kQuillDefaultSample);
-    if (widget.onCreateController != null) {
-      widget.onCreateController!(controller);
-    }
 
-    ///初始化数据的是json和html格式则可以编辑
+    ///初始化数据的是json格式则可以编辑
     if (widget.initialText != null) {
-      if (widget.mimeType == ChatMessageMimeType.json) {
-        var delta = JsonUtil.toJson(widget.initialText!);
-        controller..setDelta(delta);
+      try {
+        if (widget.mimeType == ChatMessageMimeType.json) {
+          var json = JsonUtil.toJson(widget.initialText!);
+          _doc = Document.fromJson(json);
+        }
+        if (widget.mimeType == ChatMessageMimeType.html) {
+          final converter = HtmlToDelta();
+          final delta = converter.convert(widget.initialText!);
+          _doc = Document.fromDelta(delta);
+        }
+      } catch (e) {
+        _doc = Document();
       }
-      if (widget.mimeType == ChatMessageMimeType.html &&
-          widget.initialText != null) {
-        controller.setText(widget.initialText!);
-      }
+    } else {
+      _doc = Document();
+    }
+    _controller.document = _doc;
+    if (widget.onCreateController != null) {
+      widget.onCreateController!(_controller);
     }
   }
 
   Widget _buildQuillToolbar(BuildContext context) {
-    QuillSimpleToolbar(
+    QuillToolbarImageButtonOptions imageButtonOptions =
+        const QuillToolbarImageButtonOptions();
+    QuillToolbarVideoButtonOptions videoButtonOptions =
+        const QuillToolbarVideoButtonOptions();
+    QuillToolbarCameraButtonOptions cameraButtonOptions =
+        const QuillToolbarCameraButtonOptions();
+    return QuillSimpleToolbar(
       controller: _controller,
       config: QuillSimpleToolbarConfig(
-        embedButtons: FlutterQuillEmbeds.toolbarButtons(),
+        embedButtons: FlutterQuillEmbeds.toolbarButtons(
+            imageButtonOptions: imageButtonOptions,
+            videoButtonOptions: videoButtonOptions,
+            cameraButtonOptions: cameraButtonOptions),
         showClipboardPaste: true,
+        showDirection: true,
         customButtons: [
           QuillToolbarCustomButtonOptions(
             icon: const Icon(Icons.add_alarm_rounded),
             onPressed: () {
               _controller.document.insert(
                 _controller.selection.extentOffset,
-                TimeStampEmbed(
-                  DateTime.now().toString(),
-                ),
+                TimeStampEmbed(DateTime.now().toString()),
               );
 
               _controller.updateSelection(
@@ -109,47 +120,19 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
         buttonOptions: QuillSimpleToolbarButtonOptions(
           base: QuillToolbarBaseButtonOptions(
             afterButtonPressed: () {
-              final isDesktop = {
-                TargetPlatform.linux,
-                TargetPlatform.windows,
-                TargetPlatform.macOS
-              }.contains(defaultTargetPlatform);
-              if (isDesktop) {
-                _editorFocusNode.requestFocus();
+              if (platformParams.desktop) {
+                _focusNode.requestFocus();
               }
             },
           ),
           linkStyle: QuillToolbarLinkStyleButtonOptions(
             validateLink: (link) {
-              // Treats all links as valid. When launching the URL,
-              // `https://` is prefixed if the link is incomplete (e.g., `google.com` → `https://google.com`)
-              // however this happens only within the editor.
               return true;
             },
           ),
         ),
       ),
-    ),
-    List<ToolBarStyle> toolBarConfig = [];
-    for (ToolBarStyle toolBarStyle in ToolBarStyle.values) {
-      if (widget.withMultiMedia ||
-          (toolBarStyle != ToolBarStyle.link &&
-              toolBarStyle != ToolBarStyle.image &&
-              toolBarStyle != ToolBarStyle.video)) {
-        toolBarConfig.add(toolBarStyle);
-      }
-    }
-    var customButtons = <Widget>[];
-    return ToolBar.scroll(
-        toolBarColor: Colors.white,
-        padding: const EdgeInsets.all(8),
-        iconSize: 25,
-        iconColor: Colors.black,
-        activeIconColor: myself.primary,
-        controller: controller,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        toolBarConfig: toolBarConfig,
-        customButtons: customButtons);
+    );
   }
 
   Widget _buildQuillHtmlEditor(BuildContext context) {
@@ -157,13 +140,31 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
         builder: (BuildContext context, BoxConstraints constraints) {
       double height = widget.height ?? constraints.minHeight;
       return QuillEditor(
-        text: widget.initialText,
-        controller: controller,
-        isEnabled: true,
-        minHeight: height,
-        ensureVisible: true,
-        hintTextAlign: TextAlign.start,
-        hintText: '', focusNode: null, scrollController: null,
+        focusNode: _focusNode,
+        scrollController: _scrollController,
+        controller: _controller,
+        config: QuillEditorConfig(
+          placeholder: 'Start writing your notes...',
+          padding: const EdgeInsets.all(16),
+          embedBuilders: [
+            ...FlutterQuillEmbeds.editorBuilders(
+              imageEmbedConfig: QuillEditorImageEmbedConfig(
+                imageProviderBuilder: (context, imageUrl) {
+                  if (imageUrl.startsWith('assets/')) {
+                    return AssetImage(imageUrl);
+                  }
+                  return null;
+                },
+              ),
+              videoEmbedConfig: QuillEditorVideoEmbedConfig(
+                customVideoBuilder: (videoUrl, readOnly) {
+                  return null;
+                },
+              ),
+            ),
+            TimeStampEmbedBuilder(),
+          ],
+        ),
       );
     });
     var toolbar = _buildQuillToolbar(context);
@@ -194,7 +195,40 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
 
   @override
   void dispose() {
-    controller.dispose();
+    _controller.dispose();
+    _scrollController.dispose();
+    _focusNode.dispose();
     super.dispose();
+  }
+}
+
+class TimeStampEmbed extends Embeddable {
+  const TimeStampEmbed(String value) : super(timeStampType, value);
+
+  static const String timeStampType = 'timeStamp';
+
+  static TimeStampEmbed fromDocument(Document document) =>
+      TimeStampEmbed(JsonUtil.toJsonString(document.toDelta().toJson()));
+
+  Document get document => Document.fromJson(JsonUtil.toJson(data));
+}
+
+class TimeStampEmbedBuilder extends EmbedBuilder {
+  @override
+  String get key => 'timeStamp';
+
+  @override
+  String toPlainText(Embed node) {
+    return node.value.data;
+  }
+
+  @override
+  Widget build(BuildContext context, EmbedContext embedContext) {
+    return Row(
+      children: [
+        const Icon(Icons.access_time_rounded),
+        Text(embedContext.node.value.data as String),
+      ],
+    );
   }
 }
