@@ -81,7 +81,7 @@ dependencies:
   geocoding: ^4.0.0
   network_info_plus: ^8.1.0
   beamer: ^1.4.1+1
-  flutter_contacts: ^2.0.1
+  flutter_contacts: ^2.2.2
   fluttercontactpicker_plus: ^5.1.1
   nearby_connections: ^4.0.0 #android
   nfc_manager: ^4.2.0 #mobile
