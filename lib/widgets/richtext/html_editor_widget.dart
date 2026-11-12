@@ -71,7 +71,7 @@ class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
       },
       mediaUploadInterceptor: (PlatformFile file, InsertFileType type) async {
         logger.i(file.name); //filename
-        logger.i(file.size.toString()); //size in bytes
+        logger.i(file.lengthSync().toString()); //size in bytes
         logger.i(file.extension.toString()); //file extension (eg jpeg or mp4)
         return true;
       },

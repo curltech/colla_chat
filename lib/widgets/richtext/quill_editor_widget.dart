@@ -12,7 +12,7 @@ import 'package:colla_chat/tool/video_util.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 
@@ -152,7 +152,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     if (result == null || result.isEmpty) {
       return null;
     }
-    final filename = result.first.path;
+    final filename = await result.first.name();
 
     return filename;
   }
@@ -164,10 +164,9 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     if (result == null || result.isEmpty) {
       return null;
     }
-    final filename = result.first.name;
-    final file = File(filename);
+    final filename = await result.first.name();
 
-    return '';
+    return filename;
   }
 
   ///web平台选择视频文件
@@ -177,10 +176,9 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     if (result == null || result.isEmpty) {
       return null;
     }
-    final filename = result.first.name;
-    final file = File(filename);
+    final filename = await result.first.name();
 
-    return '';
+    return filename;
   }
 
   /// 媒体来源的选择界面

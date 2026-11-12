@@ -5,13 +5,13 @@ import 'package:another_transformer_page_view/another_transformer_page_view.dart
 import 'package:card_swiper/card_swiper.dart';
 import 'package:carousel_slider_plus/carousel_slider_plus.dart'
     as carousel_slider;
-import 'package:flutter/gestures.dart';
-import 'package:flutter_carousel_widget/flutter_carousel_widget.dart'
-    as flutter_carousel;
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/page_view_transformer.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
+import 'package:flutter_carousel_widget/flutter_carousel_widget.dart'
+    as flutter_carousel;
+import 'package:material_ui/material_ui.dart';
 
 enum PlatformSwiperDirection { none, left, right, top, bottom }
 
@@ -227,25 +227,25 @@ class PlatformCarouselWidget extends StatelessWidget {
   }
 
   Widget _buildFlutterCarousel() {
-    flutter_carousel.CenterPageEnlargeStrategy? platformEnlargeStrategy =
-        StringUtil.enumFromString(
-            flutter_carousel.CenterPageEnlargeStrategy.values,
-            enlargeStrategy.name);
-    flutter_carousel.FlutterCarouselOptions options =
-        flutter_carousel.FlutterCarouselOptions(
+    return flutter_carousel.FlutterCarousel.builder(
+      key: key,
+      itemBuilder: (context, index, realIndex) {
+        return itemBuilder.call(context, index, realIndex: realIndex);
+      },
+      itemCount: itemCount,
       controller: controller.flutterCarouselController,
       height: height,
       aspectRatio: aspectRatio,
       viewportFraction: viewportFraction,
       initialPage: initialPage,
-      enableInfiniteScroll: enableInfiniteScroll,
+      infinite: enableInfiniteScroll,
       reverse: reverse,
-      autoPlay: autoPlay,
-      autoPlayInterval: autoPlayInterval,
-      autoPlayAnimationDuration: autoPlayAnimationDuration,
-      autoPlayCurve: autoPlayCurve,
-      enlargeCenterPage: enlargeCenterPage,
-      enlargeFactor: enlargeFactor,
+      autoPlay: autoPlay
+          ? flutter_carousel.CarouselAutoPlay(
+              interval: autoPlayInterval,
+              duration: autoPlayAnimationDuration,
+              curve: autoPlayCurve)
+          : null,
       onPageChanged: (index, reason) {
         String name = reason.name;
         carousel_slider.CarouselPageChangedReason? r =
@@ -254,15 +254,8 @@ class PlatformCarouselWidget extends StatelessWidget {
         onPageChanged?.call(index, reason: r);
       },
       scrollDirection: scrollDirection,
-      pauseAutoPlayOnTouch: pauseAutoPlayOnTouch,
-      pauseAutoPlayOnManualNavigate: pauseAutoPlayOnManualNavigate,
-      pauseAutoPlayInFiniteScroll: pauseAutoPlayInFiniteScroll,
       pageViewKey: pageViewKey,
       keepPage: keepPage,
-      showIndicator: showIndicator,
-      floatingIndicator: floatingIndicator,
-      indicatorMargin: indicatorMargin ?? 0,
-      slideIndicator: slideIndicator,
       clipBehavior: clipBehavior,
       scrollBehavior: scrollBehavior,
       pageSnapping: pageSnapping,
@@ -270,16 +263,6 @@ class PlatformCarouselWidget extends StatelessWidget {
       dragStartBehavior: dragStartBehavior,
       allowImplicitScrolling: allowImplicitScrolling,
       restorationId: restorationId,
-      enlargeStrategy: platformEnlargeStrategy!,
-      disableCenter: disableCenter,
-    );
-    return flutter_carousel.FlutterCarousel.builder(
-      key: key,
-      itemBuilder: (context, index, realIndex) {
-        return itemBuilder.call(context, index, realIndex: realIndex);
-      },
-      options: options,
-      itemCount: itemCount,
     );
   }
 
@@ -346,8 +329,10 @@ class PlatformCarouselWidget extends StatelessWidget {
       key: key,
       autoplay: autoPlay,
       loop: true,
-      autoplayDelay: autoPlayInterval.inMilliseconds,// 自动换页间隔
-      duration: autoPlayAnimationDuration.inMilliseconds,// 自动播放动画的时间
+      autoplayDelay: autoPlayInterval.inMilliseconds,
+      // 自动换页间隔
+      duration: autoPlayAnimationDuration.inMilliseconds,
+      // 自动播放动画的时间
       controller: controller.swiperController,
       onIndexChanged: (int index) {
         onPageChanged?.call(index);

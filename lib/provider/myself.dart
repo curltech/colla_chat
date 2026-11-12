@@ -8,7 +8,7 @@ import 'package:colla_chat/tool/locale_util.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:path/path.dart' as p;
 
 /// 单例本节点对象，包含公私钥，本节点配置，密码和过往的节点信息

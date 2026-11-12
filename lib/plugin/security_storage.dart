@@ -13,7 +13,7 @@ class LocalSecurityStorage {
   final IOSOptions iOptions =
       const IOSOptions(accessibility: KeychainAccessibility.unlocked);
   final AndroidOptions aOptions =
-      const AndroidOptions(encryptedSharedPreferences: true);
+      const AndroidOptions();
   final MacOsOptions mOptions = const MacOsOptions(synchronizable: true);
   final WindowsOptions wOptions =
       const WindowsOptions(useBackwardCompatibility: true);

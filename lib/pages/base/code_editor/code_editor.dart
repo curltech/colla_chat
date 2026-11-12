@@ -2,7 +2,7 @@ import 'package:colla_chat/pages/base/code_editor/code_context_menu.dart';
 import 'package:colla_chat/pages/base/code_editor/code_find_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:re_editor/re_editor.dart';
 import 'package:re_highlight/languages/json.dart';
@@ -65,7 +65,6 @@ class CodeEditorWidget extends StatelessWidget with DataTileMixin {
               CodeFindWidget(controller: controller, readOnly: readOnly),
           controller: CodeLineEditingController.fromText(codeContent.value),
           toolbarController: const CodeContextMenuController(),
-          sperator: Container(width: 1, color: Colors.blue),
         );
       }),
     );

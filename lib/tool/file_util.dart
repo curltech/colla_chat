@@ -169,29 +169,18 @@ class FileUtil {
       initialDirectory = dir.path;
     }
     List<XFile> xfiles = [];
-    FilePickerResult? result = await FilePicker.pickFiles(
+    List<PlatformFile>? files = await FilePicker.pickFiles(
       dialogTitle: dialogTitle,
       initialDirectory: initialDirectory,
       type: type,
       allowedExtensions: allowedExtensions,
       onFileLoading: onFileLoading,
       compressionQuality: compressionQuality,
-      allowMultiple: allowMultiple,
-      withData: withData,
-      withReadStream: withReadStream,
-      lockParentWindow: lockParentWindow,
     );
 
-    if (result != null) {
-      for (var file in result.files) {
-        XFile xfile = XFile(
-          file.path!,
-          length: file.size,
-          name: file.name,
-          mimeType: file.extension,
-        );
-        xfiles.add(xfile);
-      }
+    for (var file in files) {
+      XFile xfile = XFile.fileSystem(path: file.path!);
+      xfiles.add(xfile);
     }
 
     return xfiles;
@@ -251,9 +240,7 @@ class FileUtil {
     String? initialDirectory,
   }) async {
     String? selectedDirectory = await FilePicker.getDirectoryPath(
-        dialogTitle: dialogTitle,
-        lockParentWindow: lockParentWindow,
-        initialDirectory: initialDirectory);
+        dialogTitle: dialogTitle, initialDirectory: initialDirectory);
 
     return selectedDirectory;
   }
@@ -268,16 +255,15 @@ class FileUtil {
     List<String>? allowedExtensions,
     bool lockParentWindow = false,
   }) async {
-    String? outputFile = await FilePicker.saveFile(
-        dialogTitle: dialogTitle,
-        fileName: fileName,
-        initialDirectory: initialDirectory,
-        type: type,
-        bytes: bytes,
-        allowedExtensions: allowedExtensions,
-        lockParentWindow: lockParentWindow);
+    Uri? outputFile = await FilePicker.saveFile(
+      dialogTitle: dialogTitle,
+      fileName: fileName,
+      initialDirectory: initialDirectory,
+      type: type,
+      bytes: bytes,
+    );
 
-    return outputFile;
+    return outputFile?.toFilePath(windows: true);
   }
 
   ///保存文件,macOS, iOS, Android, Windows, Web, Linux.
@@ -396,7 +382,7 @@ class FileUtil {
       shortcuts: shortcuts,
     );
     if (path != null) {
-      return XFile(path);
+      return XFile.fileSystem(path:path);
     }
 
     return null;

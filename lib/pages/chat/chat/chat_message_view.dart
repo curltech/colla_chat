@@ -36,9 +36,8 @@ import 'package:colla_chat/transport/websocket/websocket_channel.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:flutter/material.dart';
-
 import 'package:keyboard_actions/keyboard_actions.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 import 'package:screenshot_callback/screenshot_callback.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -49,14 +48,14 @@ import 'package:window_manager/window_manager.dart';
 /// 聊天界面，包括文本聊天，视频通话呼叫，视频通话，全屏展示四个组件
 /// 支持群聊
 class ChatMessageView extends StatelessWidget
-    with DataTileMixin, WidgetsBindingObserver, WindowListener {
+    with DataTileMixin, WidgetsBindingObserver {
   final FullScreenChatMessageWidget fullScreenChatMessageWidget =
-      FullScreenChatMessageWidget();
+  FullScreenChatMessageWidget();
   final VideoChatWidget videoChatWidget = VideoChatWidget();
   final SfuVideoChatWidget sfuVideoChatWidget = SfuVideoChatWidget();
   final ChatMessageWidget chatMessageWidget = ChatMessageWidget();
   final ChatMessageInputWidget chatMessageInputWidget =
-      ChatMessageInputWidget();
+  ChatMessageInputWidget();
 
   ChatMessageView({
     super.key,
@@ -80,9 +79,9 @@ class ChatMessageView extends StatelessWidget
   String get title => 'ChatMessage';
 
   final ValueNotifier<RTCPeerConnectionState?> _peerConnectionState =
-      ValueNotifier<RTCPeerConnectionState?>(null);
+  ValueNotifier<RTCPeerConnectionState?>(null);
   final ValueNotifier<RTCDataChannelState?> _dataChannelState =
-      ValueNotifier<RTCDataChannelState?>(null);
+  ValueNotifier<RTCDataChannelState?>(null);
   final ValueNotifier<bool?> _initiator = ValueNotifier<bool?>(null);
   StreamSubscription<WebrtcEvent>? connectionStateStreamSubscription;
   StreamSubscription<WebrtcEvent>? dataChannelStateStreamSubscription;
@@ -93,10 +92,20 @@ class ChatMessageView extends StatelessWidget
   double visibleFraction = 0.0;
   NoScreenshot? noScreenshot;
   ScreenshotCallback? screenshotCallback;
+  int? eventId;
 
   void _init() {
     WidgetsBinding.instance.addObserver(this);
-    windowManager.addListener(this);
+    eventId = WindowManager.instance.addListener((event) {
+      switch (event) {
+        case WindowFocusedEvent():
+          _createPeerConnection();
+        case WindowClosedEvent():
+          _dispose();
+        default:
+          break;
+      }
+    });
     WakelockPlus.enable();
 
     ///不准截屏
@@ -115,7 +124,7 @@ class ChatMessageView extends StatelessWidget
   }
 
   void _dispose() {
-    var chatSummary = chatMessageController.chatSummary;
+    var chatSummary = chatMessageController.chatSummary.value;
     if (chatSummary != null) {
       connectionStateStreamSubscription?.cancel();
       connectionStateStreamSubscription = null;
@@ -127,7 +136,7 @@ class ChatMessageView extends StatelessWidget
       initiatorStreamSubscription = null;
     }
     WidgetsBinding.instance.removeObserver(this);
-    windowManager.removeListener(this);
+    WindowManager.instance.removeListener(eventId!);
     WakelockPlus.disable();
     if (platformParams.mobile) {
       screenshotCallback?.dispose();
@@ -146,17 +155,6 @@ class ChatMessageView extends StatelessWidget
         state == AppLifecycleState.hidden) {
       logger.i('app switch new state:$state');
     }
-  }
-
-  @override
-  void onWindowFocus() {
-    //logger.i('chat message window switch to foreground');
-    _createPeerConnection();
-  }
-
-  @override
-  void onWindowEvent(String eventName) {
-    //logger.i('[WindowManager] chat message view onWindowEvent: $eventName');
   }
 
   Future<void> _updateChatSummary() async {
@@ -196,7 +194,7 @@ class ChatMessageView extends StatelessWidget
     await chatMessageService.update(
         {'status': MessageStatus.read.name, 'readTime': DateUtil.currentDate()},
         where:
-            'senderPeerId = ? and receiverPeerId = ? and readTime is null and (status=? or status=? or status=? or status=?)',
+        'senderPeerId = ? and receiverPeerId = ? and readTime is null and (status=? or status=? or status=? or status=?)',
         whereArgs: [
           peerId,
           myself.peerId!,
@@ -227,7 +225,7 @@ class ChatMessageView extends StatelessWidget
     }
     String peerId = chatSummary.peerId!;
     List<AdvancedPeerConnection> advancedPeerConnections =
-        await peerConnectionPool.get(peerId);
+    await peerConnectionPool.get(peerId);
     AdvancedPeerConnection? advancedPeerConnection =
         advancedPeerConnections.firstOrNull;
     if (advancedPeerConnection != null) {
@@ -267,7 +265,7 @@ class ChatMessageView extends StatelessWidget
     if (linkman.linkmanStatus != LinkmanStatus.G.name) {
       AdvancedPeerConnection? advancedPeerConnection;
       List<AdvancedPeerConnection> advancedPeerConnections =
-          await peerConnectionPool.get(peerId);
+      await peerConnectionPool.get(peerId);
       //如果连接不存在，则创建新连接，
       if (advancedPeerConnections.isEmpty) {
         advancedPeerConnection = await peerConnectionPool.createOffer(peerId);
@@ -283,7 +281,7 @@ class ChatMessageView extends StatelessWidget
       } else {
         advancedPeerConnection = advancedPeerConnections.first;
         for (AdvancedPeerConnection advancedPeerConnection
-            in advancedPeerConnections) {
+        in advancedPeerConnections) {
           _peerConnectionState.value = advancedPeerConnection.connectionState;
           _dataChannelState.value = advancedPeerConnection.dataChannelState;
           _initiator.value =
@@ -317,11 +315,11 @@ class ChatMessageView extends StatelessWidget
     }
     if (linkman.linkmanStatus != LinkmanStatus.G.name) {
       List<AdvancedPeerConnection> advancedPeerConnections =
-          await peerConnectionPool.get(peerId);
+      await peerConnectionPool.get(peerId);
       //如果连接存在，则关闭连接
       if (advancedPeerConnections.isNotEmpty) {
         for (AdvancedPeerConnection advancedPeerConnection
-            in advancedPeerConnections) {
+        in advancedPeerConnections) {
           await advancedPeerConnection.close();
         }
       }
@@ -331,15 +329,15 @@ class ChatMessageView extends StatelessWidget
   ///群或者会议的成员全部尝试连接
   Future<void> _createGroupPeerConnection(String peerId) async {
     List<GroupMember> groupMembers =
-        await groupMemberService.findByGroupId(peerId);
+    await groupMemberService.findByGroupId(peerId);
     for (var groupMember in groupMembers) {
       String? memberPeerId = groupMember.memberPeerId;
       if (memberPeerId != null && memberPeerId != myself.peerId) {
         List<AdvancedPeerConnection> advancedPeerConnections =
-            await peerConnectionPool.get(memberPeerId);
+        await peerConnectionPool.get(memberPeerId);
         if (advancedPeerConnections.isEmpty) {
           AdvancedPeerConnection? advancedPeerConnection =
-              await peerConnectionPool.createOffer(memberPeerId);
+          await peerConnectionPool.createOffer(memberPeerId);
           if (advancedPeerConnection != null) {
             _peerConnectionState.value = advancedPeerConnection.connectionState;
             _dataChannelState.value = advancedPeerConnection.dataChannelState;
@@ -351,7 +349,7 @@ class ChatMessageView extends StatelessWidget
           }
         } else {
           for (AdvancedPeerConnection advancedPeerConnection
-              in advancedPeerConnections) {
+          in advancedPeerConnections) {
             _peerConnectionState.value = advancedPeerConnection.connectionState;
             _dataChannelState.value = advancedPeerConnection.dataChannelState;
             _initiator.value =
@@ -503,8 +501,8 @@ class ChatMessageView extends StatelessWidget
     return chatMessageView;
   }
 
-  List<Widget> _buildRightWidgets(
-      BuildContext context, ChatSummary chatSummary) {
+  List<Widget> _buildRightWidgets(BuildContext context,
+      ChatSummary chatSummary) {
     String partyType = chatSummary.partyType!;
     List<Widget> rightWidgets = [];
     if (partyType == PartyType.linkman.name) {
@@ -666,7 +664,7 @@ class ChatMessageView extends StatelessWidget
             String name = chatSummary.name!;
             String title = AppLocalizations.t(name);
             List<Widget> rightWidgets =
-                _buildRightWidgets(context, chatSummary);
+            _buildRightWidgets(context, chatSummary);
             return AppBarView(
                 title: title,
                 helpPath: routeName,

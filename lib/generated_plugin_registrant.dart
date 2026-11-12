@@ -22,7 +22,6 @@ import 'package:video_player_web/video_player_web.dart';
 void registerPlugins(Registrar registrar) {
   AudioplayersPlugin.registerWith(registrar);
   CameraPlugin.registerWith(registrar);
-  FlutterKeyboardVisibilityPlugin.registerWith(registrar);
   FlutterSecureStorageWeb.registerWith(registrar);
   GeolocatorPlugin.registerWith(registrar);
   ImagePickerPlugin.registerWith(registrar);

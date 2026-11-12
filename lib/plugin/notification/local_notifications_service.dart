@@ -90,6 +90,8 @@ class LocalNotificationsService {
             break;
           case NotificationResponseType.selectedNotificationAction:
             break;
+          case NotificationResponseType.notificationDismissed:
+            break;
         }
       },
       // 应用处于后台时，点击通知的响应函数

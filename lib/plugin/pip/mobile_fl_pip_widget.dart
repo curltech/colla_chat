@@ -1,6 +1,6 @@
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:fl_pip/fl_pip.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 
 class MobileFlPipController {
@@ -12,11 +12,11 @@ class MobileFlPipController {
     return await flPiP.isAvailable;
   }
 
-  Future<void> toggle(AppState state) async {
+  Future<void> toggle(FlPiPAppState state) async {
     return await flPiP.toggle(state);
   }
 
-  ValueNotifier<PiPStatusInfo?> get status {
+  ValueNotifier<FlPiPStatusInfo?> get status {
     return flPiP.status;
   }
 

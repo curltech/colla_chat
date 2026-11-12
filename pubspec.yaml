@@ -60,13 +60,13 @@ dependencies:
   # 系统功能，获取系统信息和操作，需要调用插件才能完成
   flutter_background: ^1.3.1  #android,后台运行，可以保持网络连接
   flutter_foreground_service: ^0.4.1 #android,后台运行，可以保持网络连接，和flutter_background功能一样
-  flutter_foreground_task: ^9.2.1
+  flutter_foreground_task: ^11.0.3
   flutter_background_service: ^5.0.10
   flutter_background_executor: ^1.0.0
-  upgrader: ^13.5.0
+  upgrader: ^13.8.0
   path_provider: ^2.0.11
   url_launcher: ^6.1.11 #打开系统浏览器
-  open_filex: ^4.6.0 #打开文件,
+  open_filex: ^5.0.0 #打开文件,
   camera_windows: ^0.2.6+4
   camera_linux: ^0.0.8
   camera_web: ^0.3.5+3
@@ -74,26 +74,26 @@ dependencies:
   wechat_camera_picker: ^4.5.0 #移动平台，wechat_assets_picker的扩展，照相，录像
   photo_manager: ^3.9.0 #移动平台，图像等媒体的抽象，wechat_assets_picker使用
   screenshot: ^3.0.0
-  no_screenshot: ^1.1.0
+  no_screenshot: ^2.0.1
   screenshot_callback: ^3.0.1
   screen_brightness: ^2.1.7
   orientation: ^1.2.0 # 控制屏幕旋转
-  geocoding: ^4.0.0
+  geocoding: ^5.0.1
   network_info_plus: ^8.1.0
   beamer: ^1.4.1+1
   flutter_contacts: ^2.2.2
   fluttercontactpicker_plus: ^5.1.1
   nearby_connections: ^4.0.0 #android
-  nfc_manager: ^4.2.0 #mobile
+  nfc_manager: ^4.3.0 #mobile
   flutter_nfc_kit: ^3.4.2 #mobile
   mimecon: ^1.0.1
   wakelock_plus: ^1.5.1 #让系统不会睡眠
 
   # 存储
-  flutter_secure_storage: ^10.0.0
+  flutter_secure_storage: ^11.2.0
   # sqflite: ^2.4.1
   idb_shim: ^2.8.5+1
-  postgres: ^3.5.5
+  postgres: ^3.6.0
 
   #网络
   dio: ^5.9.2
@@ -103,21 +103,15 @@ dependencies:
     git:
       url: https://github.com/suhardik/s_telephony.git
       ref: develop
-  openvpn_flutter: ^1.3.0
+  openvpn_flutter: ^2.0.0
   flutter_web_auth_2: ^5.0.1
 
   #界面
   bubble: ^1.2.1
-  flutter_local_notifications: ^22.0.0
+  flutter_local_notifications: ^23.0.1
   alarm: ^5.1.1
   stacked_notification_cards: ^0.1.0-dev.6
   toastification: ^3.2.0
-  cupertino_icons: ^1.0.8 #CupertinoIcons.heart_fill
-  # Icon(AntDesign.gitlab_fill),Icon(Bootstrap.google),Icon(BoxIcons.bxl_apple),Brand(Brands.icons8)
-  # Icon(Clarity.map_outline_badged),Icon(EvaIcons.clipboard),Flag(Flags.india),Icon(FontAwesome.stripe_brand)
-  # Icon(HeroIcons.printer),Icon(Iconsax.cake_bold),Icon(IonIcons.bug),Icon(LineAwesome.amazon)
-  # Icon(MingCute.knife_line),Icon(OctIcons.code_of_conduct),Icon(PixelArtIcons.gif),Icon(TeenyIcons.google_play_store)
-  # Icon(ZondIcons.shield)
   icons_plus: ^5.0.0
   simple_icons: ^16.23.0 #icon: Icon(SimpleIcons.github)
   fluttericon: ^2.0.0 #Icon(Typicons.attention), Icon(Fontelico.emo_wink), Icon(Linecons.globe)
@@ -126,38 +120,37 @@ dependencies:
   flutter_material_design_icons: ^3.0.0+7447 #Icon(MdiIcons.abacus)
   hugeicons: ^1.1.1 #HugeIcons.strokeRoundedHome01
   country_code_picker: ^3.4.1
-  multi_dropdown: ^3.1.1
+  multi_dropdown: ^4.0.0
   font_awesome_flutter: ^11.0.0
-  unicode_emojis: ^0.5.1
+  unicode_emojis: ^0.6.0
   fluro: ^2.0.3
   flutter_multi_formatter: ^2.13.7
   chips_choice: ^3.0.0
   validation_pro: ^4.0.0
-  flutter_pw_validator: ^1.6.0 #FlutterPwValidator放在TextFormField下面显示校验结果
+  flutter_pw_validator: ^2.0.0 #FlutterPwValidator放在TextFormField下面显示校验结果
   fzregex: ^2.1.1 #静态方法：Fzregex.hasMatch
   regexpattern: ^2.5.0
-  phone_form_field: ^10.0.17 #支持所有平台，电话号码的录入字段
   mobile_number: ^3.0.0 #仅支持android，获取电话号码，ios无此功能
   phone_numbers_parser: ^9.0.24 #支持所有的平台
   badges: ^3.1.2
   extended_list: ^3.0.0
   glass_kit: ^4.0.2
-  glass: ^2.0.0+2
+  glass: ^2.4.0
   glassmorphic_ui_kit: ^1.1.6
   liquid_glass_effect: ^1.0.1
   liquid_glass_ui_design: ^1.0.5
 #  liquid_glass_renderer: ^0.2.0-dev.4
-  liquid_glass_widgets: ^0.19.6
+  liquid_glass_widgets: ^1.17.2
   adaptive_platform_ui: ^0.1.100
-  oc_liquid_glass: ^0.2.1
+  oc_liquid_glass: ^0.3.0
   #flui: 0.9.2
-  trina_grid: ^2.2.1
+  trina_grid: ^2.4.0
   material_table_view: ^5.5.2
   multi_split_view: ^3.6.1
   calendar_view: ^2.0.0
   easy_image_viewer: ^1.5.1
   tab_container: ^3.5.3
-  file_saver: ^0.4.0
+  file_saver: ^0.7.0
   material_neumorphic: ^1.2.1
   extended_text: ^15.0.0 #文本扩展显示
   extended_text_library: ^12.0.1
@@ -182,15 +175,15 @@ dependencies:
   adaptive_screen_utils: ^2.4.0
   flutter_resizable_container: ^4.2.0
   snapping_sheet: ^3.1.0 #在上下可以滑出的sheet
-  device_preview: ^1.3.1
+  device_preview: ^3.0.0
   flutter_screenutil: ^6.0.0-alpha.1 # Flutter 屏幕适配 https://github.com/OpenFlutter/flutter_screenutil
   easy_stepper: ^1.0.1
-  flex_color_scheme: ^8.3.1
+  flex_color_scheme: ^9.0.0
   kmeans_dominant_colors: ^0.1.7
   file_selector: ^1.1.0
   filesystem_picker: ^4.1.0
   #下面是各种轮播图组件
-  flutter_carousel_widget: ^3.1.0 #类似carousel_slider，支持单页多item
+  flutter_carousel_widget: ^4.0.1 #类似carousel_slider，支持单页多item
   carousel_slider_plus: ^7.1.1  #fork carousel_slider，支持单页多item
   flutter_card_swiper: ^7.2.0 #不错的swiper的组件
   card_swiper: ^3.0.1
@@ -203,15 +196,14 @@ dependencies:
   contextmenu_plus: ^1.0.1
   star_menu: ^4.0.1
   sliding_up_panel2: ^3.3.0+1
-  flutter_floating_bottom_bar: ^2.0.0
+  flutter_floating_bottom_bar: ^3.0.1
   focused_menu: ^1.0.5
   floating_action_bubble: ^1.1.4
   expandable: ^5.0.1
   auto_size_text: ^3.0.0
   auto_size_text_field: ^2.2.1
   responsive_sizer: ^3.1.1
-  introduction_screen: ^4.0.0
-  pinput: ^5.0.1
+  introduction_screen: ^5.0.1
   align_positioned: ^5.0.1
   super_drag_and_drop: ^0.9.1
   #  dashbook: ^0.1.15
@@ -220,10 +212,9 @@ dependencies:
   simple_animations: ^5.0.2
   flutter_animate: ^4.2.0
   auto_animated: ^3.1.0 #对滚动视图内的元素定义动画
-  animations: ^2.1.2
   animate_do: ^5.1.0
   animated_text_kit: ^4.3.0
-  loading_indicator: ^3.1.1
+  loading_indicator: ^4.0.2
   loading_animation_widget: ^1.2.0+4
   mini_music_visualizer: ^1.1.4
 
@@ -234,25 +225,25 @@ dependencies:
 #  cryptography_flutter_plus: ^2.3.4
   encrypt: ^5.0.3 #aes
   openpgp: ^3.10.7 #rsa,sha
-  libsignal: ^2.2.1
+  libsignal: ^9.0.1
   crypto: ^3.0.3 #sha
   bs58: ^1.0.2
   local_auth: ^3.0.1
 
   #基本开发工具
   keyboard_actions: ^4.2.1
-  synchronized: ^3.4.0
+  synchronized: ^3.6.1+1
   flutter_smart_dialog: ^5.1.0
   json_annotation: ^4.3.0
   flutter_json_view: ^1.1.5
   flutter_code_editor: ^0.3.5
   json_editor_flutter: ^1.4.2
-  re_editor: ^0.9.0
+  re_editor: ^0.10.0
   flutter_highlight: ^0.7.0
   highlight: ^0.7.0
   re_highlight: ^0.0.3
   provider: ^6.0.1 #状态管理
-  easy_refresh: ^3.3.2+1
+  easy_refresh: ^4.0.0
   percent_indicator: ^4.2.5
   flutter_sharing_intent: ^2.0.4
   date_format: ^2.0.6
@@ -260,12 +251,10 @@ dependencies:
   toggle_switch: ^2.3.0
   talker: ^5.1.16
   talker_flutter: ^5.1.16
-  cross_file: ^0.3.5
-  mobile_scanner: ^7.2.0
+  mobile_scanner: ^7.5.0
   qr_flutter:
     git:
       url: https://github.com/theyakka/qr.flutter.git
-  qr: ^3.0.1
   lpinyin: ^2.0.3 #拼音
   #有特殊安装要求，否则编译出错
   any_link_preview: ^3.0.1 #预览link
@@ -281,7 +270,7 @@ dependencies:
   #  ffmpeg_kit_flutter_minimal: ^6.0.8
   ffmpeg_kit_flutter_new: ^4.1.0
   photo_view: ^0.15.0 #图片显示
-  pro_image_editor: ^12.11.1
+  pro_image_editor: ^14.26.0
   audioplayers: ^6.6.0 #音频处理,所有平台
   audioplayers_platform_interface: ^7.1.1
   audioplayers_windows: ^4.3.0
@@ -291,15 +280,14 @@ dependencies:
   audioplayers_android: ^5.2.1
   audio_waveforms: ^2.0.1
   waved_audio_player: ^1.3.0
-  waveform_recorder: ^1.8.0
+  waveform_recorder: ^2.0.0
   # flutter_recorder: ^1.1.0
   flutter_cache_manager: ^3.4.1
   flutter_pip_player: ^0.1.0
 #  native_video_player: ^3.0.0-dev.4
   #  native_video_player: ^1.3.1
-  fvp: ^0.37.3
-  fl_video: ^1.4.0  #video_Player control panel
-  better_player_plus: ^1.1.5
+  fvp: ^0.40.0
+  better_player_plus: ^2.0.1
   awesome_video_player: ^1.0.5
   better_player_enhanced: ^1.0.2
   # advanced_video_player: ^1.0.0
@@ -318,19 +306,19 @@ dependencies:
   flutter_image_compress: ^2.4.0
   video_thumbnail: ^0.5.6
   easy_video_editor: ^0.1.2 #mobile
-  pro_video_editor: ^2.2.2 #mobile,macos
+  pro_video_editor: ^2.47.0 #mobile,macos
   video_editor_2: ^3.1.1 #mobile
   video_compress: ^3.1.3
-  fc_native_video_thumbnail: ^3.0.1
+  fc_native_video_thumbnail: ^4.0.0
   image_editor: ^1.6.0
   image: ^4.5.3 #所有平台，装载，保存，管理图像
-  flutter_luban: ^0.1.15
-  dismissible_page: ^1.0.2
+  flutter_luban: ^2.1.2
+  dismissible_page: ^2.1.1
   infinite_scroll_pagination: ^5.1.0
   indexed_list_view: ^4.0.0
 
   #应用
-  i18n_extension: ^15.1.0
+  i18n_extension: ^16.0.1
 #  kat_html_editor: ^0.0.5
   #  quill_html_editor: ^2.2.8
   #  quill_html_editor_v2: ^2.2.10 ios下编译错误
@@ -340,16 +328,15 @@ dependencies:
   backdrop: ^0.9.0 #Use BackdropScaffold instead of the standard Scaffold in your app
   material_floating_search_bar: ^0.3.7
   flutter_svg: ^2.0.3
-  latlong2: ^0.9.0
   apple_maps_flutter: ^1.4.0
   google_maps_flutter: ^2.16.0 #谷歌地图，移动设备
   tencent_map_flutter: ^0.1.0
-  map_launcher: ^4.4.2 #打开设备已安装的地图软件，移动设备
+  map_launcher: ^7.0.0 #打开设备已安装的地图软件，移动设备
   location_picker_flutter_map: ^4.1.0 #Open Street Map，需要翻墙
 
   #服务
-  firebase_core: ^4.6.0
-  firebase_messaging: ^16.1.3
+  firebase_core: ^5.1.0
+  firebase_messaging: ^17.0.1
   # 支持本地和fcm
   awesome_notifications: ^0.12.0
   # awesome_notifications_fcm: ^0.9.2 #要付钱
@@ -357,28 +344,33 @@ dependencies:
   intercom_flutter: ^9.5.6
   flutter_native_splash: ^2.4.6
   system_tray: ^2.0.3
-  tray_manager: ^0.5.2
+  tray_manager: ^0.9.0
   livekit_server_sdk: ^1.0.1
 
   #系统
-  system_resources: ^1.6.0
+  system_resources: ^2.0.0
 dependency_overrides:
-  liquid_glass_easy: ^3.2.1
+  latlong2: ^0.10.1
+  animations: ^3.0.0
+  equatable: ^3.0.0
+  qr: ^4.0.1
+  pinput: ^7.0.0
+  phone_form_field: ^12.0.1 #支持所有平台，电话号码的录入字段
+  liquid_glass_easy: ^5.2.0
   pretty_qr_code: ^3.6.0
   insta_assets_picker: ^3.4.0
+  dbus: ^0.8.0
+  fl_video: ^2.0.0  #video_Player control panel
   livekit_client: ^2.6.2 #livekit sfu server flutter client
   dart_jsonwebtoken: ^3.3.1
   wechat_assets_picker: ^10.1.2 #移动平台，选择图像，视频等媒体并展示
-  langchain: ^0.8.0+1
-  langchain_ollama: ^0.4.0+1
-  langchain_openai: ^0.8.0+1
-  langchain_google: ^0.7.0+1
-  ollama_dart: ^2.0.1
+  langchain: ^0.9.0
+  ollama_dart: ^5.0.0
   dart_openai: ^6.1.0
-  sqlite3: ^3.2.0
+  sqlite3: ^3.9.1
   sqlite3_flutter_libs: 0.6.0+eol
   sqlite3_simple: ^2.0.0
-  cbl: ^3.6.0+2
+  cbl: ^4.0.0
   petitparser: ^7.0.0
   fluent_ui: ^4.15.1
   fluentui_system_icons: ^1.1.201 #FluentIcons.access_time_24_regular
@@ -402,7 +394,7 @@ dependency_overrides:
   reactive_pinput: ^5.0.1
   reactive_cupertino_switch: ^4.0.0
 #  reactive_pin_code_fields: ^2.0.2
-  pin_code_fields: ^9.3.0
+  pin_code_fields: ^10.1.1
   reactive_sliding_segmented: ^2.0.2
   reactive_cupertino_slider: ^2.0.2
 #  reactive_month_picker_dialog: ^3.0.1
@@ -436,14 +428,14 @@ dependency_overrides:
   uuid: ^4.3.1
   meta: ^1.11.0
   xml: ^7.0.1
-  fluttertoast: ^9.0.0
+  fluttertoast: ^10.0.2
   pointer_interceptor: ^0.10.1
   js: ^0.7.1
   web: ^1.0.0
   rxdart: ^0.28.0
   flutter_platform_widgets: ^10.0.1
   logger: ^2.7.0
-  window_manager: ^0.5.0 #桌面应用的窗口管理
+  window_manager: ^0.7.0 #桌面应用的窗口管理
   web_socket_channel: ^3.0.3
   #  web_socket_client: ^0.2.1
   #  websocket_universal: ^1.2.5
@@ -456,7 +448,11 @@ dependency_overrides:
   extended_image_library: ^5.0.1
   device_info_plus: ^13.1.0
   package_info_plus: ^10.1.0
-  flutter_keyboard_visibility: ^6.0.0
+  flutter_keyboard_visibility: ^7.0.1
+  flutter_keyboard_visibility_windows: ^2.0.0
+  flutter_keyboard_visibility_macos: ^2.0.0
+  flutter_keyboard_visibility_linux: ^2.0.0
+  flutter_keyboard_visibility_platform_interface: ^3.0.0
   pointycastle: ^4.0.0
   geolocator: ^14.0.0
   flutter_map_location_marker: ^10.2.0
@@ -473,7 +469,7 @@ dependency_overrides:
   protobuf: ^6.0.0
   analyzer: ^9.0.0
   provider: ^6.1.4
-  flex_seed_scheme: ^4.0.1
+  flex_seed_scheme: ^5.0.1
   flutter_inappwebview: ^6.2.0-beta.3 #不支持linux
   connectivity_plus: ^7.0.0
   emoji_picker_flutter: ^4.4.0
@@ -487,14 +483,14 @@ dependency_overrides:
   flutter_widget_from_html: ^0.17.1
   flutter_widget_from_html_core: ^0.17.0
   sprintf: ^7.0.0
-  flex_color_picker: ^3.8.0
-  permission_handler: ^12.0.1
-  file_picker: ^12.0.0-beta.7
+  flex_color_picker: ^4.0.0
+  permission_handler: ^13.0.2
+  file_picker: ^13.3.3
   sms_autofill: ^2.4.1
   choice: ^2.3.2
   shared_preferences: ^2.5.5
   intl: ^0.20.1
-  flutter_slidable: ^4.0.3 #滑动的按钮
+  flutter_slidable: ^5.2.0 #滑动的按钮
   image: ^4.5.3
   camera: ^0.12.0+1 #调用相机
   just_audio: ^0.10.5
@@ -503,15 +499,15 @@ dependency_overrides:
   just_waveform: ^0.0.7
   just_audio_background: ^0.0.1-beta.11
   camera_linux: ^0.0.8
-  google_fonts: ^8.0.2
+  google_fonts: ^9.0.0
 #  material_design_icons_flutter: ^7.0.7296
   full_picker: ^2.1.5
-  image_cropper: ^12.1.1
+  image_cropper: ^13.0.0
   light_compressor: ^2.2.0
   collection: ^1.17.0
   path: ^1.8.3
-  flutter_waya: ^11.5.1 #UI组件
-  fl_pip: ^3.2.2 #系统级画中画，ios有问题
+  flutter_waya: ^12.0.0 #UI组件
+  fl_pip: ^4.0.0 #系统级画中画，ios有问题
   flutter_float_window: ^0.2.2
   system_alert_window: ^2.0.7
   #  flutter_overlay_window: ^0.5.0 #android悬浮框
@@ -541,6 +537,7 @@ dependency_overrides:
   flutter_slider_drawer: ^3.0.2
   flutter_zoom_drawer: ^3.2.0
   lottie: ^3.1.2
+  cross_file: ^0.4.0
   flutter_quill: #^11.5.1
     git: https://github.com/singerdmx/flutter-quill/
   flutter_quill_extensions:
@@ -549,13 +546,13 @@ dependency_overrides:
       path: flutter_quill_extensions
   flutter_quill_delta_from_html: ^1.5.3
   saver_gallery: ^5.1.0
-  gal: ^2.3.0
+  gal: ^3.0.0
   flutter_lints: ^6.0.0
 #  html_editor_enhanced: ^2.7.1
-  html_editor_plus: ^0.0.7
+  html_editor_plus: ^0.0.8
   lints: ^6.0.0
   archive: ^4.0.1
-  screen_retriever: ^0.2.0
+  screen_retriever: ^0.4.0
   flutter_vlc_player: ^7.4.4
   video_player: ^2.11.1 #mobile and web
   video_player_platform_interface: ^6.6.0
@@ -565,6 +562,13 @@ dependency_overrides:
   video_player_web: ^2.4.0
   video_player_control_panel: ^1.1.3
   #  cached_video_player_plus: ^4.0.1
+
+  cupertino_icons: ^2.0.0 #CupertinoIcons.heart_fill
+  # Icon(AntDesign.gitlab_fill),Icon(Bootstrap.google),Icon(BoxIcons.bxl_apple),Brand(Brands.icons8)
+  # Icon(Clarity.map_outline_badged),Icon(EvaIcons.clipboard),Flag(Flags.india),Icon(FontAwesome.stripe_brand)
+  # Icon(HeroIcons.printer),Icon(Iconsax.cake_bold),Icon(IonIcons.bug),Icon(LineAwesome.amazon)
+  # Icon(MingCute.knife_line),Icon(OctIcons.code_of_conduct),Icon(PixelArtIcons.gif),Icon(TeenyIcons.google_play_store)
+  # Icon(ZondIcons.shield)
   mime: ^2.0.0
   enough_mail: #^2.1.6
     git: https://github.com/Enough-Software/enough_mail.git

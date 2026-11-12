@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:cross_file/cross_file.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:video_editor_2/video_editor.dart' as base;
 
 /// VideoEditor2实现的视频编辑功能类，内置视频播放器
@@ -19,7 +19,7 @@ class BaseVideoEditor {
       base.TrimSliderStyle? trimStyle,
       int defaultCoverThumbnailQuality = 10,
       double? aspectRatio}) {
-    editor = base.VideoEditorController.file(XFile(videoInputPath),
+    editor = base.VideoEditorController.file(XFile.fileSystem(path:videoInputPath),
         minDuration: minDuration,
         maxDuration: maxDuration,
         coverStyle: coverStyle,

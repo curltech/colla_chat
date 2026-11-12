@@ -5,7 +5,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class BrightnessPicker extends StatelessWidget {
   const BrightnessPicker({super.key});

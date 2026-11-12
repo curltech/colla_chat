@@ -15,7 +15,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:dio/dio.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_luban/flutter_luban.dart';
@@ -471,13 +471,14 @@ class ImageUtil {
     if (image != null) {
       var path =
           await FileUtil.writeTempFileAsBytes(image, extension: extension);
-      xfile = XFile(path!);
+      xfile = XFile.fileSystem(path:path!);
     }
     if (xfile != null) {
-      int length = await xfile.length();
-      if (length > 10240) {
+      int? length = await xfile.length();
+      if (length!=null && length > 10240) {
         // double quality = 10240 * 100 / length;
-        String? filename = await compress(filename: xfile.path, path: dir.path);
+        String? filename=await xfile.name();
+        filename = await compress(filename: filename!, path: dir.path);
         avatar = await FileUtil.readFileAsBytes(filename!);
       } else {
         avatar = await xfile.readAsBytes();

@@ -8,7 +8,7 @@ import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 媒体文件，比如图片或者视频文件的展示
 class MediaFileWidget extends StatefulWidget {

@@ -49,7 +49,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:path/path.dart' as p;
 
 ///每种消息的显示组件
@@ -442,7 +442,7 @@ class MessageWidget {
             chatMessage.messageId!, chatMessage.title);
         if (filename != null) {
           ShareUtil.share(
-            files: [XFile(filename)],
+            files: [XFile.fileSystem(path:filename)],
             text: chatMessage.content,
             subject: chatMessage.contentType,
             sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,

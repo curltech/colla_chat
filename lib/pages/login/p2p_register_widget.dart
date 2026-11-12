@@ -25,7 +25,7 @@ import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart'
     as phone_numbers_parser;

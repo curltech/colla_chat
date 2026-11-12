@@ -17,11 +17,12 @@ import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/websocket/websocket_channel.dart';
 import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_helper.dart';
-import 'package:flutter/material.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart' hide GlobalMaterialLocalizations, GlobalCupertinoLocalizations;
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -139,20 +140,16 @@ Future<void> initializeAndroidAudioSettings() async {
 ///初始化桌面平台的窗口管理
 Future<void> _initDesktopWindows() async {
   if (platformParams.desktop) {
-    await windowManager.ensureInitialized();
-    WindowOptions windowOptions = const WindowOptions(
-      title: appName,
-      size: Size(800, 600),
-      center: true,
-      // backgroundColor: Colors.transparent,
-      titleBarStyle: TitleBarStyle.normal,
-      windowButtonVisibility: true,
-    );
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-      await windowManager.focus();
-    });
-    windowManager.setMinimumSize(Size(appDataProvider.designSize.width, 600));
+    final windowManager = WindowManager.instance.getCurrent()!;
+    windowManager.title = appName;
+    windowManager.setSize(const Size(800, 600).toNative(), false);
+    windowManager.minimumSize =
+        Size(appDataProvider.designSize.width, 600).toNative();
+    windowManager.center();
+    windowManager.titleBarStyle = TitleBarStyle.normal;
+    windowManager.isWindowControlButtonsVisible = true;
+    windowManager.focus();
+    windowManager.show();
   }
 }
 
@@ -188,8 +185,8 @@ class CollaChatApp extends StatelessWidget {
               toastBuilder: (String msg) => DialogUtil.defaultLoadingWidget(),
               loadingBuilder: (String msg) => DialogUtil.defaultLoadingWidget(),
             ),
-            localizationsDelegates: const [
-              AppLocalizationsDelegate(),
+            localizationsDelegates: [
+              const AppLocalizationsDelegate(),
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,

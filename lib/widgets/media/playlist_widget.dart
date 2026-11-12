@@ -20,7 +20,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class PlaylistController {
   final MediaSourceController rootMediaSourceController =
@@ -344,14 +344,14 @@ class MediaSourceController extends DataListController<PlatformMediaSource> {
       if (xfiles != null && xfiles.isNotEmpty) {
         List<PlatformMediaSource>? mediaSources;
         for (var xfile in xfiles) {
-          String? extension = FileUtil.extension(xfile.path);
+          String? extension = FileUtil.extension(xfile.getExtension().toString());
           if (extension == null) {
             continue;
           }
           bool? contain = allowedExtensions.contains(extension);
           if (contain) {
             PlatformMediaSource? mediaSource =
-                await addMediaFile(filename: xfile.path);
+                await addMediaFile(filename: xfile.getExtension().toString());
             if (mediaSource != null) {
               mediaSources ??= [];
               mediaSources.add(mediaSource);
