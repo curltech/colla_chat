@@ -46,7 +46,7 @@ class PlatformMapLauncherWidget extends StatelessWidget with DataTileMixin {
   DataTile? buildMapTileData(BuildContext context, int index) {
     AvailableMap map = maps.value[index];
     DataTile tile = DataTile(
-        title: map.mapName,
+        title: map.name,
         prefix: SvgPicture.asset(
           map.icon,
           height: 30.0,

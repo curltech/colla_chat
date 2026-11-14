@@ -151,7 +151,6 @@ dependencies:
   easy_image_viewer: ^1.5.1
   tab_container: ^3.5.3
   file_saver: ^0.7.0
-  material_neumorphic: ^1.2.1
   extended_text: ^15.0.0 #文本扩展显示
   extended_text_library: ^12.0.1
   extended_masked_text: ^3.0.1

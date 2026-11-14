@@ -215,7 +215,7 @@ class SecuritySettingWidget extends StatelessWidget with DataTileMixin {
       DialogUtil.info(
           context: context,
           content:
-              '${AppLocalizations.t('Successfully restore peer filename')} ${xfiles.first.path}');
+              '${AppLocalizations.t('Successfully restore peer filename')} ${xfiles.first.uri}');
     }
   }
 
@@ -243,7 +243,7 @@ class SecuritySettingWidget extends StatelessWidget with DataTileMixin {
           allowedExtensions: ['tgz']);
       if (xfiles!=null && xfiles.isNotEmpty) {
         String? path =
-            await messageAttachmentService.restore(peerId, xfiles.first.path);
+            await messageAttachmentService.restore(peerId, xfiles.first.uri);
         if (path != null) {
           DialogUtil.info(
               context: context,

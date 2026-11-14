@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
@@ -31,20 +32,19 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 ///非文本的其他多种格式输入面板，包括照片等
 class MoreMessageInput extends StatelessWidget {
   final Future<void> Function(int index, String name, {String? value})?
-      onAction;
+  onAction;
 
   const MoreMessageInput({super.key, this.onAction});
 
@@ -209,7 +209,7 @@ class MoreMessageInput extends StatelessWidget {
       if (chatSummary != null) {
         String groupId = chatSummary.peerId!;
         ChatMessage? chatMessage =
-            await chatMessageService.findVideoChatMessage(groupId: groupId);
+        await chatMessageService.findVideoChatMessage(groupId: groupId);
         if (chatMessage != null) {
           await p2pConferenceClientPool.createConferenceClient(
               chatSummary: chatSummary, chatMessage);
@@ -234,11 +234,11 @@ class MoreMessageInput extends StatelessWidget {
       if (chatSummary != null) {
         String messageId = chatSummary.peerId!;
         ChatMessage? chatMessage =
-            await chatMessageService.findVideoChatMessage(messageId: messageId);
+        await chatMessageService.findVideoChatMessage(messageId: messageId);
         if (chatMessage != null) {
           LiveKitConferenceClient? conferenceClient =
-              await liveKitConferenceClientPool.createConferenceClient(
-                  chatSummary: chatSummary, chatMessage);
+          await liveKitConferenceClientPool.createConferenceClient(
+              chatSummary: chatSummary, chatMessage);
           if (conferenceClient != null) {
             indexWidgetProvider.push('sfu_video_chat');
           }
@@ -275,9 +275,8 @@ class MoreMessageInput extends StatelessWidget {
       if (xfiles.isNotEmpty) {
         for (var xfile in xfiles) {
           Uint8List? data = await xfile.readAsBytes();
-          String? mimeType = xfile.mimeType;
-          String title = xfile.name;
-          mimeType = mimeType ?? FileUtil.mimeType(title);
+          String? title = await xfile.name();
+          String? mimeType = title ?? FileUtil.mimeType(title!);
           String mainMimeType = FileUtil.mainMimeType(mimeType!);
           ChatMessageContentType? contentType = StringUtil.enumFromString(
               ChatMessageContentType.values, mainMimeType);
@@ -337,8 +336,8 @@ class MoreMessageInput extends StatelessWidget {
       });
       if (mediaFile != null) {
         data = await mediaFile!.readAsBytes();
-        filename = mediaFile!.name;
-        mimeType = FileUtil.mimeType(filename);
+        filename = await mediaFile!.name();
+        mimeType = FileUtil.mimeType(filename!);
       }
     }
 
@@ -441,9 +440,8 @@ class MoreMessageInput extends StatelessWidget {
       for (var xfile in xfiles) {
         Uint8List data = await xfile.readAsBytes();
         // Uint8List? thumbnail = await ImageUtil.compressThumbnail(xfile: xfile);
-        String filename = xfile.name;
-        String? mimeType = xfile.mimeType;
-        mimeType = FileUtil.mimeType(filename);
+        String? filename = await xfile.name();
+        String? mimeType = FileUtil.mimeType(filename!);
         mimeType = mimeType ?? 'text/plain';
         await chatMessageController.send(
             title: filename,

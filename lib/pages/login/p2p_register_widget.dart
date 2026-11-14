@@ -106,7 +106,7 @@ class P2pRegisterWidget extends StatelessWidget {
     if (platformParams.desktop) {
       List<XFile>? xfiles = await FileUtil.pickFiles();
       if (xfiles != null && xfiles.isNotEmpty) {
-        backupFile = xfiles[0].path;
+        backupFile = xfiles[0].uri;
       }
     } else if (platformParams.mobile) {
       List<AssetEntity>? assets = await AssetUtil.pickAssets();

@@ -39,7 +39,7 @@ class P2pLogin extends StatelessWidget with WindowListener {
   final ValueNotifier<int> index = ValueNotifier<int>(0);
 
   void init() async {
-    windowManager.addListener(this);
+    WindowManager.instance.addListener(this);
     await myselfPeerController.init();
     List<MyselfPeer> myselfPeers = myselfPeerController.data.value;
     if (myselfPeers.isEmpty) {

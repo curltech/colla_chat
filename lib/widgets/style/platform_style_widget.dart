@@ -4,8 +4,7 @@ import 'package:colla_chat/widgets/style/glass/glass_widget.dart';
 import 'package:colla_chat/widgets/style/glass/liquid_glass_design_widget.dart';
 import 'package:colla_chat/widgets/style/glass/liquid_glass_effect_widget.dart';
 import 'package:colla_chat/widgets/style/glass/liquid_glass_lens_widget.dart';
-import 'package:colla_chat/widgets/style/neumorphic/neumorphic_widget.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:colla_chat/widgets/style/glass/oc_liquid_glass_widget.dart';
 
@@ -17,7 +16,6 @@ enum PlatformStyle {
   liquidGlassDesign,
   ocLiquidGlass,
   liquidGlassLens,
-  neumorphic,
   fluent
 }
 
@@ -123,11 +121,6 @@ extension PlatformStyleWidget<T extends Widget> on T {
           width: width,
           backgroundWidget: backgroundWidget ?? Container(),
           child: this,
-        );
-      case PlatformStyle.neumorphic:
-        child = asNeumorphicStyle(
-          height: height,
-          width: width,
         );
       default:
         child = asGlassWidget(

@@ -58,7 +58,7 @@ class DataSourceEditWidget extends StatelessWidget with DataTileMixin {
                     XFile? xfile = await FileUtil.selectFile();
                     if (xfile != null) {
                       platformReactiveFormController?.setValue(
-                          'filename', xfile.path);
+                          'filename', await xfile.name());
                     }
                   },
                   icon: Icon(Icons.arrow_circle_down_outlined,

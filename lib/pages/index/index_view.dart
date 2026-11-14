@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
@@ -17,9 +18,9 @@ import 'package:colla_chat/pages/index/adaptive_layout_index.dart';
 import 'package:colla_chat/pages/index/global_chat_message.dart';
 import 'package:colla_chat/pages/index/global_webrtc_event.dart';
 import 'package:colla_chat/pages/login/background.dart';
-import 'package:colla_chat/plugin/pip/inapp_pip_player_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/overlay/overlay_notification.dart';
+import 'package:colla_chat/plugin/pip/inapp_pip_player_widget.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -37,17 +38,16 @@ import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/websocket/websocket_channel.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:extended_text/extended_text.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
 import 'package:flutter_sharing_intent/model/sharing_file.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:system_tray/system_tray.dart';
 import 'package:window_manager/window_manager.dart';
@@ -64,14 +64,14 @@ class IndexView extends StatefulWidget {
 }
 
 class _IndexViewState extends State<IndexView>
-    with WidgetsBindingObserver, WindowListener {
+    with WidgetsBindingObserver {
   final ValueNotifier<bool> conferenceJoined = ValueNotifier<bool>(false);
   final CustomSpecialTextSpanBuilder customSpecialTextSpanBuilder =
-      CustomSpecialTextSpanBuilder();
+  CustomSpecialTextSpanBuilder();
   ChatMessage? chatMessage;
 
   ConferenceChatMessageController conferenceChatMessageController =
-      ConferenceChatMessageController();
+  ConferenceChatMessageController();
 
   Widget bannerAvatarImage = AppImage.mdAppImage;
 
@@ -79,6 +79,7 @@ class _IndexViewState extends State<IndexView>
   StreamSubscription<ChatMessage>? chatMessageStreamSubscription;
   StreamSubscription<WebrtcEvent>? errorWebrtcEventStreamSubscription;
   List<SharedFile>? _sharedFiles;
+  int? eventId;
 
   late final AppLifecycleListener _appLifecycleListener;
   late AppLifecycleState? _appLifecycleState;
@@ -107,7 +108,11 @@ class _IndexViewState extends State<IndexView>
 
   void _initObserver() {
     WidgetsBinding.instance.addObserver(this);
-    windowManager.addListener(this);
+    eventId = WindowManager.instance.addListener((WindowEvent event) {
+      if (event is WindowFocusedEvent) {
+        onWindowFocus();
+      }
+    });
     _appLifecycleState = SchedulerBinding.instance.lifecycleState;
     _appLifecycleListener = AppLifecycleListener(
       onShow: () {
@@ -155,7 +160,6 @@ class _IndexViewState extends State<IndexView>
     }
   }
 
-  @override
   Future<void> onWindowFocus() async {
     //logger.i('app window focus');
     await websocketPool.connect();
@@ -202,7 +206,8 @@ class _IndexViewState extends State<IndexView>
   void didChangeTextScaleFactor() {
     super.didChangeTextScaleFactor();
     logger.i(
-        "didChangeTextScaleFactor  ：${WidgetsBinding.instance.platformDispatcher.textScaleFactor}");
+        "didChangeTextScaleFactor  ：${WidgetsBinding.instance.platformDispatcher
+            .textScaleFactor}");
     appDataProvider.changeWindowSize();
   }
 
@@ -336,8 +341,8 @@ class _IndexViewState extends State<IndexView>
   }
 
   ///有新消息到来的时候，一般消息直接显示
-  Future<void> _updateGlobalChatMessage(
-      BuildContext context, ChatMessage chatMessage) async {
+  Future<void> _updateGlobalChatMessage(BuildContext context,
+      ChatMessage chatMessage) async {
     String? subMessageType = chatMessage.subMessageType;
     String senderPeerId = chatMessage.senderPeerId!;
     String? groupId = chatMessage.groupId;
@@ -374,7 +379,7 @@ class _IndexViewState extends State<IndexView>
       Widget? bannerAvatarImage;
       String senderPeerId = chatMessage!.senderPeerId!;
       Linkman? linkman =
-          await linkmanService.findCachedOneByPeerId(senderPeerId);
+      await linkmanService.findCachedOneByPeerId(senderPeerId);
       if (linkman != null) {
         bannerAvatarImage = linkman.avatarImage ?? AppImage.mdAppImage;
       }
@@ -385,7 +390,7 @@ class _IndexViewState extends State<IndexView>
           AutoSizeText(name,
               maxLines: 1,
               style:
-                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         );
       }
       String? title = chatMessage!.title;
@@ -424,19 +429,23 @@ class _IndexViewState extends State<IndexView>
             key: 'topRight',
             type: StackedType.below,
             itemOffset: const Offset(0, 5),
-          ), onDismiss: (OverlayNotification self) async {
-        chatMessage = null;
-        await conferenceChatMessageController.close();
-      }, onNotificationPressed: (OverlayNotification self) async {
-        chatMessage = null;
-        await conferenceChatMessageController.close();
-      }, onProgressFinished: (OverlayNotification self) async {
-        chatMessage = null;
-        await conferenceChatMessageController.close();
-      }, onCloseButtonPressed: (OverlayNotification self) async {
-        chatMessage = null;
-        await conferenceChatMessageController.close();
-      });
+          ),
+          onDismiss: (OverlayNotification self) async {
+            chatMessage = null;
+            await conferenceChatMessageController.close();
+          },
+          onNotificationPressed: (OverlayNotification self) async {
+            chatMessage = null;
+            await conferenceChatMessageController.close();
+          },
+          onProgressFinished: (OverlayNotification self) async {
+            chatMessage = null;
+            await conferenceChatMessageController.close();
+          },
+          onCloseButtonPressed: (OverlayNotification self) async {
+            chatMessage = null;
+            await conferenceChatMessageController.close();
+          });
 
       return overlayNotification;
     }
@@ -469,7 +478,7 @@ class _IndexViewState extends State<IndexView>
     Conference? conference;
     if (conferenceChatMessage.content != null) {
       var content =
-          chatMessageService.recoverContent(conferenceChatMessage.content!);
+      chatMessageService.recoverContent(conferenceChatMessage.content!);
       Map<String, dynamic> json = JsonUtil.toJson(content);
       conference = Conference.fromJson(json);
       topic = conference.topic;
@@ -507,8 +516,8 @@ class _IndexViewState extends State<IndexView>
         onPressed: () async {
           _stop();
           P2pConferenceClient? p2pConferenceClient =
-              await p2pConferenceClientPool
-                  .createConferenceClient(conferenceChatMessage);
+          await p2pConferenceClientPool
+              .createConferenceClient(conferenceChatMessage);
           ConferenceChatMessageController? conferenceChatMessageController =
               p2pConferenceClient?.conferenceChatMessageController;
           await conferenceChatMessageController
@@ -579,8 +588,8 @@ class _IndexViewState extends State<IndexView>
         _stop();
         if (conferenceChatMessage.groupId == null) {
           P2pConferenceClient? p2pConferenceClient =
-              await p2pConferenceClientPool
-                  .createConferenceClient(conferenceChatMessage);
+          await p2pConferenceClientPool
+              .createConferenceClient(conferenceChatMessage);
           ConferenceChatMessageController? conferenceChatMessageController =
               p2pConferenceClient?.conferenceChatMessageController;
           await conferenceChatMessageController
@@ -618,12 +627,12 @@ class _IndexViewState extends State<IndexView>
                 if (selected != null && selected.isNotEmpty) {
                   String? receivePeerId;
                   Linkman? linkman =
-                      await linkmanService.findCachedOneByPeerId(selected[0]);
+                  await linkmanService.findCachedOneByPeerId(selected[0]);
                   if (linkman != null) {
                     receivePeerId = linkman.peerId;
                   } else {
                     Group? group =
-                        await groupService.findCachedOneByPeerId(selected[0]);
+                    await groupService.findCachedOneByPeerId(selected[0]);
                     if (group != null) {
                       receivePeerId = group.peerId;
                     }
@@ -656,7 +665,7 @@ class _IndexViewState extends State<IndexView>
                         }
                         String filename = content!;
                         Uint8List? data =
-                            await FileUtil.readFileAsBytes(filename);
+                        await FileUtil.readFileAsBytes(filename);
                         if (data != null) {
                           String? mimeType = FileUtil.mimeType(filename);
                           mimeType = mimeType ?? 'text/plain';
@@ -695,18 +704,18 @@ class _IndexViewState extends State<IndexView>
           dismissOnCapturedTaps: false,
           child: SafeArea(
               child: Stack(children: <Widget>[
-            Opacity(
-              opacity: 0.8,
-              child: backgroundWidget,
-            ),
-            Center(
-              child: widget.adaptiveLayoutIndex.asStyle(
-                height: height,
-                width: width,
-              ),
-            ),
-            inAppPipPlayerWidget,
-          ]))),
+                Opacity(
+                  opacity: 0.8,
+                  child: backgroundWidget,
+                ),
+                Center(
+                  child: widget.adaptiveLayoutIndex.asStyle(
+                    height: height,
+                    width: width,
+                  ),
+                ),
+                inAppPipPlayerWidget,
+              ]))),
     );
 
     return scaffold;
@@ -721,8 +730,8 @@ class _IndexViewState extends State<IndexView>
     var provider = Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(
         builder:
             (context, appDataProvider, indexWidgetProvider, myself, child) {
-      return _createScaffold(context);
-    });
+          return _createScaffold(context);
+        });
     return provider;
   }
 
@@ -737,7 +746,7 @@ class _IndexViewState extends State<IndexView>
     errorWebrtcEventStreamSubscription = null;
     _stop();
     WidgetsBinding.instance.removeObserver(this);
-    windowManager.removeListener(this);
+    WindowManager.instance.removeListener(eventId!);
     super.dispose();
   }
 }
