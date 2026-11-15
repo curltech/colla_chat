@@ -382,7 +382,7 @@ class FileUtil {
       shortcuts: shortcuts,
     );
     if (path != null) {
-      return XFile.fileSystem(path:path);
+      return XFile.fileSystem(path: path);
     }
 
     return null;
@@ -670,9 +670,9 @@ class FileUtil {
 
   static Future<Map<String, dynamic>> toJson(XFile file) async {
     Map<String, dynamic> json = {};
-    json['path'] = file.path;
-    json['name'] = file.name;
-    json['mimeType'] = file.mimeType;
+    json['path'] = file.uri;
+    json['name'] = await file.name();
+    json['mimeType'] = extension(json['name']);
     json['length'] = file.length();
     json['lastModified'] = file.lastModified();
     var content = await file.readAsBytes();
@@ -690,13 +690,9 @@ class FileUtil {
     final dir = await getTemporaryDirectory();
     name ??= '${StringUtil.uuid()}.$mimeType';
     String path = p.join(dir.path, name);
-    XFile file = XFile.fromData(content,
-        mimeType: json['mimeType'],
-        name: json['name'],
-        length: json['length'],
-        lastModified: json['lastModified'],
-        path: json['path']);
-    file.saveTo(path);
+    await FileUtil.writeTempFileAsBytes(content,
+        extension: mimeType, filename: name);
+    XFile file = XFile.fileSystem(path: path);
 
     return file;
   }

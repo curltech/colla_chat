@@ -15,11 +15,11 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:dio/dio.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_luban/flutter_luban.dart';
 import 'package:image/image.dart' as img;
+import 'package:material_ui/material_ui.dart';
 import 'package:saver_gallery/saver_gallery.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
@@ -63,12 +63,12 @@ class ImageUtil {
 
   static Widget buildMemoryImageWidget(Uint8List image,
       {double? width,
-      double? height,
-      BoxFit? fit = BoxFit.contain,
-      bool isRadius = false,
-      double radius = 8.0}) {
+        double? height,
+        BoxFit? fit = BoxFit.contain,
+        bool isRadius = false,
+        double radius = 8.0}) {
     Widget imageWidget =
-        Image.memory(image, width: width, height: height, fit: fit);
+    Image.memory(image, width: width, height: height, fit: fit);
     if (isRadius) {
       imageWidget = ClipRRect(
         borderRadius: BorderRadius.all(
@@ -160,13 +160,12 @@ class ImageUtil {
     return image;
   }
 
-  static Widget buildImageWidget(
-      {String? imageContent,
-      double? width,
-      double? height,
-      BoxFit? fit = BoxFit.contain,
-      bool isRadius = false,
-      double radius = 8.0}) {
+  static Widget buildImageWidget({String? imageContent,
+    double? width,
+    double? height,
+    BoxFit? fit = BoxFit.contain,
+    bool isRadius = false,
+    double radius = 8.0}) {
     Widget imageWidget = buildImage(
         imageContent: imageContent, width: width, height: height, fit: fit);
     if (isRadius) {
@@ -183,7 +182,7 @@ class ImageUtil {
   static Future<Uint8List> clipImageBytes(GlobalKey globalKey,
       {ui.ImageByteFormat format = ui.ImageByteFormat.png}) async {
     RenderRepaintBoundary? boundary =
-        globalKey.currentContext?.findRenderObject()! as RenderRepaintBoundary;
+    globalKey.currentContext?.findRenderObject()! as RenderRepaintBoundary;
 
     ui.Image uiImage = await boundary.toImage();
     ByteData? byteData = await uiImage.toByteData(format: format);
@@ -196,15 +195,14 @@ class ImageUtil {
   static Future<ui.Image> capturePng(GlobalKey key,
       {double pixelRatio = 1.0}) async {
     RenderRepaintBoundary boundary =
-        key.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    key.currentContext!.findRenderObject() as RenderRepaintBoundary;
     ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
 
     return image;
   }
 
   ///保存图片到图片廊
-  static Future<dynamic> saveImageGallery(
-    Uint8List imageBytes, {
+  static Future<dynamic> saveImageGallery(Uint8List imageBytes, {
     int quality = 100,
     String? fileExtension,
     required String fileName,
@@ -297,8 +295,7 @@ class ImageUtil {
     return image;
   }
 
-  static img.Image thumbnail(
-    img.Image image, {
+  static img.Image thumbnail(img.Image image, {
     int? width,
     int? height,
   }) {
@@ -321,35 +318,31 @@ class ImageUtil {
   }
 
   ///压缩图片，适用于多个平台
-  static Future<String?>? compress({
+  static Future<XFile?>? compress({
     required String filename,
     required String path,
-    CompressMode mode = CompressMode.LARGE2SMALL,
-    int quality = 80,
-    int step = 1,
-    bool autoRatio = true,
+    int? targetWidth,
+    bool useCache = true,
+    bool toRgb = true,
+    int numberOfColors = 128,
   }) async {
-    File? imageFile = File(filename);
+    XFile imageFile = XFile.fileSystem(path: filename);
     CompressObject compressObject = CompressObject(
-        imageFile: imageFile,
+        imageXFile: imageFile,
         //image
         targetPath: path,
-        //compress to path
-        quality: quality,
-        //first compress quality, default 80
-        step: step,
-        //compress quality step, The bigger the fast, Smaller is more accurate, default 6
-        mode: mode,
-        autoRatio: autoRatio //default AUTO
-        );
-    var name = await Luban.compressImage(compressObject);
+        targetWidth: targetWidth,
+        useCache: useCache,
+        toRgb: toRgb,
+        numberOfColors: numberOfColors
+    );
+    XFile? name = await Luban.compressImage(compressObject);
 
     return name;
   }
 
   /// compress file and get Uint8List
-  static Future<Uint8List?> compressWithFile(
-    File file, {
+  static Future<Uint8List?> compressWithFile(File file, {
     int minWidth = 1920,
     int minHeight = 1080,
     int inSampleSize = 1,
@@ -377,19 +370,18 @@ class ImageUtil {
   }
 
   /// compress file and get file.
-  static Future<XFile?> compressAndGetFile(
-    File file,
-    String targetPath, {
-    int minWidth = 1920,
-    int minHeight = 1080,
-    int inSampleSize = 1,
-    int quality = 95,
-    int rotate = 0,
-    bool autoCorrectionAngle = true,
-    CompressFormat format = CompressFormat.jpeg,
-    bool keepExif = false,
-    int numberOfRetries = 5,
-  }) async {
+  static Future<XFile?> compressAndGetFile(File file,
+      String targetPath, {
+        int minWidth = 1920,
+        int minHeight = 1080,
+        int inSampleSize = 1,
+        int quality = 95,
+        int rotate = 0,
+        bool autoCorrectionAngle = true,
+        CompressFormat format = CompressFormat.jpeg,
+        bool keepExif = false,
+        int numberOfRetries = 5,
+      }) async {
     var result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path,
       targetPath,
@@ -408,8 +400,7 @@ class ImageUtil {
   }
 
   /// compress asset and get Uint8List.
-  static Future<Uint8List?> compressAssetImage(
-    String assetName, {
+  static Future<Uint8List?> compressAssetImage(String assetName, {
     int minWidth = 1920,
     int minHeight = 1080,
     int quality = 95,
@@ -433,8 +424,7 @@ class ImageUtil {
   }
 
   /// 压缩图片，移动平台，compress Uint8List and get another Uint8List.
-  static Future<Uint8List> compressWithList(
-    Uint8List list, {
+  static Future<Uint8List> compressWithList(Uint8List list, {
     int minWidth = 1920,
     int minHeight = 1080,
     int quality = 95,
@@ -458,11 +448,10 @@ class ImageUtil {
     return result;
   }
 
-  static Future<Uint8List?> compressThumbnail(
-      {XFile? xfile,
-      AssetEntity? assetEntity,
-      Uint8List? image,
-      String extension = 'jpeg'}) async {
+  static Future<Uint8List?> compressThumbnail({XFile? xfile,
+    AssetEntity? assetEntity,
+    Uint8List? image,
+    String extension = 'jpeg'}) async {
     Uint8List? avatar;
     Directory? dir = await PathUtil.getTemporaryDirectory();
     if (dir == null) {
@@ -470,16 +459,16 @@ class ImageUtil {
     }
     if (image != null) {
       var path =
-          await FileUtil.writeTempFileAsBytes(image, extension: extension);
-      xfile = XFile.fileSystem(path:path!);
+      await FileUtil.writeTempFileAsBytes(image, extension: extension);
+      xfile = XFile.fileSystem(path: path!);
     }
     if (xfile != null) {
       int? length = await xfile.length();
-      if (length!=null && length > 10240) {
+      if (length != null && length > 10240) {
         // double quality = 10240 * 100 / length;
-        String? filename=await xfile.name();
-        filename = await compress(filename: filename!, path: dir.path);
-        avatar = await FileUtil.readFileAsBytes(filename!);
+        String? filename = await xfile.name();
+        XFile? file = await compress(filename: filename!, path: dir.path);
+        avatar = await file?.readAsBytes();
       } else {
         avatar = await xfile.readAsBytes();
       }
@@ -490,9 +479,9 @@ class ImageUtil {
       if (avatar != null && avatar.length > 10240) {
         // double quality = 10240 * 100 / avatar.length;
         mimeType = FileUtil.subMimeType(mimeType!);
-        mimeType = mimeType ?? 'jpeg';
+        mimeType = mimeType;
         CompressFormat? format =
-            StringUtil.enumFromString(CompressFormat.values, mimeType);
+        StringUtil.enumFromString(CompressFormat.values, mimeType);
         format = format ?? CompressFormat.jpeg;
         avatar = await compressWithList(avatar, format: format);
 
@@ -513,7 +502,7 @@ class ImageUtil {
       List<XFile>? xfiles = await FileUtil.pickFiles(
           type: FileType.custom,
           allowedExtensions: ['png', 'jpg', 'jpeg', 'webp', 'gif']);
-      if (xfiles!=null && xfiles.isNotEmpty) {
+      if (xfiles != null && xfiles.isNotEmpty) {
         avatar = await compressThumbnail(xfile: xfiles[0]);
       }
     } else if (platformParams.mobile) {
@@ -526,12 +515,11 @@ class ImageUtil {
     return avatar;
   }
 
-  static Future<Uint8List?> convert(
-      {Uint8List? indata,
-      String? infile,
-      String? format,
-      int? width,
-      String? outfile}) async {
+  static Future<Uint8List?> convert({Uint8List? indata,
+    String? infile,
+    String? format,
+    int? width,
+    String? outfile}) async {
     if (infile != null) {
       indata = File(infile).readAsBytesSync();
     }

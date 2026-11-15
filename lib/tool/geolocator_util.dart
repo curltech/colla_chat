@@ -188,8 +188,9 @@ class GeolocatorUtil {
       String address) async {
     if (await isPresent()) {
       try {
+        final geocoding.Geocoding geo = geocoding.Geocoding();
         List<geocoding.Location> locations =
-            await geocoding.locationFromAddress(address);
+            await geo.locationFromAddress(address);
 
         return locations;
       } catch (e) {
@@ -203,8 +204,9 @@ class GeolocatorUtil {
       double latitude, double longitude) async {
     if (await isPresent()) {
       try {
+        final geocoding.Geocoding geo = geocoding.Geocoding();
         List<geocoding.Placemark> placemarks =
-            await geocoding.placemarkFromCoordinates(latitude, longitude);
+            await geo.placemarkFromCoordinates(latitude, longitude);
 
         return placemarks;
       } catch (e) {
@@ -216,11 +218,13 @@ class GeolocatorUtil {
 
   //设置语言国家，en_US，zh_CN
   static Future<void> setLocaleIdentifier(String localeIdentifier) async {
-    await geocoding.setLocaleIdentifier(localeIdentifier);
+    final geocoding.Geocoding geo = geocoding.Geocoding();
+    geo.setLocaleIdentifier(localeIdentifier);
   }
 
   static Future<bool> isPresent() async {
-    return await geocoding.isPresent();
+    final geocoding.Geocoding geo = geocoding.Geocoding();
+    return await geo.isPresent();
   }
 
   ///以下是计算经纬度，计算地图距离

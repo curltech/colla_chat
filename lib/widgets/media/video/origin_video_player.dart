@@ -144,7 +144,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
         placeholder: const Center(
             child: Text('placeholder',
                 style: TextStyle(color: Colors.red, fontSize: 20))),
-        controls: CupertinoControls(
+        controls: FlCupertinoControls(
             hideDuration: const Duration(seconds: 5),
             enableSpeed: true,
             enableSkip: true,
@@ -195,7 +195,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
         placeholder: Center(
             child: Text(AppLocalizations.t('Waiting'),
                 style: TextStyle(color: myself.primary, fontSize: 20))),
-        controls: MaterialControls(
+        controls: FlMaterialControls(
             progressColors: FlVideoPlayerProgressColors(
                 played: myself.primary,
                 buffered: Colors.grey,

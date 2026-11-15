@@ -1,5 +1,5 @@
-import 'package:material_ui/material_ui.dart';
 import 'package:liquid_glass_easy/liquid_glass_easy.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// ios 26样式的玻璃效果组件
 /// 把组件变成透镜
@@ -22,25 +22,18 @@ extension LiquidGlassLensWidget<T extends Widget> on T {
     double cornerRadius = 50.0,
     LiquidGlassClipQuality clipQuality =
         LiquidGlassClipQuality.roundedRectangle,
-    double borderWidth = 1.0,
-    Color? borderColor,
-    double lightIntensity = 1.0,
-    Color lightColor = const Color(0xB2FFFFFF),
-    double lightDirection = 0.0,
-    LiquidGlassLightMode lightMode = LiquidGlassLightMode.edge,
-    LiquidGlassBorderType borderType = const OpticalBorder(),
+    LiquidGlassLight? specular,
+    LiquidGlassLight? glow,
+    double refractionIndex = 1.1,
+    double refractionWidth = 12.0,
+    double magnification = 1.0,
+    double dispersion = 0,
     double saturation = 1.0,
-    LiquidGlassBlur blur = const LiquidGlassBlur(),
-    Color color = Colors.transparent,
-    bool enableInnerRadiusTransparent = false,
-    double distortion = 0.1,
-    double distortionWidth = 30,
-    double magnification = 1,
-    double chromaticAberration = 0.003,
-    LiquidGlassRefractionMode refractionMode =
-        LiquidGlassRefractionMode.shapeRefraction,
-    LiquidGlassRefractionType? refractionType,
-    double diagonalFlip = 0,
+    double blur = 0.0,
+    Color color = const Color(0x00000000),
+    LiquidGlassShadow? shadow,
+    LiquidGlassAdaptivity? adaptivity,
+    bool liteGlass = false,
     bool? useImpellerBackdrop,
     bool visibility = true,
     EdgeInsetsGeometry padding = const EdgeInsets.all(0),
@@ -49,31 +42,21 @@ extension LiquidGlassLensWidget<T extends Widget> on T {
       cornerStyle: cornerStyle,
       cornerRadius: cornerRadius,
       clipQuality: clipQuality,
-      borderWidth: borderWidth,
-      borderColor: borderColor,
-      lightIntensity: lightIntensity,
-      lightColor: lightColor,
-      lightDirection: lightDirection,
-      lightMode: lightMode,
-      borderType: borderType,
     );
-    LiquidGlassAppearance appearance = LiquidGlassAppearance(
+    LiquidGlassStyle style = LiquidGlassStyle(
+      shape: shape,
+      specular: specular,
+      glow: glow,
+      refractionIndex: refractionIndex,
+      refractionWidth: refractionWidth,
+      magnification: magnification,
+      dispersion: dispersion,
       saturation: saturation,
       blur: blur,
       color: color,
-      enableInnerRadiusTransparent: enableInnerRadiusTransparent,
-    );
-    LiquidGlassRefraction refraction = LiquidGlassRefraction(
-      distortion: distortion,
-      distortionWidth: distortionWidth,
-      magnification: magnification,
-      chromaticAberration: chromaticAberration,
-      refractionMode: refractionMode,
-      refractionType: refractionType,
-      diagonalFlip: diagonalFlip,
-    );
-    LiquidGlassStyle style = LiquidGlassStyle(
-        shape: shape, appearance: appearance, refraction: refraction);
+      shadow: shadow,
+      adaptivity: adaptivity,
+      liteGlass: liteGlass,);
     return SizedBox(
         width: width,
         height: height,
@@ -112,16 +95,15 @@ class LiquidGlassLensContainer extends StatelessWidget {
 
   final Widget child;
 
-  LiquidGlassLensContainer(
-      {super.key,
-      this.height,
-      this.width,
-      this.pixelRatio = 1.0,
-      this.useSync = true,
-      this.realTimeCapture = true,
-      this.refreshRate = LiquidGlassRefreshRate.deviceRefreshRate,
-      required this.backgroundWidget,
-      required this.child});
+  LiquidGlassLensContainer({super.key,
+    this.height,
+    this.width,
+    this.pixelRatio = 1.0,
+    this.useSync = true,
+    this.realTimeCapture = true,
+    this.refreshRate = LiquidGlassRefreshRate.deviceRefreshRate,
+    required this.backgroundWidget,
+    required this.child});
 
   @override
   Widget build(BuildContext context) {

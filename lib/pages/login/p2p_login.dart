@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -9,17 +10,15 @@ import 'package:colla_chat/pages/login/p2p_setting_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-
+import 'package:material_ui/material_ui.dart';
 import 'package:window_manager/window_manager.dart';
 
 /// 远程登录页面，一个Scaffold，IndexStack下的远程登录组件，注册组件和配置组件
-class P2pLogin extends StatelessWidget with WindowListener {
+class P2pLogin extends StatelessWidget {
   final PlatformCarouselController controller = PlatformCarouselController();
   final P2pLoginWidget p2pLoginWidget = P2pLoginWidget();
   late final P2pRegisterWidget p2pRegisterWidget = P2pRegisterWidget(
@@ -39,7 +38,11 @@ class P2pLogin extends StatelessWidget with WindowListener {
   final ValueNotifier<int> index = ValueNotifier<int>(0);
 
   void init() async {
-    WindowManager.instance.addListener(this);
+    WindowManager.instance.addListener((event) {
+      if (event is WindowResizedEvent) {
+        onWindowResized();
+      }
+    });
     await myselfPeerController.init();
     List<MyselfPeer> myselfPeers = myselfPeerController.data.value;
     if (myselfPeers.isEmpty) {
@@ -47,8 +50,7 @@ class P2pLogin extends StatelessWidget with WindowListener {
     }
   }
 
-  @override
-  onWindowResized() {
+  void onWindowResized() {
     appDataProvider.changeWindowSize();
   }
 
@@ -60,57 +62,57 @@ class P2pLogin extends StatelessWidget with WindowListener {
     return ValueListenableBuilder(
         valueListenable: index,
         builder: (context, value, _) {
-      List<Widget> rightWidgets = [];
-      if (index.value != 0) {
-        rightWidgets.addAll([
-          IconTextButton(
-            padding: const EdgeInsets.symmetric(vertical: 1.0),
-            onPressed: () {
-              _animateToPage(0);
-            },
-            icon: const Icon(Icons.login, color: Colors.white),
-            label: AppLocalizations.t('Login'),
-            labelColor: Colors.white,
-          ),
-          const SizedBox(
-            width: 10.0,
-          ),
-        ]);
-      }
-      if (index.value != 1) {
-        rightWidgets.addAll([
-          IconTextButton(
-            padding: const EdgeInsets.symmetric(vertical: 1.0),
-            onPressed: () {
-              _animateToPage(1);
-            },
-            icon: const Icon(Icons.app_registration, color: Colors.white),
-            label: AppLocalizations.t('Register'),
-            labelColor: Colors.white,
-          ),
-          const SizedBox(
-            width: 10.0,
-          ),
-        ]);
-      }
-      if (index.value != 2) {
-        rightWidgets.add(
-          IconTextButton(
-            padding: const EdgeInsets.symmetric(vertical: 1.0),
-            onPressed: () {
-              _animateToPage(2);
-            },
-            icon: const Icon(Icons.settings, color: Colors.white),
-            label: AppLocalizations.t('Setting'),
-            labelColor: Colors.white,
-          ),
-        );
-      }
+          List<Widget> rightWidgets = [];
+          if (index.value != 0) {
+            rightWidgets.addAll([
+              IconTextButton(
+                padding: const EdgeInsets.symmetric(vertical: 1.0),
+                onPressed: () {
+                  _animateToPage(0);
+                },
+                icon: const Icon(Icons.login, color: Colors.white),
+                label: AppLocalizations.t('Login'),
+                labelColor: Colors.white,
+              ),
+              const SizedBox(
+                width: 10.0,
+              ),
+            ]);
+          }
+          if (index.value != 1) {
+            rightWidgets.addAll([
+              IconTextButton(
+                padding: const EdgeInsets.symmetric(vertical: 1.0),
+                onPressed: () {
+                  _animateToPage(1);
+                },
+                icon: const Icon(Icons.app_registration, color: Colors.white),
+                label: AppLocalizations.t('Register'),
+                labelColor: Colors.white,
+              ),
+              const SizedBox(
+                width: 10.0,
+              ),
+            ]);
+          }
+          if (index.value != 2) {
+            rightWidgets.add(
+              IconTextButton(
+                padding: const EdgeInsets.symmetric(vertical: 1.0),
+                onPressed: () {
+                  _animateToPage(2);
+                },
+                icon: const Icon(Icons.settings, color: Colors.white),
+                label: AppLocalizations.t('Setting'),
+                labelColor: Colors.white,
+              ),
+            );
+          }
 
-      return OverflowBar(
-        children: rightWidgets,
-      );
-    });
+          return OverflowBar(
+            children: rightWidgets,
+          );
+        });
   }
 
   @override
@@ -123,29 +125,30 @@ class P2pLogin extends StatelessWidget with WindowListener {
       listenable: appDataProvider,
       builder: (BuildContext context, Widget? child) {
         var pageView = ValueListenableBuilder(
-        valueListenable: index,
-        builder: (context, value, _) {
-          return PlatformCarouselWidget(
-            controller: controller,
-            itemCount: _children.length,
-            itemBuilder: (BuildContext context, int index, {int? realIndex}) {
-              return _children[index];
-            },
-            onPageChanged: (int index,
-                {PlatformSwiperDirection? direction,
-                int? oldIndex,
-                CarouselPageChangedReason? reason}) {
-              this.index.value=index;
-            },
-            initialPage: index.value,
-          );
-        });
+            valueListenable: index,
+            builder: (context, value, _) {
+              return PlatformCarouselWidget(
+                controller: controller,
+                itemCount: _children.length,
+                itemBuilder: (BuildContext context, int index,
+                    {int? realIndex}) {
+                  return _children[index];
+                },
+                onPageChanged: (int index,
+                    {PlatformSwiperDirection? direction,
+                      int? oldIndex,
+                      CarouselPageChangedReason? reason}) {
+                  this.index.value = index;
+                },
+                initialPage: index.value,
+              );
+            });
         Size size = appDataProvider.portraitSize;
         return Center(
             child: pageView.asStyle(
-          height: size.height,
-          width: size.width,
-        ));
+              height: size.height,
+              width: size.width,
+            ));
       },
     );
 
