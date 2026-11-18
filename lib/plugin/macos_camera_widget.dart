@@ -14,6 +14,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/list_map_notifier.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:cross_file/cross_file.dart';
@@ -325,8 +326,11 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
       if (cameraController.isRecording) {
         CameraMacOSFile? videoData = await cameraController.stopRecording();
         if (videoData != null) {
-          XFile xfile = XFile.fromData(videoData.bytes!,
-              mimeType: ChatMessageMimeType.mp4.name);
+          String? filename = await FileUtil.writeTempFileAsBytes(
+              videoData.bytes!.toList(),
+              filename: StringUtil.uuid(),
+              extension: ChatMessageMimeType.mp4.name);
+          XFile xfile = XFile.fileSystem(path: filename!);
           mediaFileController.add(xfile);
           if (mounted) {
             DialogUtil.info(
@@ -359,8 +363,11 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
     if (cameraController != null) {
       CameraMacOSFile? imageData = await cameraController.takePicture();
       if (imageData != null) {
-        XFile xfile = XFile.fromData(imageData.bytes!,
-            mimeType: ChatMessageMimeType.jpeg.name);
+        String? filename = await FileUtil.writeTempFileAsBytes(
+            imageData.bytes!.toList(),
+            filename: StringUtil.uuid(),
+            extension: ChatMessageMimeType.jpeg.name);
+        XFile xfile = XFile.fileSystem(path: filename!);
         mediaFileController.add(xfile);
         if (mounted) {
           DialogUtil.info(
@@ -401,7 +408,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
     if (widget.onData != null) {
       if (current != null) {
         var data = await current.readAsBytes();
-        widget.onData!(data, current.mimeType!);
+        widget.onData!(data, current.getExtension().toString());
       }
     }
     if (widget.onFile != null) {

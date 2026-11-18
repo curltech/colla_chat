@@ -2,9 +2,8 @@ import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:fl_pip/fl_pip.dart';
 import 'package:material_ui/material_ui.dart';
 
-
 class MobileFlPipController {
-  final FlPiP flPiP = FlPiP();
+  final FlPiP flPiP = FlPiP.instance;
 
   MobileFlPipController();
 
@@ -20,15 +19,19 @@ class MobileFlPipController {
     return flPiP.status;
   }
 
-  Future<bool> disable() async {
-    return await flPiP.disable();
+  Future<bool> dismiss() async {
+    return await flPiP.dismiss();
   }
 
   /// 显示pip的画中画组件，mobileFlPipEnabledWidget
-  Future<bool> enable(
-      {FlPiPAndroidConfig android = const FlPiPAndroidConfig(),
-      FlPiPiOSConfig ios = const FlPiPiOSConfig()}) async {
-    return await flPiP.enable(android: android, ios: ios);
+  Future<FlMultiEngineInfo> present({
+    FlPiPAndroidOptions android = const FlPiPAndroidOptions.systemPip(
+        aspectRatio: FlPiPAspectRatio.landscape()),
+    FlPiPIOSOptions ios = const FlPiPIOSOptions(),
+    FlPiPHarmonyOSOptions harmonyOS = const FlPiPHarmonyOSOptions.systemPip(),
+  }) async {
+    return await flPiP.present(
+        android: android, ios: ios, harmonyOS: harmonyOS, name: 'pipMain');
   }
 }
 
@@ -40,14 +43,18 @@ class MobileFlPipEnabledWidget extends StatelessWidget {
 
   MobileFlPipEnabledWidget({super.key});
 
-  void enable(
-      {Widget? enabled,
-      FlPiPAndroidConfig android = const FlPiPAndroidConfig(),
-      FlPiPiOSConfig ios = const FlPiPiOSConfig()}) {
+  void present({
+    Widget? enabled,
+    FlPiPAndroidOptions android = const FlPiPAndroidOptions.systemPip(
+        aspectRatio: FlPiPAspectRatio.landscape()),
+    FlPiPIOSOptions ios = const FlPiPIOSOptions(),
+    FlPiPHarmonyOSOptions harmonyOS = const FlPiPHarmonyOSOptions.systemPip(),
+  }) {
     if (enabled != null) {
       this.enabled.value = enabled;
     }
-    mobileFlPipController.enable(android: android, ios: ios);
+    mobileFlPipController.present(
+        android: android, ios: ios, harmonyOS: harmonyOS);
   }
 
   @override

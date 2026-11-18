@@ -6,7 +6,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 画中画功能主页面，带有路由回调函数
 class FlutterPipWindowWidget extends StatelessWidget with DataTileMixin {
@@ -68,7 +68,7 @@ class FlutterPipWindow extends StatelessWidget {
 
   void enable({Widget? enabled}) {
     if (platformParams.mobile) {
-      mobileFlPipEnabledWidget.enable(enabled: enabled);
+      mobileFlPipEnabledWidget.present(enabled: enabled);
     } else if (platformParams.android) {
       androidFloatingPipWidget?.enable(enabled: enabled);
     } else {

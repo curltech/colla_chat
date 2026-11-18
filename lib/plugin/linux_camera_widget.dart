@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:camera_linux/camera_linux.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/media_file_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
@@ -50,10 +49,9 @@ class _LinuxCameraWidgetState extends State<LinuxCameraWidget> {
     Uint8List bytes = CryptoUtil.decodeBase64(base64Image);
 
     var name = StringUtil.uuid();
-    String filename =
-        await FileUtil.getTempFilename(filename: name, extension: 'jpg');
-    XFile xfile =
-        XFile.fromData(bytes, mimeType: ChatMessageMimeType.jpeg.name);
+    String? filename = await FileUtil.writeTempFileAsBytes(bytes,
+        extension: 'jpg', filename: name);
+    XFile xfile = XFile.fileSystem(path: filename!);
     mediaFileController.add(xfile);
     if (mounted) {
       DialogUtil.info(
@@ -129,7 +127,7 @@ class _LinuxCameraWidgetState extends State<LinuxCameraWidget> {
     if (widget.onData != null) {
       if (current != null) {
         var data = await current.readAsBytes();
-        widget.onData!(data, current.mimeType!);
+        widget.onData!(data, current.getExtension()!);
       }
     }
     if (widget.onFile != null) {
@@ -151,15 +149,15 @@ class _LinuxCameraWidgetState extends State<LinuxCameraWidget> {
             color: Colors.grey.withAlpha(AppOpacity.lgOpacity),
             child: Center(
                 child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: <Widget>[
-                  _buildBackButton(),
-                  _buildTakeButton(context),
-                  Expanded(child: _buildMediaPreviewData(context)),
-                ],
-              ),
-            ))),
+                  padding: const EdgeInsets.all(5.0),
+                  child: Row(
+                    children: <Widget>[
+                      _buildBackButton(),
+                      _buildTakeButton(context),
+                      Expanded(child: _buildMediaPreviewData(context)),
+                    ],
+                  ),
+                ))),
       ],
     );
   }

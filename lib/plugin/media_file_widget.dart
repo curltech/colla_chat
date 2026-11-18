@@ -32,30 +32,25 @@ class MediaFileWidgetState extends State<MediaFileWidget> {
     }
   }
 
-  Widget _buildMediaImageWidget(XFile mediaFile) {
-    String? mimeType = mediaFile.mimeType;
+  Future<Widget> _buildMediaImageWidget(XFile mediaFile) async {
+    String? mimeType = mediaFile.getExtension();
     if (mimeType == ChatMessageMimeType.jpeg.name) {
-      return PlatformFutureBuilder(
-        future: mediaFile.readAsBytes(),
-        builder: (BuildContext context, Uint8List? data) {
-          return ImageUtil.buildMemoryImageWidget(
-            data!,
-            height: 50,
-            width: 90,
-          );
-        },
+      Uint8List? data = await mediaFile.readAsBytes();
+
+      return ImageUtil.buildMemoryImageWidget(
+        data!,
+        height: 50,
+        width: 90,
       );
     }
     if (mimeType == ChatMessageMimeType.mp4.name) {
-      return PlatformFutureBuilder(
-        future: VideoUtil.getByteThumbnail(srcFile: mediaFile.path),
-        builder: (BuildContext context, Uint8List? data) {
-          return ImageUtil.buildMemoryImageWidget(
-            data!,
-            height: 50,
-            width: 90,
-          );
-        },
+      Uint8List? data =
+          await VideoUtil.getByteThumbnail(srcFile: await mediaFile.name());
+
+      return ImageUtil.buildMemoryImageWidget(
+        data!,
+        height: 50,
+        width: 90,
       );
     }
 
@@ -68,7 +63,7 @@ class MediaFileWidgetState extends State<MediaFileWidget> {
     int i = 0;
     for (XFile mediaFile in widget.mediaFileController.data.value) {
       int index = i;
-      String? mimeType = mediaFile.mimeType;
+      String? mimeType = mediaFile.getExtension();
       var chip = GestureDetector(
           onTap: () async {
             widget.mediaFileController.setCurrentIndex = index;
@@ -82,7 +77,14 @@ class MediaFileWidgetState extends State<MediaFileWidget> {
                     : BorderSide.none),
             child: SizedBox(
                 width: 90.0,
-                child: Center(child: _buildMediaImageWidget(mediaFile))),
+                child: Center(
+                  child: PlatformFutureBuilder(
+                    future: _buildMediaImageWidget(mediaFile),
+                    builder: (BuildContext context, Widget data) {
+                      return data;
+                    },
+                  ),
+                )),
           ));
       chips.add(const SizedBox(
         width: 5.0,

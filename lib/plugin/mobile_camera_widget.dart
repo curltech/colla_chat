@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:camera/camera.dart';
 import 'package:colla_chat/constant/base.dart';
-import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/media_file_widget.dart';
@@ -11,13 +11,11 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/file_util.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/foundation.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:video_player/video_player.dart';
 
 class MobileCameraWidget extends StatefulWidget {
@@ -152,18 +150,18 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
             color: Colors.grey.withAlpha(AppOpacity.lgOpacity),
             child: Center(
                 child: Column(children: <Widget>[
-              _buildCameraModeWidget(),
-              _buildCaptureModeWidget(),
-              Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: Row(
-                  children: <Widget>[
-                    _buildBackButton(),
-                    Expanded(child: _buildMediaPreviewData(context)),
-                  ],
-                ),
-              )
-            ]))),
+                  _buildCameraModeWidget(),
+                  _buildCaptureModeWidget(),
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Row(
+                      children: <Widget>[
+                        _buildBackButton(),
+                        Expanded(child: _buildMediaPreviewData(context)),
+                      ],
+                    ),
+                  )
+                ]))),
       ],
     );
   }
@@ -182,7 +180,8 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AutoSizeText(
-                  '${AppLocalizations.t('Resolution')}: ${resolutionPreset.name}',
+                  '${AppLocalizations.t('Resolution')}: ${resolutionPreset
+                      .name}',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12.0,
@@ -190,7 +189,9 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                   ),
                 ),
                 AutoSizeText(
-                  '${AppLocalizations.t('Size')}: ${previewSize.width.toStringAsFixed(0)}x${previewSize.height.toStringAsFixed(0)}',
+                  '${AppLocalizations.t('Size')}: ${previewSize.width
+                      .toStringAsFixed(0)}x${previewSize.height.toStringAsFixed(
+                      0)}',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12.0,
@@ -221,14 +222,14 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
           cameraController,
           child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
-            return GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onScaleStart: _handleScaleStart,
-              onScaleUpdate: _handleScaleUpdate,
-              onTapDown: (TapDownDetails details) =>
-                  onViewFinderTap(details, constraints),
-            );
-          }),
+                return GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onScaleStart: _handleScaleStart,
+                  onScaleUpdate: _handleScaleUpdate,
+                  onTapDown: (TapDownDetails details) =>
+                      onViewFinderTap(details, constraints),
+                );
+              }),
         ),
       );
     }
@@ -274,21 +275,21 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
             // The exposure and focus mode are currently not supported on the web.
             ...!kIsWeb
                 ? <Widget>[
-                    IconButton(
-                      icon: const Icon(Icons.exposure),
-                      color: primary,
-                      onPressed:
-                          cameraController != null ? _toggleExposureMode : null,
-                      tooltip: AppLocalizations.t('Toggle ExposureMode'),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.filter_center_focus),
-                      color: primary,
-                      onPressed:
-                          cameraController != null ? _toggleFocusMode : null,
-                      tooltip: AppLocalizations.t('Toggle FocusMode'),
-                    )
-                  ]
+              IconButton(
+                icon: const Icon(Icons.exposure),
+                color: primary,
+                onPressed:
+                cameraController != null ? _toggleExposureMode : null,
+                tooltip: AppLocalizations.t('Toggle ExposureMode'),
+              ),
+              IconButton(
+                icon: const Icon(Icons.filter_center_focus),
+                color: primary,
+                onPressed:
+                cameraController != null ? _toggleFocusMode : null,
+                tooltip: AppLocalizations.t('Toggle FocusMode'),
+              )
+            ]
                 : <Widget>[],
 
             IconButton(
@@ -375,9 +376,9 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
     );
     final ButtonStyle styleLocked = TextButton.styleFrom(
       foregroundColor:
-          cameraController?.value.exposureMode == ExposureMode.locked
-              ? Colors.orange
-              : primary,
+      cameraController?.value.exposureMode == ExposureMode.locked
+          ? Colors.orange
+          : primary,
     );
 
     return SizeTransition(
@@ -420,13 +421,13 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                         ? () => cameraController!.setExposureOffset(0.0)
                         : null,
                     child:
-                        AutoSizeText(AppLocalizations.t('Reset Offset')),
+                    AutoSizeText(AppLocalizations.t('Reset Offset')),
                   ),
                 ],
               ),
               Center(
                 child:
-                    AutoSizeText(AppLocalizations.t('Exposure Offset')),
+                AutoSizeText(AppLocalizations.t('Exposure Offset')),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -438,7 +439,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                     max: _maxAvailableExposureOffset,
                     label: _currentExposureOffset.toString(),
                     onChanged: _minAvailableExposureOffset ==
-                            _maxAvailableExposureOffset
+                        _maxAvailableExposureOffset
                         ? null
                         : _setExposureOffset,
                   ),
@@ -534,9 +535,9 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
         ),
         CircleTextButton(
           onPressed:
-              cameraController != null && cameraController.value.isInitialized
-                  ? _captureMedia
-                  : null,
+          cameraController != null && cameraController.value.isInitialized
+              ? _captureMedia
+              : null,
           elevation: 2.0,
           backgroundColor: primary,
           padding: const EdgeInsets.all(15.0),
@@ -544,25 +545,25 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
         ),
         IconButton(
           icon: cameraController != null &&
-                  cameraController.value.isRecordingPaused
+              cameraController.value.isRecordingPaused
               ? const Icon(Icons.play_arrow)
               : const Icon(Icons.pause),
           color: primary,
           onPressed: cameraController != null &&
-                  cameraController.value.isInitialized &&
-                  cameraController.value.isRecordingVideo
+              cameraController.value.isInitialized &&
+              cameraController.value.isRecordingVideo
               ? (cameraController.value.isRecordingPaused)
-                  ? _resumeVideoRecording
-                  : _pauseVideoRecording
+              ? _resumeVideoRecording
+              : _pauseVideoRecording
               : null,
           tooltip: AppLocalizations.t('Play/Pause'),
         ),
         IconButton(
           icon: const Icon(Icons.pause_presentation),
           color:
-              cameraController != null && cameraController.value.isPreviewPaused
-                  ? Colors.red
-                  : primary,
+          cameraController != null && cameraController.value.isPreviewPaused
+              ? Colors.red
+              : primary,
           onPressed: cameraController == null ? null : _togglePreview,
           tooltip: AppLocalizations.t('Toggle Preview'),
         ),
@@ -654,7 +655,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                 icon: const Icon(Icons.cameraswitch),
                 color: myself.primary,
                 onPressed: cameraController != null &&
-                        cameraController!.value.isRecordingVideo
+                    cameraController!.value.isRecordingVideo
                     ? null
                     : _toggleCamera,
               );
@@ -727,12 +728,12 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
         // The exposure mode is currently not supported on the web.
         ...!kIsWeb
             ? <Future<Object?>>[
-                cameraController.getMinExposureOffset().then(
-                    (double value) => _minAvailableExposureOffset = value),
-                cameraController
-                    .getMaxExposureOffset()
-                    .then((double value) => _maxAvailableExposureOffset = value)
-              ]
+          cameraController.getMinExposureOffset().then(
+                  (double value) => _minAvailableExposureOffset = value),
+          cameraController
+              .getMaxExposureOffset()
+              .then((double value) => _maxAvailableExposureOffset = value)
+        ]
             : <Future<Object?>>[],
         cameraController
             .getMaxZoomLevel()
@@ -747,22 +748,22 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
           _showInSnackBar('You have denied camera access.');
           break;
         case 'CameraAccessDeniedWithoutPrompt':
-          // iOS only
+        // iOS only
           _showInSnackBar('Please go to Settings app to enable camera access.');
           break;
         case 'CameraAccessRestricted':
-          // iOS only
+        // iOS only
           _showInSnackBar('Camera access is restricted.');
           break;
         case 'AudioAccessDenied':
           _showInSnackBar('You have denied audio access.');
           break;
         case 'AudioAccessDeniedWithoutPrompt':
-          // iOS only
+        // iOS only
           _showInSnackBar('Please go to Settings app to enable audio access.');
           break;
         case 'AudioAccessRestricted':
-          // iOS only
+        // iOS only
           _showInSnackBar('Audio access is restricted.');
           break;
         default:
@@ -835,7 +836,11 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
         } else {
           await cameraController.lockCaptureOrientation();
           _showInSnackBar(
-              'Capture orientation locked to ${cameraController.value.lockedCaptureOrientation.toString().split('.').last}');
+              'Capture orientation locked to ${cameraController.value
+                  .lockedCaptureOrientation
+                  .toString()
+                  .split('.')
+                  .last}');
         }
       }
     } on CameraException catch (e) {
@@ -895,17 +900,11 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
 
     try {
       XFile xfile = await cameraController.stopVideoRecording();
-      var data = await xfile.readAsBytes();
-      xfile = XFile.fromData(data,
-          mimeType: ChatMessageMimeType.jpeg.name,
-          path: xfile.path,
-          length: data.length,
-          name: FileUtil.filename(xfile.path));
       mediaFileController.add(xfile);
       if (mounted) {
         setState(() {});
       }
-      _showInSnackBar('Video recorded to ${xfile.path}');
+      _showInSnackBar('Video recorded to ${await xfile.name()}');
       _startVideoPlayer();
 
       return xfile;
@@ -1042,7 +1041,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
     }
     XFile? current = mediaFileController.current;
     final VideoPlayerController vController =
-        VideoPlayerController.file(File(current!.path));
+    VideoPlayerController.file(File(current!.uri));
 
     videoPlayerListener = () {
       if (videoController != null) {
@@ -1097,19 +1096,13 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
 
     try {
       XFile xfile = await cameraController.takePicture();
-      var data = await xfile.readAsBytes();
-      xfile = XFile.fromData(data,
-          mimeType: ChatMessageMimeType.jpeg.name,
-          path: xfile.path,
-          length: data.length,
-          name: FileUtil.filename(xfile.path));
       mediaFileController.add(xfile);
       if (mounted) {
         setState(() {
           videoController?.dispose();
           videoController = null;
         });
-        _showInSnackBar('Picture saved to ${xfile.path}');
+        _showInSnackBar('Picture saved to ${xfile.uri}');
       }
       return xfile;
     } on CameraException catch (e) {
@@ -1123,7 +1116,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
     if (widget.onData != null) {
       if (current != null) {
         var data = await current.readAsBytes();
-        widget.onData!(data, current.mimeType!);
+        widget.onData!(data, current.getExtension()!.toString());
       }
     }
     if (widget.onFile != null) {

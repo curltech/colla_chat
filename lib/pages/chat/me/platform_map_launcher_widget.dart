@@ -2,20 +2,19 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
-import 'package:material_ui/material_ui.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:map_launcher/map_launcher.dart';
+import 'package:material_ui/material_ui.dart';
 
 class PlatformMapLauncherWidget extends StatelessWidget with DataTileMixin {
-  final ListNotifier<AvailableMap> maps =
-      ListNotifier<AvailableMap>([]);
+  final ListNotifier<AvailableMap> maps = ListNotifier<AvailableMap>([]);
 
   PlatformMapLauncherWidget({super.key}) {
     _init();
@@ -33,8 +32,6 @@ class PlatformMapLauncherWidget extends StatelessWidget with DataTileMixin {
   @override
   String get title => 'MapLauncher';
 
-  
-
   Future<void> _init() async {
     try {
       maps.value = await GeolocatorUtil.installedMaps();
@@ -47,17 +44,17 @@ class PlatformMapLauncherWidget extends StatelessWidget with DataTileMixin {
     AvailableMap map = maps.value[index];
     DataTile tile = DataTile(
         title: map.name,
-        prefix: SvgPicture.asset(
-          map.icon,
+        prefix: ImageUtil.buildMemoryImageWidget(
+          map.iconBytes,
           height: 30.0,
           width: 30.0,
         ),
-        subtitle: map.mapType.name,
+        subtitle: map.map.name,
         onTap: (int index, String title, {String? subtitle}) async {
           Position? position = await GeolocatorUtil.currentPosition();
           if (position != null) {
             GeolocatorUtil.showMarker(
-                map, Coords(position.latitude, position.longitude),
+                map, position.latitude, position.longitude,
                 title: AppLocalizations.t('Current position'));
           }
         });
@@ -92,6 +89,9 @@ class PlatformMapLauncherWidget extends StatelessWidget with DataTileMixin {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: title, helpPath: routeName,withLeading: true, child: buildMapLauncher(context));
+        title: title,
+        helpPath: routeName,
+        withLeading: true,
+        child: buildMapLauncher(context));
   }
 }

@@ -11,13 +11,13 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/foundation.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google_maps;
 import 'package:latlong2/latlong.dart' as latlong2;
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
-import 'package:map_launcher/map_launcher.dart' as map_launcher;
+import 'package:map_launcher/map_launcher.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:tencent_map_flutter/tencent_map_flutter.dart' as tencent_map;
 
 class LocationPosition {
@@ -78,6 +78,43 @@ class LocationPosition {
 }
 
 class GeolocatorUtil {
+  static final allMaps = <MapApp>[
+    MapApp.apple,
+    MapApp.google,
+    MapApp.waze,
+    MapApp.yandexMaps,
+    MapApp.doubleGis,
+    MapApp.here,
+    MapApp.mapyCz,
+    MapApp.mappls,
+    MapApp.googleGo,
+    MapApp.amap,
+    const BaiduMaps(source: 'fluttered.map_launcher_example'),
+    MapApp.yandexNavi,
+    MapApp.citymapper,
+    MapApp.mapswithme,
+    MapApp.osmand,
+    MapApp.osmandplus,
+    MapApp.tencent,
+    MapApp.petal,
+    MapApp.tomtomgo,
+    MapApp.tomtomgofleet,
+    MapApp.copilot,
+    MapApp.sygicTruck,
+    MapApp.flitsmeister,
+    NaverMap(
+      appName: defaultTargetPlatform == TargetPlatform.iOS
+          ? 'dev.fluttered.mapLauncherExample'
+          : 'dev.fluttered.map_launcher_example',
+    ),
+    MapApp.kakao,
+    MapApp.tmap,
+    MapApp.moovit,
+    MapApp.neshan,
+    MapApp.airnavPro,
+    MapApp.magicEarth,
+  ];
+
   ///以下是基本的定位服务提供的功能，主要是经纬度的获取
   static Future<LocationPermission> checkPermission(
       {BuildContext? context}) async {
@@ -259,48 +296,46 @@ class GeolocatorUtil {
   }
 
   ///获取安装的地图软件列表,android/ios,调用安装的地图应用
-  static Future<List<map_launcher.AvailableMap>> installedMaps() async {
-    final availableMaps = await map_launcher.MapLauncher.installedMaps;
+  static Future<List<AvailableMap>> installedMaps() async {
+    final availableMaps = await MapLauncher.getAvailableMaps(allMaps);
 
     return availableMaps;
   }
 
   ///根据地图和位置调用安装的地图软件,android/ios,调用安装的地图应用
-  static Future<void> showMarker(
-      map_launcher.AvailableMap map, map_launcher.Coords coords,
+  static Future<void> showMarker(AvailableMap map, double lat, double lng,
       {required String title}) async {
-    await map.showMarker(
-      coords: coords,
-      title: title,
-    );
+    List<AvailableMap> availableMap = await installedMaps();
+    if (availableMap.isNotEmpty) {
+      await MapLauncher.marker(Location.coords(lat, lng, title: title))
+          .show(map: availableMap.first.map);
+    }
   }
 
   ///是否安装了地图软件,android/ios,调用安装的地图应用
-  static Future<bool?> isMapAvailable(map_launcher.MapType mapType) async {
-    return await map_launcher.MapLauncher.isMapAvailable(mapType);
+  static Future<bool?> isMapAvailable(MapApp mapApp) async {
+    final availableMaps = await MapLauncher.getAvailableMaps(allMaps);
+
+    return availableMaps.contains(mapApp);
   }
 
   ///根据地图的类型调用安装的地图软件,android/ios,调用安装的地图应用
   static Future<void> mapLauncher(
-      {map_launcher.MapType? mapType,
+      {MapApp? mapApp,
       required double latitude,
       required double longitude,
       required String title,
       String? description}) async {
-    var coords = map_launcher.Coords(latitude, longitude);
-    if (mapType == null) {
-      List<map_launcher.AvailableMap> availableMap = await installedMaps();
+    if (mapApp == null) {
+      List<AvailableMap> availableMap = await installedMaps();
       if (availableMap.isNotEmpty) {
-        mapType = availableMap.first.mapType;
+        mapApp = availableMap.first.map;
       }
     }
-    if (mapType != null) {
-      await map_launcher.MapLauncher.showMarker(
-        mapType: mapType,
-        coords: coords,
-        title: title,
-        description: description,
-      );
+    if (mapApp != null) {
+      await MapLauncher.marker(
+              Location.coords(latitude, longitude, title: title))
+          .show(map: mapApp);
     }
   }
 
@@ -417,7 +452,7 @@ class GeolocatorUtil {
       showZoomController: showZoomController,
       showLocationController: showLocationController,
       showSelectLocationButton: showSelectLocationButton,
-      selectLocationButtonStyle: selectLocationButtonStyle,
+      // selectLocationButtonStyle: selectLocationButtonStyle,
       showSearchBar: showSearchBar,
       searchBarBackgroundColor: searchBarBackgroundColor,
       searchBarTextColor: searchBarTextColor,
@@ -429,7 +464,8 @@ class GeolocatorUtil {
       zoomButtonsColor: zoomButtonsColor,
       locationButtonsColor: locationButtonsColor,
       markerIcon: markerIcon,
-      loadingWidget: loadingWidget, userAgent: '',
+      loadingWidget: loadingWidget,
+      userAgent: '',
     );
   }
 
