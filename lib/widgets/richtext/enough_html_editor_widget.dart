@@ -1,7 +1,7 @@
 import 'package:colla_chat/provider/myself.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ///EnoughHtmlEditor的实现，用于简单的编辑，inappwebview实现
 ///应用于移动平台，最小高度200

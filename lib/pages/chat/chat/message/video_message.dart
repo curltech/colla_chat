@@ -7,7 +7,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:colla_chat/widgets/media/video/mediakit_video_player.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ///消息体：视频消息
 class VideoMessage extends StatefulWidget {

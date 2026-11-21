@@ -18,7 +18,7 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 
 class MethodEditWidget extends StatelessWidget with DataTileMixin {

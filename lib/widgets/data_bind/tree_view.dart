@@ -1,5 +1,5 @@
 import 'package:colla_chat/tool/list_map_notifier.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 abstract class Explorable {
   String name;

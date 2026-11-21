@@ -20,7 +20,7 @@ import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_util.dart';
 import 'package:ffmpeg_kit_flutter_new/media_information.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:ffmpeg_kit_flutter_new/session_state.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 选择多个视频文件，使用ffmpeg对video进行处理的界面
 class FFMpegMediaWidget extends StatelessWidget with DataTileMixin {

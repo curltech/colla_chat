@@ -6,7 +6,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/widgets/data_bind/tree_view.dart';
 import 'package:colla_chat/widgets/filesystem/directory_controller.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:path/path.dart' as p;
 
 import 'file_node.dart';

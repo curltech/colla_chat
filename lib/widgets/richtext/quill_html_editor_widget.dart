@@ -3,7 +3,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';

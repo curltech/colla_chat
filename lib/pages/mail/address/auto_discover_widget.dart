@@ -16,7 +16,7 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:enough_mail/discover.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 自动邮件发现视图，一个card下的录入框和按钮组合
 class AutoDiscoverWidget extends StatelessWidget with DataTileMixin {

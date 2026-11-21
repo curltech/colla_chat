@@ -11,7 +11,7 @@ import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ///单个小视频窗口，把相同的peerId的一组媒体流显示在一个滑动的窗口中swiper，
 ///长按出现更大的窗口，带有操作按钮

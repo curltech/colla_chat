@@ -7,7 +7,7 @@ import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart'
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/text.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// flame引擎渲染的麻将牌
 class RoundParticipantComponent extends PositionComponent

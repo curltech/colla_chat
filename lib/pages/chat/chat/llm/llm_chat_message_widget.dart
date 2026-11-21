@@ -5,7 +5,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_item.dart';
 import 'package:colla_chat/pages/chat/chat/controller/llm_chat_message_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 消息发送和接受展示的界面组件
 /// 此界面展示特定的目标对象的收到的消息，并且可以发送消息

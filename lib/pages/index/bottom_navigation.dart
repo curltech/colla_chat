@@ -8,7 +8,7 @@ import 'package:colla_chat/widgets/adaptive_scaffold/breakpoints.dart';
 import 'package:colla_chat/widgets/adaptive_scaffold/slot_layout.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ///mobile底边栏，用于指示当前主页面
 class BottomNavigation {

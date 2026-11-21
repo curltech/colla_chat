@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:mini_music_visualizer/mini_music_visualizer.dart';
 
 class AudioUtil {

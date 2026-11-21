@@ -13,7 +13,7 @@ import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_helper.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:pro_image_editor/core/enums/editor_mode.dart';
 import 'package:pro_image_editor/core/models/editor_callbacks/pro_image_editor_callbacks.dart';
 import 'package:pro_image_editor/features/main_editor/main_editor.dart';

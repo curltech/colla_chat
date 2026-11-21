@@ -21,7 +21,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/combine_grid_view.dart';
 import 'package:cryptography/cryptography.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class GroupService extends PeerPartyService<Group> {
   Map<String, Group> groups = {};

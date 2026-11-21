@@ -3,7 +3,7 @@ import 'dart:ui' as ui show PlaceholderAlignment;
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:extended_text_library/extended_text_library.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ///空格开头，空格结尾的特殊字符串
 class EmailText extends SpecialText {

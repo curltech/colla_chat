@@ -1,6 +1,6 @@
 import 'package:carousel_slider_plus/carousel_options.dart';
 import 'package:colla_chat/widgets/common/platform_carousel.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_resizable_container/flutter_resizable_container.dart';
 import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';

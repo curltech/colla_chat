@@ -1,7 +1,7 @@
 import 'package:chewie/chewie.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ///基于Chewie实现的媒体播放器和记录器，
 class ChewieVideoPlayerController extends OriginVideoPlayerController {

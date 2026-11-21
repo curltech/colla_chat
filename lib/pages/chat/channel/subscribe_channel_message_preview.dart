@@ -9,7 +9,7 @@ import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/webview/platform_webview.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 订阅频道消息的展示页面
 class SubscribeChannelMessagePreview extends StatelessWidget

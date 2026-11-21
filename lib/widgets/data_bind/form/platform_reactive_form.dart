@@ -6,7 +6,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_data_field.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:reactive_language_picker/reactive_language_picker.dart';
@@ -16,7 +16,6 @@ class PlatformReactiveFormController {
   final Map<String, PlatformDataField> dataFieldMap = {};
   late final FormGroup formGroup;
   final Map<String, FocusNode> focusNodes = {};
-  late final KeyboardActionsConfig keyboardActionsConfig;
 
   PlatformReactiveFormController(this.dataFields) {
     _init();
@@ -24,7 +23,6 @@ class PlatformReactiveFormController {
 
   void _init() {
     Map<String, FormControl> formControls = {};
-    final List<KeyboardActionsItem> actions = [];
     for (var i = 0; i < dataFields.length; i++) {
       PlatformDataField platformDataField = dataFields[i];
       var name = platformDataField.name;
@@ -114,11 +112,8 @@ class PlatformReactiveFormController {
           inputType == InputType.textarea) {
         var focusNode = FocusNode();
         focusNodes[name] = focusNode;
-        KeyboardActionsItem action = KeyboardActionsItem(
-          focusNode: focusNode,
-          displayActionBar: false,
-          displayArrows: false,
-          displayDoneButton: false,
+        KeyboardField action = KeyboardField(
+          focusNode: focusNode, child: null,
         );
         actions.add(action);
       }
@@ -132,12 +127,6 @@ class PlatformReactiveFormController {
       }, onError: onError, onDone: onDone);
     }
     formGroup = FormGroup(formControls);
-    keyboardActionsConfig = KeyboardActionsConfig(
-      keyboardActionsPlatform: KeyboardActionsPlatform.ALL,
-      keyboardBarColor: myself.primary,
-      nextFocus: false,
-      actions: actions,
-    );
   }
 
   void onData(String name, dynamic value) {}
@@ -510,7 +499,6 @@ class PlatformReactiveForm extends StatelessWidget {
     );
 
     final KeyboardActions keyboardActions = KeyboardActions(
-        config: platformReactiveFormController.keyboardActionsConfig,
         child: SingleChildScrollView(child: widgets));
 
     return [

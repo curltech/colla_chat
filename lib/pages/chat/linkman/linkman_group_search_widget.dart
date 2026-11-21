@@ -5,7 +5,7 @@ import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ///联系人和群的查询对话框界面，然后进行单选或者多选
 ///包装在对话框中，await DialogUtil.show

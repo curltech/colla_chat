@@ -5,7 +5,7 @@ import 'package:colla_chat/plugin/chart/k_chart/kline_tool_panel_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class StockLineChartWidget extends StatelessWidget with DataTileMixin {
   StockLineChartWidget({super.key});

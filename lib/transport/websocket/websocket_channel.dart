@@ -10,7 +10,7 @@ import 'package:colla_chat/tool/connectivity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/transport/webclient.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:web_socket_channel/web_socket_channel.dart'
     as web_socket_channel;

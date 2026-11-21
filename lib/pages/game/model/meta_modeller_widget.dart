@@ -26,7 +26,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:colla_chat/constant/base.dart';
 

@@ -8,7 +8,7 @@ import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:fullscreen_window/fullscreen_window.dart';
 import 'package:sprintf/sprintf.dart';

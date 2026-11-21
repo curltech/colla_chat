@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:pro_image_editor/features/audio_editor/models/audio_track.dart';
 import 'package:pro_video_editor/pro_video_editor.dart' as pro;
 

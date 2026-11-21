@@ -6,7 +6,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/media/abstract_audio_recorder_controller.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:record/record.dart';
 
 ///采用record和another实现的音频记录器组件

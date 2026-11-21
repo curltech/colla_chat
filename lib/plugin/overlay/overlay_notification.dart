@@ -6,7 +6,7 @@ import 'package:colla_chat/widgets/common/animated_progress_bar.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 enum NotificationType {
   success,

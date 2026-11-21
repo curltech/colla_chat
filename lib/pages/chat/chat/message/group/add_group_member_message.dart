@@ -4,7 +4,7 @@ import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ///消息体：加群成员消息
 class AddGroupMemberMessage extends StatelessWidget {

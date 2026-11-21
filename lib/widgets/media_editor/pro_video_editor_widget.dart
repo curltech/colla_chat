@@ -12,7 +12,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:colla_chat/widgets/media_editor/pro_video_render.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:media_kit/media_kit.dart' hide AudioTrack;
 import 'package:media_kit/src/player/player.dart';
 import 'package:media_kit_video/media_kit_video.dart';

@@ -6,7 +6,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ///消息体：请求加好友消息
 class RequestAddFriendMessage extends StatelessWidget {

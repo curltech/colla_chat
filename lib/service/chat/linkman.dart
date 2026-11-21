@@ -21,7 +21,7 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class LinkmanService extends PeerPartyService<Linkman> {
   Map<String, Linkman> linkmen = {};

@@ -10,7 +10,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
 
 /// 调用apple地图，用于IOS设备，

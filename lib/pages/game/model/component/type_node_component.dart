@@ -9,7 +9,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/palette.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// [TypeNodeComponent] type节点，用于类图，包含属性和方法
 class TypeNodeComponent extends RectangleComponent

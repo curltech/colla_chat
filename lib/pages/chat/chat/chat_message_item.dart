@@ -16,7 +16,7 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 每条消息展示组件，我接收的消息展示在左边，我发送的消息展示在右边
 class ChatMessageItem extends StatelessWidget {

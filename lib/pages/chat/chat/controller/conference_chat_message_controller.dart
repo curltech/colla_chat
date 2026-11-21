@@ -17,7 +17,7 @@ import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.d
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:synchronized/synchronized.dart';
 
 enum VideoChatStatus {

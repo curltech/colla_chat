@@ -16,7 +16,7 @@ import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/rea
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/toggle_buttons.dart';
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/wechat/selected_asset_view.dart';
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/wechat/selected_assets_list_view.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 // import 'package:reactive_advanced_switch/reactive_advanced_switch.dart';
 import 'package:reactive_cart_stepper/reactive_cart_stepper.dart';
 import 'package:reactive_color_picker/reactive_color_picker.dart';

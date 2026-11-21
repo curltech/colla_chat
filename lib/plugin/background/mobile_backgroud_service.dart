@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 
 ///支持android和ios，在单独线程中执行一些任务

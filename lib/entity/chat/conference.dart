@@ -2,7 +2,7 @@ import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class Conference extends StatusEntity {
   String conferenceId; // 会议编号，也是房间号，也是邀请消息号

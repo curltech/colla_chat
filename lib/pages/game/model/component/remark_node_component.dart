@@ -9,7 +9,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/text.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 在remark节点写文本
 class RemarkNodeComponent extends TextBoxComponent

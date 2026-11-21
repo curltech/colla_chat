@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ///把多个组件组合在一起显示，比如图片
 class CombineGridView extends StatelessWidget {

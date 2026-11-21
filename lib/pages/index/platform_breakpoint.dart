@@ -1,5 +1,5 @@
 import 'package:colla_chat/widgets/adaptive_scaffold/breakpoints.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class PlatformBreakpoint extends Breakpoint {
   const PlatformBreakpoint({this.begin, this.end});

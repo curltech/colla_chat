@@ -1,7 +1,7 @@
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_pip_player/models/pip_settings.dart';
 import 'package:flutter_pip_player/pip_controller.dart';
 import 'package:flutter_pip_player/pip_player.dart';

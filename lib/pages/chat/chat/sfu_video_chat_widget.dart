@@ -17,7 +17,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ///Sfu视频聊天窗口，分页显示本地视频和远程视频
 class SfuVideoChatWidget extends StatefulWidget with DataTileMixin {

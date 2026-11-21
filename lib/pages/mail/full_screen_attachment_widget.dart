@@ -5,7 +5,7 @@ import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 
 final ValueNotifier<MediaProvider?> attachmentMediaProvider = ValueNotifier<MediaProvider?>(null);

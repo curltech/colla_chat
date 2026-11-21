@@ -1,5 +1,5 @@
 import 'package:colla_chat/provider/myself.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:liquid_glass_effect/liquid_glass_buttons.dart';
 import 'package:liquid_glass_effect/liquid_glass_card.dart';
 import 'package:liquid_glass_effect/liquid_glass_theme.dart';

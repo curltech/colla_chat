@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:pdfx/pdfx.dart';
 
 ///显示pdf文件

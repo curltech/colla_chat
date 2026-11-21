@@ -9,7 +9,7 @@ import 'package:colla_chat/pages/game/model/component/type_node_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 mixin ModelNodeComponent on PositionComponent {
   Future<void> onUpdate() async {}

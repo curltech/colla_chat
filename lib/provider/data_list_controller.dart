@@ -4,7 +4,7 @@ import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/tool/pagination_util.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class SortColumn {
   final int index;

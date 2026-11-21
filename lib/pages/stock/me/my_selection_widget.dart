@@ -19,7 +19,7 @@ import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 存储在本地的自选股票的代码和分组
 class MyShareController {

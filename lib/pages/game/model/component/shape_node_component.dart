@@ -14,7 +14,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/text.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 在shape节点写文本
 class ShapeNodeComponent extends PositionComponent

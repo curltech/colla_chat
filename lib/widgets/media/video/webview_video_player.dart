@@ -1,7 +1,7 @@
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/webview/platform_webview.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ///基于WebView实现的媒体播放器和记录器，
 class WebViewVideoPlayerController extends AbstractMediaPlayerController {

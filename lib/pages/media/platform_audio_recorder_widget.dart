@@ -10,7 +10,7 @@ import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dar
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/waveforms_audio_recorder.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:record/record.dart';
 
 enum MediaRecorderType {

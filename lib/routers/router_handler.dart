@@ -2,7 +2,7 @@ import 'package:colla_chat/pages/index/index_view.dart';
 import 'package:colla_chat/pages/login/p2p_login.dart';
 import 'package:colla_chat/pages/stock/login/remote_login.dart';
 import 'package:fluro/fluro.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 Handler remoteLoginHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {

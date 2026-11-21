@@ -4,7 +4,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 
 ///在群的成员中选择联系人的多选或者单选对话框

@@ -15,7 +15,7 @@ import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:enough_mail/enough_mail.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:synchronized/synchronized.dart';
 

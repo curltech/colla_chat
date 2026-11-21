@@ -19,7 +19,7 @@ import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 可以浮动的按钮，激活当前视频会议，全局唯一，没有当前视频会议的时候不显示
 class VideoChatDragOverlay {

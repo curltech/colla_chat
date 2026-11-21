@@ -4,7 +4,7 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:uuid/uuid.dart';
 import 'package:reactive_language_picker/reactive_language_picker.dart';
 

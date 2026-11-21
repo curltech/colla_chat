@@ -13,7 +13,7 @@ import 'package:colla_chat/pages/game/mahjong/room_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// flame引擎渲染的麻将牌
 class TileComponent extends PositionComponent

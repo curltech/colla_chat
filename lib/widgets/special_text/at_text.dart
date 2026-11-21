@@ -1,6 +1,6 @@
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ///@开头，空格结尾的特殊字符串
 class AtText extends SpecialText {

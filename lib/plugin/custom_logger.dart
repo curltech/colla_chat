@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;
 import 'package:synchronized/extension.dart';

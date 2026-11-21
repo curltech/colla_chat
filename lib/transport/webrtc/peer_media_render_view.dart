@@ -1,7 +1,7 @@
 import 'package:colla_chat/plugin/talker_logger.dart' as log;
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:livekit_client/livekit_client.dart' as livekit_client;
 

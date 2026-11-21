@@ -4,7 +4,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 ///指定路由样式，不指定则系统判断，系统判断的方法是如果是移动则走全局路由，否则走工作区路由

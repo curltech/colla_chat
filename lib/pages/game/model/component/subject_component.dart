@@ -4,7 +4,7 @@ import 'package:colla_chat/pages/game/model/controller/model_project_controller.
 import 'package:colla_chat/plugin/painter/line/dash_painter.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class SubjectComponent extends RectangleComponent with ModelNodeComponent {
   static final normalStrokePaint = Paint()

@@ -1,7 +1,7 @@
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 日志显示
 class LoggerConsoleView extends StatelessWidget with DataTileMixin {

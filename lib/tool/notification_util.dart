@@ -3,7 +3,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/overlay/overlay_notification.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:stacked_notification_cards/stacked_notification_cards.dart';
 import 'package:toastification/toastification.dart';
 

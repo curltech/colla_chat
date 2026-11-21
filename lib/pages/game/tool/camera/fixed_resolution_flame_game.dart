@@ -4,7 +4,7 @@ import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/text.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 固定解析度的视角，在所有的设备上都一样
 /// 调用CameraComponent.withFixedResolution方法创建camera

@@ -10,7 +10,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// [ModelFlameGame] 使用flame engine渲染画布和所有的节点
 /// FlameGame包含world对象，camera表示看world的方式

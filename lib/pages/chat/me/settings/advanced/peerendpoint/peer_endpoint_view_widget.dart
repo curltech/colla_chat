@@ -3,7 +3,7 @@ import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_end
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/value_listview.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 final List<String> peerEndpointFields = ['id', 'name', 'peerId'];
 

@@ -3,7 +3,7 @@ import 'package:colla_chat/widgets/common/app_bar_adaptive_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/platform_video_player.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ///平台标准的video_player的实现，缺省采用MediaKit
 class PlatformVideoPlayerWidget extends StatelessWidget with DataTileMixin {

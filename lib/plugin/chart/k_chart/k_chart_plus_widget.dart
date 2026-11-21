@@ -7,7 +7,7 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:k_chart_plus/k_chart_plus.dart';
 

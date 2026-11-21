@@ -6,7 +6,7 @@ import 'package:colla_chat/widgets/richtext/quill_editor_widget.dart';
 import 'package:colla_chat/widgets/richtext/quill_html_editor_widget.dart';
 import 'package:dart_quill_delta/src/delta/delta.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:html_editor_plus/html_editor.dart';
 

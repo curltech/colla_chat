@@ -4,7 +4,7 @@ import 'package:colla_chat/widgets/filesystem/directory_controller.dart';
 import 'package:colla_chat/widgets/filesystem/directory_widget.dart';
 import 'package:colla_chat/widgets/filesystem/file_node.dart';
 import 'package:colla_chat/widgets/filesystem/file_widget.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 文件管理功能主页面，带有路由回调函数
 class FileSystemWidget extends StatelessWidget with DataTileMixin {

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:indexed_list_view/indexed_list_view.dart';
 
 class PlatformIndexedListView extends StatelessWidget {

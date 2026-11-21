@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ///根据构造函数传入的数据列表，构造内容与空间匹配的ListView列表视图
 ///利用DataListViewController修改数据，然后重新执行ListView.build

@@ -6,7 +6,7 @@ import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ///工作区的标准视图，包裹了顶部栏AppBarWidget和一个包裹了child
 class AppBarView extends StatelessWidget {

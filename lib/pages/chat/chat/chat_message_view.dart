@@ -436,31 +436,6 @@ class ChatMessageView extends StatelessWidget
     }
   }
 
-  ///创建KeyboardActionsConfig钩住所有的字段
-  KeyboardActionsConfig _buildKeyboardActionsConfig(BuildContext context) {
-    List<KeyboardActionsItem> actions = [
-      KeyboardActionsItem(
-        focusNode: chatMessageViewController.focusNode,
-        displayActionBar: false,
-        displayArrows: false,
-        displayDoneButton: false,
-      )
-    ];
-    KeyboardActionsPlatform keyboardActionsPlatform =
-        KeyboardActionsPlatform.ALL;
-    if (platformParams.ios) {
-      keyboardActionsPlatform = KeyboardActionsPlatform.IOS;
-    } else if (platformParams.android) {
-      keyboardActionsPlatform = KeyboardActionsPlatform.ANDROID;
-    }
-    return KeyboardActionsConfig(
-      keyboardActionsPlatform: keyboardActionsPlatform,
-      keyboardBarColor: myself.primary,
-      nextFocus: false,
-      actions: actions,
-    );
-  }
-
   ///创建消息显示面板，包含消息的输入框
   Widget _buildChatMessageWidget(BuildContext context) {
     final Widget chatMessageView = VisibilityDetector(
@@ -472,8 +447,6 @@ class ChatMessageView extends StatelessWidget
           visibleFraction = visibilityInfo.visibleFraction;
         },
         child: KeyboardActions(
-          autoScroll: true,
-          config: _buildKeyboardActionsConfig(context),
           child: ListenableBuilder(
             listenable: appDataProvider,
             builder: (BuildContext context, Widget? child) {

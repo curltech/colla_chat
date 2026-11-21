@@ -10,7 +10,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// [NodeRelationshipComponent] 在src节点和dst关系节点之间画关系的连线
 class NodeRelationshipComponent extends PositionComponent

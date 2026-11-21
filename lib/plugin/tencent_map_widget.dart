@@ -5,7 +5,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:latlong2/latlong.dart';
 import 'package:permission_handler/permission_handler.dart';
