@@ -10,19 +10,14 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_trina_paginated_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_code_editor/flutter_code_editor.dart';
-import 'package:flutter_highlight/themes/idea.dart';
+import 'package:flutter_monaco/flutter_monaco.dart';
 
-import 'package:highlight/languages/sql.dart';
-
-final codeController = CodeController(
-  language: sql,
-);
+late MonacoController monacoController;
 
 class QueryResultController extends DataPageController<Map<String, dynamic>> {
   @override
   FutureOr<void> findData() async {
-    String sql = codeController.text;
+    String sql = await monacoController.document.getText();
     DataSource? current = dataSourceController.current as DataSource?;
     if (current == null) {
       return null;
@@ -32,7 +27,8 @@ class QueryResultController extends DataPageController<Map<String, dynamic>> {
       return null;
     }
     List<Map<String, dynamic>> data = await dataStore.select(
-        'select * from ($sql) limit ${findCondition.value.limit} offset ${findCondition.value.offset}');
+        'select * from ($sql) limit ${findCondition.value
+            .limit} offset ${findCondition.value.offset}');
     replaceAll(data);
   }
 }
@@ -58,48 +54,49 @@ class QueryConsoleEditorWidget extends StatelessWidget with DataTileMixin {
     return ValueListenableBuilder(
         valueListenable: queryResultController.currentIndex,
         builder: (context, value, _) {
-      Map<String, dynamic>? data = queryResultController.data.value.firstOrNull;
-      if (data == null) {
-        return Center(child: Text('No data'));
-      }
-      final List<PlatformDataColumn> queryResultDataColumns = [];
-      for (var entry in data.entries) {
-        String columnName = entry.key;
-        dynamic columnValue = entry.value;
-        if (columnValue is int) {
-          queryResultDataColumns.add(PlatformDataColumn(
-            label: columnName,
-            name: columnName,
-            dataType: DataType.int,
-            align: Alignment.centerRight,
-            // width: 70,
-          ));
-        } else if (columnValue is double) {
-          queryResultDataColumns.add(PlatformDataColumn(
-            label: columnName,
-            name: columnName,
-            dataType: DataType.double,
-            align: Alignment.centerRight,
-            // width: 70,
-          ));
-        } else {
-          queryResultDataColumns.add(PlatformDataColumn(
-            label: columnName,
-            name: columnName,
-            // width: 80,
-          ));
-        }
-      }
-      return BindingTrinaPaginatedDataGrid<Map<String, dynamic>>(
-        key: UniqueKey(),
-        showCheckboxColumn: false,
-        horizontalMargin: 10.0,
-        columnSpacing: 0.0,
-        platformDataColumns: queryResultDataColumns,
-        controller: queryResultController,
-        fixedLeftColumns: 0,
-      );
-    });
+          Map<String, dynamic>? data = queryResultController.data.value
+              .firstOrNull;
+          if (data == null) {
+            return Center(child: Text('No data'));
+          }
+          final List<PlatformDataColumn> queryResultDataColumns = [];
+          for (var entry in data.entries) {
+            String columnName = entry.key;
+            dynamic columnValue = entry.value;
+            if (columnValue is int) {
+              queryResultDataColumns.add(PlatformDataColumn(
+                label: columnName,
+                name: columnName,
+                dataType: DataType.int,
+                align: Alignment.centerRight,
+                // width: 70,
+              ));
+            } else if (columnValue is double) {
+              queryResultDataColumns.add(PlatformDataColumn(
+                label: columnName,
+                name: columnName,
+                dataType: DataType.double,
+                align: Alignment.centerRight,
+                // width: 70,
+              ));
+            } else {
+              queryResultDataColumns.add(PlatformDataColumn(
+                label: columnName,
+                name: columnName,
+                // width: 80,
+              ));
+            }
+          }
+          return BindingTrinaPaginatedDataGrid<Map<String, dynamic>>(
+            key: UniqueKey(),
+            showCheckboxColumn: false,
+            horizontalMargin: 10.0,
+            columnSpacing: 0.0,
+            platformDataColumns: queryResultDataColumns,
+            controller: queryResultController,
+            fixedLeftColumns: 0,
+          );
+        });
   }
 
   @override
@@ -112,7 +109,7 @@ class QueryConsoleEditorWidget extends StatelessWidget with DataTileMixin {
           IconButton(
               onPressed: () async {
                 DataSource? current =
-                    dataSourceController.current as DataSource?;
+                dataSourceController.current as DataSource?;
                 if (current == null) {
                   return;
                 }
@@ -133,17 +130,14 @@ class QueryConsoleEditorWidget extends StatelessWidget with DataTileMixin {
         child: Column(
           children: [
             SizedBox(
-                height: 200,
-                child: SingleChildScrollView(
-                  child: CodeTheme(
-                    data: CodeThemeData(styles: ideaTheme),
-                    child: CodeField(
-                      minLines: 10,
-                      // maxLines: 10,
-                      controller: codeController,
-                    ),
-                  ),
-                )),
+              height: 200,
+              child: SingleChildScrollView(
+                child: MonacoEditor(
+                  options: const EditorOptions(language: MonacoLanguage.sql),
+                  showStatusBar: true,
+                ),
+              ),
+            ),
             Expanded(
                 child: Card(
                     elevation: 0.0,

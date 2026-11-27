@@ -18,10 +18,7 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_code_editor/flutter_code_editor.dart';
-import 'package:flutter_highlight/themes/idea.dart';
-
-import 'package:highlight/languages/sql.dart';
+import 'package:flutter_monaco/flutter_monaco.dart';
 import 'package:tab_container/tab_container.dart';
 
 DataListController<data_source.DataColumn> dataTableColumnController =
@@ -53,10 +50,22 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController =
       TabController(length: 3, vsync: this);
+  late MonacoController monacoController;
 
   @override
   void initState() {
     super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    monacoController = await MonacoController.create(
+      options: const EditorOptions(
+        language: MonacoLanguage.sql,
+        fontSize: 16,
+      ),
+    );
+    await monacoController.whenReady;
   }
 
   List<PlatformDataField> buildDataTableDataFields(String sourceType) {
@@ -81,55 +90,56 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     return ValueListenableBuilder(
         valueListenable: dataSourceController.currentIndex,
         builder: (context, value, _) {
-      data_source.DataTableNode? dataTableNode =
-          dataSourceController.getDataTableNode();
-      if (dataTableNode == null) {
-        return Container();
-      }
-      List<PlatformDataField> dataSourceDataFields =
-          buildDataTableDataFields(SourceType.sqlite.name);
-      platformReactiveFormController =
-          PlatformReactiveFormController(dataSourceDataFields);
+          data_source.DataTableNode? dataTableNode =
+              dataSourceController.getDataTableNode();
+          if (dataTableNode == null) {
+            return Container();
+          }
+          List<PlatformDataField> dataSourceDataFields =
+              buildDataTableDataFields(SourceType.sqlite.name);
+          platformReactiveFormController =
+              PlatformReactiveFormController(dataSourceDataFields);
 
-      platformReactiveFormController?.values =
-          JsonUtil.toJson(dataTableNode.value);
-      var platformReactiveForm = PlatformReactiveForm(
-        spacing: 10.0,
-        height: 160,
-        onSubmit: (Map<String, dynamic> values) {
-          _onSubmit(values);
-        },
-        platformReactiveFormController: platformReactiveFormController!,
-        formButtons: [
-          FormButton(
-              label: 'Generate',
-              onTap: (Map<String, dynamic> values) async {
-                await _onSubmit(values);
-                String? sql = createTableAndIndex();
+          platformReactiveFormController?.values =
+              JsonUtil.toJson(dataTableNode.value);
+          var platformReactiveForm = PlatformReactiveForm(
+            spacing: 10.0,
+            height: 160,
+            onSubmit: (Map<String, dynamic> values) {
+              _onSubmit(values);
+            },
+            platformReactiveFormController: platformReactiveFormController!,
+            formButtons: [
+              FormButton(
+                  label: 'Generate',
+                  onTap: (Map<String, dynamic> values) async {
+                    await _onSubmit(values);
+                    String? sql = createTableAndIndex();
 
-                if (sql != null) {
-                  codeController.fullText = sql;
-                }
-              }),
-          FormButton(
-              label: 'Execute',
-              onTap: (Map<String, dynamic> values) async {
-                await _onSubmit(values);
-                try {
-                  String? sql = createTableAndIndex(mock: false);
-                  if (sql != null) {
-                    codeController.fullText = sql;
-                  }
-                } catch (e) {
-                  DialogUtil.error(
-                      content: AppLocalizations.t('execute sql failure:$e'));
-                }
-              })
-        ],
-      );
+                    if (sql != null) {
+                      await monacoController.document.setText(sql);
+                    }
+                  }),
+              FormButton(
+                  label: 'Execute',
+                  onTap: (Map<String, dynamic> values) async {
+                    await _onSubmit(values);
+                    try {
+                      String? sql = createTableAndIndex(mock: false);
+                      if (sql != null) {
+                        await monacoController.document.setText(sql);
+                      }
+                    } catch (e) {
+                      DialogUtil.error(
+                          content:
+                              AppLocalizations.t('execute sql failure:$e'));
+                    }
+                  })
+            ],
+          );
 
-      return platformReactiveForm;
-    });
+          return platformReactiveForm;
+        });
   }
 
   Future<data_source.DataTable?> _onSubmit(Map<String, dynamic> values) async {
@@ -323,10 +333,6 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     );
   }
 
-  final codeController = CodeController(
-    language: sql,
-  );
-
   String? createTableAndIndex({bool mock = true}) {
     String? tableSql = dataSourceController.createDataTable(mock: mock);
     String? indexSql = dataSourceController.createDataIndex(mock: mock);
@@ -347,14 +353,9 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         _buildPlatformReactiveForm(context),
         Expanded(
           child: SingleChildScrollView(
-            child: CodeTheme(
-              data: CodeThemeData(styles: ideaTheme),
-              child: CodeField(
-                minLines: 15,
-                background: Colors.grey.withAlpha(25),
-                readOnly: true,
-                controller: codeController,
-              ),
+            child: MonacoEditor(
+              options: const EditorOptions(language: MonacoLanguage.sql),
+              showStatusBar: true,
             ),
           ),
         ),
@@ -375,35 +376,36 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     return ValueListenableBuilder(
         valueListenable: dataTableIndexController.currentIndex,
         builder: (context, value, _) {
-      final List<DataTile> tiles = [];
-      for (int i = 0; i < dataTableIndexController.data.value.length; ++i) {
-        DataIndex dataIndex = dataTableIndexController.data.value[i];
-        String titleTail = '';
-        if (dataIndex.isUnique != null && dataIndex.isUnique!) {
-          titleTail = 'Unique';
-        }
-        tiles.add(DataTile(
-            prefix: Icon(
-              Icons.content_paste_search,
-              color: myself.primary,
-            ),
-            title: dataIndex.name,
-            titleTail: titleTail,
-            subtitle: dataIndex.columnNames ?? '',
-            selected:
-                dataTableIndexController.currentIndex.value == i ? true : false,
-            onTap: (int index, String label, {String? subtitle}) async {
-              dataTableIndexController.currentIndex.value = index;
-              return null;
-            }));
-      }
+          final List<DataTile> tiles = [];
+          for (int i = 0; i < dataTableIndexController.data.value.length; ++i) {
+            DataIndex dataIndex = dataTableIndexController.data.value[i];
+            String titleTail = '';
+            if (dataIndex.isUnique != null && dataIndex.isUnique!) {
+              titleTail = 'Unique';
+            }
+            tiles.add(DataTile(
+                prefix: Icon(
+                  Icons.content_paste_search,
+                  color: myself.primary,
+                ),
+                title: dataIndex.name,
+                titleTail: titleTail,
+                subtitle: dataIndex.columnNames ?? '',
+                selected: dataTableIndexController.currentIndex.value == i
+                    ? true
+                    : false,
+                onTap: (int index, String label, {String? subtitle}) async {
+                  dataTableIndexController.currentIndex.value = index;
+                  return null;
+                }));
+          }
 
-      return DataListView(
-          itemCount: tiles.length,
-          itemBuilder: (context, index) {
-            return tiles[index];
-          });
-    });
+          return DataListView(
+              itemCount: tiles.length,
+              itemBuilder: (context, index) {
+                return tiles[index];
+              });
+        });
   }
 
   Widget _buildDataIndexTab(BuildContext context) {

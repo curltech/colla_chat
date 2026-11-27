@@ -292,7 +292,7 @@ class DataSourceWidget extends StatelessWidget with DataTileMixin {
       dataSourceController.current = node as data_source.DataSourceNode?;
       indexWidgetProvider.push('query_console_editor');
     } else if (explorable is data_source.DataTable) {
-      codeController.text = 'select * from ${node.value.name}';
+      monacoController.document.setText('select * from ${node.value.name}');
       indexWidgetProvider.push('query_console_editor');
     }
   }
