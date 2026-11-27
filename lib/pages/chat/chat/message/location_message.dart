@@ -5,7 +5,7 @@ import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///消息体：定位消息
 class LocationMessage extends StatelessWidget {

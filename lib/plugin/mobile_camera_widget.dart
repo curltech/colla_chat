@@ -15,7 +15,7 @@ import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class MobileCameraWidget extends StatefulWidget {

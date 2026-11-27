@@ -4,7 +4,7 @@
 
 //原来的项目不维护了，因此把源代码引入
 
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 import 'adaptive_layout.dart';
 import 'breakpoints.dart';

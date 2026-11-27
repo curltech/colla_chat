@@ -1,7 +1,7 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/gestures.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:glassmorphic_ui_kit/glassmorphic_ui_kit.dart' as glass;
 
 /// glassmorphic_ui_kit实现，提供了多个个glass化的Widget

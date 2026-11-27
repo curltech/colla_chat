@@ -9,7 +9,7 @@ import 'package:colla_chat/widgets/media/video/chewie_video_player.dart';
 import 'package:colla_chat/widgets/media/video/mediakit_video_player.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:colla_chat/widgets/media/video/vlc_video_player.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 /// 平台的多个视频媒体播放器组件
 class PlatformVideoPlayer extends StatelessWidget {

@@ -3,7 +3,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
 class RemoteLoginWidget extends StatefulWidget {

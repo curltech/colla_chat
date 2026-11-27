@@ -2,7 +2,7 @@ import 'package:any_link_preview/any_link_preview.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///连接link的预览
 class LinkPreview extends StatefulWidget {

@@ -4,7 +4,7 @@
 
 import 'package:colla_chat/widgets/adaptive_scaffold/adaptive_scaffold.dart';
 import 'package:colla_chat/widgets/adaptive_scaffold/slot_layout.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 /// A group of standard breakpoints built according to the material
 /// specifications for screen width size.

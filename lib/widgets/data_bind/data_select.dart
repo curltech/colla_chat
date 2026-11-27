@@ -10,7 +10,7 @@ import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class OptionController with ChangeNotifier {
   late List<Option<String>> _options;

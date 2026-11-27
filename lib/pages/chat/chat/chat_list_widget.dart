@@ -39,7 +39,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/webview/html_preview_widget.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 
 ///好友的汇总控制器，每当消息汇总表的数据有变化时更新控制器

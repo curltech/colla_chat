@@ -13,7 +13,7 @@ import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.d
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/widgets/media/audio/audio_session.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:synchronized/synchronized.dart';
 

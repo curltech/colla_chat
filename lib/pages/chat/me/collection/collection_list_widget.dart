@@ -9,7 +9,7 @@ import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 //收藏的清单组件
 class CollectionListWidget extends StatefulWidget {

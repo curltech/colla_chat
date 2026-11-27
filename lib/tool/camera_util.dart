@@ -1,5 +1,5 @@
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 ///基于微信UI的Flutter相机选择器，进行拍照和录像，同时是 wechat_assets_picker的扩展

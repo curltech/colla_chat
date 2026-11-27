@@ -17,7 +17,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' as google_maps;
 import 'package:latlong2/latlong.dart' as latlong2;
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:map_launcher/map_launcher.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:tencent_map_flutter/tencent_map_flutter.dart' as tencent_map;
 
 class LocationPosition {

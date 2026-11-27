@@ -1,7 +1,7 @@
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:html_editor_plus/html_editor.dart';
 
 ///html_editor_enhanced实现，用于移动和web

@@ -21,7 +21,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 
 ///Contact增加联系人

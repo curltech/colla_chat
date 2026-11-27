@@ -10,7 +10,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:openvpn_flutter/openvpn_flutter.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 

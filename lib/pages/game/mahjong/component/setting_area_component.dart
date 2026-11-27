@@ -1,7 +1,7 @@
 import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
 import 'package:colla_chat/pages/game/mahjong/room_controller.dart';
 import 'package:flame/components.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 /// 右上角的设置按钮区域
 class SettingAreaComponent extends RectangleComponent

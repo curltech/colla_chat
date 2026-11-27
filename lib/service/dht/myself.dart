@@ -14,7 +14,7 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/locale_util.dart';
 import 'package:cryptography/cryptography.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class MyselfService {
   ///创建新的myself，创建新的密钥对，设置到当前

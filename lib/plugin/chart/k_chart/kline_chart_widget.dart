@@ -4,7 +4,7 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:interactive_chart/interactive_chart.dart';
 
 class KlineChartWidget extends StatelessWidget {

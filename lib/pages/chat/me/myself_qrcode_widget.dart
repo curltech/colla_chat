@@ -5,7 +5,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/qrcode_widget.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class MyselfQrcodeWidget extends StatelessWidget with DataTileMixin {
   MyselfQrcodeWidget({super.key});

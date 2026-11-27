@@ -3,7 +3,7 @@ import 'package:colla_chat/tool/url_util.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:colla_chat/widgets/special_text/link_text.dart';
 import 'package:extended_text/extended_text.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 ///消息体：扩展文本

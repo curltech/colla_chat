@@ -1,6 +1,6 @@
 import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 import '../base.dart';
 

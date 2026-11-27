@@ -9,7 +9,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/text.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 /// 在image节点写文本
 class ImageNodeComponent extends PositionComponent

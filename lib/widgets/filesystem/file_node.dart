@@ -3,7 +3,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/data_bind/tree_view.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class Folder extends Explorable {
   io.Directory directory;

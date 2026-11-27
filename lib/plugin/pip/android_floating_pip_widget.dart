@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:floating/floating.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 
 /// 用floating实现android的画中画功能

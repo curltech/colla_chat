@@ -8,7 +8,7 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class PoemContentWidget extends StatelessWidget {
   final DataListController<Poem> poemController;

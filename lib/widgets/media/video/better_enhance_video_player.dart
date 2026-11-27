@@ -1,7 +1,7 @@
 import 'package:better_player_enhanced/better_player.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///基于better enhance实现的媒体播放器和记录器，
 class BetterEnhanceVideoPlayerController extends AbstractMediaPlayerController {

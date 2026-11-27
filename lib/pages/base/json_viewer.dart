@@ -1,7 +1,7 @@
 import 'package:colla_chat/pages/base/json_editor.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_json_view/flutter_json_view.dart';
 
 class JsonViewerWidget extends StatelessWidget with DataTileMixin {

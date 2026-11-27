@@ -25,7 +25,7 @@ import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 ///视频通话的流程，适用单个通话和群

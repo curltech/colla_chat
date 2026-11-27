@@ -1,4 +1,4 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 import 'asset_widget_builder.dart';

@@ -7,7 +7,7 @@ import 'package:colla_chat/pages/game/mahjong/room_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 /// 河牌区域
 class WasteAreaComponent extends RectangleComponent

@@ -15,7 +15,7 @@ import 'package:colla_chat/widgets/adaptive_scaffold/breakpoints.dart';
 import 'package:colla_chat/widgets/adaptive_scaffold/slot_layout.dart';
 import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 /// 自动适配的主页面结构

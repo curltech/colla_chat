@@ -6,7 +6,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:fl_video/fl_video.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:video_player_control_panel/video_player_control_panel.dart';
 import 'package:video_player_media_kit/video_player_media_kit.dart';
 import 'package:fvp/fvp.dart' as fvp;

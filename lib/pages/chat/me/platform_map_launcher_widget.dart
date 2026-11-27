@@ -11,7 +11,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:map_launcher/map_launcher.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class PlatformMapLauncherWidget extends StatelessWidget with DataTileMixin {
   final ListNotifier<AvailableMap> maps = ListNotifier<AvailableMap>([]);

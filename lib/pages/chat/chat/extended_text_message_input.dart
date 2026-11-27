@@ -16,7 +16,7 @@ import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/special_text/custom_extended_text_selection_controls.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:extended_text_field/extended_text_field.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 /// 发送文本消息的输入框

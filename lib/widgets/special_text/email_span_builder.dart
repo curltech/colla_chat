@@ -1,6 +1,6 @@
 import 'package:colla_chat/widgets/special_text/email_text.dart';
 import 'package:extended_text_library/extended_text_library.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class EmailSpanBuilder extends SpecialTextSpanBuilder {
   EmailSpanBuilder(this.controller, this.context);

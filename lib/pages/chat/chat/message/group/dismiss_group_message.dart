@@ -4,7 +4,7 @@ import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///消息体：解散群消息
 class DismissGroupMessage extends StatelessWidget {

@@ -1,6 +1,6 @@
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///多个字段显示
 class ValueListView extends StatelessWidget {

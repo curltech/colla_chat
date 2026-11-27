@@ -8,7 +8,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///简单地播放音频文件，没有控制器按钮和状态
 class BlueFireAudioPlayer {

@@ -1,7 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame/input.dart';
 import 'package:flame/text.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 /// flame的按钮渲染组件
 class FlatButton extends ButtonComponent {

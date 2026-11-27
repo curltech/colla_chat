@@ -4,7 +4,7 @@ import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class PeerClientController extends DataListController<PeerClient> {
   PeerClientController() : super();

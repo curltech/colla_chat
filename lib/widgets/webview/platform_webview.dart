@@ -8,7 +8,7 @@ import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/webview/flutter_webview.dart';
 import 'package:colla_chat/widgets/webview/html_webview.dart';
 import 'package:colla_chat/widgets/webview/inapp_webview.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:webview_flutter/webview_flutter.dart' as webview;
 

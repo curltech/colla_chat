@@ -12,7 +12,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///粘贴linkman的json字符串增加
 class JsonLinkmanAddWidget extends StatefulWidget with DataTileMixin {

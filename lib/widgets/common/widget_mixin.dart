@@ -1,5 +1,5 @@
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 mixin DataTileMixin on Widget {
   //指示图标

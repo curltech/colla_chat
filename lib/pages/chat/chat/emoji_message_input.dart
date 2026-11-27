@@ -1,6 +1,6 @@
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
 import 'package:colla_chat/plugin/unicode_emoji_picker.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///Emoji文本消息的输入面板
 class EmojiMessageInputWidget extends StatelessWidget {

@@ -20,7 +20,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class PlaylistController {
   final MediaSourceController rootMediaSourceController =

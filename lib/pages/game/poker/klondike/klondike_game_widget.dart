@@ -2,7 +2,7 @@ import 'package:colla_chat/pages/game/poker/klondike/klondike_game.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flame/game.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class KlondikeGameWidget extends StatelessWidget with DataTileMixin {
   const KlondikeGameWidget({super.key});

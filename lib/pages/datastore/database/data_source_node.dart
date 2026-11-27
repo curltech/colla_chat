@@ -2,7 +2,7 @@ import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/data_bind/tree_view.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 enum SourceType { sqlite, postgres }
 

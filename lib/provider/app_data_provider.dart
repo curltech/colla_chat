@@ -2,7 +2,7 @@ import 'package:colla_chat/pages/index/platform_breakpoint.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/locale_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 
 import '../plugin/talker_logger.dart';

@@ -5,7 +5,7 @@ import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 
 /// 平台的单个音频媒体播放器组件

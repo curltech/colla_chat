@@ -6,7 +6,7 @@ import 'package:colla_chat/tool/list_map_notifier.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart';
 
 ///远程视频通话窗口，显示多个小视频窗口，每个小窗口代表一个远程视频

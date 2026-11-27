@@ -1,4 +1,4 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///消息体：富文本
 class RichTextMessage extends StatelessWidget {

@@ -1,5 +1,5 @@
 import 'package:colla_chat/provider/myself.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 
 class ToastUtil {
@@ -71,8 +71,6 @@ class ToastUtil {
       boxShadow: boxShadow,
       direction: direction,
       showProgressBar: showProgressBar,
-      progressBarTheme: progressBarTheme,
-      closeButtonShowType: closeButtonShowType,
       closeOnClick: closeOnClick,
       dragToClose: dragToClose,
       pauseOnHover: pauseOnHover,

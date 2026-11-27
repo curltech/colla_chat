@@ -19,7 +19,7 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/combine_grid_view.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 /// 发送命令到服务器进行房间的管理操作的报文
 class LiveKitManageRoom {

@@ -8,7 +8,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 
 class FullScreenChatMessageWidget extends StatelessWidget with DataTileMixin {

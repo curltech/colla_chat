@@ -2,7 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 const animateDuration = Duration(milliseconds: 1000);
 

@@ -6,7 +6,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/open_file.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:mimecon/mimecon.dart';
 import 'package:open_filex/open_filex.dart';
 

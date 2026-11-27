@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:dart_openai/dart_openai.dart';
@@ -283,7 +284,7 @@ class OpenAIClient {
 
   ///生成图像的变种
   Future<List<OpenAIImageData>> imageVariation({
-    required File image,
+    required OpenAIFile image,
     int? n = 1,
     OpenAIImageSize? size = OpenAIImageSize.size1024,
     OpenAIImageResponseFormat? responseFormat = OpenAIImageResponseFormat.url,
@@ -302,8 +303,8 @@ class OpenAIClient {
 
   ///根据文本修改图像
   Future<OpenAIImageModel> imageEdit({
-    required File image,
-    File? mask,
+    required OpenAIFile image,
+    OpenAIFile? mask,
     required String prompt,
     int? n = 1,
     OpenAIImageSize? size = OpenAIImageSize.size1024,
@@ -338,7 +339,7 @@ class OpenAIClient {
 
   ///语音转录
   /// responseFormat:json, text, srt, verbose_json, or vtt
-  Future<File> createSpeech({
+  Future<Uint8List> createSpeech({
     required String input,
     String model = 'tts-1', //"tts-1"
     required OpenAIAudioVoice voice, //"nova",
@@ -346,9 +347,9 @@ class OpenAIClient {
         OpenAIAudioSpeechResponseFormat.mp3,
     double? speed,
     String outputFileName = "output",
-    Directory? outputDirectory,
+    String? outputDirectory,
   }) async {
-    File file = await openAI.audio.createSpeech(
+    Uint8List file = await openAI.audio.createSpeech(
       model: model,
       input: input,
       voice: voice,
@@ -364,7 +365,7 @@ class OpenAIClient {
   ///语音转录
   /// responseFormat:json, text, srt, verbose_json, or vtt
   Future<OpenAITranscriptionGeneralModel> createTranscription({
-    required File file,
+    required OpenAIFile file,
     String model = "whisper-1",
     String? prompt,
     OpenAIAudioResponseFormat? responseFormat = OpenAIAudioResponseFormat.json,
@@ -386,7 +387,7 @@ class OpenAIClient {
   ///语音转文本
   ///"whisper-1",
   Future<String> createTranslation({
-    required File file,
+    required OpenAIFile file,
     String model = "whisper-1",
     String? prompt,
     OpenAIAudioResponseFormat? responseFormat = OpenAIAudioResponseFormat.text,
@@ -415,7 +416,7 @@ class OpenAIClient {
 
   ///上传数据文件
   Future<OpenAIFileModel> upload({
-    required File file,
+    required OpenAIFile file,
     String purpose = "fine-tuning",
   }) async {
     OpenAIFileModel uploadedFile = await openAI.file.upload(

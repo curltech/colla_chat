@@ -1,7 +1,7 @@
 import 'package:awesome_video_player/awesome_video_player.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///基于awesome better实现的媒体播放器和记录器，
 class AwesomeVideoPlayerController extends AbstractMediaPlayerController {

@@ -12,7 +12,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 /// 增加联系人页面，列出了所有的增加联系人的路由
 class LinkmanAddWidget extends StatelessWidget with DataTileMixin {

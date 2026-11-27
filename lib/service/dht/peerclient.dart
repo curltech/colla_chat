@@ -11,7 +11,7 @@ import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:cryptography/cryptography.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class PeerClientService extends PeerEntityService<PeerClient> {
   var peerClients = <String, Map<String, PeerClient>>{};

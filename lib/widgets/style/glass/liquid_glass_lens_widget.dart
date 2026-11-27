@@ -1,5 +1,5 @@
 import 'package:liquid_glass_easy/liquid_glass_easy.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 /// ios 26样式的玻璃效果组件
 /// 把组件变成透镜

@@ -25,7 +25,7 @@ import 'package:colla_chat/widgets/media_editor/ffmpeg/ffmpeg_media_widget.dart'
 import 'package:colla_chat/widgets/media_editor/image_editor_widget.dart';
 import 'package:colla_chat/widgets/media_editor/pro_video_editor_widget.dart';
 import 'package:colla_chat/widgets/media_editor/video_editor_widget.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 //其他的应用的页面，带有路由回调函数
 class OtherAppWidget extends StatelessWidget with DataTileMixin {

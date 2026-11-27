@@ -3,7 +3,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/chart/k_chart/k_chart_plus_widget.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class KlineToolPanelWidget extends StatelessWidget {
   final KChartPlusController kChartPlusController;

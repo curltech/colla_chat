@@ -1,7 +1,7 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:glass_kit/glass_kit.dart' as glass;
 
 /// glass_kit实现，实际上只提供了一个glass化的Container

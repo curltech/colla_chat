@@ -16,8 +16,9 @@ import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/rea
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/toggle_buttons.dart';
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/wechat/selected_asset_view.dart';
 import 'package:colla_chat/widgets/data_bind/form/reactive_data_field_widget/wechat/selected_assets_list_view.dart';
-import 'package:material_ui/material_ui.dart';
-// import 'package:reactive_advanced_switch/reactive_advanced_switch.dart';
+import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart' as material_ui;
+import 'package:reactive_advanced_switch/reactive_advanced_switch.dart';
 import 'package:reactive_cart_stepper/reactive_cart_stepper.dart';
 import 'package:reactive_color_picker/reactive_color_picker.dart';
 import 'package:reactive_contact_picker/reactive_contact_picker.dart';
@@ -90,6 +91,36 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
           ));
     }
     InputDecoration inputDecoration = buildInputDecoration(
+        labelText: label,
+        prefixIcon: prefixIcon,
+        prefix: prefix,
+        suffixIcon: suffixIcon,
+        suffix: suffix,
+        hintText: hintText);
+
+    return inputDecoration;
+  }
+
+  material_ui.InputDecoration _buildInputDecoration_ui(PlatformDataField platformDataField) {
+    var name = platformDataField.name;
+    var label = platformDataField.label;
+    var prefixIcon = platformDataField.prefixIcon;
+    var suffixIcon = platformDataField.suffixIcon;
+    var prefix = platformDataField.prefix;
+    var suffix = platformDataField.suffix;
+    var hintText = platformDataField.hintText;
+    if (platformDataField.cancel) {
+      suffixIcon ??= IconButton(
+        //如果文本长度不为空则显示清除按钮
+          onPressed: () {
+            formGroup.control(name).value = '';
+          },
+          icon: Icon(
+            Icons.cancel,
+            color: myself.primary,
+          ));
+    }
+    material_ui.InputDecoration inputDecoration = buildInputDecoration_ui(
         labelText: label,
         prefixIcon: prefixIcon,
         prefix: prefix,
@@ -1195,7 +1226,7 @@ class PlatformReactiveDataField<T> extends StatelessWidget {
     if (value == null) {
       formGroup.value[name] = DateTime.now().month;
     }
-    InputDecoration decoration = _buildInputDecoration(platformDataField);
+    material_ui.InputDecoration decoration = _buildInputDecoration_ui(platformDataField);
     Widget filePicker = ReactiveMonthPickerDialog(
       formControlName: name,
       validationMessages:

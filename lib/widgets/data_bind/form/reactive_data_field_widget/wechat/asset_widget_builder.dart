@@ -1,4 +1,4 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart'
     show AssetEntity, AssetEntityImageProvider, AssetType;
 

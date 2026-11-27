@@ -1,6 +1,6 @@
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:fl_pip/fl_pip.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class MobileFlPipController {
   final FlPiP flPiP = FlPiP.instance;

@@ -1,4 +1,4 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class AnimatedProgressBar extends StatefulWidget {

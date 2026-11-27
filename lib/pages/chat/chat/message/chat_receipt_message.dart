@@ -3,7 +3,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///消息体：回复消息
 class ChatReceiptMessage extends StatelessWidget {

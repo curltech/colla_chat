@@ -38,7 +38,7 @@ import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 ///非文本的其他多种格式输入面板，包括照片等

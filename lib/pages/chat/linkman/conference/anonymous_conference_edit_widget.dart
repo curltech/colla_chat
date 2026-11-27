@@ -14,7 +14,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///根据token创建匿名的SFU会议
 class AnonymousConferenceEditWidget extends StatelessWidget with DataTileMixin {

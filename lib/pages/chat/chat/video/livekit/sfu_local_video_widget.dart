@@ -26,7 +26,7 @@ import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 ///sfu模式下本地视频通话显示和拨出的窗口，显示多个本地视频，音频和屏幕共享的小视频窗口

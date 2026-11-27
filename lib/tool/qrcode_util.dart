@@ -4,7 +4,7 @@ import 'dart:ui' as ui;
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart' as mobile_scanner;
 import 'package:mobile_scanner/mobile_scanner.dart';

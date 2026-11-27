@@ -6,7 +6,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 

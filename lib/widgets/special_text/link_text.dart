@@ -1,6 +1,6 @@
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/gestures.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///#开头，#结尾的特殊字符串，link标记，用于URI
 class LinkText extends SpecialText {

@@ -1,5 +1,5 @@
 import 'package:colla_chat/provider/app_data_provider.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:liquid_glass_ui_design/liquid_glass_ui.dart';
 
 extension LiquidGlassDesignWidget<T extends Widget> on T {

@@ -19,7 +19,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 //频道的页面,展示自己发布的频道消息列表

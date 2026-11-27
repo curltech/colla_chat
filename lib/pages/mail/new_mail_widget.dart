@@ -26,7 +26,7 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
 import 'package:enough_mail/highlevel.dart' as enough_mail;
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 import 'package:mimecon/mimecon.dart';
 

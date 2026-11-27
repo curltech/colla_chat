@@ -7,7 +7,7 @@
 // import 'package:colla_chat/plugin/talker_logger.dart';
 // import 'package:colla_chat/tool/json_util.dart';
 // import 'package:device_info_plus/device_info_plus.dart';
-// import 'package:material_ui/material_ui.dart';
+// import 'package:flutter/material.dart';
 // import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 //
 // enum DeviceType { advertiser, browser }

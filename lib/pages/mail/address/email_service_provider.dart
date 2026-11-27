@@ -1,7 +1,7 @@
 import 'package:colla_chat/pages/mail/address/oauth.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:enough_mail/discover.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class PlatformEmailServiceProvider {
   final Map<String, EmailServiceProvider> domainNameServiceProviders =

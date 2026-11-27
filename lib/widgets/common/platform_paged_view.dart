@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 enum ViewType {

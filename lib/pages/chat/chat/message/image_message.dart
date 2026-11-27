@@ -3,7 +3,7 @@ import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///消息体：图片消息
 class ImageMessage extends StatelessWidget {

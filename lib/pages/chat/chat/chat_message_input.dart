@@ -5,7 +5,7 @@ import 'package:colla_chat/pages/chat/chat/emoji_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/more_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/text_message_input.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///聊天消息的输入组件，
 ///第一行：包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮

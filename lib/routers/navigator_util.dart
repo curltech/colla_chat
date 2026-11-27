@@ -1,7 +1,7 @@
 import 'package:colla_chat/pages/login/p2p_login.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:fluro/fluro.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class NavigatorUtil {
   // 返回

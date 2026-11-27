@@ -1,4 +1,4 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class ListNotifier<T> {
   late final ValueNotifier<List<T>> _list;

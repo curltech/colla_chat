@@ -1,7 +1,7 @@
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class BindingTrinaMoreDataGrid<T> extends StatelessWidget {
   final List<PlatformDataColumn> platformDataColumns;

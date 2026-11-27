@@ -6,7 +6,7 @@ import 'package:colla_chat/tool/menu_util.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///工作区的顶部栏AppBar，定义了前导组件，比如回退按钮
 ///定义了尾部组件和下拉按钮

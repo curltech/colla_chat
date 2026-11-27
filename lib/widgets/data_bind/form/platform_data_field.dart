@@ -3,7 +3,8 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart' as material_ui;
 import 'package:flutter/services.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
@@ -284,6 +285,49 @@ InputDecoration buildInputDecoration({
       errorBorder: textFormFieldBorder,
       disabledBorder: textFormFieldBorder,
       focusedErrorBorder: textFormFieldBorder,
+      labelText: AppLocalizations.t(labelText ?? ''),
+      prefixIcon: prefixIcon,
+      prefix: prefix,
+      suffixIcon: suffixIcon,
+      suffix: suffix,
+      hintText: AppLocalizations.t(hintText ?? ''));
+
+  return inputDecoration;
+}
+
+const material_ui.InputBorder textFormFieldBorder_ui = material_ui.UnderlineInputBorder(
+    borderSide: BorderSide.none,
+    borderRadius: BorderRadius.all(Radius.circular(4.0)));
+
+const material_ui.InputBorder outlineTextFormFieldBorder_ui = material_ui.OutlineInputBorder(
+    borderSide: BorderSide(
+      color: Colors.white,
+      width: 1.0,
+    ),
+    borderRadius: BorderRadius.all(Radius.circular(4.0)));
+
+material_ui.InputDecoration buildInputDecoration_ui({
+  Color? fillColor,
+  Color? focusColor,
+  Color? hoverColor,
+  Widget? prefixIcon,
+  Widget? prefix,
+  Widget? suffixIcon,
+  Widget? suffix,
+  String? hintText,
+  String? labelText,
+}) {
+  material_ui.InputDecoration inputDecoration = material_ui.InputDecoration(
+      fillColor: fillColor ?? Colors.grey.withAlpha(AppOpacity.xlOpacity),
+      focusColor: focusColor ?? Colors.grey.withAlpha(AppOpacity.xlOpacity),
+      hoverColor: hoverColor ?? Colors.grey.withAlpha(AppOpacity.xlOpacity),
+      filled: true,
+      border: textFormFieldBorder_ui,
+      focusedBorder: outlineTextFormFieldBorder_ui,
+      enabledBorder: textFormFieldBorder_ui,
+      errorBorder: textFormFieldBorder_ui,
+      disabledBorder: textFormFieldBorder_ui,
+      focusedErrorBorder: textFormFieldBorder_ui,
       labelText: AppLocalizations.t(labelText ?? ''),
       prefixIcon: prefixIcon,
       prefix: prefix,

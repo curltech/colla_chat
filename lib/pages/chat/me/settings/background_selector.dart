@@ -1,6 +1,6 @@
 import 'package:colla_chat/pages/login/background.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///从assets目录下背景图片选择器
 class BackgroundSelector extends StatelessWidget {

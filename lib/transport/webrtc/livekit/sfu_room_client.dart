@@ -14,7 +14,7 @@ import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/widgets/media/audio/audio_session.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:livekit_client/livekit_client.dart' as livekit_client;
 import 'package:synchronized/synchronized.dart';

@@ -10,7 +10,7 @@ import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:colla_chat/widgets/media/video/mediakit_video_player.dart';
 import 'package:colla_chat/widgets/media_editor/pro_video_render.dart';
 import 'package:flutter/foundation.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:pro_video_editor/core/models/video/color_filter_model.dart' as pro;

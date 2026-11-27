@@ -19,7 +19,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 
 ///邮件地址子视图

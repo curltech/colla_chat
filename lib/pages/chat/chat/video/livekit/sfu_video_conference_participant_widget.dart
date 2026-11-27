@@ -8,7 +8,7 @@ import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart' as livekit_client;
 
 ///Sfu会议池的会议的远程参与者列表显示界面

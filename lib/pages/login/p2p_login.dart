@@ -14,7 +14,7 @@ import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
 /// 远程登录页面，一个Scaffold，IndexStack下的远程登录组件，注册组件和配置组件

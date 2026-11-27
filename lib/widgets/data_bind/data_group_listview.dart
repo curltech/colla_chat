@@ -3,7 +3,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class GroupDataListController {
   final Map<DataTile, List<DataTile>> allData = <DataTile, List<DataTile>>{};

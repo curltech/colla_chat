@@ -22,7 +22,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/webview/platform_webview.dart';
 import 'package:enough_mail/highlevel.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 import 'package:mimecon/mimecon.dart';
 

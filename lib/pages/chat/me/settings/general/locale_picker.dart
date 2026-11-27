@@ -3,7 +3,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/locale_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class LocalePicker extends StatelessWidget {
   const LocalePicker({super.key});

@@ -5,7 +5,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 /// FlutterWebView，打开一个内部的浏览器窗口，可以用来观看网页，音频，视频文件，office文件

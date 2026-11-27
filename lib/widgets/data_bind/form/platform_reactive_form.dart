@@ -6,7 +6,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/button_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_data_field.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:reactive_language_picker/reactive_language_picker.dart';
@@ -104,18 +104,6 @@ class PlatformReactiveFormController {
             validators: validators,
           );
           break;
-      }
-
-      var inputType = platformDataField.inputType;
-      if (inputType == InputType.text ||
-          inputType == InputType.password ||
-          inputType == InputType.textarea) {
-        var focusNode = FocusNode();
-        focusNodes[name] = focusNode;
-        KeyboardField action = KeyboardField(
-          focusNode: focusNode, child: null,
-        );
-        actions.add(action);
       }
 
       formControls[name] = formControl;
@@ -498,7 +486,7 @@ class PlatformReactiveForm extends StatelessWidget {
       children: children,
     );
 
-    final KeyboardActions keyboardActions = KeyboardActions(
+    final KeyboardActions keyboardActions = KeyboardActions.done(
         child: SingleChildScrollView(child: widgets));
 
     return [

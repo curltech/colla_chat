@@ -12,7 +12,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_data_field.dart';
 import 'package:colla_chat/widgets/data_bind/form/platform_reactive_form.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 /// 邮件地址手工注册组件，录入框和按钮组合
 class ManualAddWidget extends StatelessWidget with DataTileMixin {

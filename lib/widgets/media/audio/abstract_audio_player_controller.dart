@@ -1,7 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 abstract class AbstractAudioPlayerController
     extends AbstractMediaPlayerController {

@@ -5,7 +5,7 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 /// 一般设置组件，包括颜色，亮度，语言
 class GeneralSettingWidget extends StatelessWidget with DataTileMixin {

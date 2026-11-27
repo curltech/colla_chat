@@ -10,7 +10,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/style/platform_style_widget.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///横屏左边栏，用于指示当前主页面
 class PrimaryNavigation {

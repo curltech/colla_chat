@@ -1,7 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:flex_color_picker/flex_color_picker.dart' as flex;
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 class ColorPicker extends StatelessWidget {
   String label;

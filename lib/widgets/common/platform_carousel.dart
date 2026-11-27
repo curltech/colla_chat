@@ -11,7 +11,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart'
     as flutter_carousel;
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 enum PlatformSwiperDirection { none, left, right, top, bottom }
 

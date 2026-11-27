@@ -37,7 +37,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 import 'package:screenshot_callback/screenshot_callback.dart';
 import 'package:visibility_detector/visibility_detector.dart';

@@ -3,7 +3,7 @@ import 'package:colla_chat/pages/chat/chat/video/single_video_view_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 ///多个小视频窗口的排列
 class VideoViewCard extends StatefulWidget {

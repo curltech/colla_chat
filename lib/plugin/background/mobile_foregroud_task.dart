@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 ///支持android和ios，在单独线程中执行一些前台任务

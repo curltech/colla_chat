@@ -32,7 +32,7 @@ import 'package:colla_chat/tool/network_connectivity.dart';
 import 'package:colla_chat/tool/phone_number_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 

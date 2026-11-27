@@ -3,7 +3,7 @@ import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/platform_carousel.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 
 /// 带有播放列表平台的媒体播放器组件

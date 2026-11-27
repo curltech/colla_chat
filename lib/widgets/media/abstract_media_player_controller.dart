@@ -16,7 +16,7 @@ import 'package:colla_chat/tool/video_util.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 enum MediaPlayerStatus {
   none,
